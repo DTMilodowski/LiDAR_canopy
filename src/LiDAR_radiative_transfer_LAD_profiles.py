@@ -1,6 +1,4 @@
 import numpy as np
-import calculate_LAD_profiles as LiDAR
-from matplotlib import pyplot as plt
 
 # This library contains code to calculate Leaf Area Density (LAD) profiles from LiDAR-
 # derived 3D point cloud data using a model based on radiative tranfer theory.  The 

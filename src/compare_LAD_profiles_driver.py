@@ -26,8 +26,6 @@ minimum_height = 2.
 plot_area = 10.**4
 
 
-
-
 allometry_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Regional/Allometry/Crown_depth_data_SEAsia.csv'
 field_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_carbonplots_FieldMapcensus2016.csv'
 
@@ -37,12 +35,21 @@ a_ht, b_ht, CF_ht, a_A, b_A, CF_A = field.calculate_allometric_equations_from_su
 
 
 # store profiles in dictionaries
-MacArthurHorn_native = {}
-radiative_spherical = {}
-radiative_spherical_1st = {}
-radiative_planophile = {}
-radiative_erectophile = {}
-bottom_up_profiles = {}
+MacArthurHorn_native_LAD = {}
+radiative_spherical_LAD = {}
+radiative_spherical_1st_LAD = {}
+radiative_planophile_LAD = {}
+radiative_erectophile_LAD = {}
+bottom_up_profiles_LAD = {}
+lidar_return_profiles ={}
+
+MacArthurHorn_native_LAI = {}
+radiative_spherical_LAI = {}
+radiative_spherical_1st_LAI = {}
+radiative_planophile_LAI = {}
+radiative_erectophile_LAI = {}
+bottom_up_profiles_LAI = {}
+
 Hemisfer = {}
 
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
@@ -124,36 +131,55 @@ for pp in range(0,N_plots):
 
 
     # store profiles in dictionaries
-    MacArthurHorn_native[Plot_name] = np.sum(subplot_LAD_profiles_native,axis=1)
-    radiative_spherical[Plot_name] = np.sum(subplot_LAD_profiles_spherical[:,:-1],axis=1)
-    radiative_spherical_1st[Plot_name] = np.sum(subplot_LAD_profiles_spherical_1stOnly[:,:-1],axis=1)
-    radiative_planophile[Plot_name] = np.sum(subplot_LAD_profiles_planophile[:,:-1],axis=1)
-    radiative_erectophile[Plot_name] = np.sum(subplot_LAD_profiles_erectophile[:,:-1],axis=1)
+    MacArthurHorn_native_LAI[Plot_name] = np.sum(subplot_LAD_profiles_native,axis=1)
+    radiative_spherical_LAI[Plot_name] = np.sum(subplot_LAD_profiles_spherical[:,:-1],axis=1)
+    radiative_spherical_1st_LAI[Plot_name] = np.sum(subplot_LAD_profiles_spherical_1stOnly[:,:-1],axis=1)
+    radiative_planophile_LAI[Plot_name] = np.sum(subplot_LAD_profiles_planophile[:,:-1],axis=1)
+    radiative_erectophile_LAI[Plot_name] = np.sum(subplot_LAD_profiles_erectophile[:,:-1],axis=1)
     Hemisfer[Plot_name] = subplot_LAI
-    bottom_up_profiles[Plot_name]=LAD_bottom_up
+    bottom_up_profiles_LAI[Plot_name]=LAD_bottom_up
+
+    lidar_return_profiles[Plot_name] = subplot_lidar_profiles
+
+    MacArthurHorn_native_LAD[Plot_name] = subplot_LAD_profiles_native
+    radiative_spherical_LAD[Plot_name] = subplot_LAD_profiles_spherical[:,:-1]
+    radiative_spherical_1st_LAD[Plot_name] = subplot_LAD_profiles_spherical_1stOnly[:,:-1]
+    radiative_planophile_LAD[Plot_name] = subplot_LAD_profiles_planophile[:,:-1]
+    radiative_erectophile_LAD[Plot_name] = subplot_LAD_profiles_erectophile[:,:-1]
+    bottom_up_profiles_LAD[Plot_name]=LAD_bottom_up
+
+
+
+
+# Now get some descriptive stats and make up some plots
+for pp in range(0,N_plots):
+    Plot_name=Plots[pp]
 
     # print some stats to screen
-    Rsq_1 = stats.calculate_r_squared(subplot_LAI,np.sum(subplot_LAD_profiles_native,axis=1))
-    Rsq_2 = stats.calculate_r_squared(subplot_LAI,np.sum(best_k_LAD_profiles,axis=1))
-    Rsq_3 = stats.calculate_r_squared(subplot_LAI,np.sum(subplot_LAD_profiles_spherical[:,:-1],axis=1))
-    Rsq_4 = stats.calculate_r_squared(subplot_LAI,np.sum(subplot_LAD_profiles_planophile[:,:-1],axis=1))
-    Rsq_5 = stats.calculate_r_squared(subplot_LAI,np.sum(subplot_LAD_profiles_erectophile[:,:-1],axis=1))
+    Rsq_1 = stats.calculate_r_squared(subplot_LAI,MacArthurHorn_native_LAI[Plot_name])
+    #Rsq_2 = stats.calculate_r_squared(subplot_LAI,np.sum(best_k_LAD_profiles,axis=1))
+    Rsq_3 = stats.calculate_r_squared(subplot_LAI,radiative_spherical_LAI[Plot_name])
+    Rsq_4 = stats.calculate_r_squared(subplot_LAI,radiative_planophile_LAI[Plot_name])
+    Rsq_5 = stats.calculate_r_squared(subplot_LAI,radiative_erectophile_LAI[Plot_name])
     print "================================================================="
     print Plot_name
     print "\tHemisfer"
     print "\t\tLAI = ", np.mean(subplot_LAI), "+/-", np.std(subplot_LAI)
     print "Mac-Horn native"
-    print "\t\tLAI = ", np.mean(np.sum(subplot_LAD_profiles_native[:,1:],axis=1)), "+/-", np.std(np.sum(subplot_LAD_profiles_native[:,1:],axis=1)), "; R^2 = ", Rsq_1
-    print "Mac-Horn calibrated"
-    print "\t\tLAI = ", np.mean(np.sum(best_k_LAD_profiles[:,1:],axis=1)), "+/-", np.std(np.sum(best_k_LAD_profiles[:,1:],axis=1)), "; R^2 = ", Rsq_2
+    print "\t\tLAI = ", np.mean(MacArthurHorn_native_LAI[Plot_name]), "+/-", np.std(MacArthurHorn_native_LAI[Plot_name]), "; R^2 = ", Rsq_1
+    #print "Mac-Horn calibrated"
+    #print "\t\tLAI = ", np.mean(np.sum(best_k_LAD_profiles[:,1:],axis=1)), "+/-", np.std(np.sum(best_k_LAD_profiles[:,1:],axis=1)), "; R^2 = ", Rsq_2
     print "Radiative transfer - spherical"
-    print "\t\tLAI = ", np.mean(np.sum(subplot_LAD_profiles_spherical[:,:-2],axis=1)), "+/-", np.std(np.sum(subplot_LAD_profiles_spherical[:,:-2],axis=1)), "; R^2 = ", Rsq_3
+    print "\t\tLAI = ", np.mean(radiative_spherical_LAI[Plot_name]), "+/-", np.std(radiative_spherical_LAI[Plot_name]), "; R^2 = ", Rsq_3
     print "Radiative transfer - planophile"
-    print "\t\tLAI = ", np.mean(np.sum(subplot_LAD_profiles_planophile[:,:-2],axis=1)), "+/-", np.std(np.sum(subplot_LAD_profiles_planophile[:,:-2],axis=1)), "; R^2 = ", Rsq_4
+    print "\t\tLAI = ", np.mean(radiative_planophile_LAI[Plot_name]), "+/-", np.std(radiative_planophile_LAI[Plot_name]), "; R^2 = ", Rsq_4
     print "Radiative transfer - erectophile"
-    print "\t\tLAI = ", np.mean(np.sum(subplot_LAD_profiles_erectophile[:,:-2],axis=1)), "+/-", np.std(np.sum(subplot_LAD_profiles_erectophile[:,:-2],axis=1)), "; R^2 = ", Rsq_5
+    print "\t\tLAI = ", np.mean(radiative_erectophile_LAI[Plot_name]), "+/-", np.std(radiative_erectophile_LAI[Plot_name]), "; R^2 = ", Rsq_5
     print "================================================================="
 
+
+for pp in range(0,N_plots):
+    Plot_name=Plots[pp]
     plt.figure(1, facecolor='White',figsize=[12,6])
     ax1 = plt.subplot2grid((2,4),(0,0))
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -167,8 +193,8 @@ for pp in range(0,N_plots):
     ax2 = plt.subplot2grid((2,4),(0,1),rowspan=2)
     ax2.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,n_subplots):
-        ax2.plot(subplot_lidar_profiles[i,:]/1000.,heights,'-',c='k',alpha=0.2,linewidth=1)
-    ax2.plot(np.mean(subplot_lidar_profiles,axis=0)/1000.,heights,'-',c='k',linewidth=1)
+        ax2.plot(lidar_return_profiles[Plot_name][i,:]/1000.,heights,'-',c='k',alpha=0.2,linewidth=1)
+    ax2.plot(np.mean(lidar_return_profiles[Plot_name],axis=0)/1000.,heights,'-',c='k',linewidth=1)
     ax2.set_ylim(0,80)
     ax2.set_ylabel('Height / m')
     ax2.set_xlabel('Number of returns (x1000)')
@@ -176,9 +202,8 @@ for pp in range(0,N_plots):
     ax3 = plt.subplot2grid((2,4),(1,0))
     ax3.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10) 
     ax3.plot([0,10],[0,10],'-',color='0.5')
-    ax3.plot(subplot_LAI,np.sum(subplot_LAD_profiles_native,axis=1),'.',c='k',label = 'Mac-Horn$_{native}$')
-    ax3.plot(subplot_LAI,np.sum(best_k_LAD_profiles,axis=1),'.',c='b',label = 'Mac-Horn$_{calibrated}$')
-    ax3.plot(subplot_LAI,np.sum(subplot_LAD_profiles_spherical[:,:-1],axis=1),'.',c='r',label = 'Radiative Transfer')
+    ax3.plot(subplot_LAI,MacArthurHorn_native_LAI[Plot_name],'.',c='b',label = 'Mac-Horn')
+    ax3.plot(subplot_LAI,radiative_spherical_LAI[Plot_name],'.',c='r',label = 'Radiative Transfer')
     ax3.set_ylim(0,10)
     ax3.set_xlim(0,10)
     ax3.set_xlabel('LAI$_{Hemisfer}$')
@@ -189,8 +214,8 @@ for pp in range(0,N_plots):
     ax4 = plt.subplot2grid((2,4),(0,2),rowspan=2)
     ax4.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,n_subplots):
-        ax4.plot(best_k_LAD_profiles[i,:],heights,'-',c='b',alpha=0.2,linewidth=1)
-    ax4.plot(np.mean(best_k_LAD_profiles,axis=0),heights,'-',c='k',linewidth=1)
+        ax4.plot(MacArthurHorn_native_LAD[Plot_name][i,:],heights,'-',c='b',alpha=0.2,linewidth=1)
+    ax4.plot(np.mean(MacArthurHorn_native_LAD[Plot_name],axis=0),heights,'-',c='k',linewidth=1)
     ax4.set_ylim(0,80)
     ax4.set_ylabel('Height / m')
     ax4.set_xlabel('LAD$_{MacArthur-Horn}$ / m$^2$m$^{-1}$')
@@ -199,8 +224,8 @@ for pp in range(0,N_plots):
     ax5.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax5.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10) 
     for i in range(0,n_subplots):
-        ax5.plot(subplot_LAD_profiles_spherical[i,:-1],np.max(heights_rad)-heights_rad[:-1],'-',c='r',alpha=0.2,linewidth=1)
-    ax5.plot(np.mean(subplot_LAD_profiles_spherical[:,:-1],axis=0),np.max(heights_rad)-heights_rad[:-1],'-',c='k',linewidth=1)
+        ax5.plot(radiative_spherical_LAD[Plot_name][i,:],np.max(heights)-heights+1,'-',c='r',alpha=0.2,linewidth=1) #np.max(heights_rad)-heights_rad[:-1]
+    ax5.plot(np.mean(radiative_spherical_LAD[Plot_name],axis=0),np.max(heights)-heights+1,'-',c='k',linewidth=1)
     ax5.set_ylim(0,80)
     ax5.set_ylabel('Height / m')
     ax5.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
@@ -211,64 +236,56 @@ for pp in range(0,N_plots):
     plt.savefig(Plot_name+'_LAD_profile.png')
 
 
-    plt.figure(2, facecolor='White',figsize=[3,3])
-    Rsq = stats.calculate_r_squared(np.sum(best_k_LAD_profiles,axis=1),np.sum(subplot_LAD_profiles_spherical[:,:-1],axis=1))
-    ax6 = plt.subplot2grid((1,1),(0,0))
-    ax6.annotate('R$^2$='+'%.3f' % Rsq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=10)
-    ax6.plot([0,10],[0,10],'-',color='0.5')
-    ax6.plot(np.sum(best_k_LAD_profiles,axis=1),np.sum(subplot_LAD_profiles_spherical[:,:-1],axis=1),'.k')
-    ax6.set_ylim(0,10)
-    ax6.set_xlim(0,10)
-    ax6.set_ylabel('LAI$_{rad}$')
-    ax6.set_xlabel('LAI$_{MacArthur-Horn}$')
 
-    plt.tight_layout()
-    plt.savefig(Plot_name+'_LAI_lidar_comparison.png')
-
-    #plt.show()
-
+for pp in range(0,N_plots):
+    Plot_name=Plots[pp]
     plt.figure(3, facecolor='White',figsize=[10,6.5])
-    plt.title(Plot_name)
+    #plt.title(Plot_name)
+    # lidar
     ax31 = plt.subplot2grid((1,4),(0,0))
     ax31.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,n_subplots):
-        ax31.plot(subplot_lidar_profiles[i,:]/1000.,heights,'-',c='k',alpha=0.2,linewidth=1)
-    ax31.plot(np.mean(subplot_lidar_profiles,axis=0)/1000.,heights,'-',c='k',linewidth=1)
+        ax31.plot(lidar_return_profiles[Plot_name][i,:]/1000.,heights,'-',c='k',alpha=0.2,linewidth=1)
+    ax31.plot(np.mean(lidar_return_profiles[Plot_name],axis=0)/1000.,heights,'-',c='k',linewidth=1)
     ax31.set_ylim(0,80)
     ax31.set_ylabel('Height / m')
     ax31.set_xlabel('Number of returns (x1000)')
-
+    #Mac-Horn
     ax32 = plt.subplot2grid((1,4),(0,1))
     ax32.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,n_subplots):
-        ax32.plot(subplot_LAD_profiles_native[i,:],heights,'-',c='b',alpha=0.2,linewidth=1)
-    ax32.plot(np.mean(subplot_LAD_profiles_native,axis=0),heights,'-',c='k',linewidth=1)
+        ax32.plot(MacArthurHorn_native_LAD[Plot_name][i,:],heights,'-',c='b',alpha=0.2,linewidth=1)
+    ax32.plot(np.mean(MacArthurHorn_native_LAD[Plot_name],axis=0),heights,'-',c='k',linewidth=1)
     ax32.set_ylim(0,80)
-    ax32.set_ylabel('Height / m')
+    #ax32.set_ylabel('Height / m')
     ax32.set_xlabel('LAD$_{MacArthur-Horn}$ / m$^2$m$^{-1}$')
-
+    #Radiative Transfer
     ax33 = plt.subplot2grid((1,4),(0,2),sharex=ax32)
     ax33.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,n_subplots):
-        ax33.plot(subplot_LAD_profiles_spherical[i,:-1],np.max(heights_rad)-heights_rad[:-1],'-',c='r',alpha=0.2,linewidth=1)
-    ax33.plot(np.mean(subplot_LAD_profiles_spherical[:,:-1],axis=0),np.max(heights_rad)-heights_rad[:-1],'-',c='k',linewidth=1)
+        ax33.plot(radiative_spherical_LAD[Plot_name][i,:],np.max(heights)-heights+1,'-',c='r',alpha=0.2,linewidth=1)
+    ax33.plot(np.mean(radiative_spherical_LAD[Plot_name],axis=0),np.max(heights)-heights+1,'-',c='k',linewidth=1)
     ax33.set_ylim(0,80)
-    ax33.set_ylabel('Height / m')
+    #ax33.set_ylabel('Height / m')
     ax33.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
-
-    ax34 = plt.subplot2grid((1,4),(0,3))
+    #field inventory
+    ax34 = plt.subplot2grid((1,4),(0,3),sharex=ax32)
     ax34.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    ax34.plot(LAD_bottom_up,canopy_layers,'-',c='k',linewidth=1)
+    ax34.plot(bottom_up_profiles_LAD[Plot_name],heights,'-',c='k',linewidth=1)
     ax34.set_ylim(0,80)
-    ax34.set_ylabel('Height / m')
+    #ax34.set_ylabel('Height / m')
     ax34.set_xlabel('Canopy Volume / m$^3$m$^{-2}$')
 
-    #ax33.set_xlim(xmax=1.2)
+    ax32.set_xlim(xmax=0.7)
+    ax31.set_xlim(xmax=3*np.mean(lidar_return_profiles[Plot_name],axis=0).max()/1000)
+
+    ax31.locator_params(axis='x',nbins=5)
+    ax32.locator_params(axis='x',nbins=5)
 
     
     plt.tight_layout()
     plt.savefig(Plot_name+'_LAD_profile_all_methods.png')
-    #plt.show()
+    plt.show()
 
 
 plt.figure(4, facecolor='White',figsize=[9,3])

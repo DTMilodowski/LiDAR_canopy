@@ -1,9 +1,12 @@
 import numpy as np
 import sys
 from matplotlib import pyplot as plt
-import calculate_LAD_profiles as LiDAR
-import calculate_LAD_profiles_radiative_transfer as LiDAR2
-import bottom_up_LAD_profiles as field
+import LiDAR_tools as lidar
+import auxilliary_functions as aux
+import LiDAR_MacHorn_LAD_profiles as LAD1
+import LiDAR_radiative_transfer_LAD_profiles as LAD2
+import inventory_based_LAD_profiles as field
+
 
 sys.path.append('/home/dmilodow/DataStore_DTM/BALI/MetDataProcessing/UtilityTools/')
 import statistics_tools as stats
@@ -42,18 +45,18 @@ radiative_erectophile = {}
 bottom_up_profiles = {}
 Hemisfer = {}
 
-subplot_polygons, subplot_labels = LiDAR.load_boundaries(subplot_coordinate_file)
+subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
 
-field_LAI = LiDAR.load_field_LAI(LAI_file)
-all_pts = LiDAR.load_lidar_data(las_file)
+field_LAI = aux.load_field_LAI(LAI_file)
+all_pts = lidar.load_lidar_data(las_file)
 
 for pp in range(0,N_plots):
     Plot_name=Plots[pp]
     n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
     coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
-    bbox_polygon = LiDAR.get_bounding_box(coord_pairs)
+    bbox_polygon = aux.get_bounding_box(coord_pairs)
 
-    lidar_pts = LiDAR.filter_lidar_data_by_polygon(all_pts,bbox_polygon)
+    lidar_pts = lidar.filter_lidar_data_by_polygon(all_pts,bbox_polygon)
 
     n_subplots = subplot_polygons[Plot_name].shape[0]
     subplot_lidar_profiles = np.zeros((n_subplots,n_layers))
@@ -69,23 +72,23 @@ for pp in range(0,N_plots):
 
     for i in range(0,n_subplots):
         print "Subplot: ", subplot_labels[Plot_name][i]
-        sp_pts = LiDAR.filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name][i,:,:])
+        sp_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name][i,:,:])
         #print sp_pts[sp_pts[:,3]==1].shape[0]/20./20.
-        heights,subplot_lidar_profiles[i,:],n_ground_returns[i] = LiDAR.bin_returns(sp_pts, max_height, layer_thickness)
+        heights,subplot_lidar_profiles[i,:],n_ground_returns[i] = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
         subplot_LAI[i] = field_LAI['LAI'][np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)]
 
-        subplot_LAD_profiles_native[i,:] = LiDAR.estimate_LAD_MacArtherHorn(subplot_lidar_profiles[i,:],n_ground_returns[i],layer_thickness,1.)
+        subplot_LAD_profiles_native[i,:] = LAD1.estimate_LAD_MacArtherHorn(subplot_lidar_profiles[i,:],n_ground_returns[i],layer_thickness,1.)
 
-        u,n,I,U = LiDAR2.calculate_LAD(sp_pts,heights_rad,1,'spherical')
+        u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,1,'spherical')
         subplot_LAD_profiles_spherical_1stOnly[i,:]=u.copy()
 
-        u,n,I,U = LiDAR2.calculate_LAD(sp_pts,heights_rad,max_return,'spherical')
+        u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_return,'spherical')
         subplot_LAD_profiles_spherical[i,:]=u.copy()
 
-        u,n,I,U = LiDAR2.calculate_LAD(sp_pts,heights_rad,max_return,'planophile',n)
+        u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_return,'planophile',n)
         subplot_LAD_profiles_planophile[i,:]=u.copy()
 
-        u,n,I,U = LiDAR2.calculate_LAD(sp_pts,heights_rad,max_return,'erectophile',n)
+        u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_return,'erectophile',n)
         subplot_LAD_profiles_erectophile[i,:]=u.copy()
         
     subplot_LAD_profiles_spherical[np.isnan(subplot_LAD_profiles_spherical)]=0
@@ -95,7 +98,7 @@ for pp in range(0,N_plots):
     kmin = 0.20
     kmax = 5.
     kinc = 0.005
-    misfit, ks, best_k_LAD_profiles, best_k = LiDAR.minimise_misfit_for_k(kmin,kmax,kinc,subplot_LAI,subplot_lidar_profiles,n_ground_returns,layer_thickness, minimum_height)
+    misfit, ks, best_k_LAD_profiles, best_k = LAD1.minimise_misfit_for_k(kmin,kmax,kinc,subplot_LAI,subplot_lidar_profiles,n_ground_returns,layer_thickness, minimum_height)
 
 
     # field based "bottom-up" estimates of LAD

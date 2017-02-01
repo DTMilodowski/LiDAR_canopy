@@ -1,12 +1,18 @@
 import numpy as np
 
+###################################################################################
+# This set of functions provides some auxilliary tools needed for some of the
+# LAD profiles analysis
+# @author DTMilodowski
+###################################################################################
+
+
 # Load spreadsheet of LAI derived from hemispherical photographs (courtesy of Terhi Riutta at Oxford).  LAI estimated using Hemisfer.
 def load_field_LAI(LAI_file):
     datatype = {'names': ('ForestType','Plot', 'Subplot', 'LAI'), 'formats': ('S32','S32','i8','f16')}
     hemisfer_LAI = np.genfromtxt(LAI_file, skiprows = 1, delimiter = ',',dtype=datatype)
 
     return hemisfer_LAI
-
 
 # This function loads the subplot coordinates from a csv file.  File columns should be as follows:
 # Plot Subplot 'X0', 'Y0', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3'

@@ -1,6 +1,7 @@
 import numpy as np
 import laspy as las
-import LiDAR_tools as LiDAR
+import LiDAR_tools as lidar
+import auxilliary_functions as aux
 
 # bin lidar returns 
 def bin_returns(pts, max_height, layer_thickness):
@@ -80,9 +81,9 @@ def minimise_misfit_for_k(kmin,kmax,k_interval,subplot_LAIs,subplot_lidar_profil
 
 
 def calculate_bestfit_LAD_profile(subplot_coordinate_file,LAI_file,las_file,Plot_name,minimum_height=0):
-    subplot_polygons, subplot_labels = load_boundaries(subplot_coordinate_file)
-    field_LAI = load_field_LAI(LAI_file)
-    lidar_pts = load_lidar_data(las_file)
+    subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
+    field_LAI = aux.load_field_LAI(LAI_file)
+    lidar_pts = lidar.load_lidar_data(las_file)
     
     n_subplots = subplot_polygons[Plot_name].shape[0]
     max_height = 80
@@ -94,7 +95,7 @@ def calculate_bestfit_LAD_profile(subplot_coordinate_file,LAI_file,las_file,Plot
 
     for i in range(0,n_subplots):
         print "Subplot: ", subplot_labels[Plot_name][i]
-        sp_pts = filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name][i,:,:])
+        sp_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name][i,:,:])
         heights,subplot_lidar_profiles[i,:],n_ground_returns[i] = bin_returns(sp_pts, max_height, layer_thickness)
         subplot_LAI[i] = field_LAI['LAI'][np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)]
         

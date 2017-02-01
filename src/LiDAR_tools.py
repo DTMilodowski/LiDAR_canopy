@@ -46,54 +46,6 @@ def points_in_poly(x,y,poly):
     return x[inside],y[inside], inside
         
 
-
-# This function loads the subplot coordinates from a csv file.  File columns should be as follows:
-# Plot Subplot 'X0', 'Y0', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3'
-def load_boundaries(coordinate_list):
-    
-    datatype = {'names': ('Plot', 'Subplot', 'X0', 'Y0', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3'), 'formats': ('S32','i8','f16','f16','f16','f16','f16','f16','f16','f16')}
-    coords = np.genfromtxt(coordinate_list, skiprows = 1, delimiter = ',',dtype=datatype)
-    plot_name=np.unique(coords['Plot'])
-    coordinate_dict = {}
-    subplot_dict = {}
-    for pp in range(0,plot_name.size):
-        n_subplots = np.sum(coords['Plot']==plot_name[pp])
-        subplot_polygons = np.zeros((n_subplots,5,2))
-        subplot_list = np.zeros(n_subplots)
-        for i in range(0,n_subplots):
-            subplot_polygons[i,0,0]=coords['X0'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,0,1]=coords['Y0'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,1,0]=coords['X1'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,1,1]=coords['Y1'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,2,0]=coords['X2'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,2,1]=coords['Y2'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,3,0]=coords['X3'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,3,1]=coords['Y3'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,4,0]=coords['X0'][coords['Plot']==plot_name[pp]][i]
-            subplot_polygons[i,4,1]=coords['Y0'][coords['Plot']==plot_name[pp]][i]
-            subplot_list[i]=coords['Subplot'][coords['Plot']==plot_name[pp]][i]
-        coordinate_dict[plot_name[pp]]=subplot_polygons.copy()
-        subplot_dict[plot_name[pp]]=subplot_list.copy()
-    return coordinate_dict, subplot_dict
-
-# get bounding box for list of coordinates
-def get_bounding_box(coordinate_list):
-    N = coordinate_list.shape[0]
-    bbox = np.zeros((4,2))
-    top = coordinate_list[:,1].max()
-    bottom = coordinate_list[:,1].min()
-    left = coordinate_list[:,0].min()
-    right = coordinate_list[:,0].max()
-    bbox[0,0]=left
-    bbox[0,1]=top
-    bbox[1,0]=right
-    bbox[1,1]=top
-    bbox[2,0]=right
-    bbox[2,1]=bottom
-    bbox[3,0]=left
-    bbox[3,1]=bottom
-    return bbox
-
 # Load lidar data => x,y,z,return,class
 def load_lidar_data(las_file):#,subplot_coords,max_height,bin_width):
     lasFile = las.file.File(las_file,mode='r')
@@ -107,5 +59,49 @@ def load_lidar_data(las_file):#,subplot_coords,max_height,bin_width):
 def filter_lidar_data_by_polygon(in_pts,polygon):
     x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
     pts = in_pts[inside,:]
+    return pts
+
+
+# get bounding box from las file
+def get_lasfile_bbox(las_file):
+    lasFile = las.file.File(las_file,mode='r')
+    max_xyz = lasFile.header.max
+    min_xyz = lasFile.header.min
+    UR = np.asarray[max_xyz[0],max_xyz[1]]
+    LR = np.asarray[max_xyz[0],min_xyz[1]]
+    UL = np.asarray[min_xyz[0],max_xyz[1]]
+    LL = np.asarray[min_xyz[0],min_xyz[1]]
+    
+    return UR, LR, UL, LL
+
+# find all las files from a list that are located within a specified polygon
+def find_las_files_by_polygon(file_list,polygon):
+    las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
+    keep = []
+    n_files = las_files.size
+    for i in range(0,n_files):
+        UR, LR, UL, LL = get_lasfile_bbox(las_files[i])
+        in_pts = np.asarray(UR,LR,UL,LL)
+        x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
+        if inside.sum()>0:
+            keep.append(las_files[i])
+    print keep
+    return keep
+
+# load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.
+def load_lidar_data_by_polygon(file_list,polygon):
+    keep_files = find_las_files_by_polygon(file_list,polygon)
+    n_files = len(keep_files)
+    if n_files == 0:
+        print 'WARNING: No files within specified polygon - try again'
+    else:
+        tile_pts = load_lidar_data(keep_files[0])
+        pts = filter_lidar_data_by_polygon(tile_pts,polygon)
+        for i in range(1,n_files):
+            tile_pts = load_lidar_data(keep_files[i])
+            tile_pts_filt = filter_lidar_data_by_polygon(tile_pts,polygon)
+            pts = np.concatenate(pts,tile_pts_filt,axis=0)
+
+    print "loaded ", pts[:,0].size, " points"
     return pts
 

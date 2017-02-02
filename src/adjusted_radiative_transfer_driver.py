@@ -69,7 +69,7 @@ for pp in range(0,N_plots):
     subplot_LAD_profiles_spherical_adjusted[:,mask]=0
 
     # store profiles in dictionaries
-    lidar_return_profiles[Plot_name] = subplot_lidar_profiles
+    lidar_profiles[Plot_name] = subplot_lidar_profiles
     radiative_spherical_LAD[Plot_name] = subplot_LAD_profiles_spherical[:,:-1]
     radiative_spherical_adjusted_LAD[Plot_name] = subplot_LAD_profiles_spherical_adjusted[:,:-1]
 

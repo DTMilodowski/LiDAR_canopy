@@ -162,7 +162,6 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
     S  = th.size
     K  = int(R.max())
 
-
     # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
     # and return number
     print "\tCalculating return matrix"
@@ -184,6 +183,6 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
         CF[i]=N_veg_kprev/N_k
         n[:,:,i]/=np.product(CF[:k])
 
-    calculate_LAD(pts,zi,max_k,tl,n)
+    u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n)
     
     return u,n,I,U

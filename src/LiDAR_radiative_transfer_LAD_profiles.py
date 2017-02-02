@@ -140,6 +140,11 @@ def Gfunction(LAD,ze,zi):
     return G
 
     
-
+#----------------------------------------------------------------------------------
+# This function is an adapted version of Detto et al. (2015)'s radiative transfer
+# model.  In this version, however, I account for the variable attenuation of lidar
+# returns in the canopy: not every return reaches the ground and therefore there is
+# "missing information" from the LiDAR returns, especially within the lower canopy
+# that manifests itself as a negative bias in leaf area lower in the canopy.
 
 

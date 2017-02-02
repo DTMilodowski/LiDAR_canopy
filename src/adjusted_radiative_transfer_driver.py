@@ -8,7 +8,7 @@ import LiDAR_radiative_transfer_LAD_profiles as LAD2
 
 las_file = 'Carbon_plot_point_cloud_buffer.las'
 subplot_coordinate_file = 'BALI_subplot_coordinates_corrected.csv'
-Plots = ['LF']#,'E','Belian','Seraya','B North','B South','DC1','DC2']
+Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
 N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
@@ -53,10 +53,11 @@ for pp in range(0,N_plots):
         subplot_LAD_profiles_spherical[i,:]=u.copy()
 
         #derive correction factor for number of second returns
-        #N_1veg = np.all((sp_pts[:,3]==1,sp_pts[:,4]==1),axis=0).sum()
-        #N_2 = (sp_pts[:,3]==2).sum()
+        #N_1veg = float(np.all((sp_pts[:,3]==1,sp_pts[:,4]==1),axis=0).sum())
+        #N_2 = float((sp_pts[:,3]==2).sum())
         #n[:,:,1]*=N_1veg/N_2
         u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_return,'spherical')
+        u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_return,'spherical',n)
         subplot_LAD_profiles_spherical_adjusted[i,:]=u.copy()
 
     subplot_LAD_profiles_spherical[np.isnan(subplot_LAD_profiles_spherical)]=0
@@ -112,7 +113,7 @@ for pp in range(0,N_plots):
     ax31.locator_params(axis='x',nbins=5)
     ax32.locator_params(axis='x',nbins=5)
 
-    
+    print np.mean(radiative_spherical_adjusted_LAD[Plot_name],axis=0).sum()
     plt.tight_layout()
     plt.savefig(Plot_name+'_LAD_radiative_comparison.png')
     plt.show()

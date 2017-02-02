@@ -31,8 +31,8 @@ import numpy as np
 def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     print "Calculating LAD using radiative tranfer model"
     # first unpack pts
-    keep = np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
-    #keep = pts[:,3]<=max_k
+    #keep = np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
+    keep = pts[:,3]<=max_k
     z0 = np.max(zi) - pts[keep,2]
     R  = pts[keep,3]
     A  = np.abs(pts[keep,5])

@@ -81,8 +81,8 @@ for pp in range(0,N_plots):
     ax31 = plt.subplot2grid((1,3),(0,0))
     ax31.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,n_subplots):
-        ax31.plot(lidar_return_profiles[Plot_name][i,:]/1000.,heights,'-',c='k',alpha=0.2,linewidth=1)
-    ax31.plot(np.mean(lidar_return_profiles[Plot_name],axis=0)/1000.,heights,'-',c='k',linewidth=1)
+        ax31.plot(lidar_profiles[Plot_name][i,:]/1000.,heights,'-',c='k',alpha=0.2,linewidth=1)
+    ax31.plot(np.mean(lidar_profiles[Plot_name],axis=0)/1000.,heights,'-',c='k',linewidth=1)
     ax31.set_ylim(0,80)
     ax31.set_ylabel('Height / m')
     ax31.set_xlabel('Number of returns (x1000)')
@@ -100,14 +100,14 @@ for pp in range(0,N_plots):
     ax33 = plt.subplot2grid((1,3),(0,2),sharex=ax32)
     ax33.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,n_subplots):
-        ax33.plot(radiative_spherical_LAD_adjusted[Plot_name][i,:],np.max(heights)-heights+1,'-',c='r',alpha=0.2,linewidth=1)
-    ax33.plot(np.mean(radiative_spherical_LAD_adjusted[Plot_name],axis=0),np.max(heights)-heights+1,'-',c='k',linewidth=1)
+        ax33.plot(radiative_spherical_adjusted_LAD[Plot_name][i,:],np.max(heights)-heights+1,'-',c='r',alpha=0.2,linewidth=1)
+    ax33.plot(np.mean(radiative_spherical_adjusted_LAD[Plot_name],axis=0),np.max(heights)-heights+1,'-',c='k',linewidth=1)
     ax33.set_ylim(0,80)
     ax33.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
     
 
     ax32.set_xlim(xmax=0.7)
-    ax31.set_xlim(xmax=3*np.mean(lidar_return_profiles[Plot_name],axis=0).max()/1000)
+    ax31.set_xlim(xmax=3*np.mean(lidar_profiles[Plot_name],axis=0).max()/1000)
 
     ax31.locator_params(axis='x',nbins=5)
     ax32.locator_params(axis='x',nbins=5)

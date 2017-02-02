@@ -45,8 +45,8 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
 
     # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
     # and return number
-    print "\tCalculating return matrix"
     if n.size == 0:
+        print "\tCalculating return matrix"
         n = np.zeros((M,S,K))
         for i in range(0,M):
             use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
@@ -151,7 +151,7 @@ def Gfunction(LAD,ze,zi):
 def calculate_LAD_DTM(pts,zi,max_k,tl):
     print "Calculating LAD using radiative tranfer model"
     # first unpack pts
-    keep = np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
+    keep = pts[:,3]<=max_k#np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
     z0 = np.max(zi) - pts[keep,2]
     R  = pts[keep,3]
     A  = np.abs(pts[keep,5])
@@ -174,13 +174,14 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
                 n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
     #derive correction factor for different return numbers
-    CF = np.zeros(max_k)
+    CF = np.zeros(K)
     CF[0]=1.
-    for i in range(1,max_k):
+    for i in range(1,K):
         k = i+1
-        N_veg_kprev = np.all((pts[:,3]==k-1,pts[:,4]==1),axis=0).sum()
-        N_k = (pts[:,3]==k).sum()
-        CF[i]=N_veg_kprev/N_k
+        N_veg_kprev = float(np.all((pts[:,3]==k-1,pts[:,4]==1),axis=0).sum())
+        N_k = float((pts[:,3]==k).sum())
+        CF[i]=N_k/N_veg_kprev
+        print CF[i],np.product(CF[:k]),np.sum(n[:,:,i]),np.sum(n[:,:,i]/np.product(CF[:k]))
         n[:,:,i]/=np.product(CF[:k])
 
     u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n)

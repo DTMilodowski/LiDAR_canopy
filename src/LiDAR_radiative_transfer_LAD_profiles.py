@@ -147,4 +147,30 @@ def Gfunction(LAD,ze,zi):
 # "missing information" from the LiDAR returns, especially within the lower canopy
 # that manifests itself as a negative bias in leaf area lower in the canopy.
 
+def calculate_LAD_DTM(pts,zi,max_k,tl):
+    print "Calculating LAD using radiative tranfer model"
+    # first unpack pts
+    keep = np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
+    z0 = np.max(zi) - pts[keep,2]
+    R  = pts[keep,3]
+    A  = np.abs(pts[keep,5])
+    # define other variables
+    dz = np.abs(zi[0]-zi[1])
+    M  = zi.size
+    th = np.unique(A)
+    S  = th.size
+    K  = int(R.max())
 
+    # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
+    # and return number
+    print "\tCalculating return matrix"
+    if n.size == 0:
+        n = np.zeros((M,S,K))
+        for i in range(0,M):
+            use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
+            for j in range(0,S):
+                use2 = A[use1]==th[j]
+                for k in range(0,K):
+                    n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
+
+    calculate_LAD(pts,zi,max_k,tl,n

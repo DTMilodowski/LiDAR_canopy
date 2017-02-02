@@ -29,7 +29,7 @@ import numpy as np
 # U   :: matrix (dimensions MxSxK) probability for leaf at depth zi to be the kth contact
 #        along the beam path
 def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
-    print "Calculating LAD using radiative tranfer model"
+    #print "Calculating LAD using radiative tranfer model"
     # first unpack pts
     #keep = np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
     keep = pts[:,3]<=max_k
@@ -46,7 +46,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
     # and return number
     if n.size == 0:
-        print "\tCalculating return matrix"
+        #print "\tCalculating return matrix"
         n = np.zeros((M,S,K))
         for i in range(0,M):
             use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
@@ -56,7 +56,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
     # calculate penetration functions for each scan angle
-    print "\tCalculating penetration functions"
+    #print "\tCalculating penetration functions"
     I = np.zeros((M,S,K))
     U = np.zeros((M,S,K))
     G = np.zeros((M,S))
@@ -76,7 +76,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         G[:,i]=Gfunction(tl,th[i],zi)
 
     # Compute LAD from ensemble across scan angles
-    print "\tComputing LAD from ensemble across scan angles"
+    #print "\tComputing LAD from ensemble across scan angles"
     p = np.sum(n[:,:,0],axis=1)
     p_indices = np.arange(p.size)
     jj = p_indices[p>0][0]-1
@@ -104,7 +104,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     beta = np.interp(beta_indices,use,beta[use]) 
     beta[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
     # numerical solution
-    print "\tNumerical solution"
+    #print "\tNumerical solution"
     u = np.zeros(M)
     for i in range(jj,M): # check indexing here
         # Eq 6
@@ -149,9 +149,10 @@ def Gfunction(LAD,ze,zi):
 # that manifests itself as a negative bias in leaf area lower in the canopy.
 
 def calculate_LAD_DTM(pts,zi,max_k,tl):
-    print "Calculating LAD using radiative tranfer model"
+    #print "Calculating LAD using radiative tranfer model"
     # first unpack pts
-    keep = pts[:,3]<=max_k#np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
+    keep = pts[:,3]<=max_k
+    #keep = np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
     z0 = np.max(zi) - pts[keep,2]
     R  = pts[keep,3]
     A  = np.abs(pts[keep,5])
@@ -164,7 +165,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
 
     # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
     # and return number
-    print "\tCalculating return matrix"
+    #print "\tCalculating return matrix"
     n = np.zeros((M,S,K))
     for i in range(0,M):
         use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
@@ -180,9 +181,8 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
         k = i+1
         N_veg_kprev = float(np.all((pts[:,3]==k-1,pts[:,4]==1),axis=0).sum())
         N_k = float((pts[:,3]==k).sum())
-        CF[i]=N_k/N_veg_kprev
-        print CF[i],np.product(CF[:k]),np.sum(n[:,:,i]),np.sum(n[:,:,i]/np.product(CF[:k]))
-        n[:,:,i]/=np.product(CF[:k])
+        CF[i]=N_veg_kprev/N_k
+        n[:,:,i]*=np.product(CF[:k])
 
     u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n)
     

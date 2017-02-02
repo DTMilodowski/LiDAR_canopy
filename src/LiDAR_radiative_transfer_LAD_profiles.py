@@ -179,9 +179,11 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
     CF[0]=1.
     for i in range(1,max_k):
         k = i+1
-        N_veg_kprev = np.all((pts[:,3]==k-1,sp_pts[:,4]==1),axis=0).sum()
+        N_veg_kprev = np.all((pts[:,3]==k-1,pts[:,4]==1),axis=0).sum()
         N_k = (sp_pts[:,3]==k).sum()
         CF[i]=N_veg_kprev/N_k
         n[:,:,i]/=np.product(CF[:k])
 
     calculate_LAD(pts,zi,max_k,tl,n)
+    
+    return u,n,I,U

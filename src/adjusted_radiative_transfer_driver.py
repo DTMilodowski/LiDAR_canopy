@@ -77,7 +77,7 @@ for pp in range(0,N_plots):
 for pp in range(0,N_plots):
     Plot_name=Plots[pp]
     plt.figure(3, facecolor='White',figsize=[10,6.5])
-    #plt.title(Plot_name)
+    ##plt.title(Plot_name)
     # lidar
     ax31 = plt.subplot2grid((1,3),(0,0))
     ax31.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)

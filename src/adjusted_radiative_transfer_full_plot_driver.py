@@ -29,41 +29,29 @@ all_pts = lidar.load_lidar_data(las_file)
 
 for pp in range(0,N_plots):
     Plot_name=Plots[pp]
-    #n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
-    #coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
-    #bbox_polygon = aux.get_bounding_box(coord_pairs)
     bbox_polygon = subplot_polygons[Plot_name] 
     print Plot_name
     print bbox_polygon
     lidar_pts = lidar.filter_lidar_data_by_polygon(all_pts,bbox_polygon)
 
-    #n_subplots = subplot_polygons[Plot_name].shape[0]
-    subplot_lidar_profiles = np.zeros((n_subplots,n_layers))
-    subplot_LAD_profiles_spherical = np.zeros((n_subplots,n_layers+1))
-    subplot_LAD_profiles_spherical_adjusted = np.zeros((n_subplots,n_layers+1))
-    n_ground_returns = np.zeros(n_subplots)
-
+    lidar_profiles = np.zeros(n_layers)
+    LAD_profiles_spherical = np.zeros(n_layers+1)
+    LAD_profiles_spherical_adjusted = np.zeros(n_layers+1)
     heights_rad = np.arange(0,max_height+1)
 
-    for i in range(0,n_subplots):
-        #print "Subplot: ", subplot_labels[Plot_name][i]
-        #sp_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name][i,:,:])
-        sp_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name])
-        heights,subplot_lidar_profiles[i,:],n_ground_returns[i] = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
+    heights,lidar_profiles,n_ground_returns = LAD1.bin_returns(lidar_pts, max_height, layer_thickness)
+    u,n,I,U = LAD2.calculate_LAD(lidar_pts,heights_rad,max_return,'spherical')
+    LAD_profiles_spherical=u.copy()
 
-        u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_return,'spherical')
-        subplot_LAD_profiles_spherical[i,:]=u.copy()
+    #derive correction factor for number of second returns
+    #N_1veg = float(np.all((sp_pts[:,3]==1,sp_pts[:,4]==1),axis=0).sum())
+    #N_2 = float((sp_pts[:,3]==2).sum())
+    #n[:,:,1]*=N_1veg/N_2
+    u,n,I,U = LAD2.calculate_LAD_DTM(lidar_pts,heights_rad,max_return,'spherical')
+    LAD_profiles_spherical_adjusted=u.copy()
 
-        #derive correction factor for number of second returns
-        #N_1veg = float(np.all((sp_pts[:,3]==1,sp_pts[:,4]==1),axis=0).sum())
-        #N_2 = float((sp_pts[:,3]==2).sum())
-        #n[:,:,1]*=N_1veg/N_2
-        u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_return,'spherical')
-        #u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_return,'spherical',n)
-        subplot_LAD_profiles_spherical_adjusted[i,:]=u.copy()
-
-    subplot_LAD_profiles_spherical[np.isnan(subplot_LAD_profiles_spherical)]=0
-    subplot_LAD_profiles_spherical_adjusted[np.isnan(subplot_LAD_profiles_spherical_adjusted)]=0
+    LAD_profiles_spherical[np.isnan(LAD_profiles_spherical)]=0
+    LAD_profiles_spherical_adjusted[np.isnan(LAD_profiles_spherical_adjusted)]=0
 
     # remove all profile values below minimum height prior to comparison
     #mask = heights <= minimum_height

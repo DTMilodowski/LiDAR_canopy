@@ -31,15 +31,14 @@ for pp in range(0,N_plots):
     Plot_name=Plots[pp]
     bbox_polygon = subplot_polygons[Plot_name] 
     print Plot_name
-    print bbox_polygon
     lidar_pts = lidar.filter_lidar_data_by_polygon(all_pts,bbox_polygon)
 
-    lidar_profiles = np.zeros(n_layers)
+    plot_lidar_profiles = np.zeros(n_layers)
     LAD_profiles_spherical = np.zeros(n_layers+1)
     LAD_profiles_spherical_adjusted = np.zeros(n_layers+1)
     heights_rad = np.arange(0,max_height+1)
 
-    heights,lidar_profiles,n_ground_returns = LAD1.bin_returns(lidar_pts, max_height, layer_thickness)
+    heights,plot_lidar_profiles,n_ground_returns = LAD1.bin_returns(lidar_pts, max_height, layer_thickness)
     u,n,I,U = LAD2.calculate_LAD(lidar_pts,heights_rad,max_return,'spherical')
     LAD_profiles_spherical=u.copy()
 
@@ -60,7 +59,7 @@ for pp in range(0,N_plots):
     subplot_LAD_profiles_spherical_adjusted[:,mask]=0
 
     # store profiles in dictionaries
-    lidar_profiles[Plot_name] = subplot_lidar_profiles
+    lidar_profiles[Plot_name] = plot_lidar_profiles
     radiative_spherical_LAD[Plot_name] = subplot_LAD_profiles_spherical[:,:-1]
     radiative_spherical_adjusted_LAD[Plot_name] = subplot_LAD_profiles_spherical_adjusted[:,:-1]
 
@@ -71,9 +70,7 @@ for pp in range(0,N_plots):
     # lidar
     ax31 = plt.subplot2grid((1,3),(0,0))
     ax31.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    for i in range(0,n_subplots):
-        ax31.plot(lidar_profiles[Plot_name][i,:]/1000.,heights,'-',c='k',alpha=0.2,linewidth=1)
-    ax31.plot(np.mean(lidar_profiles[Plot_name],axis=0)/1000.,heights,'-',c='k',linewidth=1)
+    ax31.plot(lidar_profiles[Plot_name]/1000.,heights,'-',c='k',linewidth=1)
     ax31.set_ylim(0,80)
     ax31.set_ylabel('Height / m')
     ax31.set_xlabel('Number of returns (x1000)')
@@ -81,18 +78,14 @@ for pp in range(0,N_plots):
     #Radiative Transfer initial
     ax32 = plt.subplot2grid((1,3),(0,1))
     ax32.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    for i in range(0,n_subplots):
-        ax32.plot(radiative_spherical_LAD[Plot_name][i,:],np.max(heights)-heights+1,'-',c='r',alpha=0.2,linewidth=1)
-    ax32.plot(np.mean(radiative_spherical_LAD[Plot_name],axis=0),np.max(heights)-heights+1,'-',c='k',linewidth=1)
+    ax32.plot(radiative_spherical_LAD[Plot_name],np.max(heights)-heights+1,'-',c='k',linewidth=1)
     ax32.set_ylim(0,80)
     ax32.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
 
     #Radiative Transfer adjusted
     ax33 = plt.subplot2grid((1,3),(0,2),sharex=ax32)
     ax33.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    for i in range(0,n_subplots):
-        ax33.plot(radiative_spherical_adjusted_LAD[Plot_name][i,:],np.max(heights)-heights+1,'-',c='r',alpha=0.2,linewidth=1)
-    ax33.plot(np.mean(radiative_spherical_adjusted_LAD[Plot_name],axis=0),np.max(heights)-heights+1,'-',c='k',linewidth=1)
+    ax33.plot(radiative_spherical_adjusted_LAD[Plot_name],np.max(heights)-heights+1,'-',c='k',linewidth=1)
     ax33.set_ylim(0,80)
     ax33.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
     
@@ -103,7 +96,7 @@ for pp in range(0,N_plots):
     ax31.locator_params(axis='x',nbins=5)
     ax32.locator_params(axis='x',nbins=5)
 
-    print np.mean(radiative_spherical_adjusted_LAD[Plot_name],axis=0).sum()
+    print radiative_spherical_adjusted_LAD[Plot_name].sum()
     plt.tight_layout()
     plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion.png')
     plt.show()

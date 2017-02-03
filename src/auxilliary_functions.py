@@ -43,6 +43,26 @@ def load_boundaries(coordinate_list):
         subplot_dict[plot_name[pp]]=subplot_list.copy()
     return coordinate_dict, subplot_dict
 
+# This function is similar to above but now will read an arbitrary number of vertices so that generic polygons can be used
+def load_generic_boundaries(coordinate_list):
+    
+    f = open(coordinate_list,'r')
+    lines=f.readlines()[0:]
+    N = len(lines)
+    
+    coordinate_dict = {}
+    for i in range(1,N):
+        line = lines[i].strip().split(" ")
+        Ncols = line.size
+        plot = line[0]
+        vertices = np.zeros((Ncols-1,2))
+        for j in range(0,Ncols-1):
+            vertices[j,0]=float(line[j+1])
+            vertices[j,1]=float(line[j+2])
+        print vertices
+        coordinate_dict[plot]=vertices.copy()
+    return coordinate_dict
+
 # get bounding box for list of coordinates
 def get_bounding_box(coordinate_list):
     N = coordinate_list.shape[0]

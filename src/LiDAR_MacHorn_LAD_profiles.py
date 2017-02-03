@@ -6,7 +6,7 @@ import auxilliary_functions as aux
 # bin lidar returns 
 def bin_returns(pts, max_height, layer_thickness):
     # filter the points to leave only first returns - not sure why this is necessary, but Cam group suggest - point for discussion
-    print pts.shape
+    #print pts.shape
     pts=pts[pts[:,3]==1,:]
     
     # calculate n ground points

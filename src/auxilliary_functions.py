@@ -61,6 +61,7 @@ def load_generic_boundaries(coordinate_list):
             vertices[j,1]=float(line[j+2])
         print vertices
         coordinate_dict[plot]=vertices.copy()
+    f.close()
     return coordinate_dict
 
 # get bounding box for list of coordinates

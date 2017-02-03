@@ -55,13 +55,13 @@ for pp in range(0,N_plots):
     # remove all profile values below minimum height prior to comparison
     #mask = heights <= minimum_height
     mask = np.max(heights_rad)-heights_rad<=minimum_height
-    subplot_LAD_profiles_spherical[:,mask]=0
-    subplot_LAD_profiles_spherical_adjusted[:,mask]=0
+    LAD_profiles_spherical[mask]=0
+    LAD_profiles_spherical_adjusted[mask]=0
 
     # store profiles in dictionaries
     lidar_profiles[Plot_name] = plot_lidar_profiles
-    radiative_spherical_LAD[Plot_name] = subplot_LAD_profiles_spherical[:,:-1]
-    radiative_spherical_adjusted_LAD[Plot_name] = subplot_LAD_profiles_spherical_adjusted[:,:-1]
+    radiative_spherical_LAD[Plot_name] = LAD_profiles_spherical[:-1]
+    radiative_spherical_adjusted_LAD[Plot_name] = LAD_profiles_spherical_adjusted[:-1]
 
 for pp in range(0,N_plots):
     Plot_name=Plots[pp]

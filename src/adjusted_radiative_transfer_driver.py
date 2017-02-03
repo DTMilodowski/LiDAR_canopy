@@ -110,5 +110,5 @@ for pp in range(0,N_plots):
 
     print np.mean(radiative_spherical_adjusted_LAD[Plot_name],axis=0).sum()
     plt.tight_layout()
-    plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion.png')
+    plt.savefig(Plot_name+'_LAD_radiative_comparison.png')
     plt.show()

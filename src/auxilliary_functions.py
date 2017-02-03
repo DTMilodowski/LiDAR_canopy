@@ -52,15 +52,17 @@ def load_generic_boundaries(coordinate_list):
     
     coordinate_dict = {}
     for i in range(1,N):
-        line = lines[i].strip().split(" ")
-        Ncols = line.size
+        line = lines[i].strip().split(",")
+        Ncols = len(line)
         plot = line[0]
-        vertices = np.zeros((Ncols-1,2))
-        for j in range(0,Ncols-1):
-            vertices[j,0]=float(line[j+1])
-            vertices[j,1]=float(line[j+2])
-        print vertices
-        coordinate_dict[plot]=vertices.copy()
+        vertices = []#np.zeros((Ncols-1,2))
+        vertices.append([])
+        vertices.append([])
+        for j in range(0,(Ncols-1)/2):
+            if len(line[2*j+1])>0:
+                vertices[0].append(float(line[2*j+1]))
+                vertices[1].append(float(line[2*j+2]))
+        coordinate_dict[plot]=np.asarray(vertices).transpose()
     f.close()
     return coordinate_dict
 

@@ -23,7 +23,6 @@ radiative_spherical_adjusted_LAD = {}
 lidar_profiles ={}
 
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
-
 all_pts = lidar.load_lidar_data(las_file)
 
 for pp in range(0,N_plots):
@@ -31,7 +30,6 @@ for pp in range(0,N_plots):
     n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
     coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
     bbox_polygon = aux.get_bounding_box(coord_pairs)
-
     lidar_pts = lidar.filter_lidar_data_by_polygon(all_pts,bbox_polygon)
 
     n_subplots = subplot_polygons[Plot_name].shape[0]
@@ -39,14 +37,12 @@ for pp in range(0,N_plots):
     subplot_LAD_profiles_spherical = np.zeros((n_subplots,n_layers+1))
     subplot_LAD_profiles_spherical_adjusted = np.zeros((n_subplots,n_layers+1))
     n_ground_returns = np.zeros(n_subplots)
-    subplot_LAI = np.zeros(n_subplots)
 
     heights_rad = np.arange(0,max_height+1)
 
     for i in range(0,n_subplots):
         print "Subplot: ", subplot_labels[Plot_name][i]
         sp_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name][i,:,:])
-        #print sp_pts[sp_pts[:,3]==1].shape[0]/20./20.
         heights,subplot_lidar_profiles[i,:],n_ground_returns[i] = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
 
         u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_return,'spherical')
@@ -57,7 +53,6 @@ for pp in range(0,N_plots):
         #N_2 = float((sp_pts[:,3]==2).sum())
         #n[:,:,1]*=N_1veg/N_2
         u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_return,'spherical')
-        u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_return,'spherical',n)
         subplot_LAD_profiles_spherical_adjusted[i,:]=u.copy()
 
     subplot_LAD_profiles_spherical[np.isnan(subplot_LAD_profiles_spherical)]=0
@@ -115,5 +110,5 @@ for pp in range(0,N_plots):
 
     print np.mean(radiative_spherical_adjusted_LAD[Plot_name],axis=0).sum()
     plt.tight_layout()
-    plt.savefig(Plot_name+'_LAD_radiative_comparison.png')
+    plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion.png')
     plt.show()

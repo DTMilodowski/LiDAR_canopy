@@ -65,7 +65,7 @@ for pp in range(0,N_plots):
 
 for pp in range(0,N_plots):
     Plot_name=Plots[pp]
-    plt.figure(3, facecolor='White',figsize=[10,6.5])
+    plt.figure(1, facecolor='White',figsize=[10,6.5])
     ##plt.title(Plot_name)
     # lidar
     ax31 = plt.subplot2grid((1,3),(0,0))
@@ -91,12 +91,12 @@ for pp in range(0,N_plots):
     
 
     ax32.set_xlim(xmax=0.7)
-    ax31.set_xlim(xmax=3*np.mean(lidar_profiles[Plot_name],axis=0).max()/1000)
+    #ax31.set_xlim(xmax=lidar_profiles[Plot_name].max()/1000)
 
     ax31.locator_params(axis='x',nbins=5)
     ax32.locator_params(axis='x',nbins=5)
 
-    print radiative_spherical_adjusted_LAD[Plot_name].sum()
+    print Plot_name, radiative_spherical_LAD[Plot_name].sum(),  radiative_spherical_adjusted_LAD[Plot_name].sum()
     plt.tight_layout()
     plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion.png')
     plt.show()

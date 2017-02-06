@@ -112,8 +112,8 @@ for i in range(0,4):
     if i=1:
         ax21.plot(1,1,'o',color='blue')
     else:
-        N_veg = float(np.all((sp_pts[:,3]==i+1,sp_pts[:,4]==1),axis=0).sum())
-        N_i = float((sp_pts[:,3]==i+1).sum())
+        N_veg = float(np.all((all_pts[:,3]==i+1,all_pts[:,4]==1),axis=0).sum())
+        N_i = float((all_pts[:,3]==i+1).sum())
         ax21.plot(i+1,N_i/N_veg,'o',color='blue')
 ax21.set_ylim(0,1.1)
 ax21.set_xlim(0,5)

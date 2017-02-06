@@ -13,7 +13,7 @@ Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
 N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
-max_return = 2
+max_return = 4
 layer_thickness = 1
 n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
@@ -60,7 +60,7 @@ for pp in range(0,N_plots):
     LAD_profiles_spherical_adjusted[mask]=0
 
     # store profiles in dictionaries
-    lidar_profiles[Plot_name] = plot_lidar_profiles
+    lidar_profiles[Plot_name] = np.sum(n,axis=1)#plot_lidar_profiles
     radiative_spherical_LAD[Plot_name] = LAD_profiles_spherical[:-1]
     radiative_spherical_adjusted_LAD[Plot_name] = LAD_profiles_spherical_adjusted[:-1]
 
@@ -104,3 +104,6 @@ for pp in range(0,N_plots):
     plt.tight_layout()
     plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion.png')
     plt.show()
+
+# A figure illustrating transmittance factor between successive returns 
+plt.figure(2, facecolor='White',figsize=[4,4])

@@ -35,16 +35,22 @@ for pp in range(0,N_plots):
     lidar_pts = lidar.filter_lidar_data_by_polygon(all_pts,bbox_polygon)
 
     heights_rad = np.arange(0,max_height+1)
+    LAD_profiles_spherical=np.zeros((heights_rad.size,max_return))
+    LAD_profiles_spherical_adjusted=np.zeros((heights_rad.size,max_return))
 
-    u,n,I,U = LAD2.calculate_LAD(lidar_pts,heights_rad,max_return,'spherical')
-    LAD_profiles_spherical=u.copy()
+    for rr in range(0,max_return):
+        max_k=rr+1
+        u,n,I,U = LAD2.calculate_LAD(lidar_pts,heights_rad,max_k,'spherical')
+        LAD_profiles_spherical[:,rr]=u.copy()
     lidar_profiles[Plot_name] = np.sum(n.copy(),axis=1)
     #derive correction factor for number of second returns
     #N_1veg = float(np.all((sp_pts[:,3]==1,sp_pts[:,4]==1),axis=0).sum())
     #N_2 = float((sp_pts[:,3]==2).sum())
     #n[:,:,1]*=N_1veg/N_2
-    u,n,I,U = LAD2.calculate_LAD_DTM(lidar_pts,heights_rad,max_return,'spherical')
-    LAD_profiles_spherical_adjusted=u.copy()
+    for rr in range(0,max_return):
+        max_k=rr+1
+        u,n,I,U = LAD2.calculate_LAD_DTM(lidar_pts,heights_rad,max_k,'spherical')
+        LAD_profiles_spherical_adjusted[:,rr]=u.copy()
     lidar_profiles_adjusted[Plot_name] = np.sum(n.copy(),axis=1)
 
     LAD_profiles_spherical[np.isnan(LAD_profiles_spherical)]=0
@@ -53,12 +59,12 @@ for pp in range(0,N_plots):
     # remove all profile values below minimum height prior to comparison
     #mask = heights <= minimum_height
     mask = np.max(heights_rad)-heights_rad<=minimum_height
-    LAD_profiles_spherical[mask]=0
-    LAD_profiles_spherical_adjusted[mask]=0
+    LAD_profiles_spherical[mask,:]=0
+    LAD_profiles_spherical_adjusted[mask,:]=0
 
     # store profiles in dictionaries
-    radiative_spherical_LAD[Plot_name] = LAD_profiles_spherical[:-1]
-    radiative_spherical_adjusted_LAD[Plot_name] = LAD_profiles_spherical_adjusted[:-1]
+    radiative_spherical_LAD[Plot_name] = LAD_profiles_spherical[:-1,:]
+    radiative_spherical_adjusted_LAD[Plot_name] = LAD_profiles_spherical_adjusted[:-1,:]
 
 heights = np.arange(1,81)
 for pp in range(0,N_plots):
@@ -82,7 +88,8 @@ for pp in range(0,N_plots):
     #Radiative Transfer initial
     ax12 = plt.subplot2grid((1,3),(0,1))
     ax12.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    ax12.plot(radiative_spherical_LAD[Plot_name],np.max(heights)-heights+1,'-',c='k',linewidth=1)
+    for i in range(0,max_return):
+        ax12.plot(radiative_spherical_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
     ax12.set_ylim(0,80)
     ax12.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
 
@@ -90,7 +97,7 @@ for pp in range(0,N_plots):
     ax13 = plt.subplot2grid((1,3),(0,2),sharex=ax12)
     ax13.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
     ax13.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    ax13.plot(radiative_spherical_adjusted_LAD[Plot_name],np.max(heights)-heights+1,'-',c='k',linewidth=1)
+    ax13.plot(radiative_spherical_adjusted_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
     ax13.set_ylim(0,80)
     ax13.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
     
@@ -102,7 +109,7 @@ for pp in range(0,N_plots):
 
     print Plot_name, radiative_spherical_LAD[Plot_name].sum(),  radiative_spherical_adjusted_LAD[Plot_name].sum()
     plt.tight_layout()
-    plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion.png')
+    plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion_maxreturn_'+str(max_return)+'.png')
     plt.show()
 
 # A figure illustrating transmittance ratio between successive returns 
@@ -116,7 +123,6 @@ for i in range(0,4):
     else:
         N_veg = float(np.all((all_pts[:,3]==i,all_pts[:,4]==1),axis=0).sum())
         N_i = float((all_pts[:,3]==i+1).sum())
-        print i,N_i/N_veg
         ax21.plot(i+1,N_i/N_veg,'o',color='blue')
 ax21.set_ylim(0,1.1)
 ax21.set_xlim(0,5)

@@ -97,7 +97,8 @@ for pp in range(0,N_plots):
     ax13 = plt.subplot2grid((1,3),(0,2),sharex=ax12)
     ax13.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
     ax13.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    ax13.plot(radiative_spherical_adjusted_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
+    for i in range(0,max_return):
+        ax13.plot(radiative_spherical_adjusted_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
     ax13.set_ylim(0,80)
     ax13.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
     
@@ -107,7 +108,7 @@ for pp in range(0,N_plots):
     ax11.locator_params(axis='x',nbins=5)
     ax12.locator_params(axis='x',nbins=5)
 
-    print Plot_name, radiative_spherical_LAD[Plot_name].sum(),  radiative_spherical_adjusted_LAD[Plot_name].sum()
+    print Plot_name, radiative_spherical_LAD[Plot_name].sum(axis=0),  radiative_spherical_adjusted_LAD[Plot_name].sum(axis=0)
     plt.tight_layout()
     plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion_maxreturn_'+str(max_return)+'.png')
     plt.show()

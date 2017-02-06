@@ -47,7 +47,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     # and return number
     if n.size == 0:
         #print "\tCalculating return matrix"
-        n = np.zeros((M,S,K))
+        n = np.zeros((M,S,K),dtype='float')
         for i in range(0,M):
             use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
             for j in range(0,S):
@@ -57,11 +57,11 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
 
     # calculate penetration functions for each scan angle
     #print "\tCalculating penetration functions"
-    I = np.zeros((M,S,K))
-    U = np.zeros((M,S,K))
-    G = np.zeros((M,S))
+    I = np.zeros((M,S,K),dtype='float')
+    U = np.zeros((M,S,K),dtype='float')
+    G = np.zeros((M,S),dtype='float')
     control = np.zeros((M,S))
-    n0 = np.zeros(S)
+    n0 = np.zeros(S,dtype='float')
     for i in range(0,S):
         n0[i]=np.sum(np.all((R==1, A==th[i]),axis=0))
         n1=np.sum(n[:,i,:],axis=1)
@@ -80,9 +80,9 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     p = np.sum(n[:,:,0],axis=1)
     p_indices = np.arange(p.size)
     jj = p_indices[p>0][0]-1
-    alpha =np.zeros(M)*np.nan
-    beta =np.zeros(M)*np.nan
-    U0 =np.zeros(M)*np.nan
+    alpha =np.zeros(M,dtype='float')*np.nan
+    beta =np.zeros(M,dtype='float')*np.nan
+    U0 =np.zeros(M,dtype='float')*np.nan
     for i in range(0,M):
         use = control[i,:]>0
         w=n0[use]/np.sum(n0[use])
@@ -105,7 +105,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     beta[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
     # numerical solution
     #print "\tNumerical solution"
-    u = np.zeros(M)
+    u = np.zeros(M,dtype='float')
     for i in range(jj,M): # check indexing here
         # Eq 6
         u[i] = (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)

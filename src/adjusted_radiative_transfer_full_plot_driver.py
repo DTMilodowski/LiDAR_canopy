@@ -77,6 +77,7 @@ for pp in range(0,N_plots):
     ax11.set_ylabel('Height / m')
     ax11.set_xlabel('Number of returns (x1000)')
     ax11.legend(loc=1)
+    ax11.set_xlim(xmax=1.2*lidar_profiles[Plot_name].max()/1000.)
     
     #Radiative Transfer initial
     ax12 = plt.subplot2grid((1,3),(0,1))
@@ -106,14 +107,19 @@ for pp in range(0,N_plots):
 
 # A figure illustrating transmittance ratio between successive returns 
 plt.figure(2, facecolor='White',figsize=[4,4])
+ax21 = plt.subplot2grid((1,1),(0,0))
 ax21.set_xlabel('return number')
 ax21.set_ylabel('transmittance ratio')
 for i in range(0,4):
-    if i=1:
+    if i==0:
         ax21.plot(1,1,'o',color='blue')
     else:
-        N_veg = float(np.all((all_pts[:,3]==i+1,all_pts[:,4]==1),axis=0).sum())
+        N_veg = float(np.all((all_pts[:,3]==i,all_pts[:,4]==1),axis=0).sum())
         N_i = float((all_pts[:,3]==i+1).sum())
+        print i,N_i/N_veg
         ax21.plot(i+1,N_i/N_veg,'o',color='blue')
 ax21.set_ylim(0,1.1)
 ax21.set_xlim(0,5)
+plt.tight_layout()
+plt.savefig('transmittance_ratios.png')
+plt.show()

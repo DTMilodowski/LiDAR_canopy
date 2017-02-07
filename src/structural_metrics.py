@@ -74,11 +74,19 @@ def calculate_VSI(vertical_profiles, heights):
     # convert number of peaks & their locations in canopy into VSI    
     N_peaks = peaks.size
     
+    N_pairs = N_peaks*(N_peaks-1)/2
+    separation = np.zeros(N_pairs)
+    index = 0
+    for i in range(0,N_peaks):
+        for j in range(i+1,N_peaks):
+            separation[index] = np.sqrt((peaks[i]-peaks[j])*(peaks[i]-peaks[j]))
+
+    # CHECK THIS WITH MARIVI TELLO
+    VSI = float(N_peaks)*np.mean(separation)
     return VSI
 
-
+# Simple function to find local maxima based on immediate neighbourhood
 def find_maxima(signal_x, signal_y):
-
     pks = []
     N=signal_x.size
     for i in range(1,N-1):

@@ -47,7 +47,15 @@ def frechetDist(P,Q):
 #    forest by means of L-band tomographic SAR. In Geoscience and Remote Sensing Symposium (IGARSS), 2015 IEEE 
 #    International (pp. 5288-5291). IEEE.
 def calculate_mean_Frechet_distance(vertical_profiles):
-
+    
+    N_heights, N_profiles = vertical_profiles.shape
+    N_pairs = N_profiles*(N_profiles-1)/2
+    Frechet = np.zeros(N_pairs)
+    index = 0
+    for i in range(0,N_profiles):
+        for j in range(i+1,N_profiles):
+            Frechet[index] = frechetDist(vertical_profiles[:,i],vertical_profiles[:,j])
+    mean_Fr = np.mean(Frechet)
     return mean_Fr
 
 #--------------------------------------------------------------------------------------------------------------

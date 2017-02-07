@@ -1,18 +1,16 @@
 ## This library hosts functions to quantify aspects of the canopy structure, for example canopy heterogeneity in the horizontal and vertical dimensions.
 import numpy as np
 
-#-------------------------------------------------------------------------------
-# Frechet number calculation - this algorithm was coded up by Max Bareiss and 
-# can be found here:
+#--------------------------------------------------------------------------------------------------------------
+# Frechet number calculation - this algorithm was coded up by Max Bareiss and can be found here:
 #     https://www.snip2code.com/Snippet/76076/Fr-chet-Distance-in-Python
-# The Frechet number is a metric to describe the similarity of two curves.  In
-# this instance the curves are simplified to polygonal curves of an arbitrary
-# number of points, giving the discrete Frechet difference.  This approximation # gives great advantages with respect to performance.
+# The Frechet number is a metric to describe the similarity of two curves.  In this instance the curves are
+# simplified to polygonal curves of an arbitrary number of points, giving the discrete Frechet difference. 
+# This approximation gives great advantages with respect to performance.
 # The original algorithm was developed here:
 #     Eiter, T. and Mannila, H., 1994. Computing discrete Fréchet distance.
 #     Tech. Report CD-TR 94/64, Information Systems Department, Technical
-#      University of Vienna.
-
+#     University of Vienna.
 
 # Calculate Euclidean distance between two points.
 def euc_dist(pt1,pt2):
@@ -42,4 +40,23 @@ def frechetDist(P,Q):
     ca = np.multiply(ca,-1)
     return _c(ca,len(P)-1,len(Q)-1,P,Q)
 
-#------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------
+
+# calculate mean Frechet distance -> horizontal structural index suggested in:
+#    Tello, M., Cazcarra-Bes, V., Pardini, M. and Papathanassiou, K., 2015, July. Structural classification of
+#    forest by means of L-band tomographic SAR. In Geoscience and Remote Sensing Symposium (IGARSS), 2015 IEEE 
+#    International (pp. 5288-5291). IEEE.
+def calculate_mean_Frechet_distance(vertical_profiles):
+
+    return mean_Fr
+
+#--------------------------------------------------------------------------------------------------------------
+# calculate vertical forest structural index (VSI)
+# This calculates a measure of forest structural heterogeneity based on the number and vertical distribution of 
+# canopy layers picked out by the remote sensing product.  Follows method suggested in:
+#    Tello, M., Cazcarra-Bes, V., Pardini, M. and Papathanassiou, K., 2015, July. Structural classification of
+#    forest by means of L-band tomographic SAR. In Geoscience and Remote Sensing Symposium (IGARSS), 2015 IEEE 
+#    International (pp. 5288-5291). IEEE.
+def calculate_VSI(vertical_profiles):
+
+    return VSI

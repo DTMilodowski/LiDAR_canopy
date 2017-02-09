@@ -94,6 +94,15 @@ def calculate_vertical_structural_variance(peaks):
     vertical_structural_variance = np.var(peaks)
     return vertical_structural_variance
     
+# Likewise for the horizontal structural heterogeneity
+def calculate_horizontal_structural_heterogeneity_alt(profiles,heights,stand_area):
+    pk_hts = retrieve_peaks(vertical_profiles,heights)
+    mean_profile = np.mean(vertical_profiles,axis=1)
+    stand_ht = np.max(heights[mean_profile>0])
+    Npks_upper_canopy = float(np.sum(pk_hts>=0.6*stand_ht))
+    HSI = N_peaks_upper_canopy*stand_ht/stand_area
+    return HSI
+
 
 
 # Simple function to find local maxima based on immediate neighbourhood

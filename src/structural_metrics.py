@@ -1,4 +1,5 @@
-## This library hosts functions to quantify aspects of the canopy structure, for example canopy heterogeneity in the horizontal and vertical dimensions.
+## This library hosts functions to quantify aspects of the canopy structure, for example canopy heterogeneity 
+## in the horizontal and vertical dimensions.
 import numpy as np
 
 #--------------------------------------------------------------------------------------------------------------
@@ -65,12 +66,15 @@ def calculate_mean_Frechet_distance(vertical_profiles):
 #    Tello, M., Cazcarra-Bes, V., Pardini, M. and Papathanassiou, K., 2015, July. Structural classification of
 #    forest by means of L-band tomographic SAR. In Geoscience and Remote Sensing Symposium (IGARSS), 2015 IEEE 
 #    International (pp. 5288-5291). IEEE.
-def calculate_VSI(vertical_profiles, heights):
+def retrieve_peaks(vertical_profiles,heights):
     N_heights, N_profiles = vertical_profiles.shape
     peaks, peak_amplitude = find_maxima(heights,vertical_profiles[0])
     for i in range(1,N_profiles):
         peaks_this_iter, peak_amplitude = find_maxima(heights,vertical_profiles[i])
         peaks = np.concatenate(peaks,peaks_this_iter)
+    return peaks
+
+def calculate_VSI(peaks):
     # convert number of peaks & their locations in canopy into VSI    
     N_peaks = peaks.size
     
@@ -84,6 +88,13 @@ def calculate_VSI(vertical_profiles, heights):
     # CHECK THIS WITH MARIVI TELLO
     VSI = float(N_peaks)*np.mean(separation)
     return VSI
+
+# alternative metric suggested by Marivi Tello is just to use vertical variance of peaks
+def calculate_vertical_structural_variance(peaks):
+    vertical_structural_variance = np.var(peaks)
+    return vertical_structural_variance
+    
+
 
 # Simple function to find local maxima based on immediate neighbourhood
 def find_maxima(signal_x, signal_y):

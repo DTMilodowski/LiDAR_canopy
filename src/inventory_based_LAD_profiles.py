@@ -106,10 +106,6 @@ def calculate_LAD_profiles_ellipsoid(canopy_layers, a, b, c, z0, plot_area, leaf
     layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
     N_layers = canopy_layers.size
     CanopyV = np.zeros(N_layers)
-    CanopyV1 = np.zeros(N_layers)
-    CanopyV2 = np.zeros(N_layers)
-    CanopyV3 = np.zeros(N_layers)
-    CanopyV4 = np.zeros(N_layers)
     pi=np.pi
     zeros = np.zeros(a.size)
     # Formula for volume of ellipsoidal cap: V = pi*a*b*x**2*(3c-x)/c**2 where x is the vertical distance from the top of the sphere along axis c.

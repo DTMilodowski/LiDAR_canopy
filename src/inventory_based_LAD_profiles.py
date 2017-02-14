@@ -105,6 +105,7 @@ def construct_ellipses_for_subplot(Ht, Area, Depth):
 def calculate_LAD_profiles_ellipsoid(canopy_layers, a, b, c, z0, plot_area, leafA_per_unitV=1.):
     layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
     N_layers = canopy_layers.size
+    CanopyV = np.zeros(N_layers)
     CanopyV1 = np.zeros(N_layers)
     CanopyV2 = np.zeros(N_layers)
     CanopyV3 = np.zeros(N_layers)

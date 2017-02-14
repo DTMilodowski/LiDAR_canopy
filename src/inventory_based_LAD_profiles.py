@@ -126,3 +126,30 @@ def calculate_LAD_profiles_ellipsoid(canopy_layers, a, b, c, z0, plot_area, leaf
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
 
+# An alternative model providing more generic canopy shapes - currently assume radial symmetry around trunk.  The crown
+# volume in a given layer is determined by the volume of revolution of the function r = a*D^b
+def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, leafA_per_unitV=1.):
+    r_max = np.sqrt(Area/np.pi)
+    layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
+    N_layers = canopy_layers.size
+    CanopyV = np.zeros(N_layers)
+    pi=np.pi
+    zeros = np.zeros(a.size)
+    # Formula for volume of revolution of power law function r = alpha*D^beta:
+    #                 V = pi*(r_max/D_max^beta)^2/(2*beta+1) * (D2^(2beta+1) - D1^(2beta+1))
+    #                 where alpha = (r_max/D_max^beta)^2
+    for i in range(0,N_layers):
+        ht_u = canopy_layers[i]
+        ht_l = ht_u-layer_thickness
+        mask = np.all((Ht>=ht_l,Ht-D<=ht_u),axis=0)
+        d1 = np.max((Ht-ht_u,zeros),axis=0)
+        d2 = np.min((Ht-ht_l,D),axis=0)
+        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta)**2/(2*beta+1) * (d2[mask]**(2*beta+1) - d1[mask]**(2*beta+1)) )
+    
+    # sanity check
+    TestV = np.nansum(pi*D*r_max**2/(2*beta+1))
+    print CanopyV.sum(),TestV
+    LAD = CanopyV*leafA_per_unitV/plot_area
+    return LAD, CanopyV
+
+

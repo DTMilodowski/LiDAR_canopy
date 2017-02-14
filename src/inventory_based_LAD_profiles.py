@@ -113,27 +113,6 @@ def calculate_LAD_profiles_ellipsoid(canopy_layers, a, b, c, z0, plot_area, leaf
     for i in range(0,N_layers):
         ht_u = canopy_layers[i]
         ht_l = ht_u-layer_thickness
-        """
-        # Case 1: z0+c >= ht_upper && z0-c < ht_upper && z0-c >= ht_lower
-        mask1 = np.all((z0+c>=ht_u,z0-c<ht_u,z0-c>=ht_l),axis=0)
-        x = z0+c-ht_u
-        CanopyV1[i] += np.sum(pi/3.*a[mask1]*b[mask1]*((4*c[mask1]) - (x[mask1]**2.*(3.*c[mask1]-x[mask1])/c[mask1]**2.)))
-
-        # Case 2: z0+c >= ht_upper && z0 - c < ht_lower
-        mask2 = np.all((z0+c>=ht_u,z0-c<ht_l),axis=0)
-        x1 = z0+c-ht_u
-        x2 = z0+c-ht_l
-        CanopyV2[i] += np.sum(pi/3.*a[mask2]*b[mask2]/c[mask2]**2*(x2[mask2]**2.*(3.*c[mask2]-x2[mask2]) - x1[mask2]**2.*(3.*c[mask2]-x1[mask2])))
-
-        # Case 3: z0+c < ht_upper, z0+c >= ht_lower, z0-c < ht_lower
-        mask3 = np.all((z0+c<ht_u,z0+c>=ht_l,z0-c<ht_l),axis=0)
-        x = z0+c-ht_l
-        CanopyV3[i] += np.sum(pi/3.*a[mask3]*b[mask3]*(x[mask3]**2.*(3.*c[mask3]-x[mask3])/c[mask3]**2.)) 
-
-        # Case 4 z0+c < ht_upper, z0-c >= ht_lower
-        mask4 = np.all((z0+c<ht_u,z0-c>=ht_l),axis=0)
-        CanopyV4[i] += np.sum(4*pi*a[mask4]*b[mask4]*c[mask4]/3)
-        """
         mask = np.all((z0+c>=ht_l,z0-c<=ht_u),axis=0)
         x1 = np.max((z0+c-ht_u,zeros),axis=0)
         x2 = np.min((z0+c-ht_l,2*c),axis=0)

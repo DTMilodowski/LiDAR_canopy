@@ -110,11 +110,13 @@ def calculate_LAD_profiles_ellipsoid(canopy_layers, a, b, c, z0, plot_area, leaf
     CanopyV3 = np.zeros(N_layers)
     CanopyV4 = np.zeros(N_layers)
     pi=np.pi
+    zeros = np.zeros(a.size)
     # Formula for volume of ellipsoidal cap: V = pi*a*b*x**2*(3c-x)/c**2 where x is the vertical distance from the top of the sphere along axis c.
     # Formula for volume of ellipsoid: V = 4/3*pi*a*b*c
     for i in range(0,N_layers):
         ht_u = canopy_layers[i]
         ht_l = ht_u-layer_thickness
+        """
         # Case 1: z0+c >= ht_upper && z0-c < ht_upper && z0-c >= ht_lower
         mask1 = np.all((z0+c>=ht_u,z0-c<ht_u,z0-c>=ht_l),axis=0)
         x = z0+c-ht_u
@@ -134,8 +136,13 @@ def calculate_LAD_profiles_ellipsoid(canopy_layers, a, b, c, z0, plot_area, leaf
         # Case 4 z0+c < ht_upper, z0-c >= ht_lower
         mask4 = np.all((z0+c<ht_u,z0-c>=ht_l),axis=0)
         CanopyV4[i] += np.sum(4*pi*a[mask4]*b[mask4]*c[mask4]/3)
+        """
+        mask = np.all((z0+c>=ht_l,z0-c<=ht_u),axis=0)
+        x1 = np.max((z0+c-ht_u,zeros),axis=0)
+        x2 = np.min((z0+c-ht_l,2*c),axis=0)
+        CanopyV[i]+= np.sum(pi/3.*a[mask]*b[mask]/c[mask]**2 *(x2[mask]**2.*(3.*c[mask]-x2[mask]) - x1[mask]**2.*(3.*c[mask]-x1[mask])))
 
-    CanopyV = CanopyV1+CanopyV2+CanopyV3+CanopyV4
+    #CanopyV = CanopyV1+CanopyV2+CanopyV3+CanopyV4
 
     # sanity check
     TestV = np.nansum(4*pi*a*b*c/3)

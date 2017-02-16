@@ -157,4 +157,27 @@ for pp in range(0,N_plots):
     inventory_LAI[Plot_name] = np.sum(field_LAD_profiles,axis=1)
     Hemisfer_LAI[Plot_name] = LAI_hemisfer.copy()
 
-
+#########################################################################################
+# Now plot some figures
+#----------------------------------------------------------------------------------------
+# Figure 1 - Transmittance ratios for the point cloud.
+# This figure plots the number of vegetation returns that propagate through further into
+# the canopy, defined as the transmittance ratio.
+ 
+# A figure illustrating transmittance ratio between successive returns 
+plt.figure(1, facecolor='White',figsize=[4,4])
+ax21 = plt.subplot2grid((1,1),(0,0))
+ax21.set_xlabel('return number')
+ax21.set_ylabel('transmittance ratio')
+for i in range(0,4):
+    if i==0:
+        ax21.plot(1,1,'o',color='blue')
+    else:
+        N_veg = float(np.all((all_lidar_pts[:,3]==i,all_lidar_pts[:,4]==1),axis=0).sum())
+        N_i = float((all_lidar_pts[:,3]==i+1).sum())
+        ax21.plot(i+1,N_i/N_veg,'o',color='blue')
+ax21.set_ylim(0,1.1)
+ax21.set_xlim(0,5)
+plt.tight_layout()
+plt.savefig('transmittance_ratios.png')
+plt.show()

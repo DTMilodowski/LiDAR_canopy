@@ -154,4 +154,3 @@ def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, 
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
 
-

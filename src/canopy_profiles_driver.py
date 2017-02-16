@@ -36,23 +36,15 @@ subplot_area = 20.*20.
 
 # define dictionaries to host the various canopy profiles and LAI estimates that will be produced
 MacArthurHorn_LAD = {}
-radiative_LAD_1st = {}
-radiative_LAD_2nd = {}
-radiative_LAD_3rd = {}
-radiative_DTM_LAD_1st = {}
-radiative_DTM_LAD_2nd = {}
-radiative_DTM_LAD_3rd = {}
+radiative_LAD = {}
+radiative_DTM_LAD = {}
 field_LAD = {}
 lidar_profiles ={}
 lidar_profiles_adjusted ={}
 
 MacArthurHorn_LAI = {}
-radiative_LAI_1st = {}
-radiative_LAI_2nd = {}
-radiative_LAI_3rd = {}
-radiative_DTM_LAI_1st = {}
-radiative_DTM_LAI_2nd = {}
-radiative_DTM_LAI_3rd = {}
+radiative_LAI = {}
+radiative_DTM_LAI = {}
 field_LAI = {}
 Hemisfer_LAI = {}
 
@@ -88,5 +80,57 @@ for pp in range(0,N_plots):
 
     # set up some arrays to host the MacArthur-Horn profiles
     heights = np.arange(0,max_height)+1
-    LAD_MH = np.zeros((heights.size))
+    LAD_MH = np.zeros((n_subplots, heights.size))
     
+    # set up array to host the lidar return profiles
+    lidar_returns_profiles = np.zeros((n_subplots, heights.size, max_return))
+    lidar_returns_profiles_adj = np.zeros((n_subplots, heights.size, max_return))
+
+    # set up array to host inventory profiles
+    field_LAD_profiles = np.zeros((n_subplots,heights.size))
+
+    # set up array to hold the hemisfer LAI estimate
+    LAI_hemisfer = np.zeros(n_subplots)
+
+    # loop through subplots, calculating both return profiles and LAD distributions
+    for i in range(0,n_subplots):
+        print "Subplot: ", subplot_labels[Plot_name][i]
+        # filter lidar points into subplot
+        sp_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name][i,:,:])
+
+        # first of all, loop through the return numbers to calculate the radiative LAD profiles
+        for rr in range(0,max_return):
+            max_k=rr+1
+            u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
+            LAD_rad[i,:,rr]=u.copy()
+        lidar_return_profiles[i,:,:] = np.sum(n.copy(),axis=1)
+
+        # now repeat but for adjusted profiles, accounting for imperfect penetration of LiDAR pulses into canopy
+        for rr in range(0,max_return):
+            max_k=rr+1
+            u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
+            LAD_rad_DTM[i,:,rr]=u.copy()
+        lidar_return_profiles_adj[i,:,:] = np.sum(n.copy(),axis=1)
+
+        # now get MacArthur-Horn profiles
+        heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
+        LAD_MH[i,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
+
+        # now get field inventory estimate
+        mask = field_data['plot']==Plot_name
+        Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+        axis_a, axis_b, axis_c, z0 = field.construct_ellipses_for_subplot(Ht, Area, Depth)
+        field_LAD_profiles[i,:], CanopyV = field.calculate_LAD_profiles_ellipsoid(heights, axis_a, axis_b, axis_c, z0, plot_area)
+
+        # now load in the LAI estimates from the hemispherical photographs
+        LAI_hemisfer[i] = field_LAI['LAI'][np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)]
+
+
+    # set NaN values to zero
+    LAD_rad[np.isnan(LAD_rad)]=0
+    LAD_rad_DTM[np.isnan(LAD_rad_DTM)]=0
+    LAD_MH[np.isnan(LAD_MH)]=0
+
+    # store arrays into their relevant dictionaries
+    lidar_profiles[Plot_name] = lidar_return_profiles.copy()
+    lidar_profiles_adjusted[Plot_name] = lidar_return_profiles_adj.copy()

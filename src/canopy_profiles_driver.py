@@ -171,7 +171,7 @@ ax1.set_xlabel('return number')
 ax1.set_ylabel('transmittance ratio')
 for i in range(0,4):
     if i==0:
-        ax11.plot(1,1,'o',color='blue')
+        ax1.plot(1,1,'o',color='blue')
     else:
         N_veg = float(np.all((all_lidar_pts[:,3]==i,all_lidar_pts[:,4]==1),axis=0).sum())
         N_i = float((all_lidar_pts[:,3]==i+1).sum())
@@ -221,3 +221,57 @@ ax2c.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none
 plt.tight_layout()
 plt.savefig(output_dir+'BALI_allometries.png')
 plt.show()
+
+#-------------------------------------------------------------------------------------------------
+# Figure 3 - Comparison of LiDAR return profiles and the radiative transfer profiles with/without
+# compensation for "lost" returns
+
+for pp in range(0,N_plots):
+    Plot_name=Plots[pp]
+    return_dist = np.mean(lidar_profiles[Plot_name],axis=0)
+    return_dist_adj = np.mean(lidar_profiles_adjusted[Plot_name],axis=0)
+    LAD_r = np.mean(radiative_LAD[Plot_name],axis=0)
+    LAD_r_adj = np.mean(radiative_DTM_LAD[Plot_name],axis=0)
+
+
+    plt.figure(3, facecolor='White',figsize=[10,6.5])
+    ##plt.title(Plot_name)
+    # lidar
+    ax3a = plt.subplot2grid((1,3),(0,0))
+    colour = ['black','blue','red','orange']
+    labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
+    ax3a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    for i in range(0,max_return):
+        ax3a.plot(return_dist[:,i]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[i],linewidth=1,label=labels[i])
+        ax3a.plot(return_dist_adj[:,i]/1000.,np.max(heights_rad)-heights_rad,'--',c=colour[i],linewidth=1)
+    ax3a.set_ylim(0,80)
+    ax3a.set_ylabel('Height / m')
+    ax3a.set_xlabel('Number of returns (x1000)')
+    ax3a.legend(loc=1)
+    ax3a.set_xlim(xmax=1.2*return_dist.max()/1000.)
+    
+    #Radiative Transfer initial
+    ax3b = plt.subplot2grid((1,3),(0,1))
+    ax3b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    for i in range(0,max_return):
+        ax3b.plot(LAD_r[:,i],np.max(heights_rad)-heights_rad,'-',c=colour[i],linewidth=1)
+    ax3b.set_ylim(0,80)
+    ax3b.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
+
+    #Radiative Transfer adjusted
+    ax3c = plt.subplot2grid((1,3),(0,2),sharex=ax3b)
+    ax3c.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+    ax3c.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    for i in range(0,max_return):
+        ax3c.plot(LAD_r_adj[:,i],np.max(heights_rad)-heights_rad,'-',c=colour[i],linewidth=1)
+    ax3c.set_ylim(0,80)
+    ax3c.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
+    
+
+    ax3c.set_xlim(xmax=0.7)
+  
+    ax3c.locator_params(axis='x',nbins=5)
+
+    plt.tight_layout()
+    plt.savefig(output_dir+Plot_name+'_LAD_radiative_comparison_full_plot_inversion_maxreturn_'+str(max_return)+'.png')
+    plt.show()

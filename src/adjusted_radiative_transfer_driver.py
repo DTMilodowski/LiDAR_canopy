@@ -33,6 +33,7 @@ for pp in range(0,N_plots):
     lidar_pts = lidar.filter_lidar_data_by_polygon(all_pts,bbox_polygon)
 
     n_subplots = subplot_polygons[Plot_name].shape[0]
+    
     subplot_lidar_profiles = np.zeros((n_subplots,n_layers))
     subplot_LAD_profiles_spherical = np.zeros((n_subplots,n_layers+1))
     subplot_LAD_profiles_spherical_adjusted = np.zeros((n_subplots,n_layers+1))

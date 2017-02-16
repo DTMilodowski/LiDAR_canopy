@@ -119,8 +119,7 @@ for pp in range(0,N_plots):
         # now get field inventory estimate
         mask = field_data['plot']==Plot_name
         Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-        axis_a, axis_b, axis_c, z0 = field.construct_ellipses_for_subplot(Ht, Area, Depth)
-        field_LAD_profiles[i,:], CanopyV = field.calculate_LAD_profiles_ellipsoid(heights, axis_a, axis_b, axis_c, z0, plot_area)
+        field_LAD_profiles[i,:], CanopyV = field.calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area)
 
         # now load in the LAI estimates from the hemispherical photographs
         LAI_hemisfer[i] = field_LAI['LAI'][np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)]

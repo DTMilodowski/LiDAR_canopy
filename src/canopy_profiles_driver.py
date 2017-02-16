@@ -58,7 +58,7 @@ all_lidar_pts = lidar.load_lidar_data(las_file)
 
 # load field data and retrieve allometric relationships
 field_data = field.load_crown_survey_data(field_file)
-a, b, CF, r_sq, p, H, D = field.retrieve_crown_allometry_file(allometry_file)
+a, b, CF, r_sq, p, H, D = field.retrieve_crown_allometry(allometry_file)
 a_ht, b_ht, CF_ht, a_A, b_A, CF_A = field.calculate_allometric_equations_from_survey(field_data)
 
 # load LAI estimates from hemiphotos
@@ -179,5 +179,45 @@ for i in range(0,4):
 ax1.set_ylim(0,1.1)
 ax1.set_xlim(0,5)
 plt.tight_layout()
-plt.savefig('transmittance_ratios.png')
+plt.savefig(output_dir+'transmittance_ratios.png')
+plt.show()
+
+#----------------------------------------------------------------------------------------
+# Figure 2 - Allometric relationships used to construct the inventory-based LAD profiles.
+plt.figure(2, facecolor='White',figsize=[9,3])
+ax2a = plt.subplot2grid((1,3),(0,0))
+ax2a.set_ylabel('Crown Depth / m')
+ax2a.set_xlabel('Height / m')
+ax2a.annotate('a - Height-Crown Depth', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2a.plot(H,D,'.',color='blue',alpha=0.1)
+H_mod = np.linspace(0.,H.max(),1000)
+D_mod = CF*a*H_mod**b
+ax2a.plot(H_mod,D_mod,'-',color='black')
+eq = '$D=%.3fH^{%.3f}$' % (CF*a, b)
+ax2a.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=10)
+
+ax2b = plt.subplot2grid((1,3),(0,1))
+ax2b.annotate('b - DBH-Crown Area', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2b.set_xlabel('DBH / cm')
+ax2b.set_ylabel('Crown Area / m$^2$')
+ax2b.plot(field_data['DBH_field'],field_data['CrownArea'],'.',color='red',alpha=0.1)
+DBH_mod = np.linspace(0.,np.nanmax(field_data['DBH_field']),1000)
+CA_mod = CF_A*a_A*DBH_mod**b_A
+ax2b.plot(DBH_mod,CA_mod,'-',color='black')
+eq = '$A=%.3fDBH^{%.3f}$' % (CF_A*a_A, b_A)
+ax2b.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=10)
+
+ax2c = plt.subplot2grid((1,3),(0,2),sharex=ax8)
+ax2c.annotate('c - DBH-Height', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2c.set_xlabel('DBH / cm')
+ax2c.set_ylabel('Height / m')
+ax2c.plot(field_data['DBH_field'],field_data['Height_field'],'.',color='red',alpha=0.1)
+Ht_mod = CF_ht*a_ht*DBH_mod**b_ht
+ax2c.plot(DBH_mod,Ht_mod,'-',color='black')
+eq = '$H=%.3fDBH^{%.3f}$' % (CF_ht*a_ht, b_ht)
+ax2c.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=10)
+
+
+plt.tight_layout()
+plt.savefig(output_dir+'BALI_allometries.png')
 plt.show()

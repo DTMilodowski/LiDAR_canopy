@@ -17,10 +17,13 @@ import statistics_tools as stats
 
 # start by defining input files
 las_file = 'Carbon_plot_point_cloud_buffer.las'
-coordinate_file = 'BALI_plot_coordinates.csv'
+subplot_coordinate_file = 'BALI_subplot_coordinates_corrected.csv'
 allometry_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Regional/Allometry/Crown_depth_data_SEAsia.csv'
 field_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_carbonplots_FieldMapcensus2016.csv'
 LAI_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_LAI_fromHemisphericalPhotos.csv'
+
+# also define output directory (for saving figures)
+output_dir = './Figures/'
 
 # define important parameters for canopy profile estimation
 Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
@@ -97,7 +100,7 @@ for pp in range(0,N_plots):
     for i in range(0,n_subplots):
         print "Subplot: ", subplot_labels[Plot_name][i]
         # filter lidar points into subplot
-        sp_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,subplot_polygons[Plot_name][i,:,:])
+        sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_polygons[Plot_name][i,:,:])
 
         # first of all, loop through the return numbers to calculate the radiative LAD profiles
         for rr in range(0,max_return):

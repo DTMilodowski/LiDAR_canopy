@@ -33,19 +33,20 @@ n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 plot_area = 10.**4
 subplot_area = 20.*20.
+beta = 0.6 # morphological parameter in inventory-based canopy model
 
 # define dictionaries to host the various canopy profiles and LAI estimates that will be produced
 MacArthurHorn_LAD = {}
 radiative_LAD = {}
 radiative_DTM_LAD = {}
-field_LAD = {}
+inventory_LAD = {}
 lidar_profiles ={}
 lidar_profiles_adjusted ={}
 
 MacArthurHorn_LAI = {}
 radiative_LAI = {}
 radiative_DTM_LAI = {}
-field_LAI = {}
+inventory_LAI = {}
 Hemisfer_LAI = {}
 
 # load coordinates and lidar points for target areas
@@ -117,19 +118,40 @@ for pp in range(0,N_plots):
         LAD_MH[i,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
 
         # now get field inventory estimate
-        mask = field_data['plot']==Plot_name
+        mask = np.all((field_data['plot']==Plot_name,field_data['subplot']==subplot_labels[Plot_name][i]),axis=0)
         Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-        field_LAD_profiles[i,:], CanopyV = field.calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area)
-
+        field_LAD_profiles[i,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
         # now load in the LAI estimates from the hemispherical photographs
-        LAI_hemisfer[i] = field_LAI['LAI'][np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)]
+        Hemisfer_mask = np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)
+        LAI_hemisfer[i] = field_LAI['LAI'][Hemisfer_mask]
 
-
-    # set NaN values to zero
+    # now we have looped through and created the different profiles, need to account for any NaN's and apply minimum height
+    # to the LAD distributions
+    # - set NaN values to zero
     LAD_rad[np.isnan(LAD_rad)]=0
     LAD_rad_DTM[np.isnan(LAD_rad_DTM)]=0
     LAD_MH[np.isnan(LAD_MH)]=0
+    # - remove all profile values below minimum height prior to comparison
+    mask = heights <= minimum_height
+    LAD_MH[:,mask]=0
+    mask = np.max(heights_rad)-heights_rad<=minimum_height
+    LAD_rad[:,mask]=0
+    LAD_rad_DTM[:,mask]=0
 
-    # store arrays into their relevant dictionaries
+    # now the profiles are ready to be stored into their relevant dictionaries
     lidar_profiles[Plot_name] = lidar_return_profiles.copy()
     lidar_profiles_adjusted[Plot_name] = lidar_return_profiles_adj.copy()
+
+    MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
+    radiative_LAD[Plot_name] = LAD_rad.copy()
+    radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.sopy()
+    inventory_LAD[Plot_name] = field_LAD_profiles.copy()
+
+    # Also ready to store their respective LAI profiles
+    MacArthurHorn_LAI[Plot_name] = np.sum(LAD_MH,axis=1)
+    radiative_LAI[Plot_name] = np.sum(LAD_rad,axis=1)
+    radiative_DTM_LAI[Plot_name] = np.sum(LAD_rad_DTM,axis=1)
+    inventory_LAI[Plot_name] = np.sum(field_LAD_profiles,axis=1)
+    Hemisfer_LAI[Plot_name] = LAI_hemisfer.copy()
+
+

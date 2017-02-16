@@ -44,6 +44,7 @@ radiative_DTM_LAD_2nd = {}
 radiative_DTM_LAD_3rd = {}
 field_LAD = {}
 lidar_profiles ={}
+lidar_profiles_adjusted ={}
 
 MacArthurHorn_LAI = {}
 radiative_LAI_1st = {}
@@ -57,7 +58,7 @@ Hemisfer_LAI = {}
 
 # load coordinates and lidar points for target areas
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
-all_pts = lidar.load_lidar_data(las_file)
+all_lidar_pts = lidar.load_lidar_data(las_file)
 
 # load field data and retrieve allometric relationships
 field_data = field.load_crown_survey_data(field_file)
@@ -67,4 +68,25 @@ a_ht, b_ht, CF_ht, a_A, b_A, CF_A = field.calculate_allometric_equations_from_su
 # load LAI estimates from hemiphotos
 field_LAI = aux.load_field_LAI(LAI_file)
 
+# loop through all plots to be analysed
+for pp in range(0,N_plots):
+    print Plots[pp]
+    Plot_name=Plots[pp]
+    # clip LiDAR point cloud to plot level (this makes subsequent processing much faster)
+    n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
+    coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
+    bbox_polygon = aux.get_bounding_box(coord_pairs)
+    plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon)
+    
+    # get some subplot-level information
+    n_subplots = subplot_polygons[Plot_name].shape[0]
 
+    # set up some arrays to host the radiative transfer based profiles
+    heights_rad = np.arange(0,max_height+1)
+    LAD_rad = np.zeros((n_subplots,heights_rad.size,max_return))
+    LAD_rad_DTM = np.zeros((n_subplots,heights_rad.size,max_return))
+
+    # set up some arrays to host the MacArthur-Horn profiles
+    heights = np.arange(0,max_height)+1
+    LAD_MH = np.zeros((heights.size))
+    

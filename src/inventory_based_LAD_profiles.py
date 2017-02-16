@@ -134,7 +134,7 @@ def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, 
     N_layers = canopy_layers.size
     CanopyV = np.zeros(N_layers)
     pi=np.pi
-    zeros = np.zeros(a.size)
+    zeros = np.zeros(Ht.size)
     # Formula for volume of revolution of power law function r = alpha*D^beta:
     #                 V = pi*(r_max/D_max^beta)^2/(2*beta+1) * (D2^(2beta+1) - D1^(2beta+1))
     #                 where alpha = (r_max/D_max^beta)^2

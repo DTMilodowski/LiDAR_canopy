@@ -149,7 +149,7 @@ def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, 
     # sanity check
     TestV = np.nansum(pi*D*r_max**2/(2*beta+1))
     precision_requirement = 10**-8
-    if CanopyV.sum()-precision_requirement >= TestV:
+    if CanopyV.sum() <= TestV - precision_requirement:
         print "Issue - sanity check fail: ", CanopyV.sum(),TestV
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV

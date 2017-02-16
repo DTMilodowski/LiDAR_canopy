@@ -5,7 +5,7 @@ from scipy import stats
 
 
 # This function reads in the crown allometry data from the database: Falster et al,. 2015; BAAD: a Biomass And Allometry Database for woody plants. Ecology, 96: 1445. doi: 10.1890/14-1889.1
-def retrieve_crown_allometry_file(filename):
+def retrieve_crown_allometry(filename):
     datatype = {'names': ('ID', 'Ref', 'Location', 'Lat', 'Long', 'Species', 'Family','Diameter','Height','CrownArea','CrownDepth'), 'formats': ('i8','S32','S256','f16','f16','S32','S32','f16','f16','f16','f16')}
     data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
     

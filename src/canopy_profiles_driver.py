@@ -275,3 +275,6 @@ for pp in range(0,N_plots):
     plt.tight_layout()
     plt.savefig(output_dir+Plot_name+'_LAD_radiative_comparison_full_plot_inversion_maxreturn_'+str(max_return)+'.png')
     plt.show()
+
+#----------------------------------------------------------------------------------------------------------------
+# Figure 4 - Comparison of subplot and mean LiDAR return profiles and the different methods for estimating LAD

@@ -207,7 +207,7 @@ ax2b.plot(DBH_mod,CA_mod,'-',color='black')
 eq = '$A=%.3fDBH^{%.3f}$' % (CF_A*a_A, b_A)
 ax2b.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=10)
 
-ax2c = plt.subplot2grid((1,3),(0,2),sharex=ax8)
+ax2c = plt.subplot2grid((1,3),(0,2),sharex=ax2b)
 ax2c.annotate('c - DBH-Height', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax2c.set_xlabel('DBH / cm')
 ax2c.set_ylabel('Height / m')

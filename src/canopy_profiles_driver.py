@@ -87,8 +87,8 @@ for pp in range(0,N_plots):
     LAD_MH = np.zeros((n_subplots, heights.size))
     
     # set up array to host the lidar return profiles
-    lidar_returns_profiles = np.zeros((n_subplots, heights.size, max_return))
-    lidar_returns_profiles_adj = np.zeros((n_subplots, heights.size, max_return))
+    lidar_return_profiles = np.zeros((n_subplots, heights_rad.size, max_return))
+    lidar_return_profiles_adj = np.zeros((n_subplots, heights_rad.size, max_return))
 
     # set up array to host inventory profiles
     field_LAD_profiles = np.zeros((n_subplots,heights.size))
@@ -147,7 +147,7 @@ for pp in range(0,N_plots):
 
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
     radiative_LAD[Plot_name] = LAD_rad.copy()
-    radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.sopy()
+    radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
     inventory_LAD[Plot_name] = field_LAD_profiles.copy()
 
     # Also ready to store their respective LAI profiles

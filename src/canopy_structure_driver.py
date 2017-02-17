@@ -10,9 +10,7 @@ import LiDAR_tools as lidar
 import auxilliary_functions as aux
 import LiDAR_MacHorn_LAD_profiles as LAD1
 import LiDAR_radiative_transfer_LAD_profiles as LAD2
-
-sys.path.append('/home/dmilodow/DataStore_DTM/BALI/MetDataProcessing/UtilityTools/')
-import statistics_tools as stats
+import structural_metrics as structure
 
 # start by defining input files
 las_file = 'Carbon_plot_point_cloud_buffer.las'
@@ -95,3 +93,9 @@ for pp in range(0,N_plots):
     radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
 
 
+
+
+
+
+#----------------------------------------------------------------------------------------------------------
+# Figure 1 - Illustration of the Frechet distance

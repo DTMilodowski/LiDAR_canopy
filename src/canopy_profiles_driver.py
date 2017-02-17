@@ -273,8 +273,68 @@ for pp in range(0,N_plots):
     ax3c.locator_params(axis='x',nbins=5)
 
     plt.tight_layout()
-    plt.savefig(output_dir+Plot_name+'_LAD_radiative_comparison_full_plot_inversion_maxreturn_'+str(max_return)+'.png')
+    plt.savefig(output_dir+Plot_name+'_LAD_radiative_kmax_'+str(max_return)+'.png')
     plt.show()
 
 #----------------------------------------------------------------------------------------------------------------
 # Figure 4 - Comparison of subplot and mean LiDAR return profiles and the different methods for estimating LAD
+for pp in range(0,N_plots):
+    Plot_name=Plots[pp]
+    return_dist_adj = np.mean(lidar_profiles_adjusted[Plot_name],axis=0)
+
+    LAD_r = np.mean(radiative_LAD[Plot_name],axis=0)
+    LAD_r_adj = np.mean(radiative_DTM_LAD[Plot_name],axis=0)
+
+
+    plt.figure(4, facecolor='White',figsize=[10,6.5])
+    ##plt.title(Plot_name)
+    # lidar
+    ax4a = plt.subplot2grid((1,4),(0,0))
+    colour = ['black','blue','red','orange']
+    labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
+    ax4a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    for k in range(0,max_return):
+        ax4a.plot(return_dist_adj[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[i],linewidth=1)
+    ax4a.set_ylim(0,80)
+    ax4a.set_ylabel('Height / m')
+    ax4a.set_xlabel('Number of returns (x1000)')
+    ax4a.legend(loc=1)
+    ax4a.set_xlim(xmax=1.2*return_dist.max()/1000.)
+    
+    # MacArthur-Horn method
+    ax4b = plt.subplot2grid((1,4),(0,1))
+    ax4b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax4b.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+    for i in range(0,n_subplots):
+        ax4b.plot(MacArthurHorn_LAD[Plot_name][i,:],heights,'-',c='blue',linewidth=0.5,alpha=0.5)
+    ax4b.plot(np.mean(MacArthurHorn_LAD[Plot_name],axis=0),heights,'-',c='blue',linewidth=1)
+    ax4b.set_ylim(0,80)
+    ax4b.set_xlabel('LAD$_{MacArthur-Horn}$ / m$^2$m$^{-1}$')
+
+    #Radiative Transfer initial
+    ax4c = plt.subplot2grid((1,4),(0,2))
+    ax4c.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    for i in range(0,max_return):
+        ax4c.plot(radiative_DTM_LAD[i,:,-1],np.max(heights_rad)-heights_rad,'-',c='red',linewidth=0.5,alpha=0.5)
+    ax4c.plot(np.mean(radiative_DTM_LAD[:,:,-1],axis=0),np.max(heights_rad)-heights_rad,'-',c='red',linewidth=1)
+    ax4c.set_ylim(0,80)
+    ax4c.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
+
+    #Radiative Transfer adjusted
+    ax4d = plt.subplot2grid((1,3),(0,2),sharex=ax3b)
+    ax4d.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+    ax4d.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    for i in range(0,max_return):
+        ax4d.plot(LAD_r_adj[:,i],np.max(heights_rad)-heights_rad,'-',c='green',alpha=0.5,linewidth=0.5)
+    ax4d.plot(LAD_r_adj[:,i],np.max(heights_rad)-heights_rad,'-',c='green',linewidth=1)
+    ax4d.set_ylim(0,80)
+    ax4d.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
+    
+
+    ax4d.set_xlim(xmax=0.7)
+  
+    ax4d.locator_params(axis='x',nbins=5)
+
+    plt.tight_layout()
+    plt.savefig(output_dir+Plot_name+'_LAD_comparison_kmax_'+str(max_return)+'.png')
+    plt.show()

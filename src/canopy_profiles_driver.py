@@ -374,7 +374,8 @@ for pp in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
     y_err1=np.std(radiative_LAI[Plots[i]])/np.sqrt(N_plots)
     y_err2=np.std(radiative_DTM_LAI[Plots[i]])/np.sqrt(N_plots)
-    ax7.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,'o',color='black')
+    ax7.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]]),xerr=x_err,yerr=y_err1,'o',color='black',mfc='white')
+    ax7.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]]),xerr=x_err,yerr=y_err2,'o',color='black')
 
 
 ax9 = plt.subplot2grid((1,3),(0,2), sharex=ax7)

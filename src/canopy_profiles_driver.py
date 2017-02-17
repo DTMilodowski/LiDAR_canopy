@@ -322,7 +322,7 @@ for pp in range(0,N_plots):
     ax4c.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
 
     #Field Inventory
-    ax4d = plt.subplot2grid((1,3),(0,2))
+    ax4d = plt.subplot2grid((1,4),(0,3))
     ax4d.annotate('Field inventory', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
     ax4d.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
@@ -340,3 +340,63 @@ for pp in range(0,N_plots):
     plt.tight_layout()
     plt.savefig(output_dir+Plot_name+'_LAD_comparison_kmax_'+str(max_return)+'.png')
     plt.show()
+
+
+
+#----------------------------------------------------------------------------------------------------------------
+# Figure 5 - Comparing LAI from hemiphotos against integrated LAD from the different methods
+# Plot up the subplot-level estimates, in addition to the 
+plt.figure(4, facecolor='White',figsize=[9,3])
+ax7 = plt.subplot2grid((1,3),(0,0))
+ax7.set_xlabel('LAI$_{Hemisfer}$')
+ax7.set_ylabel('LAI$_{MacArthur-Horn}$')
+ax7.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax7.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+for pp in range(0,N_plots):
+    ax7.plot(Hemisfer_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color='blue',alpha=0.5)
+
+for pp in range(0,N_plots):
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
+    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_plots)
+    ax7.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,'o',color='black')
+
+
+ax8 = plt.subplot2grid((1,3),(0,1), sharex=ax7, sharey=ax7)
+ax8.annotate('b - Radiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax8.set_xlabel('LAI$_{Hemisfer}$')
+ax8.set_ylabel('LAI$_{rad}$')
+ax8.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+for pp in range(0,N_plots):
+    ax7.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]],'.',color='0.5',alpha=0.5)
+    ax7.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]],'.',color='blue',alpha=0.5)
+
+for pp in range(0,N_plots):
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
+    y_err1=np.std(radiative_LAI[Plots[i]])/np.sqrt(N_plots)
+    y_err2=np.std(radiative_DTM_LAI[Plots[i]])/np.sqrt(N_plots)
+    ax7.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,'o',color='black')
+
+
+ax9 = plt.subplot2grid((1,3),(0,2), sharex=ax7)
+ax9.annotate('c - Field inventory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax9.set_xlabel('LAI$_{Hemisfer}$')
+ax9.set_ylabel('Canopy Volume / $m^3m^{-2}$')
+
+#ax9.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+
+
+for i in range(0,len(Plots)):
+    ax7.plot(Hemisfer[Plots[i]],MacArthurHorn_native[Plots[i]],'.',color='blue',alpha=0.5)
+    ax8.plot(Hemisfer[Plots[i]],radiative_spherical[Plots[i]],'.',color='red', alpha=0.5)
+    ax8.plot(Hemisfer[Plots[i]],radiative_spherical_1st[Plots[i]],'.',color='black', alpha=0.5)
+    ax9.plot(MacArthurHorn_native[Plots[i]],radiative_spherical[Plots[i]],'.',color='red', alpha=0.5)
+    ax9.plot(MacArthurHorn_native[Plots[i]],radiative_spherical_1st[Plots[i]],'.',color='black', alpha=0.5)
+    
+
+ax7.set_xlim((0,20))
+ax7.set_ylim((0,20))
+plt.tight_layout()
+plt.savefig('GEM_subplot_compilation.png')
+plt.show()
+
+

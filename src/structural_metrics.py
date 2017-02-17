@@ -1,7 +1,6 @@
 ## This library hosts functions to quantify aspects of the canopy structure, for example canopy heterogeneity 
 ## in the horizontal and vertical dimensions.
 import numpy as np
-
 #--------------------------------------------------------------------------------------------------------------
 # Frechet number calculation - this algorithm was coded up by Max Bareiss and can be found here:
 #     https://www.snip2code.com/Snippet/76076/Fr-chet-Distance-in-Python
@@ -9,9 +8,9 @@ import numpy as np
 # simplified to polygonal curves of an arbitrary number of points, giving the discrete Frechet difference. 
 # This approximation gives great advantages with respect to performance.
 # The original algorithm was developed here:
-#     Eiter, T. and Mannila, H., 1994. Computing discrete Fréchet distance.
-#     Tech. Report CD-TR 94/64, Information Systems Department, Technical
-#     University of Vienna.
+#     Eiter, T. and Mannila, H., 1994. Computing discrete Frechet distance. Tech. Report CD-TR 94/64,
+#     Information Systems Department, Technical University of Vienna.
+
 
 # Calculate Euclidean distance between two points.
 def euc_dist(pt1,pt2):

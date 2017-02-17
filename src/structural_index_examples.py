@@ -9,6 +9,7 @@ pi=np.pi
 
 # First up, let's create some generic canopy profiles
 h = np.arange(0,81.,step=4)
+h_hr = np.arange(0,81.,step=1)
 lambda_1 = 81/3.
 lambda_2 = 40
 lambda_3 = 16
@@ -17,6 +18,12 @@ profile_1[profile_1<0]=0
 
 profile_2 = (1+np.cos(pi*2*h/lambda_1)+0.5*np.cos(pi*2.3*h/lambda_2))*(80-h)
 profile_2[profile_2<0]=0
+
+profile_1_hr = (1+np.sin(pi*2*h_hr/lambda_1)+np.sin(pi*2*h_hr/lambda_2))*(80-h_hr)
+profile_1_hr[profile_1_hr<0]=0
+
+profile_2_hr = (1+np.cos(pi*2*h_hr/lambda_1)+0.5*np.cos(pi*2.3*h_hr/lambda_2))*(80-h_hr)
+profile_2_hr[profile_2_hr<0]=0
 
 #-------------------------------------------------------------------------------
 # Figure 1 - Illustration of the Frechet distance
@@ -66,4 +73,27 @@ axb.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none
 
 plt.tight_layout()
 plt.savefig('Figures/Frechet_example.png')
+plt.show()
+
+#-------------------------------------------------------------------------------
+# Figure 2 - Illustration of the VSI
+h1,p1= structure.find_maxima(h_hr,profile_1_hr)
+h2,p2 = structure.find_maxima(h_hr,profile_2_hr)
+
+plt.figure(2, facecolor='White',figsize=[4,4])
+ax2 = plt.subplot2grid((1,1),(0,0))
+ax2.plot(profile_1_hr,h_hr,'-',color='blue')
+ax2.plot(profile_2_hr,h_hr,'-',color='red')
+ax2.plot(p1,h1,'o',color='blue')
+ax2.plot(p2,h2,'o',color='red')
+for i in range(0,p1.size):
+    ax2.plot((0,p1[i]),(h1[i],h1[i]),'--',color='blue')
+for i in range(0,p2.size):
+    ax2.plot((0,p2[i]),(h2[i],h2[i]),'--',color='red')
+
+ax2.set_xticklabels([])
+ax2.set_yticklabels([])
+
+plt.tight_layout()
+plt.savefig('Figures/VSI_example.png')
 plt.show()

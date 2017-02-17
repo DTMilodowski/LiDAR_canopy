@@ -252,7 +252,7 @@ for pp in range(0,N_plots):
     
     #Radiative Transfer initial
     ax3b = plt.subplot2grid((1,3),(0,1))
-    ax3b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax3b.annotate('b - radiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
         ax3b.plot(LAD_r[:,i],np.max(heights_rad)-heights_rad,'-',c=colour[i],linewidth=1)
     ax3b.set_ylim(0,80)
@@ -261,7 +261,7 @@ for pp in range(0,N_plots):
     #Radiative Transfer adjusted
     ax3c = plt.subplot2grid((1,3),(0,2),sharex=ax3b)
     ax3c.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
-    ax3c.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax3c.annotate('c - radiative transfer with correction', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
         ax3c.plot(LAD_r_adj[:,i],np.max(heights_rad)-heights_rad,'-',c=colour[i],linewidth=1)
     ax3c.set_ylim(0,80)
@@ -356,8 +356,8 @@ for pp in range(0,N_plots):
     ax5a.plot(Hemisfer_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color='blue',alpha=0.5)
 
 for pp in range(0,N_plots):
-    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
-    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_plots)
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_subplots)
+    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_subplots)
     ax5a.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,'o',color='black')
 
 
@@ -367,15 +367,15 @@ ax5b.set_xlabel('LAI$_{Hemisfer}$')
 ax5b.set_ylabel('LAI$_{rad}$')
 ax5b.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 for pp in range(0,N_plots):
-    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]],'.',color='0.5',alpha=0.5)
-    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]],'.',color='red',alpha=0.5)
+    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]][:,-1],'.',color='0.5',alpha=0.5)
+    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,-1],'.',color='red',alpha=0.5)
 
 for pp in range(0,N_plots):
-    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
-    y_err1=np.std(radiative_LAI[Plots[i]])/np.sqrt(N_plots)
-    y_err2=np.std(radiative_DTM_LAI[Plots[i]])/np.sqrt(N_plots)
-    ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]]),xerr=x_err,yerr=y_err1,'o',color='black',mfc='white')
-    ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]]),xerr=x_err,yerr=y_err2,'o',color='black')
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_subplots)
+    y_err1=np.std(radiative_LAI[Plots[i]][:,-1])/np.sqrt(N_subplots)
+    y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,-1])/np.sqrt(N_subplots)
+    ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err1,'o',color='black',mfc='white')
+    ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err2,'o',color='black')
 
 
 ax5c = plt.subplot2grid((1,3),(0,2), sharex=ax5a)
@@ -388,15 +388,81 @@ for pp in range(0,N_plots):
     ax5c.plot(Hemisfer_LAI[Plots[i]],inventory_LAI[Plots[i]],'.',color='green',alpha=0.5)
 
 for pp in range(0,N_plots):
-    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
-    y_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(N_plots)
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_subplots)
+    y_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(N_subplots)
     ax5c.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(inventory_LAI[Plots[i]]),xerr=x_err,yerr=y_err,'o',color='black')
 
 
-ax7.set_xlim((0,20))
-ax7.set_ylim((0,20))
+ax5a.set_xlim((0,20))
+ax5a.set_ylim((0,20))
 plt.tight_layout()
 plt.savefig(output_dir+'GEM_subplot_LAI_comparison.png')
 plt.show()
 
 
+#----------------------------------------------------------------------------------------------------------------
+# Figure 6 - Comparison of radiative transfer models
+plt.figure(6, facecolor='White',figsize=[4,4])
+ax6 = plt.subplot2grid((1,1),(0,0))
+ax6.set_xlabel('LAI$_{rad}$')
+ax6.set_ylabel('LAI$_{rad_DTM}$')
+
+labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
+colour = ['black','blue','red','orange']
+for pp in range(0,N_plots):
+    for k in range(0,max_return):
+        ax6.plot(radiative_LAI[Plots[i]][:,k],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+    
+for pp in range(0,N_plots):
+    for k in range(0,max_return):
+        x_err=np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(N_subplots)
+        y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(N_subplots)
+        ax6.errorbar(np.mean(radiative_LAI[Plots[i]][:,k]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,'o',color=colour[k],label=labels[i])
+
+ax6.set_xlim((0,20))
+ax6.set_ylim((0,20))
+ax6.legend()
+plt.tight_layout()
+plt.savefig(output_dir+'GEM_subplot_radiative_model_LAI_comparison.png')
+plt.show()
+
+#----------------------------------------------------------------------------------------------------------------
+# Figure 7 - Comparison of radiative transfer models against MacArthur-Horn model
+plt.figure(7, facecolor='White',figsize=[4,4])
+ax7a = plt.subplot2grid((1,2),(0,0))
+ax7a.set_xlabel('LAI$_{MacArthur-Horn}$')
+ax7a.set_ylabel('LAI$_{rad}$')
+ax7a.annotate('a - radiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+for pp in range(0,N_plots):
+    for k in range(0,max_return):
+        ax7a.plot(MacArthurHorn_LAI[Plots[i]],radiative_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+    
+for pp in range(0,N_plots):
+    for k in range(0,max_return):
+        x_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_subplots)
+        y_err=np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(N_subplots)
+        ax7a.errorbar(np.mean(MacArthurHorn_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,'o',color=colour[k],label=labels[i])
+
+ax7a.set_xlim((0,20))
+ax7a.set_ylim((0,20))
+ax7.legend()
+
+
+ax7b = plt.subplot2grid((1,2),(0,0), sharex = ax7a, sharey = ax7a)
+ax7b.set_xlabel('LAI$_{MacArthur-Horn}$')
+ax7b.set_ylabel('LAI$_{rad_DTM}$')
+ax7b.annotate('b - radiative transfer with correction', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+for pp in range(0,N_plots):
+    for k in range(0,max_return):
+        ax7b.plot(MacArthurHorn_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+    
+for pp in range(0,N_plots):
+    for k in range(0,max_return):
+        x_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_subplots)
+        y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(N_subplots)
+        ax7b.errorbar(np.mean(MacArthurHorn_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,'o',color=colour[k],label=labels[i])
+
+plt.tight_layout()
+plt.savefig(output_dir+'GEM_subplot_lidar_LAI_comparison.png')
+plt.show()

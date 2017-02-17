@@ -346,44 +346,44 @@ for pp in range(0,N_plots):
 #----------------------------------------------------------------------------------------------------------------
 # Figure 5 - Comparing LAI from hemiphotos against integrated LAD from the different methods
 # Plot up the subplot-level estimates, in addition to the 
-plt.figure(4, facecolor='White',figsize=[9,3])
-ax7 = plt.subplot2grid((1,3),(0,0))
-ax7.set_xlabel('LAI$_{Hemisfer}$')
-ax7.set_ylabel('LAI$_{MacArthur-Horn}$')
-ax7.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax7.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+plt.figure(5, facecolor='White',figsize=[9,3])
+ax5a = plt.subplot2grid((1,3),(0,0))
+ax5a.set_xlabel('LAI$_{Hemisfer}$')
+ax5a.set_ylabel('LAI$_{MacArthur-Horn}$')
+ax5a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax5a.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 for pp in range(0,N_plots):
-    ax7.plot(Hemisfer_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color='blue',alpha=0.5)
+    ax5a.plot(Hemisfer_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color='blue',alpha=0.5)
 
 for pp in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
     y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_plots)
-    ax7.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,'o',color='black')
+    ax5a.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,'o',color='black')
 
 
-ax8 = plt.subplot2grid((1,3),(0,1), sharex=ax7, sharey=ax7)
-ax8.annotate('b - Radiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax8.set_xlabel('LAI$_{Hemisfer}$')
-ax8.set_ylabel('LAI$_{rad}$')
-ax8.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+ax5b = plt.subplot2grid((1,3),(0,1), sharex=ax5a, sharey=ax5a)
+ax5b.annotate('b - Radiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax5b.set_xlabel('LAI$_{Hemisfer}$')
+ax5b.set_ylabel('LAI$_{rad}$')
+ax5b.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 for pp in range(0,N_plots):
-    ax7.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]],'.',color='0.5',alpha=0.5)
-    ax7.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]],'.',color='blue',alpha=0.5)
+    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]],'.',color='0.5',alpha=0.5)
+    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]],'.',color='blue',alpha=0.5)
 
 for pp in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
     y_err1=np.std(radiative_LAI[Plots[i]])/np.sqrt(N_plots)
     y_err2=np.std(radiative_DTM_LAI[Plots[i]])/np.sqrt(N_plots)
-    ax7.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]]),xerr=x_err,yerr=y_err1,'o',color='black',mfc='white')
-    ax7.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]]),xerr=x_err,yerr=y_err2,'o',color='black')
+    ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]]),xerr=x_err,yerr=y_err1,'o',color='black',mfc='white')
+    ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]]),xerr=x_err,yerr=y_err2,'o',color='black')
 
 
-ax9 = plt.subplot2grid((1,3),(0,2), sharex=ax7)
-ax9.annotate('c - Field inventory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax9.set_xlabel('LAI$_{Hemisfer}$')
-ax9.set_ylabel('Canopy Volume / $m^3m^{-2}$')
+ax5c = plt.subplot2grid((1,3),(0,2), sharex=ax5a)
+ax5c.annotate('c - Field inventory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax5c.set_xlabel('LAI$_{Hemisfer}$')
+ax5c.set_ylabel('Canopy Volume / $m^3m^{-2}$')
 
-#ax9.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+#ax5c.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 
 
 for i in range(0,len(Plots)):

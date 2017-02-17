@@ -112,9 +112,10 @@ def find_maxima(signal_x, signal_y):
         if np.all((signal_y[i]>signal_y[i-1],signal_y[i]>signal_y[i+1])):
             pks.append(i)
     Npks = len(pks)
+    print Npks
     peak_x = np.zeros(Npks)
     peak_y=peak_x.copy()
     for i in range(0,Npks):
-        peak_x = signal_x[pks[i]]
-        peak_y = signal_y[pks[i]]
+        peak_x[i] = signal_x[pks[i]]
+        peak_y[i] = signal_y[pks[i]]
     return peak_x, peak_y

@@ -446,7 +446,7 @@ for pp in range(0,N_plots):
 
 ax7a.set_xlim((0,20))
 ax7a.set_ylim((0,20))
-ax7.legend()
+ax7a.legend()
 
 
 ax7b = plt.subplot2grid((1,2),(0,0), sharex = ax7a, sharey = ax7a)

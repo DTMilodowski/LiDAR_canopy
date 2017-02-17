@@ -466,3 +466,6 @@ for pp in range(0,N_plots):
 plt.tight_layout()
 plt.savefig(output_dir+'GEM_subplot_lidar_LAI_comparison.png')
 plt.show()
+
+
+##################################################################################################################

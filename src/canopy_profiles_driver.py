@@ -368,7 +368,7 @@ ax5b.set_ylabel('LAI$_{rad}$')
 ax5b.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 for pp in range(0,N_plots):
     ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]],'.',color='0.5',alpha=0.5)
-    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]],'.',color='blue',alpha=0.5)
+    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]],'.',color='red',alpha=0.5)
 
 for pp in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
@@ -382,22 +382,21 @@ ax5c = plt.subplot2grid((1,3),(0,2), sharex=ax5a)
 ax5c.annotate('c - Field inventory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax5c.set_xlabel('LAI$_{Hemisfer}$')
 ax5c.set_ylabel('Canopy Volume / $m^3m^{-2}$')
-
 #ax5c.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 
+for pp in range(0,N_plots):
+    ax5c.plot(Hemisfer_LAI[Plots[i]],inventory_LAI[Plots[i]],'.',color='green',alpha=0.5)
 
-for i in range(0,len(Plots)):
-    ax7.plot(Hemisfer[Plots[i]],MacArthurHorn_native[Plots[i]],'.',color='blue',alpha=0.5)
-    ax8.plot(Hemisfer[Plots[i]],radiative_spherical[Plots[i]],'.',color='red', alpha=0.5)
-    ax8.plot(Hemisfer[Plots[i]],radiative_spherical_1st[Plots[i]],'.',color='black', alpha=0.5)
-    ax9.plot(MacArthurHorn_native[Plots[i]],radiative_spherical[Plots[i]],'.',color='red', alpha=0.5)
-    ax9.plot(MacArthurHorn_native[Plots[i]],radiative_spherical_1st[Plots[i]],'.',color='black', alpha=0.5)
-    
+for pp in range(0,N_plots):
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_plots)
+    y_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(N_plots)
+    ax5c.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(inventory_LAI[Plots[i]]),xerr=x_err,yerr=y_err,'o',color='black')
+
 
 ax7.set_xlim((0,20))
 ax7.set_ylim((0,20))
 plt.tight_layout()
-plt.savefig('GEM_subplot_compilation.png')
+plt.savefig(output_dir+'GEM_subplot_LAI_comparison.png')
 plt.show()
 
 

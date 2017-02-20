@@ -13,16 +13,16 @@ h_hr = np.arange(0,81.,step=1)
 lambda_1 = 81/3.
 lambda_2 = 40
 lambda_3 = 16
-profile_1 = (1+np.sin(pi*2*h/lambda_1)+np.sin(pi*2*h/lambda_2))*(80-h)
+profile_1 = (1+np.sin(pi*2*h/lambda_1)+np.sin(pi*2*h/lambda_2))*(80-h)/5.
 profile_1[profile_1<0]=0
 
-profile_2 = (1+np.cos(pi*2*h/lambda_1)+0.5*np.cos(pi*2.3*h/lambda_2))*(80-h)
+profile_2 = (1+np.cos(pi*2*h/lambda_1)+0.5*np.cos(pi*2.3*h/lambda_2))*(80-h)/5.
 profile_2[profile_2<0]=0
 
-profile_1_hr = (1+np.sin(pi*2*h_hr/lambda_1)+np.sin(pi*2*h_hr/lambda_2))*(80-h_hr)
+profile_1_hr = (1+np.sin(pi*2*h_hr/lambda_1)+np.sin(pi*2*h_hr/lambda_2))*(80-h_hr)/5.
 profile_1_hr[profile_1_hr<0]=0
 
-profile_2_hr = (1+np.cos(pi*2*h_hr/lambda_1)+0.5*np.cos(pi*2.3*h_hr/lambda_2))*(80-h_hr)
+profile_2_hr = (1+np.cos(pi*2*h_hr/lambda_1)+0.5*np.cos(pi*2.3*h_hr/lambda_2))*(80-h_hr)/5.
 profile_2_hr[profile_2_hr<0]=0
 
 #-------------------------------------------------------------------------------
@@ -93,6 +93,8 @@ for i in range(0,p2.size):
 
 ax2.set_xticklabels([])
 ax2.set_yticklabels([])
+ax2.set_ylabel('height')
+ax2.set_xlabel('LAD')
 
 plt.tight_layout()
 plt.savefig('Figures/VSI_example.png')

@@ -299,7 +299,7 @@ for pp in range(0,N_plots):
     ax4a.set_ylabel('Height / m')
     ax4a.set_xlabel('Number of returns (x1000)')
     ax4a.legend(loc=1)
-    ax4a.set_xlim(xmax=1.2*return_dist.max()/1000.)
+    ax4a.set_xlim(xmax=1.2*return_dist_adj.max()/1000.)
     
     # MacArthur-Horn method
     ax4b = plt.subplot2grid((1,4),(0,1))

@@ -52,8 +52,8 @@ for pp in range(0,N_plots):
         LAD_profiles_spherical_adjusted[:,rr]=u.copy()
     lidar_profiles_adjusted[Plot_name] = np.sum(n.copy(),axis=1)
     # now perform same calculation, but removing azimuth info (i.e. assuming scan angle = 0 in all cases)
-    lidar_points_no_azimuth = lidar_pts.copy()
-    lidar_points_no_azimuth[:,5] = 0.
+    lidar_pts_no_azimuth = lidar_pts.copy()
+    lidar_pts_no_azimuth[:,5] = 0.
     for rr in range(0,max_return):
         max_k=rr+1
         u,n,I,U = LAD2.calculate_LAD_DTM(lidar_pts_no_azimuth,heights_rad,max_k,'spherical')

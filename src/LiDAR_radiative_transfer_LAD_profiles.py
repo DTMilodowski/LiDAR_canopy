@@ -49,7 +49,8 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         #print "\tCalculating return matrix"
         n = np.zeros((M,S,K),dtype='float')
         for i in range(0,M):
-            use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
+            #use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
+            use1 = np.all((z0>=zi[i],z0<zi[i]+dz),axis=0)
             for j in range(0,S):
                 use2 = A[use1]==th[j]
                 for k in range(0,K):
@@ -66,15 +67,12 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         n0[i]=np.sum(np.all((R==1, A==th[i]),axis=0))
         n1=np.sum(n[:,i,:],axis=1)
         for j in range(0,K):
-            #I[:,i,j]=1-np.cumsum(np.sum(n[:,i,j],axis=2))/n0[i]
             I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
             U[:,i,j]=n[:,i,j]/n1
-    
         #Apply correction factor for limited available return
         U[:,i,0]=U[:,i,0]*I[:,i,K-1]
         control[:,i]=n1>0
         G[:,i]=Gfunction(tl,th[i],zi)
-
     # Compute LAD from ensemble across scan angles
     #print "\tComputing LAD from ensemble across scan angles"
     p = np.sum(n[:,:,0],axis=1)
@@ -106,13 +104,13 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     # numerical solution
     #print "\tNumerical solution"
     u = np.zeros(M,dtype='float')
-    for i in range(jj,M): # check indexing here
+    for i in range(jj,M):
         # Eq 6
         u[i] = (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)
         if u[i]<0:
             u[i]=0
 
-    u[np.isfinite(u)==False]=0#np.nan
+    u[~np.isfinite(u)]=0#np.nan
     return u,n,I,U
 
 #----------------------------------------------------------------------------------------

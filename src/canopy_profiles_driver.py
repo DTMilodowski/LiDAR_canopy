@@ -369,7 +369,7 @@ for i in range(0,N_plots):
     ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,-1],'.',color='red',alpha=0.5)
 
 for i in range(0,N_plots):
-    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_subplots)
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
     y_err1=np.std(radiative_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
     y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
     ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err1,marker='o',color='black',mfc='white')
@@ -481,3 +481,53 @@ plt.show()
 
 
 ##################################################################################################################
+# Figure 8 - Comparing inventory based canopy volumes against integrated LAD from the different methods
+# Plot up the subplot-level estimates, in addition to the 
+plt.figure(8, facecolor='White',figsize=[9,4])
+ax8a = plt.subplot2grid((1,3),(0,0))
+ax8a.set_xlabel('Canopy Volume / $m^3m^{-2}$')
+ax8a.set_ylabel('LAI$_{MacArthur-Horn}$')
+ax8a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax8a.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+for i in range(0,N_plots):
+    ax8a.plot(inventory_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color='blue',alpha=0.5)
+
+for i in range(0,N_plots):
+    x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
+    ax8a.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),x_err,y_err,'o',color='black')
+
+
+ax8b = plt.subplot2grid((1,3),(0,1), sharex=ax8a, sharey=ax8a)
+ax8b.annotate('b - Radiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax8b.set_xlabel('Canopy Volume')
+ax8b.set_ylabel('LAI$_{rad}$')
+ax8b.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+for i in range(0,N_plots):
+    ax8b.plot(inventory_LAI[Plots[i]],radiative_LAI[Plots[i]][:,-1],'.',color='0.5',alpha=0.5)
+
+for i in range(0,N_plots):
+    x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(radiative_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
+    ax8b.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err,marker='o',color='black')
+
+
+ax8c = plt.subplot2grid((1,3),(0,2), sharex=ax8a, sharey=ax8a)
+ax8c.annotate('c - Radiative transfer corrected', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax8c.set_ylabel('LAI$_{rad DTM}')
+ax8c.set_xlabel('Canopy Volume / $m^3m^{-2}$')
+ax8c.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+
+for i in range(0,N_plots):
+    ax8c.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]],'.',color='red',alpha=0.5)
+
+for i in range(0,N_plots):
+    x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(radiative_DTM_LAI[Plots[i]])/np.sqrt(n_subplots)
+    ax8c.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker='o',color='black')
+
+
+ax8a.set_ylim((0,20))
+plt.tight_layout()
+plt.savefig(output_dir+'GEM_subplot_LAI_canopy_volume_comparison.png')
+plt.show()

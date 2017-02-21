@@ -166,7 +166,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
     #print "\tCalculating return matrix"
     n = np.zeros((M,S,K))
     for i in range(0,M):
-        use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
+        use1 = np.all((z0>=zi[i],z0<zi[i]+dz),axis=0)
         for j in range(0,S):
             use2 = A[use1]==th[j]
             for k in range(0,K):

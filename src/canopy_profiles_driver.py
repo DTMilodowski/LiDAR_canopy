@@ -19,14 +19,14 @@ import statistics_tools as stats
 las_file = 'Carbon_plot_point_cloud_buffer.las'
 subplot_coordinate_file = 'BALI_subplot_coordinates_corrected.csv'
 allometry_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Regional/Allometry/Crown_depth_data_SEAsia.csv'
-field_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_carbonplots_FieldMapcensus2016.csv'
+field_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_DANUM_carbonplots_FieldMapcensus2016.csv'
 LAI_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_LAI_fromHemisphericalPhotos.csv'
 
 # also define output directory (for saving figures)
 output_dir = './Figures/'
 
 # define important parameters for canopy profile estimation
-Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
+#Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
 N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
@@ -72,11 +72,10 @@ for pp in range(0,N_plots):
     n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
     coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
     bbox_polygon = aux.get_bounding_box(coord_pairs)
-    plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon)
-    
+    plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon)    
+
     # get some subplot-level information
     n_subplots = subplot_polygons[Plot_name].shape[0]
-
     # set up some arrays to host the radiative transfer based profiles
     heights_rad = np.arange(0,max_height+1)
     LAD_rad = np.zeros((n_subplots,heights_rad.size,max_return))
@@ -101,7 +100,6 @@ for pp in range(0,N_plots):
         print "Subplot: ", subplot_labels[Plot_name][i]
         # filter lidar points into subplot
         sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_polygons[Plot_name][i,:,:])
-
         # first of all, loop through the return numbers to calculate the radiative LAD profiles
         for rr in range(0,max_return):
             max_k=rr+1

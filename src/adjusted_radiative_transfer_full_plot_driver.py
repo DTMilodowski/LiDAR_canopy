@@ -82,7 +82,7 @@ for pp in range(0,N_plots):
     ax11 = plt.subplot2grid((1,4),(0,0))
     colour = ['black','blue','red','orange']
     labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
-    ax11.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax11.annotate('a - lidar profiles', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
         ax11.plot(lidar_profiles[Plot_name][:,i]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[i],linewidth=1,label=labels[i])
         ax11.plot(lidar_profiles_adjusted[Plot_name][:,i]/1000.,np.max(heights_rad)-heights_rad,'--',c=colour[i],linewidth=1)
@@ -94,7 +94,7 @@ for pp in range(0,N_plots):
     
     #Radiative Transfer initial
     ax12 = plt.subplot2grid((1,4),(0,1))
-    ax12.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax12.annotate('b - initial radiative \ntransfer model', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
         ax12.plot(radiative_spherical_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
     ax12.set_ylim(0,80)
@@ -102,7 +102,7 @@ for pp in range(0,N_plots):
 
     #Radiative Transfer adjusted
     ax13 = plt.subplot2grid((1,4),(0,2),sharex=ax12)
-    ax13.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax13.annotate('c - improved radiative \ntransfer model', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
         ax13.plot(radiative_spherical_adjusted_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
     ax13.set_ylim(0,80)
@@ -112,7 +112,7 @@ for pp in range(0,N_plots):
     #Radiative Transfer adjusted with no azimuth information
     ax14 = plt.subplot2grid((1,4),(0,3),sharex=ax12)
     ax14.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
-    ax14.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax14.annotate('d\n- ignoring scan angle ', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
         ax14.plot(radiative_spherical_no_azimuth_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
     ax14.set_ylim(0,80)
@@ -124,7 +124,10 @@ for pp in range(0,N_plots):
     ax11.locator_params(axis='x',nbins=5)
     ax12.locator_params(axis='x',nbins=5)
 
-    print Plot_name, radiative_spherical_LAD[Plot_name].sum(axis=0),  radiative_spherical_adjusted_LAD[Plot_name].sum(axis=0)
+    print Plot_name
+    print radiative_spherical_LAD[Plot_name].sum(axis=0)
+    print radiative_spherical_adjusted_LAD[Plot_name].sum(axis=0)
+    print radiative_spherical_no_azimuth_LAD[Plot_name].sum(axis=0)
     plt.tight_layout()
     plt.savefig(Plot_name+'_LAD_radiative_comparison_full_plot_inversion_maxreturn_'+str(max_return)+'.png')
     plt.show()

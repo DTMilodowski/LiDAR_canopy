@@ -26,7 +26,7 @@ LAI_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_L
 output_dir = './Figures/'
 
 # define important parameters for canopy profile estimation
-#Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
+Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
 N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
@@ -354,8 +354,8 @@ for i in range(0,N_plots):
     ax5a.plot(Hemisfer_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color='blue',alpha=0.5)
 
 for i in range(0,N_plots):
-    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_subplots)
-    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_subplots)
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
     ax5a.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),x_err,y_err,'o',color='black')
 
 
@@ -370,8 +370,8 @@ for i in range(0,N_plots):
 
 for i in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_subplots)
-    y_err1=np.std(radiative_LAI[Plots[i]][:,-1])/np.sqrt(N_subplots)
-    y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,-1])/np.sqrt(N_subplots)
+    y_err1=np.std(radiative_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
+    y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
     ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err1,marker='o',color='black',mfc='white')
     ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err2,marker='o',color='black')
 
@@ -386,8 +386,8 @@ for i in range(0,N_plots):
     ax5c.plot(Hemisfer_LAI[Plots[i]],inventory_LAI[Plots[i]],'.',color='green',alpha=0.5)
 
 for i in range(0,N_plots):
-    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(N_subplots)
-    y_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(N_subplots)
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
     ax5c.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(inventory_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker='o',color='black')
 
 
@@ -416,8 +416,8 @@ for i in range(0,N_plots):
 for i in range(0,N_plots):
     for k in range(0,max_return):
         print Plots[i],np.mean(radiative_DTM_LAI[Plots[i]][:,k])
-        x_err=np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(N_subplots)
-        y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(N_subplots)
+        x_err=np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
+        y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
         if i == 0:
             ax6.errorbar(np.mean(radiative_LAI[Plots[i]][:,k]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=labels[k])
         else:
@@ -445,8 +445,8 @@ for i in range(0,N_plots):
     
 for i in range(0,N_plots):
     for k in range(0,max_return):
-        x_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_subplots)
-        y_err=np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(N_subplots)
+        x_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
+        y_err=np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
         ax7a.errorbar(np.mean(MacArthurHorn_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
 
 
@@ -463,8 +463,8 @@ for i in range(0,N_plots):
     
 for i in range(0,N_plots):
     for k in range(0,max_return):
-        x_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(N_subplots)
-        y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(N_subplots)
+        x_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
+        y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
         if i == 0:
             ax7b.errorbar(np.mean(MacArthurHorn_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=labels[k])
         else:

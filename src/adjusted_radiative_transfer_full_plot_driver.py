@@ -21,6 +21,7 @@ minimum_height = 2.
 # store profiles in dictionaries
 radiative_spherical_LAD = {}
 radiative_spherical_adjusted_LAD = {}
+radiative_spherical_no_azimuth_LAD = {}
 lidar_profiles ={}
 lidar_profiles_adjusted = {}
 
@@ -37,21 +38,26 @@ for pp in range(0,N_plots):
     heights_rad = np.arange(0,max_height+1)
     LAD_profiles_spherical=np.zeros((heights_rad.size,max_return))
     LAD_profiles_spherical_adjusted=np.zeros((heights_rad.size,max_return))
-
+    LAD_profiles_spherical_no_azimuth=np.zeros((heights_rad.size,max_return))
+    # first get LAD distribution following Detto et al., 2015
     for rr in range(0,max_return):
         max_k=rr+1
         u,n,I,U = LAD2.calculate_LAD(lidar_pts,heights_rad,max_k,'spherical')
         LAD_profiles_spherical[:,rr]=u.copy()
     lidar_profiles[Plot_name] = np.sum(n.copy(),axis=1)
-    #derive correction factor for number of second returns
-    #N_1veg = float(np.all((sp_pts[:,3]==1,sp_pts[:,4]==1),axis=0).sum())
-    #N_2 = float((sp_pts[:,3]==2).sum())
-    #n[:,:,1]*=N_1veg/N_2
+    # now retrieve LAD distribution using correction for imperfect penetration
     for rr in range(0,max_return):
         max_k=rr+1
         u,n,I,U = LAD2.calculate_LAD_DTM(lidar_pts,heights_rad,max_k,'spherical')
         LAD_profiles_spherical_adjusted[:,rr]=u.copy()
     lidar_profiles_adjusted[Plot_name] = np.sum(n.copy(),axis=1)
+    # now perform same calculation, but removing azimuth info (i.e. assuming scan angle = 0 in all cases)
+    lidar_points_no_azimuth = lidar_pts.copy()
+    lidar_points_no_azimuth[:,5] = 0.
+    for rr in range(0,max_return):
+        max_k=rr+1
+        u,n,I,U = LAD2.calculate_LAD_DTM(lidar_pts_no_azimuth,heights_rad,max_k,'spherical')
+        LAD_profiles_spherical_no_azimuth[:,rr]=u.copy()
 
     LAD_profiles_spherical[np.isnan(LAD_profiles_spherical)]=0
     LAD_profiles_spherical_adjusted[np.isnan(LAD_profiles_spherical_adjusted)]=0
@@ -63,8 +69,9 @@ for pp in range(0,N_plots):
     LAD_profiles_spherical_adjusted[mask,:]=0
 
     # store profiles in dictionaries
-    radiative_spherical_LAD[Plot_name] = LAD_profiles_spherical[:-1,:]
-    radiative_spherical_adjusted_LAD[Plot_name] = LAD_profiles_spherical_adjusted[:-1,:]
+    radiative_spherical_LAD[Plot_name] = LAD_profiles_spherical[:-1,:].copy()
+    radiative_spherical_adjusted_LAD[Plot_name] = LAD_profiles_spherical_adjusted[:-1,:].copy()
+    radiative_spherical_no_azimuth_LAD[Plot_name] = LAD_profiles_spherical_no_azimuth[:-1,:].copy()
 
 heights = np.arange(1,81)
 for pp in range(0,N_plots):
@@ -72,7 +79,7 @@ for pp in range(0,N_plots):
     plt.figure(1, facecolor='White',figsize=[10,6.5])
     ##plt.title(Plot_name)
     # lidar
-    ax11 = plt.subplot2grid((1,3),(0,0))
+    ax11 = plt.subplot2grid((1,4),(0,0))
     colour = ['black','blue','red','orange']
     labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
     ax11.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -86,7 +93,7 @@ for pp in range(0,N_plots):
     ax11.set_xlim(xmax=1.2*lidar_profiles[Plot_name].max()/1000.)
     
     #Radiative Transfer initial
-    ax12 = plt.subplot2grid((1,3),(0,1))
+    ax12 = plt.subplot2grid((1,4),(0,1))
     ax12.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
         ax12.plot(radiative_spherical_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
@@ -94,13 +101,22 @@ for pp in range(0,N_plots):
     ax12.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
 
     #Radiative Transfer adjusted
-    ax13 = plt.subplot2grid((1,3),(0,2),sharex=ax12)
-    ax13.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+    ax13 = plt.subplot2grid((1,4),(0,2),sharex=ax12)
     ax13.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     for i in range(0,max_return):
         ax13.plot(radiative_spherical_adjusted_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
     ax13.set_ylim(0,80)
     ax13.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
+    
+
+    #Radiative Transfer adjusted with no azimuth information
+    ax14 = plt.subplot2grid((1,4),(0,3),sharex=ax12)
+    ax14.annotate(Plot_name, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+    ax14.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    for i in range(0,max_return):
+        ax14.plot(radiative_spherical_no_azimuth_LAD[Plot_name][:,i],np.max(heights)-heights+1,'-',c=colour[i],linewidth=1)
+    ax14.set_ylim(0,80)
+    ax14.set_xlabel('LAD$_{rad}$ / m$^2$m$^{-1}$')
     
 
     ax12.set_xlim(xmax=0.7)

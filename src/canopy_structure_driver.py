@@ -37,9 +37,6 @@ radiative_DTM_LAD = {}
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
 all_lidar_pts = lidar.load_lidar_data(las_file)
 
-# load LAI estimates from hemiphotos
-field_LAI = aux.load_field_LAI(LAI_file)
-
 # loop through all plots to be analysed
 for pp in range(0,N_plots):
     print Plots[pp]
@@ -119,4 +116,5 @@ for pp in range(0,N_plots):
     # get mean Frechet distance
     frechet_dist_MH[plot_name] = structure.calculate_mean_Frechet_distance(MacArthurHorn_LAD[Plot_name])
     frechet_dist_rad[plot_name] = structure.calculate_mean_Frechet_distance(radiative_DTM_rad[Plot_name])
+
 

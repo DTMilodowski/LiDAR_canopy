@@ -86,12 +86,37 @@ for pp in range(0,N_plots):
     mask = heights <= minimum_height
     LAD_MH[:,mask]=0
     mask = np.max(heights_rad)-heights_rad<=minimum_height
-    LAD_rad_DTM[:,mask]=0
+    LAD_rad_DTM[:,mask]=np.nan
 
     # Store arrays into respective dictionaries
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
     radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
 
 
+# next step is to take the canopy profiles and get the vertical and horizontal canopy structural metrics
 
+# first up - create some dictionaries to host the structural metrics
+frechet_dist_MH = {}
+peak_heights_MH = {}
+vertical_structural_variance_MH = {}
+VSI_MH = {}
+frechet_dist_rad = {}
+peak_heights_rad = {}
+vertical_structural_variance_rad = {}
+VSI_rad = {}
+
+for pp in range(0,N_plots):
+    plot_name = Plots[pp]
+    # get peaks
+    peak_heights_MH[plot_name] = structure.retrieve_peaks(MacArthurHorn_LAD[Plot_name])
+    peak_heights_rad[plot_name] = structure.retrieve_peaks(radiative_DTM_rad[Plot_name])
+    # get variance in layer heights
+    vertical_structural_variance_MH[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_MH[plot_name])
+    vertical_structural_variance_rad[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_rad[plot_name])
+    # get VSI
+    VSI_MH[plot_name] = structure.calculate_VSI(peak_heights_MH[plot_name])
+    VSI_rad[plot_name] = structure.calculate_VSI(peak_heights_rad[plot_name])
+    # get mean Frechet distance
+    frechet_dist_MH[plot_name] = structure.calculate_mean_Frechet_distance(MacArthurHorn_LAD[Plot_name])
+    frechet_dist_rad[plot_name] = structure.calculate_mean_Frechet_distance(radiative_DTM_rad[Plot_name])
 

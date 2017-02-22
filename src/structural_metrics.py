@@ -66,11 +66,11 @@ def calculate_mean_Frechet_distance(vertical_profiles):
 #    forest by means of L-band tomographic SAR. In Geoscience and Remote Sensing Symposium (IGARSS), 2015 IEEE 
 #    International (pp. 5288-5291). IEEE.
 def retrieve_peaks(vertical_profiles,heights):
-    N_heights, N_profiles = vertical_profiles.shape
+    N_profiles,N_heights = vertical_profiles.shape
     peaks, peak_amplitude = find_maxima(heights,vertical_profiles[0])
     for i in range(1,N_profiles):
         peaks_this_iter, peak_amplitude = find_maxima(heights,vertical_profiles[i])
-        peaks = np.concatenate(peaks,peaks_this_iter)
+        peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
     return peaks
 
 def calculate_VSI(peaks):
@@ -112,10 +112,11 @@ def find_maxima(signal_x, signal_y):
         if np.all((signal_y[i]>signal_y[i-1],signal_y[i]>signal_y[i+1])):
             pks.append(i)
     Npks = len(pks)
-    print Npks
+    #print Npks
     peak_x = np.zeros(Npks)
     peak_y=peak_x.copy()
     for i in range(0,Npks):
         peak_x[i] = signal_x[pks[i]]
         peak_y[i] = signal_y[pks[i]]
     return peak_x, peak_y
+

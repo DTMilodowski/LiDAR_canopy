@@ -14,6 +14,7 @@ import numpy as np
 
 # Calculate Euclidean distance between two points.
 def euc_dist(pt1,pt2):
+    print pt1, pt2
     return np.sqrt((pt2[0]-pt1[0])*(pt2[0]-pt1[0])+(pt2[1]-pt1[1])*(pt2[1]-pt1[1]))
 
 def _c(ca,i,j,P,Q):
@@ -46,7 +47,7 @@ def frechetDist(P,Q):
 #    Tello, M., Cazcarra-Bes, V., Pardini, M. and Papathanassiou, K., 2015, July. Structural classification of
 #    forest by means of L-band tomographic SAR. In Geoscience and Remote Sensing Symposium (IGARSS), 2015 IEEE 
 #    International (pp. 5288-5291). IEEE.
-def calculate_mean_Frechet_distance(vertical_profiles):
+def calculate_mean_Frechet_distance(vertical_profiles,heights):
     
     N_heights, N_profiles = vertical_profiles.shape
     N_pairs = N_profiles*(N_profiles-1)/2
@@ -54,7 +55,7 @@ def calculate_mean_Frechet_distance(vertical_profiles):
     index = 0
     for i in range(0,N_profiles):
         for j in range(i+1,N_profiles):
-            Frechet[index] = frechetDist(vertical_profiles[:,i],vertical_profiles[:,j])
+            Frechet[index] = frechetDist(np.concatenate((vertical_profiles[:,i],heights),axis=1),np.concatenate((vertical_profiles[:,j],heights),axis=1))
     mean_Fr = np.mean(Frechet)
     return mean_Fr
 

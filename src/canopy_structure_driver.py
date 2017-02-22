@@ -103,18 +103,21 @@ vertical_structural_variance_rad = {}
 VSI_rad = {}
 
 for pp in range(0,N_plots):
+    print Plots[pp]
     plot_name = Plots[pp]
     # get peaks
-    peak_heights_MH[plot_name] = structure.retrieve_peaks(MacArthurHorn_LAD[Plot_name])
-    peak_heights_rad[plot_name] = structure.retrieve_peaks(radiative_DTM_rad[Plot_name])
+    print "\t- getting vertical metrics"
+    peak_heights_MH[plot_name] = structure.retrieve_peaks(MacArthurHorn_LAD[Plot_name],heights)
+    peak_heights_rad[plot_name] = structure.retrieve_peaks(radiative_DTM_LAD[Plot_name][:,:,-1],heights_rad)
     # get variance in layer heights
     vertical_structural_variance_MH[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_MH[plot_name])
     vertical_structural_variance_rad[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_rad[plot_name])
     # get VSI
     VSI_MH[plot_name] = structure.calculate_VSI(peak_heights_MH[plot_name])
     VSI_rad[plot_name] = structure.calculate_VSI(peak_heights_rad[plot_name])
+    print "\t- getting horizontal metrics"
     # get mean Frechet distance
-    frechet_dist_MH[plot_name] = structure.calculate_mean_Frechet_distance(MacArthurHorn_LAD[Plot_name])
-    frechet_dist_rad[plot_name] = structure.calculate_mean_Frechet_distance(radiative_DTM_rad[Plot_name])
+    frechet_dist_MH[plot_name] = structure.calculate_mean_Frechet_distance(MacArthurHorn_LAD[Plot_name],heights)
+    frechet_dist_rad[plot_name] = structure.calculate_mean_Frechet_distance(radiative_DTM_LAD[Plot_name][:,:,-1],heights_rad)
 
 

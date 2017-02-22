@@ -14,7 +14,6 @@ import numpy as np
 
 # Calculate Euclidean distance between two points.
 def euc_dist(pt1,pt2):
-    print pt1, pt2
     return np.sqrt((pt2[0]-pt1[0])*(pt2[0]-pt1[0])+(pt2[1]-pt1[1])*(pt2[1]-pt1[1]))
 
 def _c(ca,i,j,P,Q):
@@ -48,14 +47,19 @@ def frechetDist(P,Q):
 #    forest by means of L-band tomographic SAR. In Geoscience and Remote Sensing Symposium (IGARSS), 2015 IEEE 
 #    International (pp. 5288-5291). IEEE.
 def calculate_mean_Frechet_distance(vertical_profiles,heights):
-    
-    N_heights, N_profiles = vertical_profiles.shape
+    N_profiles, N_heights = vertical_profiles.shape
     N_pairs = N_profiles*(N_profiles-1)/2
     Frechet = np.zeros(N_pairs)
     index = 0
+    line1=np.zeros((N_heights,2))
+    line1[:,0] = heights.copy()
+    line2=line1.copy()
     for i in range(0,N_profiles):
+        line1[:,1] = vertical_profiles[i,:]
         for j in range(i+1,N_profiles):
-            Frechet[index] = frechetDist(np.concatenate((vertical_profiles[:,i],heights),axis=1),np.concatenate((vertical_profiles[:,j],heights),axis=1))
+            line2[:,1] = vertical_profiles[j,:]
+            Frechet[index] = frechetDist(line1,line2)
+            index+=1
     mean_Fr = np.mean(Frechet)
     return mean_Fr
 
@@ -113,7 +117,6 @@ def find_maxima(signal_x, signal_y):
         if np.all((signal_y[i]>signal_y[i-1],signal_y[i]>signal_y[i+1])):
             pks.append(i)
     Npks = len(pks)
-    #print Npks
     peak_x = np.zeros(Npks)
     peak_y=peak_x.copy()
     for i in range(0,Npks):

@@ -19,6 +19,7 @@ import inventory_based_LAD_profiles as field
 # irradiance through the canopy
 # I_0 is the incident radiation at the top of the canopy.  If I_0==1 this will
 # give the fraction of light transmitted to a given canopy layer.
+# For reference - see Stark et al., Ecology Letters, 2012
 def estimate_canopy_light_transmittance(LAD,heights,k,I_0):
     N_levels = heights.size
     dz = np.abs(heights[1]-heights[0])
@@ -26,7 +27,9 @@ def estimate_canopy_light_transmittance(LAD,heights,k,I_0):
 
     return I
 
-# Estimate fraction of light absorbed at each layer within the canopy
+# Estimate fraction of light absorbed at each layer within the canopy assuming
+# Beer-Lambert decay of light intensity into canopy with horizontally uniform
+# LAD distributions
 def estimate_canopy_light_absorption(I,k):
     N_levels = I.size
     temp_I = np.zeros(N_levels+1)

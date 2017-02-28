@@ -14,6 +14,10 @@ import numpy as np
 # give the fraction of light transmitted to a given canopy layer.
 # For reference - see Stark et al., Ecology Letters, 2012
 def estimate_canopy_light_transmittance(LAD,heights,k,I_0):
+    # make sure that canopy levels are labelled from ground up.
+    if heights[0]>heights[1]:
+        LAD = LAD[::-1]
+
     N_levels = heights.size
     dz = np.abs(heights[1]-heights[0])
     I = I_0*np.exp( -k*np.cumsum(LAD[::-1])[::-1]*dz )

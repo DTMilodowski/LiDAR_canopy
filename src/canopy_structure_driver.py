@@ -2,6 +2,8 @@
 # This driver function analyses both LiDAR data and field inventory data to produce independent estimates of
 # canopy structure.  These are compared against each other and their integrated LAD is compared against LAI
 # estimates from hemispherical photographs.
+# An additional test is to change the vertical resolution to investigate whether this improves the stability of
+# the LAD profiles when the point cloud becomes sparse - for example lower in the canopy of old growth forest
 ############################################################################################################### 
 import numpy as np
 import sys

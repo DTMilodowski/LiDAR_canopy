@@ -81,9 +81,9 @@ for pp in range(0,N_plots):
         for rr in range(0,max_return):
             max_k=rr+1
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
-            LAD_rad_DTM[i,:,rr]=u.copy()
+            LAD_rad_DTM[i,:,rr]=u[::-1].copy()
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad_2m,max_k,'spherical')
-            LAD_rad_2m[i,:,rr]=u.copy()
+            LAD_rad_2m[i,:,rr]=u[::-1].copy()
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
@@ -101,11 +101,12 @@ for pp in range(0,N_plots):
     # - remove all profile values below minimum height prior to comparison
     mask = heights <= minimum_height
     LAD_MH[:,mask]=0
-    mask = np.max(heights_rad)-heights_rad<=minimum_height
+    #mask = np.max(heights_rad)-heights_rad<=minimum_height
+    mask = heights_rad<=minimum_height
     LAD_rad_DTM[:,mask]=np.nan
     mask = heights_2m <= minimum_height
     LAD_MH_2m[:,mask]=0
-    mask = np.max(heights_rad_2m)-heights_rad_2m<=minimum_height
+    mask = heights_rad_2m<=minimum_height
     LAD_rad_2m[:,mask]=np.nan
 
     # Store arrays into respective dictionaries

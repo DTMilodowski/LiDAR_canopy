@@ -22,7 +22,8 @@ subplot_coordinate_file = 'BALI_subplot_coordinates_corrected.csv'
 output_dir = './Figures/'
 
 # define important parameters for canopy profile estimation
-Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
+#Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
+Plots = ['Belian']
 N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
@@ -34,7 +35,10 @@ minimum_height = 2.
 # define dictionaries to host the various canopy profiles and LAI estimates that will be produced
 MacArthurHorn_LAD = {}
 radiative_DTM_LAD = {}
-
+MacArthurHorn_LAD_2m = {}
+MacArthurHorn_LAD_5m = {}
+radiative_LAD_2m = {}
+radiative_LAD_5m = {}
 # load coordinates and lidar points for target areas
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
 all_lidar_pts = lidar.load_lidar_data(las_file)

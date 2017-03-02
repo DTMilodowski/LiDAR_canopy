@@ -115,6 +115,31 @@ for pp in range(0,N_plots):
     MacArthurHorn_LAD_2m[Plot_name] = LAD_MH_2m.copy()
     radiative_DTM_LAD_2m[Plot_name] = LAD_rad_2m.copy()
 
+# Plot up the subplot profiles to see how changing resolution impacts on the resultant LAD profiles
+for pp in range(0,N_plots):
+    print Plots[pp]
+    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_MH_1m'
+    plot_subplot_LAD_profiles(MacArthurHorn_LAD[Plots[pp]],heights,'g',label_string,figure_name)
+
+    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_MH_2m'
+    plot_subplot_LAD_profiles(MacArthurHorn_LAD_2m[Plots[pp]],heights_2m,'g',label_string,figure_name)
+
+    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_1m_k2'
+    plot_subplot_LAD_profiles(radiative_DTM_LAD[Plots[pp]][:,:,1],heights_rad,'g',label_string,figure_name)
+
+    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_1m_k3'
+    plot_subplot_LAD_profiles(radiative_DTM_LAD[Plots[pp]][:,:,2],heights_rad,'g',label_string,figure_name)
+
+
+    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k2'
+    plot_subplot_LAD_profiles(radiative_DTM_LAD_2m[Plots[pp]][:,:,1],heights_rad_2m,'g',label_string,figure_name)
+
+    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k3'
+    plot_subplot_LAD_profiles(radiative_DTM_LAD_2m[Plots[pp]][:,:,2],heights_rad_2m,'g',label_string,figure_name)
+
+
+
+
 
 # next step is to take the canopy profiles and get the vertical and horizontal canopy structural metrics
 

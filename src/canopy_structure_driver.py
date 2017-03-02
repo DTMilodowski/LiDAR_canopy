@@ -130,10 +130,10 @@ for pp in range(0,N_plots):
 
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k2'
-    plot_subplot_LAD_profiles(radiative_DTM_LAD_2m[Plots[pp]][:,:,1],heights_rad_2m,'g',label_string,figure_name)
+    plot_subplot_LAD_profiles(radiative_LAD_2m[Plots[pp]][:,:,1],heights_rad_2m,'g',label_string,figure_name)
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k3'
-    plot_subplot_LAD_profiles(radiative_DTM_LAD_2m[Plots[pp]][:,:,2],heights_rad_2m,'g',label_string,figure_name)
+    plot_subplot_LAD_profiles(radiative_LAD_2m[Plots[pp]][:,:,2],heights_rad_2m,'g',label_string,figure_name)
 
 
 

@@ -29,6 +29,8 @@ leaf_angle_dist = 'spherical'
 max_height = 80
 max_return = 3
 layer_thickness = 1
+layer_thickness_2m = 2
+layer_thickness_5m = 5
 n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 
@@ -58,11 +60,15 @@ for pp in range(0,N_plots):
 
     # set up some arrays to host the radiative transfer based profiles
     heights_rad = np.arange(0,max_height+1)
+    heights_rad_2m = np.arange(0,max_height+1,2.)
     LAD_rad_DTM = np.zeros((n_subplots,heights_rad.size,max_return))
+    LAD_rad_2m = np.zeros((n_subplots,heights_rad_2m.size,max_return))
 
     # set up some arrays to host the MacArthur-Horn profiles
     heights = np.arange(0,max_height)+1
+    heights_2m = np.arange(0,max_height,2.)+2
     LAD_MH = np.zeros((n_subplots, heights.size))
+    LAD_MH_2m = np.zeros((n_subplots, heights_2m.size))
 
     # loop through subplots, calculating both return profiles and LAD distributions
     for i in range(0,n_subplots):
@@ -75,25 +81,37 @@ for pp in range(0,N_plots):
             max_k=rr+1
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
             LAD_rad_DTM[i,:,rr]=u.copy()
+            u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad_2m,max_k,'spherical')
+            LAD_rad_2m[i,:,rr]=u.copy()
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
         LAD_MH[i,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
+        heights_2m,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness_2m)
+        LAD_MH_2m[i,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness_2m, 1.)
 
     # now we have looped through and created the different profiles, need to account for any NaN's and apply minimum height
     # to the LAD distributions
     # - set NaN values to zero
     LAD_rad_DTM[np.isnan(LAD_rad_DTM)]=0
     LAD_MH[np.isnan(LAD_MH)]=0
+    LAD_rad_2m[np.isnan(LAD_rad_2m)]=0
+    LAD_MH_2m[np.isnan(LAD_MH_2m)]=0
     # - remove all profile values below minimum height prior to comparison
     mask = heights <= minimum_height
     LAD_MH[:,mask]=0
     mask = np.max(heights_rad)-heights_rad<=minimum_height
     LAD_rad_DTM[:,mask]=np.nan
+    mask = heights_2m <= minimum_height
+    LAD_MH_2m[:,mask]=0
+    mask = np.max(heights_rad_2m)-heights_rad_2m<=minimum_height
+    LAD_rad_2m[:,mask]=np.nan
 
     # Store arrays into respective dictionaries
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
     radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
+    MacArthurHorn_LAD_2m[Plot_name] = LAD_MH_2m.copy()
+    radiative_DTM_LAD_2m[Plot_name] = LAD_rad_2m.copy()
 
 
 # next step is to take the canopy profiles and get the vertical and horizontal canopy structural metrics

@@ -13,6 +13,7 @@ import auxilliary_functions as aux
 import LiDAR_MacHorn_LAD_profiles as LAD1
 import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import structural_metrics as structure
+import plot_LAD_profiles
 
 # start by defining input files
 las_file = 'Carbon_plot_point_cloud_buffer.las'

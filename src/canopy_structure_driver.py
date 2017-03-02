@@ -39,9 +39,7 @@ minimum_height = 2.
 MacArthurHorn_LAD = {}
 radiative_DTM_LAD = {}
 MacArthurHorn_LAD_2m = {}
-MacArthurHorn_LAD_5m = {}
 radiative_LAD_2m = {}
-radiative_LAD_5m = {}
 # load coordinates and lidar points for target areas
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
 all_lidar_pts = lidar.load_lidar_data(las_file)
@@ -113,7 +111,7 @@ for pp in range(0,N_plots):
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
     radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
     MacArthurHorn_LAD_2m[Plot_name] = LAD_MH_2m.copy()
-    radiative_DTM_LAD_2m[Plot_name] = LAD_rad_2m.copy()
+    radiative_LAD_2m[Plot_name] = LAD_rad_2m.copy()
 
 # Plot up the subplot profiles to see how changing resolution impacts on the resultant LAD profiles
 for pp in range(0,N_plots):

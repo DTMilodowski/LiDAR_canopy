@@ -4,6 +4,11 @@ from matplotlib import pyplot as plt
 
 # This function produces a figure that provides a detailed look at LAD variations across a GEM ICP.
 # The layout of the subplot axes represents the subplot distribution 
+# Profiles_in is a 2D array (N_profiles x N_layers) for the 25 subplots in a given plot.
+# Heights_in is an array giving the heights of the top of each layer
+# color_string is the colour you'd like to use for your plots
+# label_string is a string you use to label the plot e.g. the GEM plot name
+# figure_name is the filename you'd like to use for the resultant figure
 def plot_subplot_LAD_profiles(Profiles_in,Heights_in,color_string,label_string,figure_name):
     n_subplots,n_layers = Profiles_in.shape
     Profiles = np.zeros((n_subplots,n_layers*2))

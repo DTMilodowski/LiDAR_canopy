@@ -125,9 +125,9 @@ for pp in range(0,N_plots):
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
     radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
     MacArthurHorn_LAD_2m[Plot_name] = LAD_MH_2m.copy()
-    MacArthurHorn_LAD_2m[Plot_name] = LAD_MH_5m.copy()
+    MacArthurHorn_LAD_5m[Plot_name] = LAD_MH_5m.copy()
     radiative_LAD_2m[Plot_name] = LAD_rad_2m.copy()
-    radiative_LAD_2m[Plot_name] = LAD_rad_5m.copy()
+    radiative_LAD_5m[Plot_name] = LAD_rad_5m.copy()
 
 # Plot up the subplot profiles to see how changing resolution impacts on the resultant LAD profiles
 for pp in range(0,N_plots):

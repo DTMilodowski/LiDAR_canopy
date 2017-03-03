@@ -1,6 +1,7 @@
 # This library hosts some scripts to produce plots of LAD profiles
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib import rcParams
 
 # This function produces a figure that provides a detailed look at LAD variations across a GEM ICP.
 # The layout of the subplot axes represents the subplot distribution 
@@ -20,7 +21,7 @@ def plot_subplot_LAD_profiles(Profiles_in,Heights_in,color_string,label_string,f
         Heights[i*2+1] = Heights_in[i]
     Heights=np.roll(Heights,1)
     Heights[0] = 0
-
+    dz = Heights_in[1]-Heights_in[0]
     Profiles[np.isfinite(Profiles)==False]=0
 
     plt.figure(1,facecolor='White',figsize=[15,10])
@@ -144,7 +145,7 @@ def plot_subplot_LAD_profiles(Profiles_in,Heights_in,color_string,label_string,f
     ax_main.set_ylim(ymin=0,ymax=80)
     ax_main.set_xlim(xmin=0,xmax=0.8)
 
-    plotLAI='%.2f' % np.sum(np.mean(Profiles,axis=0)/2.)
+    plotLAI='%.2f' % np.sum(np.mean(Profiles,axis=0)*dz/2.)
     ax_main.annotate('LAI = ' + plotLAI, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=rcParams['font.size']+2)
     ax_main.annotate(label_string, xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=rcParams['font.size']+2)
 
@@ -154,4 +155,5 @@ def plot_subplot_LAD_profiles(Profiles_in,Heights_in,color_string,label_string,f
     ax_main.yaxis.set_label_position("right")
     #plt.tight_layout()
     plt.savefig(figure_name+".png",format="png")
+    plt.show()
 

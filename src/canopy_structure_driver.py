@@ -13,7 +13,7 @@ import auxilliary_functions as aux
 import LiDAR_MacHorn_LAD_profiles as LAD1
 import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import structural_metrics as structure
-import plot_LAD_profiles
+import plot_LAD_profiles as plot_LAD
 
 # start by defining input files
 las_file = 'Carbon_plot_point_cloud_buffer.las'
@@ -116,24 +116,25 @@ for pp in range(0,N_plots):
 # Plot up the subplot profiles to see how changing resolution impacts on the resultant LAD profiles
 for pp in range(0,N_plots):
     print Plots[pp]
+    label_string = Plots[pp]
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_MH_1m'
-    plot_subplot_LAD_profiles(MacArthurHorn_LAD[Plots[pp]],heights,'g',label_string,figure_name)
+    plot_LAD.plot_subplot_LAD_profiles(MacArthurHorn_LAD[Plots[pp]],heights,'g',label_string,figure_name)
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_MH_2m'
-    plot_subplot_LAD_profiles(MacArthurHorn_LAD_2m[Plots[pp]],heights_2m,'g',label_string,figure_name)
+    plot_LAD.plot_subplot_LAD_profiles(MacArthurHorn_LAD_2m[Plots[pp]],heights_2m,'g',label_string,figure_name)
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_1m_k2'
-    plot_subplot_LAD_profiles(radiative_DTM_LAD[Plots[pp]][:,:,1],heights_rad,'g',label_string,figure_name)
+    plot_LAD.plot_subplot_LAD_profiles(radiative_DTM_LAD[Plots[pp]][:,:,1],heights_rad,'g',label_string,figure_name)
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_1m_k3'
-    plot_subplot_LAD_profiles(radiative_DTM_LAD[Plots[pp]][:,:,2],heights_rad,'g',label_string,figure_name)
+    plot_LAD.plot_subplot_LAD_profiles(radiative_DTM_LAD[Plots[pp]][:,:,2],heights_rad,'g',label_string,figure_name)
 
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k2'
-    plot_subplot_LAD_profiles(radiative_LAD_2m[Plots[pp]][:,:,1],heights_rad_2m,'g',label_string,figure_name)
+    plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_2m[Plots[pp]][:,:,1],heights_rad_2m,'g',label_string,figure_name)
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k3'
-    plot_subplot_LAD_profiles(radiative_LAD_2m[Plots[pp]][:,:,2],heights_rad_2m,'g',label_string,figure_name)
+    plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_2m[Plots[pp]][:,:,2],heights_rad_2m,'g',label_string,figure_name)
 
 
 

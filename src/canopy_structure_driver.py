@@ -73,7 +73,7 @@ for pp in range(0,N_plots):
     heights_5m = np.arange(0,max_height,5.)+5
     LAD_MH = np.zeros((n_subplots, heights.size))
     LAD_MH_2m = np.zeros((n_subplots, heights_2m.size))
-    LAD_MH_5m = np.zeros((n_subplots,heights_rad_5m.size,max_return))
+    LAD_MH_5m = np.zeros((n_subplots,heights_5m.size))
 
     # loop through subplots, calculating both return profiles and LAD distributions
     for i in range(0,n_subplots):

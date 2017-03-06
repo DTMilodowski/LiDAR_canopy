@@ -81,17 +81,13 @@ def calculate_LAD_Detto_original(pts,zi,max_k,tl,n=np.array([])):
         G[:,i]=Gfunction(tl,th[i],zi)
     # Compute LAD from ensemble across scan angles
     #print "\tComputing LAD from ensemble across scan angles"
-    print '----------'
     p = np.sum(n[:,:,0],axis=1)
-    print p
     p_indices = np.arange(p.size)
     #jj = p_indices[p>0][0]-1
     jj = p_indices[p>0][0]
-    print "jj", jj
     alpha =np.zeros(M,dtype='float')*np.nan
     beta =np.zeros(M,dtype='float')*np.nan
     U0 =np.zeros(M,dtype='float')*np.nan
-    print control
     for i in range(0,M):
         use = control[i,:]>0
         w=n0[use]/np.sum(n0[use])

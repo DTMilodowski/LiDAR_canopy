@@ -118,7 +118,9 @@ def calculate_LAD_Detto_original(pts,zi,max_k,tl,n=np.array([])):
     return u,n,I,U
 
 
-
+# An updated version of Detto's radiative transfer scheme - in this instance, I do not interpolate across
+# nodata gaps within the canopy - these generally arise where we have no returns at all, and my preference
+# is for the simpler treatment that these are levels with zero LAD
 def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     #print "Calculating LAD using radiative tranfer model"
     # first unpack pts

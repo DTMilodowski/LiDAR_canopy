@@ -150,10 +150,10 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
     ##### New test -> let's add 1 to all 1st return bins for which there are also other returns
-    for i in range(0,S):
-        n1=np.sum(n[:,i,:],axis=1)
-        mask = np.all((n1>0,n[:,i,0]==0),axis=0) 
-        n[mask,i,0] = 1
+    for s in range(0,S):
+        n1_test=np.sum(n[:,s,:],axis=1)   # this replicates code used in loop below for calculating penetration functions
+        mask = np.all((n1_test>0,n[:,s,0]==0),axis=0) # this finds all layers for which there are no first returns, but 2nd and 3rd returns present.  This leads to a beta value of zero resulting in a nan in the ultimate distribution of u.  I add an arbitrary single return to this canopy layer, since this enables the calculation an estimate of LAD in this layer rather than setting it as zero when it is known that there are reflections at this level.
+        n[mask,s,0] = 1
 
     # calculate penetration functions for each scan angle
     #print "\tCalculating penetration functions"

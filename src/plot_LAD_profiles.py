@@ -155,5 +155,5 @@ def plot_subplot_LAD_profiles(Profiles_in,Heights_in,color_string,label_string,f
     ax_main.yaxis.set_label_position("right")
     #plt.tight_layout()
     plt.savefig(figure_name+".png",format="png")
-    plt.show()
+    #plt.show()
 

@@ -169,33 +169,27 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     for i in range(0,S):
         n0[i]=np.sum(np.all((R==1, A==th[i]),axis=0))
         n1=np.sum(n[:,i,:],axis=1)
-        ## This is the original transcription of Detto's code
-        ##for j in range(0,K):
-        ##    I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
-        ##    U[:,i,j]=n[:,i,j]/n1
-        ###Apply correction factor for limited available return
-        ##U[:,i,0]=U[:,i,0]*I[:,i,K-1]
-        ##---------------
         for j in range(0,K):
             I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
             U[:,i,j]=n[:,i,j]/n1
+        ## This is the original transcription of Detto's code
+        ###Apply correction factor for limited available return
+        ##U[:,i,0]=U[:,i,0]*I[:,i,K-1]
+        ##---------------
+        ## Update below - applying correction factor across all available returns???
         #Apply correction factor for limited available return
         U[:,i,0]=U[:,i,0]*I[:,i,K-1]
         control[:,i]=n1>0
         G[:,i]=Gfunction(tl,th[i],zi)
     # Compute LAD from ensemble across scan angles
     #print "\tComputing LAD from ensemble across scan angles"
-    print '----------'
     p = np.sum(n[:,:,0],axis=1)
-    #print p
     p_indices = np.arange(p.size)
     #jj = p_indices[p>0][0]-1
     jj = p_indices[p>0][0]
-    #print "jj", jj
     alpha =np.zeros(M,dtype='float')*np.nan
     beta =np.zeros(M,dtype='float')*np.nan
     U0 =np.zeros(M,dtype='float')*np.nan
-    #print control
     for i in range(0,M):
         use = control[i,:]>0
         w=n0[use]/np.sum(n0[use])
@@ -205,17 +199,6 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
             alpha[i]= 1.-np.inner(I[i,use,0],w)
             # Eq 8b
             beta[i] = np.inner((U[i,use,0]*G[i,use]/np.abs(np.cos(np.conj(th[use])/180*np.pi))),w)
-            if beta[i] == 0:
-                print '#####################'
-                print i
-                print beta
-                print U[i,use,0]
-                print 'alpha'
-                print alpha[i]
-                print 'n0'
-                print n0
-                print '######################'
-    
     
     #### In Detto's original code, interpolation is used to traverse nodata gaps.  I am not sure why this 
     ### approach was used as nodata gaps arise when the number of returns within a given canopy layer is 

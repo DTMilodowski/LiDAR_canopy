@@ -56,12 +56,6 @@ def calculate_LAD_Detto_original(pts,zi,max_k,tl,n=np.array([])):
                 for k in range(0,K):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
-    ##### New test -> let's add 1 to all 1st return bins for which there are also other returns
-    for i in range(0,S):
-        n1=np.sum(n[:,i,:],axis=1)
-        mask = np.all((n1>0,n[:,i,0]==0),axis=0) 
-        n[mask,i,0] = 1
-
     # calculate penetration functions for each scan angle
     #print "\tCalculating penetration functions"
     I = np.zeros((M,S,K),dtype='float')

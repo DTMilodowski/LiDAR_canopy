@@ -174,7 +174,9 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         ##U[:,i,0]=U[:,i,0]*I[:,i,K-1]
         ##---------------
         ## Update below - applying correction factor across all available returns???
-        U[:,i,0]=U[:,i,0]*I[:,i,K-1]
+        #U[:,i,0]=U[:,i,0]*I[:,i,K-1]
+        for k in range(0,K):
+            U[:,i,k]=U[:,i,k]*I[:,i,-1]
         control[:,i]=n1>0
         G[:,i]=Gfunction(tl,th[i],zi)
     # Compute LAD from ensemble across scan angles

@@ -28,6 +28,107 @@ import numpy as np
 #        than k leaves up to a depth of zi
 # U   :: matrix (dimensions MxSxK) probability for leaf at depth zi to be the kth contact
 #        along the beam path
+def calculate_LAD_Detto_original(pts,zi,max_k,tl,n=np.array([])):
+    #print "Calculating LAD using radiative tranfer model"
+    # first unpack pts
+    #keep = np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
+    keep = pts[:,3]<=max_k
+    z0 = np.max(zi) - pts[keep,2]
+    R  = pts[keep,3]
+    A  = np.abs(pts[keep,5])
+    # define other variables
+    dz = np.abs(zi[0]-zi[1])
+    M  = zi.size
+    th = np.unique(A)
+    S  = th.size
+    K  = int(R.max())
+
+    # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
+    # and return number
+    if n.size == 0:
+        #print "\tCalculating return matrix"
+        n = np.zeros((M,S,K),dtype='float')
+        for i in range(0,M):
+            #use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
+            use1 = np.all((z0>=zi[i],z0<zi[i]+dz),axis=0)
+            for j in range(0,S):
+                use2 = A[use1]==th[j]
+                for k in range(0,K):
+                    n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
+
+    ##### New test -> let's add 1 to all 1st return bins for which there are also other returns
+    for i in range(0,S):
+        n1=np.sum(n[:,i,:],axis=1)
+        mask = np.all((n1>0,n[:,i,0]==0),axis=0) 
+        n[mask,i,0] = 1
+
+    # calculate penetration functions for each scan angle
+    #print "\tCalculating penetration functions"
+    I = np.zeros((M,S,K),dtype='float')
+    U = np.zeros((M,S,K),dtype='float')
+    G = np.zeros((M,S),dtype='float')
+    control = np.zeros((M,S))
+    n0 = np.zeros(S,dtype='float')
+    for i in range(0,S):
+        n0[i]=np.sum(np.all((R==1, A==th[i]),axis=0))
+        n1=np.sum(n[:,i,:],axis=1)
+        for j in range(0,K):
+            I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
+            U[:,i,j]=n[:,i,j]/n1
+        #Apply correction factor for limited available return
+        U[:,i,0]=U[:,i,0]*I[:,i,K-1]
+        control[:,i]=n1>0
+        G[:,i]=Gfunction(tl,th[i],zi)
+    # Compute LAD from ensemble across scan angles
+    #print "\tComputing LAD from ensemble across scan angles"
+    print '----------'
+    p = np.sum(n[:,:,0],axis=1)
+    print p
+    p_indices = np.arange(p.size)
+    #jj = p_indices[p>0][0]-1
+    jj = p_indices[p>0][0]
+    print "jj", jj
+    alpha =np.zeros(M,dtype='float')*np.nan
+    beta =np.zeros(M,dtype='float')*np.nan
+    U0 =np.zeros(M,dtype='float')*np.nan
+    print control
+    for i in range(0,M):
+        use = control[i,:]>0
+        w=n0[use]/np.sum(n0[use])
+        U0[i] = np.inner((G[i,:]/np.abs(np.cos(np.conj(th)/180*np.pi))),(n0/np.sum(n0)))
+        if w.size >0:
+            # Eq 8a from Detto et al., 2015
+            alpha[i]= 1-np.inner(I[i,use,0],w)
+            # Eq 8b
+            beta[i] = np.inner((U[i,use,0]*G[i,use]/np.abs(np.cos(np.conj(th[use])/180*np.pi))),w)
+
+    #alpha[:jj+1]=0
+    alpha[:jj]=0
+    alpha_indices=np.arange(alpha.size)
+    use = alpha_indices[np.isfinite(alpha)]
+    alpha = np.interp(alpha_indices,use,alpha[use])
+    alpha[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
+    
+    #beta[:jj+1]=U0[:jj+1]
+    beta[:jj]=U0[:jj]
+    beta_indices = np.arange(beta.size)
+    use = beta_indices[np.isfinite(beta)]
+    beta = np.interp(beta_indices,use,beta[use]) 
+    beta[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
+
+    # numerical solution
+    #print "\tNumerical solution"
+    u = np.zeros(M,dtype='float')
+    for i in range(jj,M):
+        # Eq 6
+        u[i] = (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)
+        if u[i]<0:
+            u[i]=0
+    u[~np.isfinite(u)]=0#np.nan
+    return u,n,I,U
+
+
+
 def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     #print "Calculating LAD using radiative tranfer model"
     # first unpack pts
@@ -56,6 +157,12 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
                 for k in range(0,K):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
+    ##### New test -> let's add 1 to all 1st return bins for which there are also other returns
+    for i in range(0,S):
+        n1=np.sum(n[:,i,:],axis=1)
+        mask = np.all((n1>0,n[:,i,0]==0),axis=0) 
+        n[mask,i,0] = 1
+
     # calculate penetration functions for each scan angle
     #print "\tCalculating penetration functions"
     I = np.zeros((M,S,K),dtype='float')
@@ -66,21 +173,39 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     for i in range(0,S):
         n0[i]=np.sum(np.all((R==1, A==th[i]),axis=0))
         n1=np.sum(n[:,i,:],axis=1)
+        ## This is the original transcription of Detto's code
+        ##for j in range(0,K):
+        ##    I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
+        ##    U[:,i,j]=n[:,i,j]/n1
+        ###Apply correction factor for limited available return
+        ##U[:,i,0]=U[:,i,0]*I[:,i,K-1]
+        ##---------------
         for j in range(0,K):
             I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
             U[:,i,j]=n[:,i,j]/n1
+        """
+        if np.isnan(U[:,i,:].sum()):
+            print np.asarray(n[:,i,:],dtype='int')
+            print n1
+            print U[:,i,:]
+        """
         #Apply correction factor for limited available return
         U[:,i,0]=U[:,i,0]*I[:,i,K-1]
         control[:,i]=n1>0
         G[:,i]=Gfunction(tl,th[i],zi)
     # Compute LAD from ensemble across scan angles
     #print "\tComputing LAD from ensemble across scan angles"
+    print '----------'
     p = np.sum(n[:,:,0],axis=1)
+    print p
     p_indices = np.arange(p.size)
-    jj = p_indices[p>0][0]-1
+    #jj = p_indices[p>0][0]-1
+    jj = p_indices[p>0][0]
+    print "jj", jj
     alpha =np.zeros(M,dtype='float')*np.nan
     beta =np.zeros(M,dtype='float')*np.nan
     U0 =np.zeros(M,dtype='float')*np.nan
+    print control
     for i in range(0,M):
         use = control[i,:]>0
         w=n0[use]/np.sum(n0[use])
@@ -90,17 +215,30 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
             alpha[i]= 1-np.inner(I[i,use,0],w)
             # Eq 8b
             beta[i] = np.inner((U[i,use,0]*G[i,use]/np.abs(np.cos(np.conj(th[use])/180*np.pi))),w)
-    alpha[:jj+1]=0
+            if beta[i] == 0:
+                print '#####################'
+                print i
+                print beta
+                print U[i,use,0]
+                print '######################'
+    #alpha[:jj+1]=0
+    alpha[:jj]=0
     alpha_indices=np.arange(alpha.size)
     use = alpha_indices[np.isfinite(alpha)]
     alpha = np.interp(alpha_indices,use,alpha[use])
     alpha[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
     
-    beta[:jj+1]=U0[:jj+1]
+    #beta[:jj+1]=U0[:jj+1]
+    beta[:jj]=U0[:jj]
+    print beta
     beta_indices = np.arange(beta.size)
     use = beta_indices[np.isfinite(beta)]
     beta = np.interp(beta_indices,use,beta[use]) 
     beta[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
+    print beta
+
+    #### Not sure why the interpolation function is used here - it interpolates across areas where beta in infinite
+
     # numerical solution
     #print "\tNumerical solution"
     u = np.zeros(M,dtype='float')
@@ -109,7 +247,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         u[i] = (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)
         if u[i]<0:
             u[i]=0
-
+    print u
     u[~np.isfinite(u)]=0#np.nan
     return u,n,I,U
 

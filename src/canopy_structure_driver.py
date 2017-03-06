@@ -42,6 +42,7 @@ MacArthurHorn_LAD_2m = {}
 MacArthurHorn_LAD_5m = {}
 radiative_LAD_5m = {}
 radiative_LAD_2m = {}
+radiative_LAD_noS = {}
 # load coordinates and lidar points for target areas
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
 all_lidar_pts = lidar.load_lidar_data(las_file)
@@ -66,6 +67,7 @@ for pp in range(0,N_plots):
     LAD_rad_DTM = np.zeros((n_subplots,heights_rad.size,max_return))
     LAD_rad_2m = np.zeros((n_subplots,heights_rad_2m.size,max_return))
     LAD_rad_5m = np.zeros((n_subplots,heights_rad_5m.size,max_return))
+    LAD_rad_2m_noS  = np.zeros((n_subplots,heights_rad_2m.size,max_return))
 
     # set up some arrays to host the MacArthur-Horn profiles
     heights = np.arange(0,max_height)+1
@@ -90,6 +92,12 @@ for pp in range(0,N_plots):
             LAD_rad_2m[i,:,rr]=u[::-1].copy()
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad_5m,max_k,'spherical')
             LAD_rad_5m[i,:,rr]=u[::-1].copy()
+
+
+            sp_pts_noS = sp_pts.copy()
+            sp_pts_noS[:,5] = 0
+            u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_noS,heights_rad_2m,max_k,'spherical')
+            LAD_rad_2m_noS[i,:,rr]=u[::-1].copy()
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
@@ -119,7 +127,7 @@ for pp in range(0,N_plots):
     mask = heights_rad_2m<=minimum_height
     LAD_rad_2m[:,mask]=np.nan
     LAD_MH_5m[:,0]=np.nan
-    LAD_rad_5m[:,0]=np.nan
+    LAD_rad_5m[:,:2]=np.nan
 
     # Store arrays into respective dictionaries
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
@@ -128,6 +136,8 @@ for pp in range(0,N_plots):
     MacArthurHorn_LAD_5m[Plot_name] = LAD_MH_5m.copy()
     radiative_LAD_2m[Plot_name] = LAD_rad_2m.copy()
     radiative_LAD_5m[Plot_name] = LAD_rad_5m.copy()
+
+    radiative_LAD_noS[Plot_name] = LAD_rad_2m_noS.copy()
 
 # Plot up the subplot profiles to see how changing resolution impacts on the resultant LAD profiles
 for pp in range(0,N_plots):
@@ -161,6 +171,10 @@ for pp in range(0,N_plots):
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_5m_k3'
     plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_5m[Plots[pp]][:,:,2],heights_rad_5m,'g',label_string,figure_name)
 
+    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k2_noS'
+    plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_noS[Plots[pp]][:,:,1],heights_rad_2m,'g',label_string,figure_name)
+    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k3_noS'
+    plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_noS[Plots[pp]][:,:,2],heights_rad_2m,'g',label_string,figure_name)
 
 
 

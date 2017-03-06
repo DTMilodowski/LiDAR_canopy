@@ -179,12 +179,6 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         for j in range(0,K):
             I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
             U[:,i,j]=n[:,i,j]/n1
-        """
-        if np.isnan(U[:,i,:].sum()):
-            print np.asarray(n[:,i,:],dtype='int')
-            print n1
-            print U[:,i,:]
-        """
         #Apply correction factor for limited available return
         U[:,i,0]=U[:,i,0]*I[:,i,K-1]
         control[:,i]=n1>0
@@ -193,22 +187,22 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     #print "\tComputing LAD from ensemble across scan angles"
     print '----------'
     p = np.sum(n[:,:,0],axis=1)
-    print p
+    #print p
     p_indices = np.arange(p.size)
     #jj = p_indices[p>0][0]-1
     jj = p_indices[p>0][0]
-    print "jj", jj
+    #print "jj", jj
     alpha =np.zeros(M,dtype='float')*np.nan
     beta =np.zeros(M,dtype='float')*np.nan
     U0 =np.zeros(M,dtype='float')*np.nan
-    print control
+    #print control
     for i in range(0,M):
         use = control[i,:]>0
         w=n0[use]/np.sum(n0[use])
         U0[i] = np.inner((G[i,:]/np.abs(np.cos(np.conj(th)/180*np.pi))),(n0/np.sum(n0)))
         if w.size >0:
             # Eq 8a from Detto et al., 2015
-            alpha[i]= 1-np.inner(I[i,use,0],w)
+            alpha[i]= 1.-np.inner(I[i,use,0],w)
             # Eq 8b
             beta[i] = np.inner((U[i,use,0]*G[i,use]/np.abs(np.cos(np.conj(th[use])/180*np.pi))),w)
             if beta[i] == 0:
@@ -216,34 +210,51 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
                 print i
                 print beta
                 print U[i,use,0]
+                print 'alpha'
+                print alpha[i]
+                print 'n0'
+                print n0
                 print '######################'
+    
+    
+    #### In Detto's original code, interpolation is used to traverse nodata gaps.  I am not sure why this 
+    ### approach was used as nodata gaps arise when the number of returns within a given canopy layer is 
+    ### zero.  The simplest explanation for this scenario is that there is very low leaf area density and 
+    ### hence no interception of the LiDAR pulses.  The interpolation function used by Detto seems likely 
+    ### to overestimate leaf area - perhaps by a large amount where there are distinct layers in the
+    ### canopy.  In contrast, I set ui  = 0 for these layers.  This is simpler, and matches the modelled
+    ### scenario more closely.
+
     #alpha[:jj+1]=0
     alpha[:jj]=0
+    """
     alpha_indices=np.arange(alpha.size)
     use = alpha_indices[np.isfinite(alpha)]
     alpha = np.interp(alpha_indices,use,alpha[use])
     alpha[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
-    
+    """
+    alpha[~np.isfinite(alpha)]=0
+
+
     #beta[:jj+1]=U0[:jj+1]
     beta[:jj]=U0[:jj]
-    print beta
+    """
     beta_indices = np.arange(beta.size)
     use = beta_indices[np.isfinite(beta)]
     beta = np.interp(beta_indices,use,beta[use]) 
     beta[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
-    print beta
-
-    #### Not sure why the interpolation function is used here - it interpolates across areas where beta in infinite
-
+    """
+    beta[~np.isfinite(beta)]=0
     # numerical solution
     #print "\tNumerical solution"
     u = np.zeros(M,dtype='float')
     for i in range(jj,M):
         # Eq 6
-        u[i] = (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)
+        if b[i]!=0:
+            u[i] = (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)
         if u[i]<0:
             u[i]=0
-    print u
+    #print u
     u[~np.isfinite(u)]=0#np.nan
     return u,n,I,U
 

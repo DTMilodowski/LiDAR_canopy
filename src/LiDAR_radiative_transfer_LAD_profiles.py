@@ -163,7 +163,9 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     control = np.zeros((M,S))
     n0 = np.zeros(S,dtype='float')
     for i in range(0,S):
+        test_n0 = np.sum(n[:,i,0])
         n0[i]=np.sum(np.all((R==1, A==th[i]),axis=0))
+        print test_n0, n0
         n1=np.sum(n[:,i,:],axis=1)
         for j in range(0,K):
             I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
@@ -229,7 +231,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     u = np.zeros(M,dtype='float')
     for i in range(jj,M):
         # Eq 6
-        if b[i]!=0:
+        if beta[i]!=0:
             u[i] = (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)
         if u[i]<0:
             u[i]=0

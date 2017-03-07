@@ -279,6 +279,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
     #keep = np.all((pts[:,3]<=max_k,pts[:,4]==1),axis=0)
     z0 = np.max(zi) - pts[keep,2]
     R  = pts[keep,3]
+    Class  = pts[keep,4]
     A  = np.abs(pts[keep,5])
     # define other variables
     dz = np.abs(zi[0]-zi[1])
@@ -309,8 +310,10 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
             N_veg_kprev = float(np.all((pts[:,3]==this_k-1,pts[:,4]==1),axis=0).sum())
             N_k = float((pts[:,3]==this_k).sum())
             """
-            N_veg_kprev = float(np.all((pts[:,3]==this_k-1,pts[:,4]==1,pts[:,5]==th[s]),axis=0).sum())
-            N_k = float(np.all((pts[:,3]==this_k,pts[:,5]==th[s]),axis=0).sum())
+            N_veg_kprev = float(np.all((R==this_k-1,Class==1,A==th[s]),axis=0).sum())
+            N_k = float(np.all((R==this_k,A==th[s]),axis=0).sum())
+            if N_k == 0:
+                print s,k
             CF[s,k]=N_veg_kprev/N_k
             n[:,s,k]*=np.product(CF[s,:this_k])
 

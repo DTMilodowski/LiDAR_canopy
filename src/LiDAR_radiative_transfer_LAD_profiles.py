@@ -142,7 +142,6 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         #print "\tCalculating return matrix"
         n = np.zeros((M,S,K),dtype='float')
         for i in range(0,M):
-            #use1 = np.all((z0>zi[i],z0<=zi[i]+dz),axis=0)
             use1 = np.all((z0>=zi[i],z0<zi[i]+dz),axis=0)
             for j in range(0,S):
                 use2 = A[use1]==th[j]
@@ -163,7 +162,6 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     control = np.zeros((M,S))
     n0 = np.zeros(S,dtype='float')
     for i in range(0,S):
-        #n0[i]=np.sum(np.all((R==1, A==th[i]),axis=0))
         n0[i]=np.sum(n[:,i,0])
         n1=np.sum(n[:,i,:],axis=1)
         for j in range(0,K):
@@ -178,10 +176,10 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         ##U[:,i,0]=U[:,i,0]*I[:,i,K-1]
         ##---------------
         ## Update below - applying correction factor across all available returns???
-        #U[:,i,0]=U[:,i,0]*I[:,i,K-1]
         for k in range(0,K):
             U[:,i,k]=U[:,i,k]*I[:,i,-1]
         control[:,i]=n1>0
+        ##---------------
         G[:,i]=Gfunction(tl,th[i],zi)
     # Compute LAD from ensemble across scan angles
     #print "\tComputing LAD from ensemble across scan angles"
@@ -210,7 +208,6 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     ### canopy.  In contrast, I set ui  = 0 for these layers.  This is simpler, and matches the modelled
     ### scenario more closely.
 
-    #alpha[:jj+1]=0
     alpha[:jj]=0
     """
     alpha_indices=np.arange(alpha.size)
@@ -220,8 +217,6 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     """
     alpha[~np.isfinite(alpha)]=0
 
-
-    #beta[:jj+1]=U0[:jj+1]
     beta[:jj]=U0[:jj]
     """
     beta_indices = np.arange(beta.size)

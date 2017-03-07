@@ -168,7 +168,11 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         n1=np.sum(n[:,i,:],axis=1)
         for j in range(0,K):
             I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
-            U[:,i,j]=n[:,i,j]/n1
+            # account for occasions where there are no returns at a given scan angle
+            # i.e. where n1==0 set U equal to 0
+            U[n1!=0,i,j]=n[n1!=0,i,j]/n1[n1!=0]
+            U[n1==0,i,j]=0
+            #U[:,i,j]=n[:,i,j]/n1
         ## This is the original transcription of Detto's code
         ###Apply correction factor for limited available return
         ##U[:,i,0]=U[:,i,0]*I[:,i,K-1]
@@ -312,9 +316,14 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
             """
             N_veg_kprev = float(np.all((R==this_k-1,Class==1,A==th[s]),axis=0).sum())
             N_k = float(np.all((R==this_k,A==th[s]),axis=0).sum())
+            # in the case where there are no returns at return number = k for scan angle s
+            # we have no information about vegetation and therefore cannot make a correction
+            # This is likely to be rare, and possible future fixes could include exclusion
+            # of scan angles that do not have sufficient numbers of returns.
             if N_k == 0:
-                print s,k
-            CF[s,k]=N_veg_kprev/N_k
+                CF[s,k]=0
+            else:
+                CF[s,k]=N_veg_kprev/N_k
             n[:,s,k]*=np.product(CF[s,:this_k])
 
     u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n)

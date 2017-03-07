@@ -299,8 +299,8 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
                 n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
     #derive correction factor for different return numbers for each scan angle
-    CF = np.zeros(K)
-    CF = np.zeros(S,K)
+    #CF = np.zeros(K)
+    CF = np.zeros((S,K))
     CF[:,0]=1.
     for s in range(0,S):
         for k in range(1,K):

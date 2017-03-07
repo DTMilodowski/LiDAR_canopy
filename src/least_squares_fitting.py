@@ -1,5 +1,7 @@
 import numpy as np
-
+# This function calculates best fitting polynomial line (up to order 3) for a
+# given set of input points x and y, using linear least squares inversion.
+# Default is for 1st order.
 def oneD_least_squares_polynomial(x,y,order=1):
     # first up - mask nodata values
     mask = np.isfinite(y)
@@ -24,7 +26,9 @@ def oneD_least_squares_polynomial(x,y,order=1):
     coeff, r, rank, s = np.linalg.lstsq(A, b)
     return coeff
 
-
+# This function calculates best fitting polynomial surface (up to order 3) for a
+# given set of input points x,y and z, using linear least squares inversion.
+# Default is for 1st order.
 def twoD_least_squares_polynomial(x,y,z,order=1):
     # first up - mask nodata values
     mask = np.isfinite(z)

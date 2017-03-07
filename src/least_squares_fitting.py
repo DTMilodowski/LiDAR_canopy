@@ -22,6 +22,10 @@ def oneD_least_squares_polynomial(x,y,order=1):
         # coefficients returned should be in order a-d for:
         # z = ax^3 + bx^2 + cx + d
         A = np.array([X**3, X**2, X, ones]).T
+    elif order == 4:
+        # coefficients returned should be in order a-e for:
+        # z = ax^4 + bx^3 + cx^2 + dx + e
+        A = np.array([X**4, X**3, X**2, X, ones]).T
     b = Y.copy()
     coeff, r, rank, s = np.linalg.lstsq(A, b)
     return coeff

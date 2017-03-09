@@ -111,7 +111,8 @@ def calculate_horizontal_structural_heterogeneity_alt(profiles,heights,stand_are
 
 
 # Simple function to find local maxima based on immediate neighbourhood
-def find_maxima(signal_x, signal_y):
+def find_maxima(signal_x, signal_y, lower_cutoff=0):
+    signal_y[-lower_cutoff:]=
     pks = []
     N=signal_x.size
     for i in range(1,N-1):
@@ -128,11 +129,11 @@ def find_maxima(signal_x, signal_y):
 
 
 # function to smooth using moving window with polynomial fit (default is second order).
-# Specify window half width (in pixels) for fitting polynomial and lower cutoff 
-# (specific for canopy profiles where lowermost bins tend to be removed
+# Specify window half width (in pixels) for fitting polynomial
 # i.e. a Savitzky-Golay filter.  Currently supports up to 4th order
-def moving_polynomial_filter(signal_x,signal_y,window_half_width,order=2,lower_cutoff = 0):
+def moving_polynomial_filter(signal_x,signal_y,window_width,order=2):
     N = signal_x.size
+    window_half_width = window_width//2
     y_filt = np.zeros(N)
 
     firstvals = signal_y[0] - np.abs(signal_y[1:window_half_width+1][::-1] - signal_y[0] )

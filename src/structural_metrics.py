@@ -130,14 +130,14 @@ def find_maxima(signal_x, signal_y):
 # function to smooth using moving window with polynomial fit (default is second order).
 # Specify window half width (in pixels) for fitting polynomial and lower cutoff 
 # (specific for canopy profiles where lowermost bins tend to be removed
-# Along a similar line to Savitzky-Golay filter
+# i.e. a Savitzky-Golay filter.  Currently supports up to 4th order
 def moving_polynomial_filter(signal_x,signal_y,window_half_width,order=2,lower_cutoff = 0):
     N = signal_x.size
     y_filt = np.zeros(N)
-    y_temp = np.zeros(N+2*window_half_width)
-    y_temp[window_half_width:-window_half_width] = signal_y
-    y_temp[:window_half_width]= signal_y[0]
-    y_temp[-(window_half_width+lower_cutoff):] = signal_y[-(1+lower_cutoff)]
+
+    firstvals = signal_y[0] - np.abs(signal_y[1:window_half_width+1][::-1] - signal_y[0] )
+    lastvals = signal_y[-1] + np.abs(signal_y[-window_half_width-1:-1][::-1] - signal_y[-1])
+    y_temp = np.concatenate((firstvals, signal_y, lastvals))
 
     for i in range(0,N):
         ii = i + window_half_width

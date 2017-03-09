@@ -137,14 +137,13 @@ def moving_polynomial_filter(signal_x,signal_y,window_half_width,order=2,lower_c
     y_temp = np.zeros(N+2*window_half_width)
     y_temp[window_half_width:-window_half_width] = signal_y
     y_temp[:window_half_width]= signal_y[0]
-    y_temp[-(window_half_width+lower_cutoff):] = signal_y[-(1+lower_cut_off)]
+    y_temp[-(window_half_width+lower_cutoff):] = signal_y[-(1+lower_cutoff)]
 
     for i in range(0,N):
         ii = i + window_half_width
         x = np.arange(-window_half_width,window_half_width+1)
         y = y_temp[ii-window_half_width:ii+window_half_width+1]
-        print ii+window_half_width+1-(ii-window_half_width)
-        coeffs = oneD_least_squares_polynomial(x,y,order)
+        coeffs = lstsq.oneD_least_squares_polynomial(x,y,order)
         # at x=0 - the centre of the moving window - polynomial reduces down to constant
         y_filt[i] = coeffs[-1]
     

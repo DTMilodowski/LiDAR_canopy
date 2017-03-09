@@ -82,7 +82,7 @@ def retrieve_peaks(vertical_profiles,heights):
     return peaks
 
 # filter signal using savitzky-golay filter before retrieving peaks
-def retrieve_peaks_with_filter(vertical_profiles,heights,filter_window,filter_order=3):
+def retrieve_peaks_with_filter(vertical_profiles,heights,filter_window,filter_order=3,threshold = 0, lower_cutoff=0):
     N_profiles,N_heights = vertical_profiles.shape
     profile = moving_polynomial_filter(vertical_profiles[0],filter_window,window_width,filter_order)
     peaks, peak_amplitude = find_maxima(heights,profile)

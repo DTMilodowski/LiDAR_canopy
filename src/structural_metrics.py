@@ -71,6 +71,8 @@ def calculate_mean_Frechet_distance(vertical_profiles,heights):
 #    Tello, M., Cazcarra-Bes, V., Pardini, M. and Papathanassiou, K., 2015, July. Structural classification of
 #    forest by means of L-band tomographic SAR. In Geoscience and Remote Sensing Symposium (IGARSS), 2015 IEEE 
 #    International (pp. 5288-5291). IEEE.
+
+
 def retrieve_peaks(vertical_profiles,heights):
     N_profiles,N_heights = vertical_profiles.shape
     peaks, peak_amplitude = find_maxima(heights,vertical_profiles[0])
@@ -78,6 +80,18 @@ def retrieve_peaks(vertical_profiles,heights):
         peaks_this_iter, peak_amplitude = find_maxima(heights,vertical_profiles[i])
         peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
     return peaks
+
+# filter signal using savitzky-golay filter before retrieving peaks
+def retrieve_peaks_with_filter(vertical_profiles,heights,filter_window,filter_order=3):
+    N_profiles,N_heights = vertical_profiles.shape
+    vertical_profiles[0] = moving_polynomial_filter(vertical_profiles[0],filter_window,window_width,filter_order)
+    peaks, peak_amplitude = find_maxima(heights,vertical_profiles[0])
+    for i in range(1,N_profiles):
+        vertical_profiles[i] = moving_polynomial_filter(vertical_profiles[i],filter_window,window_width,filter_order)
+        peaks_this_iter, peak_amplitude = find_maxima(heights,vertical_profiles[i])
+        peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
+    return peaks
+
 
 def calculate_VSI(peaks):
     # convert number of peaks & their locations in canopy into VSI    
@@ -130,9 +144,9 @@ def find_maxima(signal_x, signal_y, lower_cutoff=0):
 
 # function to smooth using moving window with polynomial fit (default is second order).
 # Specify window half width (in pixels) for fitting polynomial
-# i.e. a Savitzky-Golay filter.  Currently supports up to 4th order
-def moving_polynomial_filter(signal_x,signal_y,window_width,order=2):
-    N = signal_x.size
+# i.e. a Savitzky-Golay filter.  Currently supports up to 4th order fitting
+def moving_polynomial_filter(signal_y,window_width,order=2):
+    N = signal_y.size
     window_half_width = window_width//2
     y_filt = np.zeros(N)
 

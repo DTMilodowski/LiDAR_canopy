@@ -193,8 +193,7 @@ threshold = 0.05
 for pp in range(0,N_plots):
     print Plots[pp]
     plot_name = Plots[pp]
-    # use
- print "\t- getting vertical metrics"
+    print "\t- getting vertical metrics"
     peak_heights_MH = structure.retrieve_peaks_with_filter(MacArthurHorn_LAD_2m[plot_name],heights_2m,filter_window,filter_order,threshold)
     peak_heights_rad = structure.retrieve_peaks_with_filter(radiative_LAD_2m[plot_name][:,:,-1],heights_rad_2m,filter_order,threshold)
     peaks_MH[plot_name] = peak_heights_MH.size

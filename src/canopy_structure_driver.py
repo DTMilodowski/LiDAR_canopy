@@ -189,16 +189,14 @@ vertical_structural_variance_rad = {}
 filter_window = 5.
 filter_order = 3
 threshold = 0.05
-lower_cutoff_rad=2
-lower_cutoff_MH =1
 
 for pp in range(0,N_plots):
     print Plots[pp]
     plot_name = Plots[pp]
     # use
  print "\t- getting vertical metrics"
-    peak_heights_MH = structure.retrieve_peaks_with_filter(MacArthurHorn_LAD_2m[plot_name],heights_2m,filter_window,filter_order,threshold,lower_cutoff_rad)
-    peak_heights_rad = structure.retrieve_peaks_with_filter(radiative_LAD_2m[plot_name][:,:,-1],heights_rad_2m,filter_order,threshold,lower_cutoff_rad)
+    peak_heights_MH = structure.retrieve_peaks_with_filter(MacArthurHorn_LAD_2m[plot_name],heights_2m,filter_window,filter_order,threshold)
+    peak_heights_rad = structure.retrieve_peaks_with_filter(radiative_LAD_2m[plot_name][:,:,-1],heights_rad_2m,filter_order,threshold)
     peaks_MH[plot_name] = peak_heights_MH.size
     peaks_rad[plot_name] = peak_heights_rad.size
     # get variance in layer heights

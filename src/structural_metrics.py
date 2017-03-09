@@ -82,13 +82,13 @@ def retrieve_peaks(vertical_profiles,heights):
     return peaks
 
 # filter signal using savitzky-golay filter before retrieving peaks
-def retrieve_peaks_with_filter(vertical_profiles,heights,filter_window,filter_order=3,threshold = 0, lower_cutoff=0):
+def retrieve_peaks_with_filter(vertical_profiles,heights,filter_window,filter_order=3,threshold = 0):
     N_profiles,N_heights = vertical_profiles.shape
     profile = moving_polynomial_filter(vertical_profiles[0],filter_window,window_width,filter_order)
-    peaks, peak_amplitude = find_maxima(heights,profile)
+    peaks, peak_amplitude = find_maxima(heights,profile,threshold)
     for i in range(1,N_profiles):
         profile = moving_polynomial_filter(vertical_profiles[i],filter_window,window_width,filter_order)
-        peaks_this_iter, peak_amplitude = find_maxima(heights,profiles)
+        peaks_this_iter, peak_amplitude = find_maxima(heights,profiles,threshold)
         peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
     return peaks
 
@@ -125,12 +125,11 @@ def calculate_horizontal_structural_heterogeneity_alt(profiles,heights,stand_are
 
 
 # Simple function to find local maxima based on immediate neighbourhood
-def find_maxima(signal_x, signal_y, threshold=0, lower_cutoff=0):
-    signal_y[-lower_cutoff:]=np.nan
+def find_maxima(signal_x, signal_y, threshold=0):
     pks = []
     N=signal_x.size
     for i in range(1,N-1):
-        if np.all((signal_y[i]>signal_y[i-1],signal_y[i]>signal_y[i+1])):
+        if np.all((signal_y>=threshold,signal_y[i]>signal_y[i-1],signal_y[i]>signal_y[i+1])):
             pks.append(i)
     Npks = len(pks)
     peak_x = np.zeros(Npks)

@@ -188,7 +188,7 @@ peaks_rad = {}
 vertical_structural_variance_rad = {}
 filter_window = 5.
 filter_order = 3
-threshold = 0
+threshold = 0.05
 lower_cutoff_rad=2
 lower_cutoff_MH =1
 

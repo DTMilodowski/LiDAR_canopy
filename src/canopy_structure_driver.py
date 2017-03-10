@@ -42,7 +42,7 @@ MacArthurHorn_LAD_2m = {}
 #MacArthurHorn_LAD_5m = {}
 #radiative_LAD_5m = {}
 radiative_LAD_2m = {}
-radiative_LAD_noS = {}
+#radiative_LAD_noS = {}
 # load coordinates and lidar points for target areas
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
 all_lidar_pts = lidar.load_lidar_data(las_file)
@@ -67,7 +67,7 @@ for pp in range(0,N_plots):
     LAD_rad_DTM = np.zeros((n_subplots,heights_rad.size,max_return))
     LAD_rad_2m = np.zeros((n_subplots,heights_rad_2m.size,max_return))
     #LAD_rad_5m = np.zeros((n_subplots,heights_rad_5m.size,max_return))
-    LAD_rad_2m_noS  = np.zeros((n_subplots,heights_rad_2m.size,max_return))
+    #LAD_rad_2m_noS  = np.zeros((n_subplots,heights_rad_2m.size,max_return))
 
     # set up some arrays to host the MacArthur-Horn profiles
     heights = np.arange(0,max_height)+1
@@ -94,10 +94,10 @@ for pp in range(0,N_plots):
             #LAD_rad_5m[i,:,rr]=u[::-1].copy()
 
 
-            sp_pts_noS = sp_pts.copy()
-            sp_pts_noS[:,5] = 0
-            u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_noS,heights_rad_2m,max_k,'spherical')
-            LAD_rad_2m_noS[i,:,rr]=u[::-1].copy()
+            #sp_pts_noS = sp_pts.copy()
+            #sp_pts_noS[:,5] = 0
+            #u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_noS,heights_rad_2m,max_k,'spherical')
+            #LAD_rad_2m_noS[i,:,rr]=u[::-1].copy()
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
@@ -137,7 +137,7 @@ for pp in range(0,N_plots):
     radiative_LAD_2m[Plot_name] = LAD_rad_2m.copy()
     #radiative_LAD_5m[Plot_name] = LAD_rad_5m.copy()
 
-    radiative_LAD_noS[Plot_name] = LAD_rad_2m_noS.copy()
+    #radiative_LAD_noS[Plot_name] = LAD_rad_2m_noS.copy()
 
 # Plot up the subplot profiles to see how changing resolution impacts on the resultant LAD profiles
 for pp in range(0,N_plots):
@@ -186,8 +186,8 @@ peaks_MH = {}
 vertical_structural_variance_MH = {}
 peaks_rad = {}
 vertical_structural_variance_rad = {}
-filter_window = 5.
-filter_order = 3
+filter_window = 9.
+filter_order = 4
 threshold = 0.05
 
 for pp in range(0,N_plots):
@@ -195,7 +195,7 @@ for pp in range(0,N_plots):
     plot_name = Plots[pp]
     print "\t- getting vertical metrics"
     peak_heights_MH = structure.retrieve_peaks_with_filter(MacArthurHorn_LAD_2m[plot_name],heights_2m,filter_window,filter_order,threshold)
-    peak_heights_rad = structure.retrieve_peaks_with_filter(radiative_LAD_2m[plot_name][:,:,-1],heights_rad_2m,filter_order,threshold)
+    peak_heights_rad = structure.retrieve_peaks_with_filter(radiative_LAD_2m[plot_name][:,:,-1],heights_rad_2m,filter_window,filter_order,threshold)
     peaks_MH[plot_name] = peak_heights_MH.size
     peaks_rad[plot_name] = peak_heights_rad.size
     # get variance in layer heights

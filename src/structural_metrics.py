@@ -2,6 +2,7 @@
 ## in the horizontal and vertical dimensions.
 import numpy as np
 import least_squares_fitting as lstsq
+from matplotlib import pyplot as plt
 #--------------------------------------------------------------------------------------------------------------
 # Frechet number calculation - this algorithm was coded up by Max Bareiss and can be found here:
 #     https://www.snip2code.com/Snippet/76076/Fr-chet-Distance-in-Python
@@ -84,12 +85,23 @@ def retrieve_peaks(vertical_profiles,heights):
 # filter signal using savitzky-golay filter before retrieving peaks
 def retrieve_peaks_with_filter(vertical_profiles,heights,filter_window,filter_order=3,threshold = 0):
     N_profiles,N_heights = vertical_profiles.shape
-    profile = moving_polynomial_filter(vertical_profiles[0],filter_window,window_width,filter_order)
+    profile = moving_polynomial_filter(vertical_profiles[0],filter_window,filter_order)
+    
     peaks, peak_amplitude = find_maxima(heights,profile,threshold)
+    plt.plot(vertical_profiles[0],heights,'-')
+    plt.plot(profile,heights,'-')
+    plt.plot(peak_amplitude,peaks,'o')
+    plt.xlim(xmin=0)
+    plt.show()
     for i in range(1,N_profiles):
-        profile = moving_polynomial_filter(vertical_profiles[i],filter_window,window_width,filter_order)
-        peaks_this_iter, peak_amplitude = find_maxima(heights,profiles,threshold)
+        profile = moving_polynomial_filter(vertical_profiles[i],filter_window,filter_order)
+        peaks_this_iter, peak_amplitude = find_maxima(heights,profile,threshold)
         peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
+        plt.plot(vertical_profiles[i],heights,'-')
+        plt.plot(profile,heights,'-')
+        plt.plot(peak_amplitude,peaks_this_iter,'o')
+        plt.xlim(xmin=0)
+        plt.show()
     return peaks
 
 
@@ -129,7 +141,7 @@ def find_maxima(signal_x, signal_y, threshold=0):
     pks = []
     N=signal_x.size
     for i in range(1,N-1):
-        if np.all((signal_y>=threshold,signal_y[i]>signal_y[i-1],signal_y[i]>signal_y[i+1])):
+        if np.all((signal_y[i]>=threshold,signal_y[i]>signal_y[i-1],signal_y[i]>signal_y[i+1])):
             pks.append(i)
     Npks = len(pks)
     peak_x = np.zeros(Npks)

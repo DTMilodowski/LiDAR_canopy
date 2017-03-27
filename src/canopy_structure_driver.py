@@ -179,7 +179,7 @@ for pp in range(0,N_plots):
 
 
 
-
+"""
 # next step is to take the canopy profiles and get the vertical and horizontal canopy structural metrics
 # use the 2m profiles - both radiative transfer and MacArthur-Horn versions for comparison
 peaks_MH = {}
@@ -201,7 +201,7 @@ for pp in range(0,N_plots):
     # get variance in layer heights
     vertical_structural_variance_MH[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_MH)
     vertical_structural_variance_rad[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_rad)
-
+"""
 
 
 

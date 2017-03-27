@@ -31,7 +31,7 @@ N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
 max_return = 3
-layer_thickness = 1
+layer_thickness = 2.#1
 n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 plot_area = 10.**4
@@ -77,12 +77,13 @@ for pp in range(0,N_plots):
     # get some subplot-level information
     n_subplots = subplot_polygons[Plot_name].shape[0]
     # set up some arrays to host the radiative transfer based profiles
-    heights_rad = np.arange(0,max_height+1)
+    heights_rad = np.arange(0,max_height+layer_thickness,layer_thickness)
     LAD_rad = np.zeros((n_subplots,heights_rad.size,max_return))
     LAD_rad_DTM = np.zeros((n_subplots,heights_rad.size,max_return))
 
     # set up some arrays to host the MacArthur-Horn profiles
-    heights = np.arange(0,max_height)+1
+    #heights = np.arange(0,max_height)+1
+    heights = np.arange(0,max_height,layer_thickness)+layer_thickness
     LAD_MH = np.zeros((n_subplots, heights.size))
     
     # set up array to host the lidar return profiles
@@ -149,10 +150,10 @@ for pp in range(0,N_plots):
     inventory_LAD[Plot_name] = field_LAD_profiles.copy()
 
     # Also ready to store their respective LAI profiles
-    MacArthurHorn_LAI[Plot_name] = np.sum(LAD_MH,axis=1)
-    radiative_LAI[Plot_name] = np.sum(LAD_rad,axis=1)
-    radiative_DTM_LAI[Plot_name] = np.sum(LAD_rad_DTM,axis=1)
-    inventory_LAI[Plot_name] = np.sum(field_LAD_profiles,axis=1)
+    MacArthurHorn_LAI[Plot_name] = np.sum(LAD_MH,axis=1)*layer_thickness
+    radiative_LAI[Plot_name] = np.sum(LAD_rad,axis=1)*layer_thickness
+    radiative_DTM_LAI[Plot_name] = np.sum(LAD_rad_DTM,axis=1)*layer_thickness
+    inventory_LAI[Plot_name] = np.sum(field_LAD_profiles,axis=1)*layer_thickness
     Hemisfer_LAI[Plot_name] = LAI_hemisfer.copy()
 
 #########################################################################################
@@ -178,7 +179,7 @@ ax1.set_ylim(0,1.1)
 ax1.set_xlim(0,5)
 plt.tight_layout()
 plt.savefig(output_dir+'transmittance_ratios.png')
-plt.show()
+#plt.show()
 
 #----------------------------------------------------------------------------------------
 # Figure 2 - Allometric relationships used to construct the inventory-based LAD profiles.
@@ -218,7 +219,7 @@ ax2c.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none
 
 plt.tight_layout()
 plt.savefig(output_dir+'BALI_allometries.png')
-plt.show()
+#plt.show()
 
 #-------------------------------------------------------------------------------------------------
 # Figure 3 - Comparison of LiDAR return profiles and the radiative transfer profiles with/without
@@ -495,7 +496,7 @@ for i in range(0,N_plots):
 for i in range(0,N_plots):
     x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
     y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
-    ax8a.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),x_err,y_err,'o',color='black')
+    ax8a.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker='o',color='black')
 
 
 ax8b = plt.subplot2grid((1,3),(0,1), sharex=ax8a, sharey=ax8a)
@@ -514,18 +515,23 @@ for i in range(0,N_plots):
 
 ax8c = plt.subplot2grid((1,3),(0,2), sharex=ax8a, sharey=ax8a)
 ax8c.annotate('c - Radiative transfer corrected', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax8c.set_ylabel('LAI$_{rad DTM}')
+ax8c.set_ylabel('LAI$_{rad DTM}$')
 ax8c.set_xlabel('Canopy Volume / $m^3m^{-2}$')
 ax8c.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+for k in range(1,3):
+    for i in range(0,N_plots):
+        ax8c.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
 
-for i in range(0,N_plots):
-    ax8c.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]],'.',color='red',alpha=0.5)
-
-for i in range(0,N_plots):
-    x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
-    y_err=np.std(radiative_DTM_LAI[Plots[i]])/np.sqrt(n_subplots)
-    ax8c.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker='o',color='black')
-
+for k in range(1,3):
+    for i in range(0,N_plots):
+        x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
+        y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
+        if i==0:
+            ax8c.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=labels[k])
+        else:
+            ax8c.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
+            
+ax8c.legend(loc=4)
 
 ax8a.set_ylim((0,20))
 plt.tight_layout()

@@ -174,3 +174,27 @@ def moving_polynomial_filter(signal_y,window_width,order=2):
         y_filt[i] = coeffs[-1]
     
     return y_filt
+
+
+# function to convolve a signal with a gaussian curve (comprising three standard deviations)
+# to provide a signal filter.
+
+def get_gaussian_kernel(sigma):
+    x = np.arange(2*3*sigma+1)-3*sigma
+    kernel = np.exp(-(x**2)/(2*sigma**2))
+    return kernel/kernel.sum()
+
+# Specify i) input signal, ii) standard deviation width, sigma.  sigma must be an integer, and represents a number of cells
+# the total width of the gaussian filter will be 2*3*sigma+1 cells
+# Boundary conditions are reflected
+def moving_gaussian_filter(signal_y,sigma):
+    N = signal_y.size
+    window_width = 3*sigma+1
+    window_half_width = window_width//2
+    y_filt = np.zeros(N)
+    kernel = get_gaussian_kernel(sigma)
+    firstvals = signal_y[0] - np.abs(signal_y[1:window_half_width+1][::-1] - signal_y[0] )
+    lastvals = signal_y[-1] + np.abs(signal_y[-window_half_width-1:-1][::-1] - signal_y[-1])
+    y_temp = np.concatenate((firstvals, signal_y, lastvals))
+    y_filt = np.convolve(y_temp,kernel,'valid')
+    return y_filt

@@ -189,12 +189,13 @@ def get_gaussian_kernel(sigma):
 # Boundary conditions are reflected
 def moving_gaussian_filter(signal_y,sigma):
     N = signal_y.size
-    window_width = 3*sigma+1
+    window_width = 3*2*sigma+1
     window_half_width = window_width//2
     y_filt = np.zeros(N)
-    kernel = get_gaussian_kernel(sigma)
+    kernel = get_gaussian_kernel(float(sigma))
     firstvals = signal_y[0] - np.abs(signal_y[1:window_half_width+1][::-1] - signal_y[0] )
     lastvals = signal_y[-1] + np.abs(signal_y[-window_half_width-1:-1][::-1] - signal_y[-1])
     y_temp = np.concatenate((firstvals, signal_y, lastvals))
+    print kernel
     y_filt = np.convolve(y_temp,kernel,'valid')
     return y_filt

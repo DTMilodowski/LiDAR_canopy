@@ -83,7 +83,7 @@ def retrieve_peaks(vertical_profiles,heights):
     return peaks
 
 # filter signal using savitzky-golay filter before retrieving peaks
-def retrieve_peaks_with_filter(vertical_profiles,heights,filter_window,filter_order=3,threshold = 0):
+def retrieve_peaks_with_savitzky_golay_filter(vertical_profiles,heights,filter_window,filter_order=3,threshold = 0):
     N_profiles,N_heights = vertical_profiles.shape
     profile = moving_polynomial_filter(vertical_profiles[0],filter_window,filter_order)
     
@@ -104,6 +104,28 @@ def retrieve_peaks_with_filter(vertical_profiles,heights,filter_window,filter_or
         plt.show()
     return peaks
 
+
+# filter signal using gaussian filter before retrieving peaks
+def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1):
+    N_profiles,N_heights = vertical_profiles.shape
+    profile = moving_gaussian_filter(vertical_profiles[0],sigma)
+    
+    peaks, peak_amplitude = find_maxima(heights,profile,threshold)
+    plt.plot(vertical_profiles[0],heights,'-')
+    plt.plot(profile,heights,'-')
+    plt.plot(peak_amplitude,peaks,'o')
+    plt.xlim(xmin=0)
+    plt.show()
+    for i in range(1,N_profiles):
+        profile = moving_polynomial_filter(vertical_profiles[i],filter_window,filter_order)
+        peaks_this_iter, peak_amplitude = find_maxima(heights,profile,threshold)
+        peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
+        plt.plot(vertical_profiles[i],heights,'-')
+        plt.plot(profile,heights,'-')
+        plt.plot(peak_amplitude,peaks_this_iter,'o')
+        plt.xlim(xmin=0)
+        plt.show()
+    return peaks
 
 def calculate_VSI(peaks):
     # convert number of peaks & their locations in canopy into VSI    

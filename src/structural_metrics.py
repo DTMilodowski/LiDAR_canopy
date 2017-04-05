@@ -106,25 +106,29 @@ def retrieve_peaks_with_savitzky_golay_filter(vertical_profiles,heights,filter_w
 
 
 # filter signal using gaussian filter before retrieving peaks
-def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1):
+def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1,threshold=0,plot_profiles=False):
     N_profiles,N_heights = vertical_profiles.shape
     profile = moving_gaussian_filter(vertical_profiles[0],sigma)
     
     peaks, peak_amplitude = find_maxima(heights,profile,threshold)
-    plt.plot(vertical_profiles[0],heights,'-')
-    plt.plot(profile,heights,'-')
-    plt.plot(peak_amplitude,peaks,'o')
-    plt.xlim(xmin=0)
-    plt.show()
-    for i in range(1,N_profiles):
-        profile = moving_polynomial_filter(vertical_profiles[i],filter_window,filter_order)
-        peaks_this_iter, peak_amplitude = find_maxima(heights,profile,threshold)
-        peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
-        plt.plot(vertical_profiles[i],heights,'-')
+    if plot_profiles:
+        plt.figure(1,facecolor='White',figsize=[4,4])
+        plt.plot(vertical_profiles[0],heights,'-')
         plt.plot(profile,heights,'-')
-        plt.plot(peak_amplitude,peaks_this_iter,'o')
+        plt.plot(peak_amplitude,peaks,'o')
         plt.xlim(xmin=0)
         plt.show()
+    for i in range(1,N_profiles):
+        profile = moving_gaussian_filter(vertical_profiles[i],sigma)
+        peaks_this_iter, peak_amplitude = find_maxima(heights,profile,threshold)
+        peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
+        if plot_profiles:
+            plt.figure(1,facecolor='White',figsize=[4,4])
+            plt.plot(vertical_profiles[i],heights,'-')
+            plt.plot(profile,heights,'-')
+            plt.plot(peak_amplitude,peaks_this_iter,'o')
+            plt.xlim(xmin=0)
+            plt.show()
     return peaks
 
 def calculate_VSI(peaks):
@@ -218,6 +222,5 @@ def moving_gaussian_filter(signal_y,sigma):
     firstvals = signal_y[0] - np.abs(signal_y[1:window_half_width+1][::-1] - signal_y[0] )
     lastvals = signal_y[-1] + np.abs(signal_y[-window_half_width-1:-1][::-1] - signal_y[-1])
     y_temp = np.concatenate((firstvals, signal_y, lastvals))
-    print kernel
     y_filt = np.convolve(y_temp,kernel,'valid')
     return y_filt

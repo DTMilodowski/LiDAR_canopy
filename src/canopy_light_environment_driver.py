@@ -20,6 +20,8 @@ light_absorption = {}
 light_transmittance = {}
 k = 0.034
 n_plots = len(LAD_profiles.keys())
+color_string = 'blue'
+label_string = '-'
 for pp in range(0,n_plots):
     plot = LAD_profiles.keys()[pp]
     print plot
@@ -28,13 +30,20 @@ for pp in range(0,n_plots):
     n_sub = I.shape[0]
     for ss in range(0,n_sub):
         I[ss,:]=clim.estimate_canopy_light_transmittance(LAD_profiles[plot][ss],heights,k)
-        A[ss,:]=clim.estimate_canopy_light_absorption(I,k)
+        A[ss,:]=clim.estimate_canopy_light_absorption(I[ss,:],k)
 
     light_transmittance[plot] = I.copy()
     light_absorption[plot] = A.copy()
 
+    figure_name = output_dir + '/light_environment/'+Plots[pp]+'_subplot_transmitance'
+    plot_LAD.plot_subplot_transmittance_profiles(light_transmittance[plot],heights,color_string,label_string,figure_name)
+    figure_name = output_dir + '/light_environment/'+Plots[pp]+'_subplot_absorption'
+    plot_LAD.plot_subplot_absorption_profiles(light_absorption[plot],heights,color_string,label_string,figure_name)
+
 OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_lighttransmittance'
-np.savez(OutFile+'.npz', light_transmittance**)
+np.savez(OutFile+'.npz', **light_transmittance)
 OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_light_absorption'
-np.savez(OutFile+'.npz', light_absorption**)
+np.savez(OutFile+'.npz', **light_absorption)
+
+
 

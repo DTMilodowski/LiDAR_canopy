@@ -121,11 +121,11 @@ for pp in range(0,N_plots):
     LAD_MH[:,mask]=0
     #mask = np.max(heights_rad)-heights_rad<=minimum_height
     mask = heights_rad<=minimum_height
-    LAD_rad_DTM[:,mask]=np.nan
+    LAD_rad_DTM[:,mask]=0
     mask = heights_2m <= minimum_height
     LAD_MH_2m[:,mask]=0
     mask = heights_rad_2m<=minimum_height
-    LAD_rad_2m[:,mask]=np.nan
+    LAD_rad_2m[:,mask]=0
     #LAD_MH_5m[:,0]=np.nan
     #LAD_rad_5m[:,:2]=np.nan
 
@@ -147,7 +147,7 @@ np.savez(OutFile+'.npz', **MacArthurHorn_LAD_2m)
 OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_LAD_profiles_RadiativeTransfer_1m'
 np.savez(OutFile+'.npz', **radiative_DTM_LAD)
 OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_LAD_profiles_RadiativeTransfer_2m'
-np.savez(OutFile+'.npz', **radiative_DTM_LAD_2m)
+np.savez(OutFile+'.npz', **radiative_LAD_2m)
 
 
 
@@ -162,15 +162,11 @@ for pp in range(0,N_plots):
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_MH_2m'
     plot_LAD.plot_subplot_LAD_profiles(MacArthurHorn_LAD_2m[Plots[pp]],heights_2m,'g',label_string,figure_name)
 
-    #figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_MH_5m'
-    #plot_LAD.plot_subplot_LAD_profiles(MacArthurHorn_LAD_5m[Plots[pp]],heights_5m,'g',label_string,figure_name)
-
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_1m_k2'
     plot_LAD.plot_subplot_LAD_profiles(radiative_DTM_LAD[Plots[pp]][:,:,1],heights_rad,'g',label_string,figure_name)
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_1m_k3'
     plot_LAD.plot_subplot_LAD_profiles(radiative_DTM_LAD[Plots[pp]][:,:,2],heights_rad,'g',label_string,figure_name)
-
 
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k2'
     plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_2m[Plots[pp]][:,:,1],heights_rad_2m,'g',label_string,figure_name)
@@ -178,26 +174,15 @@ for pp in range(0,N_plots):
     figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k3'
     plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_2m[Plots[pp]][:,:,2],heights_rad_2m,'g',label_string,figure_name)
 
-    #figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_5m_k2'
-    #plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_5m[Plots[pp]][:,:,1],heights_rad_5m,'g',label_string,figure_name)
-
-    #figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_5m_k3'
-    #plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_5m[Plots[pp]][:,:,2],heights_rad_5m,'g',label_string,figure_name)
-
-    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k2_noS'
-    plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_noS[Plots[pp]][:,:,1],heights_rad_2m,'g',label_string,figure_name)
-    figure_name = output_dir + '/subplot_profiles/'+Plots[pp]+'_subplot_LAD_profiles_rad_2m_k3_noS'
-    plot_LAD.plot_subplot_LAD_profiles(radiative_LAD_noS[Plots[pp]][:,:,2],heights_rad_2m,'g',label_string,figure_name)
-
-
-
 
 
 # next step is to take the canopy profiles and get the vertical and horizontal canopy structural metrics
 # use the 2m profiles - both radiative transfer and MacArthur-Horn versions for comparison
 peaks_MH = {}
+peaks_MH_2m = {}
 vertical_structural_variance_MH = {}
 peaks_rad = {}
+peaks_rad_2m = {}
 vertical_structural_variance_rad = {}
 filter_window = 9.
 filter_order = 4
@@ -207,10 +192,14 @@ for pp in range(0,N_plots):
     print Plots[pp]
     plot_name = Plots[pp]
     print "\t- getting vertical metrics"
-    peak_heights_MH = structure.retrieve_peaks_gaussian_convolution(MacArthurHorn_LAD_2m[plot_name],heights_2m)
-    peak_heights_rad = structure.retrieve_peaks_gaussian_convolution(radiative_LAD_2m[plot_name][:,:,-1],heights_rad_2m)
+    peak_heights_MH = structure.retrieve_peaks_gaussian_convolution(MacArthurHorn_LAD[plot_name],heights,sigma=2,plot_profiles=True)
+    peak_heights_rad = structure.retrieve_peaks_gaussian_convolution(radiative_DTM_LAD[plot_name][:,:,-1],heights_rad,sigma=2,plot_profiles=True)
+    peak_heights_MH_2m = structure.retrieve_peaks_gaussian_convolution(MacArthurHorn_LAD_2m[plot_name],heights_2m)
+    peak_heights_rad_2m = structure.retrieve_peaks_gaussian_convolution(radiative_LAD_2m[plot_name][:,:,-1],heights_rad_2m)
     peaks_MH[plot_name] = peak_heights_MH.size
     peaks_rad[plot_name] = peak_heights_rad.size
+    peaks_MH_2m[plot_name] = peak_heights_MH.size
+    peaks_rad_2m[plot_name] = peak_heights_rad.size
     # get variance in layer heights
     vertical_structural_variance_MH[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_MH)
     vertical_structural_variance_rad[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_rad)

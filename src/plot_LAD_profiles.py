@@ -159,7 +159,7 @@ def plot_subplot_LAD_profiles(Profiles_in,Heights_in,color_string,label_string,f
 
 # Equivalent function that instead plots profiles of transmittance or absorption through the canopy at both the subplot level and plot averages
 def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_string,figure_name):
-    n_subplots,n_layers = Profiles_in.shape
+    n_subplots,n_layers = Profiles.shape
     dz = Heights[1]-Heights[0]
     Profiles[np.isfinite(Profiles)==False]=0
     plt.figure(1,facecolor='White',figsize=[15,10])
@@ -273,7 +273,7 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
 
 # An equivalent function that instead plots profiles of transmittance through the canopy at both the subplot level and plot averages
 def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_string,figure_name):
-    n_subplots,n_layers = Profiles_in.shape
+    n_subplots,n_layers = Profiles.shape
     dz = Heights[1]-Heights[0]
     Profiles[np.isfinite(Profiles)==False]=0
     plt.figure(1,facecolor='White',figsize=[15,10])

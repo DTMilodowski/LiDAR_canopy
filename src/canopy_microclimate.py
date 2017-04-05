@@ -13,7 +13,7 @@ import numpy as np
 # I_0 is the incident radiation at the top of the canopy.  If I_0==1 this will
 # give the fraction of light transmitted to a given canopy layer.
 # For reference - see Stark et al., Ecology Letters, 2012
-def estimate_canopy_light_transmittance(LAD,heights,k,I_0):
+def estimate_canopy_light_transmittance(LAD,heights,k,I_0=1):
     # make sure that canopy levels are labelled from ground up.
     if heights[0]>heights[1]:
         LAD = LAD[::-1]

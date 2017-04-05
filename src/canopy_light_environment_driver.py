@@ -32,3 +32,9 @@ for pp in range(0,n_plots):
 
     light_transmittance[plot] = I.copy()
     light_absorption[plot] = A.copy()
+
+OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_lighttransmittance'
+np.savez(OutFile+'.npz', light_transmittance**)
+OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_light_absorption'
+np.savez(OutFile+'.npz', light_absorption**)
+

@@ -8,3 +8,6 @@ import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import structural_metrics as structure
 import plot_LAD_profiles as plot_LAD
 import canopy_microclimate as clim
+
+sys.path.append('/home/dmilodow/DataStore_DTM/BALI/SPA_BALI_data_and_analysis/scripts/field_data/')
+import load_field_data as field

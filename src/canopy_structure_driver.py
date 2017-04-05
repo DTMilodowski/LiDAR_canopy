@@ -139,6 +139,19 @@ for pp in range(0,N_plots):
 
     #radiative_LAD_noS[Plot_name] = LAD_rad_2m_noS.copy()
 
+# write profiles to file# save profiles for plot to file
+OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_LAD_profiles_MacHorn_1m'
+np.savez(OutFile+'.npz', **MacArthurHorn_LAD)
+OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_LAD_profiles_MacHorn_2m'
+np.savez(OutFile+'.npz', **MacArthurHorn_LAD_2m)
+OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_LAD_profiles_RadiativeTransfer_1m'
+np.savez(OutFile+'.npz', **radiative_DTM_LAD)
+OutFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_LAD_profiles_RadiativeTransfer_2m'
+np.savez(OutFile+'.npz', **radiative_DTM_LAD_2m)
+
+
+
+
 # Plot up the subplot profiles to see how changing resolution impacts on the resultant LAD profiles
 for pp in range(0,N_plots):
     print Plots[pp]

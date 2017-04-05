@@ -255,7 +255,7 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
 
     ax_main.set_ylim(ymin=0,ymax=80)
     
-    Transmission ='%.2f' % np.mean(Profiles[:,Heights==2])*dz
+    Transmission ='%.2f' % np.mean(Profiles[:,Heights==3])
     ax_main.annotate('Transmission to 2m height = ' + Transmission, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=rcParams['font.size']+2)
     ax_main.annotate(label_string, xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=rcParams['font.size']+2)
 
@@ -367,7 +367,7 @@ def plot_subplot_absorption_profiles(Profiles,Heights,color_string,label_string,
 
     ax_main.set_ylim(ymin=0,ymax=80)
 
-    Absorption='%.2f' % np.sum(np.mean(Profiles[:,Heights>=2],axis=0)*dz)
+    Absorption='%.2f' % np.sum(np.mean(Profiles[:,Heights>2],axis=0))
     ax_main.annotate('Absorption to 2m height = ' + Absorption, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=rcParams['font.size']+2)
     ax_main.annotate(label_string, xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=rcParams['font.size']+2)
 

@@ -145,8 +145,8 @@ def plot_subplot_LAD_profiles(Profiles_in,Heights_in,color_string,label_string,f
     ax_main.set_ylim(ymin=0,ymax=80)
     ax_main.set_xlim(xmin=0,xmax=0.8)
 
-    Transmission ='%.2f' % np.sum(np.mean(Profiles,axis=0)*dz/2.)
-    ax_main.annotate('Transmission to 2m height = ' + Transmission, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=rcParams['font.size']+2)
+    LAI ='%.2f' % np.sum(np.mean(Profiles,axis=0)*dz/2.)
+    ax_main.annotate('LAI = ' + LAI, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=rcParams['font.size']+2)
     ax_main.annotate(label_string, xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=rcParams['font.size']+2)
 
     ax_main.set_xlabel('Leaf Area Density')
@@ -220,11 +220,9 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
 
     ax13 = plt.subplot2grid((10,15),(6,6),colspan=2,rowspan=2,sharex=ax40,sharey=ax40)
     ax13.plot(Profiles[6,:],Heights,color=color_string)
-    ax13.fill_betweenx(Heights,0,Profiles[6,:],color=color_string,alpha=0.5)
 
     ax14 = plt.subplot2grid((10,15),(6,8),colspan=2,rowspan=2,sharex=ax40,sharey=ax40)
     ax14.plot(Profiles[5,:],Heights,color=color_string)
-    ax14.fill_betweenx(Heights,0,Profiles[5,:],color=color_string,alpha=0.5)
 
     ax00 = plt.subplot2grid((10,15),(8,0),colspan=2,rowspan=2,sharex=ax40,sharey=ax40)
     ax00.plot(Profiles[0,:],Heights,color=color_string)
@@ -242,7 +240,6 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
     ax04.plot(Profiles[4,:],Heights,color=color_string)
 
     ax40.set_ylim(ymin=0,ymax=80)
-    ax40.set_xlim(xmin=0,xmax=0.8)
 
     xticklabels = ax00.get_xticklabels()+ax01.get_xticklabels()+ax02.get_xticklabels()+ax03.get_xticklabels()+ax04.get_xticklabels() + ax10.get_xticklabels()+ax11.get_xticklabels()+ax12.get_xticklabels()+ax13.get_xticklabels()+ax14.get_xticklabels() + ax20.get_xticklabels()+ax21.get_xticklabels()+ax22.get_xticklabels()+ax23.get_xticklabels()+ax24.get_xticklabels() + ax30.get_xticklabels()+ax31.get_xticklabels()+ax32.get_xticklabels()+ax33.get_xticklabels()+ax34.get_xticklabels() + ax40.get_xticklabels()+ax41.get_xticklabels()+ax42.get_xticklabels()+ax43.get_xticklabels()+ax44.get_xticklabels()
 
@@ -257,10 +254,9 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
     ax_main.plot(np.mean(Profiles,axis=0),Heights,color=color_string)
 
     ax_main.set_ylim(ymin=0,ymax=80)
-    ax_main.set_xlim(xmin=0,xmax=0.8)
-
-    plotLAI='%.2f' % np.sum(np.mean(Profiles,axis=0)*dz/2.)
-    ax_main.annotate('LAI = ' + plotLAI, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=rcParams['font.size']+2)
+    
+    Transmission ='%.2f' % np.mean(Profiles[:,Heights==2])*dz
+    ax_main.annotate('Transmission to 2m height = ' + Transmission, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=rcParams['font.size']+2)
     ax_main.annotate(label_string, xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=rcParams['font.size']+2)
 
     ax_main.set_xlabel('Fractional Light Transmittance')
@@ -272,7 +268,9 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
     #plt.show()
 
 # An equivalent function that instead plots profiles of transmittance through the canopy at both the subplot level and plot averages
-def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_string,figure_name):
+def plot_subplot_absorption_profiles(Profiles,Heights,color_string,label_string,figure_name):
+    print Profiles.shape
+    print Heights.shape
     n_subplots,n_layers = Profiles.shape
     dz = Heights[1]-Heights[0]
     Profiles[np.isfinite(Profiles)==False]=0
@@ -334,11 +332,9 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
 
     ax13 = plt.subplot2grid((10,15),(6,6),colspan=2,rowspan=2,sharex=ax40,sharey=ax40)
     ax13.plot(Profiles[6,:],Heights,color=color_string)
-    ax13.fill_betweenx(Heights,0,Profiles[6,:],color=color_string,alpha=0.5)
 
     ax14 = plt.subplot2grid((10,15),(6,8),colspan=2,rowspan=2,sharex=ax40,sharey=ax40)
     ax14.plot(Profiles[5,:],Heights,color=color_string)
-    ax14.fill_betweenx(Heights,0,Profiles[5,:],color=color_string,alpha=0.5)
 
     ax00 = plt.subplot2grid((10,15),(8,0),colspan=2,rowspan=2,sharex=ax40,sharey=ax40)
     ax00.plot(Profiles[0,:],Heights,color=color_string)
@@ -356,7 +352,6 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
     ax04.plot(Profiles[4,:],Heights,color=color_string)
 
     ax40.set_ylim(ymin=0,ymax=80)
-    ax40.set_xlim(xmin=0,xmax=0.8)
 
     xticklabels = ax00.get_xticklabels()+ax01.get_xticklabels()+ax02.get_xticklabels()+ax03.get_xticklabels()+ax04.get_xticklabels() + ax10.get_xticklabels()+ax11.get_xticklabels()+ax12.get_xticklabels()+ax13.get_xticklabels()+ax14.get_xticklabels() + ax20.get_xticklabels()+ax21.get_xticklabels()+ax22.get_xticklabels()+ax23.get_xticklabels()+ax24.get_xticklabels() + ax30.get_xticklabels()+ax31.get_xticklabels()+ax32.get_xticklabels()+ax33.get_xticklabels()+ax34.get_xticklabels() + ax40.get_xticklabels()+ax41.get_xticklabels()+ax42.get_xticklabels()+ax43.get_xticklabels()+ax44.get_xticklabels()
 
@@ -371,9 +366,8 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
     ax_main.plot(np.mean(Profiles,axis=0),Heights,color=color_string)
 
     ax_main.set_ylim(ymin=0,ymax=80)
-    ax_main.set_xlim(xmin=0,xmax=0.8)
 
-    Absorption='%.2f' % np.sum(np.mean(Profiles,axis=0)*dz/2.)
+    Absorption='%.2f' % np.sum(np.mean(Profiles[:,Heights>=2],axis=0)*dz)
     ax_main.annotate('Absorption to 2m height = ' + Absorption, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=rcParams['font.size']+2)
     ax_main.annotate(label_string, xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=rcParams['font.size']+2)
 

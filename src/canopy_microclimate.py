@@ -32,6 +32,8 @@ def estimate_canopy_light_absorption(I,k):
     N_levels = I.size
     temp_I = np.zeros(N_levels+1)
     temp_I[1:] = I.copy()
+    temp_I[0] = I[0]
     I0 = I[-1]
     A = (temp_I[1:]-temp_I[:-1])/I0
+
     return A

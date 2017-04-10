@@ -30,7 +30,6 @@ for pp in range(0,n_plots):
     A = np.zeros(LAD_profiles[plot].shape)
     n_sub = I.shape[0]
     for ss in range(0,n_sub):
-        print '======'
         I[ss,:]=clim.estimate_canopy_light_transmittance(LAD_profiles[plot][ss],heights,k)
         A[ss,:]=clim.estimate_canopy_light_absorption(I[ss,:],k)
 

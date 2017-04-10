@@ -80,6 +80,7 @@ for pp in range(0,N_plots):
     # loop through subplots, calculating both return profiles and LAD distributions
     for i in range(0,n_subplots):
         print "Subplot: ", subplot_labels[Plot_name][i]
+        subplot_index = subplot_labels[Plot_name][i]-1 # this is so that the subplots are stored in a logical order
         # filter lidar points into subplot
         sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_polygons[Plot_name][i,:,:])
 
@@ -87,9 +88,9 @@ for pp in range(0,N_plots):
         for rr in range(0,max_return):
             max_k=rr+1
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
-            LAD_rad_DTM[i,:,rr]=u[::-1].copy()
+            LAD_rad_DTM[subplot_index,:,rr]=u[::-1].copy()
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad_2m,max_k,'spherical')
-            LAD_rad_2m[i,:,rr]=u[::-1].copy()
+            LAD_rad_2m[subplot_index,:,rr]=u[::-1].copy()
             #u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad_5m,max_k,'spherical')
             #LAD_rad_5m[i,:,rr]=u[::-1].copy()
 
@@ -101,9 +102,9 @@ for pp in range(0,N_plots):
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
-        LAD_MH[i,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
+        LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
         heights_2m,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness_2m)
-        LAD_MH_2m[i,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness_2m, 1.)
+        LAD_MH_2m[subplot_index,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness_2m, 1.)
         #heights_5m,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness_5m)
         #LAD_MH_5m[i,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness_5m, 1.)
 

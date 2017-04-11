@@ -99,33 +99,34 @@ for pp in range(0,N_plots):
     # loop through subplots, calculating both return profiles and LAD distributions
     for i in range(0,n_subplots):
         print "Subplot: ", subplot_labels[Plot_name][i]
+        subplot_index = subplot_labels[Plot_name][i]-1
         # filter lidar points into subplot
         sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_polygons[Plot_name][i,:,:])
         # first of all, loop through the return numbers to calculate the radiative LAD profiles
         for rr in range(0,max_return):
             max_k=rr+1
             u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
-            LAD_rad[i,:,rr]=u.copy()
-        lidar_return_profiles[i,:,:] = np.sum(n.copy(),axis=1)
+            LAD_rad[subplot_index,:,rr]=u.copy()
+        lidar_return_profiles[subplot_index,:,:] = np.sum(n.copy(),axis=1)
 
         # now repeat but for adjusted profiles, accounting for imperfect penetration of LiDAR pulses into canopy
         for rr in range(0,max_return):
             max_k=rr+1
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
-            LAD_rad_DTM[i,:,rr]=u.copy()
-        lidar_return_profiles_adj[i,:,:] = np.sum(n.copy(),axis=1)
+            LAD_rad_DTM[subplot_index,:,rr]=u.copy()
+        lidar_return_profiles_adj[subplot_index,:,:] = np.sum(n.copy(),axis=1)
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
-        LAD_MH[i,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
+        LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
 
         # now get field inventory estimate
         mask = np.all((field_data['plot']==Plot_name,field_data['subplot']==subplot_labels[Plot_name][i]),axis=0)
         Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-        field_LAD_profiles[i,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
+        field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
         # now load in the LAI estimates from the hemispherical photographs
         Hemisfer_mask = np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)
-        LAI_hemisfer[i] = field_LAI['LAI'][Hemisfer_mask]
+        LAI_hemisfer[subplot_index] = field_LAI['LAI'][Hemisfer_mask]
 
     # now we have looped through and created the different profiles, need to account for any NaN's and apply minimum height
     # to the LAD distributions

@@ -21,6 +21,7 @@ subplot_coordinate_file = 'BALI_subplot_coordinates_corrected.csv'
 
 # also define output directory (for saving figures)
 output_dir = './Figures/'
+pointcloud_dir = './subplot_pointclouds/'
 
 # define important parameters for canopy profile estimation
 Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
@@ -76,13 +77,25 @@ for pp in range(0,N_plots):
     LAD_MH = np.zeros((n_subplots, heights.size))
     LAD_MH_2m = np.zeros((n_subplots, heights_2m.size))
     #LAD_MH_5m = np.zeros((n_subplots,heights_5m.size))
-
+    
+    """
+    # write point cloud to file for testing
+    out = open(pointcloud_dir + Plot_name+'_pts.csv','w')
+    out.write('x,y,z,plot,subplot\n')
+    """
     # loop through subplots, calculating both return profiles and LAD distributions
     for i in range(0,n_subplots):
         print "Subplot: ", subplot_labels[Plot_name][i]
         subplot_index = subplot_labels[Plot_name][i]-1 # this is so that the subplots are stored in a logical order
         # filter lidar points into subplot
         sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_polygons[Plot_name][i,:,:])
+        """
+        for p in range(0,sp_pts.shape[0]):
+            out.write(str(sp_pts[p,0]) + ',' + str(sp_pts[p,1]) + ',' + str(sp_pts[p,2]) + ',' +  Plot_name + ',' + str(subplot_labels[Plot_name][i])+'\n')
+
+    out.close()
+        """
+
 
         # first of all, loop through the return numbers to calculate the radiative LAD profiles, accounting for imperfect penetration of LiDAR pulses into canopy
         for rr in range(0,max_return):

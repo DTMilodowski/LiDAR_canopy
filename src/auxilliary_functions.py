@@ -83,3 +83,21 @@ def get_bounding_box(coordinate_list):
     bbox[3,0]=left
     bbox[3,1]=bottom
     return bbox
+
+# get bounding box for list of coordinates
+def get_bounding_box_with_buffer(coordinate_list,buffer_width):
+    N = coordinate_list.shape[0]
+    bbox = np.zeros((4,2))
+    top = coordinate_list[:,1].max()+buffer_width
+    bottom = coordinate_list[:,1].min()-buffer_width
+    left = coordinate_list[:,0].min()-buffer_width
+    right = coordinate_list[:,0].max()+buffer_width
+    bbox[0,0]=left
+    bbox[0,1]=top
+    bbox[1,0]=right
+    bbox[1,1]=top
+    bbox[2,0]=right
+    bbox[2,1]=bottom
+    bbox[3,0]=left
+    bbox[3,1]=bottom
+    return bbox

@@ -71,7 +71,7 @@ def filter_lidar_data_by_polygon(in_pts,polygon):
     return pts
 
 # filter lidar by circular neighbourhood
-def filter_lidar_data_by_polygon(in_pts,target_xy,radius):
+def filter_lidar_data_by_neighbourhood(in_pts,target_xy,radius):
     x,y,inside =  points_in_radius(in_pts[:,0],in_pts[:,1],target_xy[0],target_xy[1],radius)
     pts = in_pts[inside,:]
     return pts

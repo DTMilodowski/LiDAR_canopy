@@ -107,4 +107,18 @@ minimum_height = 2. # ignore profiles <2m due to difficulties distinguishing gro
 # this second set of parameters is only used for the radiative transfer model
 leaf_angle_dist = 'spherical'
 max_return = 3
+heights_rad = np.arange(0,max_height+1)
+
+# load LiDAR point cloud and clip to polygon
+lidar_pts = lidar.load_lidar_data(las_file)
+coord_pairs = 
+sample_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,polygon)
+
+# MacArthur-Horn method (Stark et al., 2012)
+heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
+LAD_MacArthurHorn = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
+
+#Radiative transfer approach (Milodowski building on Detto et al., 2015)
+u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,leaf_angle_dist)
+LAD_rad=u[::-1]
 

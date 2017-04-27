@@ -54,8 +54,11 @@ plt.show()
 # Of the two methods, the radiative transfer scheme gives systematically higher LAD values,
 # although the profile characteristics are consistent.  Moreover the MacArthur Horn estimates
 # are typically corrected empirically using a scalar to account for under-prediction of total
-# leaf area.  For example Stark et al. (2012) used correction factors of ~0.7 for two Amazon
-# sites.
+# leaf area.  For example Stark et al. (2012) found that LAI values predicted using the
+# MacArthur-Horn method with airborne LiDAR predicted LAI values ~70% of true values for two
+# Amazon sites.  I wrote a script to find the correction factor based on minimising misfit
+# against subplot LAI derived from hemispherical photographs, but it turns out that hemiphotos
+# seem to be terrible at predicting LAI in this landscape (paper draft forthcoming!)
 #
 # A second difference is that the radiative transfer scheme utilises multiple discrete returns.
 # This may in part be driving the difference in the observed LAD profiles.  Happy to discuss

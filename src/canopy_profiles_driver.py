@@ -387,7 +387,12 @@ print " R^2 = ", r_MH**2, "; p = ", p_MH
 print " hemiphoto -> radiative transfer model"
 print " LAD_rad = ", a_rad, " x LAD_hemi^", b_rad
 print " R^2 = ", r_rad**2, "; p = ", p_rad
+print "========================================"
 
+# Now create some model values for plotting alongside data
+LAI_hemi_mod = np.arange(np.min(hemiphot_all),np.max(hemiphot_all),0.001)
+LAI_rad_mod = CF_rad*a_rad*LAI_hemi_mod**b_rad
+LAI_MH_mod = CF_MH*a_MH*LAI_hemi_mod**b_MH
 
 plt.figure(5, facecolor='White',figsize=[9,4])
 ax5a = plt.subplot2grid((1,3),(0,0))
@@ -402,6 +407,7 @@ for i in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
     y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
     ax5a.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),x_err,y_err,'o',color='black')
+ax5a.plot(LAI_hemi_mod, LAI_MH_mod, '-', color = 'k')
 
 
 ax5b = plt.subplot2grid((1,3),(0,1), sharex=ax5a, sharey=ax5a)
@@ -419,6 +425,8 @@ for i in range(0,N_plots):
     y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
     ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err1,marker='o',color='black',mfc='white')
     ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err2,marker='o',color='black')
+
+ax5b.plot(LAI_hemi_mod, LAI_rad_mod, '-', color = 'k')
 
 
 ax5c = plt.subplot2grid((1,3),(0,2), sharex=ax5a)

@@ -32,7 +32,7 @@ N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
 max_return = 3
-layer_thickness = 2.#1
+layer_thickness = 1.#2.
 n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 plot_area = 10.**4
@@ -274,7 +274,7 @@ for pp in range(0,N_plots):
     ax3c.locator_params(axis='x',nbins=5)
 
     plt.tight_layout()
-    plt.savefig(output_dir+Plot_name+'_LAD_radiative_kmax_'+str(max_return)+'.png')
+    #plt.savefig(output_dir+Plot_name+'_LAD_radiative_kmax_'+str(max_return)+'.png')
     plt.show()
 
 #----------------------------------------------------------------------------------------------------------------
@@ -356,7 +356,7 @@ hemiphot_all = np.zeros(n_subplots*N_plots)
 ii = 0
 for pp in range(0, N_plots):
     for ss in range(0,n_subplots):
-        MacHorn_all[ii] = MacArthurHorn_LAI[Plots[pp]]
+        MacHorn_all[ii] = MacArthurHorn_LAI[Plots[pp]][ss]
         rad_all[ii] = radiative_DTM_LAI[Plots[pp]][ss,-1]
         hemiphot_all[ii] = Hemisfer_LAI[Plots[pp]][ss]
         ii+=1
@@ -448,7 +448,7 @@ ax5a.set_xlim((0,10))
 ax5a.set_ylim((0,20))
 ax5c.set_ylim(ymin=0)
 plt.tight_layout()
-plt.savefig(output_dir+'GEM_subplot_LAI_comparison.png')
+#plt.savefig(output_dir+'GEM_subplot_LAI_comparison.png')
 plt.show()
 
 

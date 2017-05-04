@@ -389,6 +389,43 @@ print " LAD_rad = ", a_rad, " x LAD_hemi^", b_rad
 print " R^2 = ", r_rad**2, "; p = ", p_rad
 print "========================================"
 
+# Repeat for plot-level (1 ha) averages
+MacHorn_ha = np.zeros(N_plots)
+rad_ha = np.zeros(N_plots)
+hemiphot_ha = np.zeros(N_plots)
+
+for pp in range(0, N_plots):
+    MacHorn_ha[pp] = np.mean(MacArthurHorn_LAI[Plots[pp]])
+    rad_ha[pp] = np.mean(radiative_DTM_LAI[Plots[pp]][:,-1])
+    hemiphot_ha[pp] = np.mean(Hemisfer_LAI[Plots[pp]])
+
+log_MH_ha = np.log(MacHorn_ha)
+log_rad_ha = np.log(rad_ha)
+log_hemi_ha = np.log(hemiphot_ha)
+
+b_MH, loga_MH, r_MH, p_MH, serr_MH = stats.linregress(log_hemi_ha,log_MH_ha)
+model_log_MH = b_MH*log_hemi + loga_MH
+error_MH = log_MH-model_log_MH
+MSE_MH = np.mean(error_MH**2)
+CF_MH = np.exp(MSE_MH/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+a_MH = np.exp(loga_MH)
+
+b_rad, loga_rad, r_rad, p_rad, serr_rad = stats.linregress(log_hemi_ha,log_rad_ha)
+model_log_rad = b_rad*log_hemi + loga_rad
+error_rad = log_rad-model_log_rad
+MSE_rad = np.mean(error_rad**2)
+CF_rad = np.exp(MSE_rad/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+a_rad = np.exp(loga_rad)
+print "========================================"
+print " hemiphoto -> MacArthur-Horn"
+print " LAD_MH = ", CF_MH*a_MH, " x LAD_hemi^", b_MH
+print " R^2 = ", r_MH**2, "; p = ", p_MH
+
+print " hemiphoto -> radiative transfer model"
+print " LAD_rad = ", CF_rad*a_rad, " x LAD_hemi^", b_rad
+print " R^2 = ", r_rad**2, "; p = ", p_rad
+print "========================================"
+
 # Now create some model values for plotting alongside data
 LAI_hemi_mod = np.arange(np.min(hemiphot_all),np.max(hemiphot_all),0.001)
 LAI_rad_mod = CF_rad*a_rad*LAI_hemi_mod**b_rad

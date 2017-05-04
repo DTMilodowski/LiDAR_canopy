@@ -12,8 +12,9 @@ import LiDAR_MacHorn_LAD_profiles as LAD1
 import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import inventory_based_LAD_profiles as field
 
-sys.path.append('/home/dmilodow/DataStore_DTM/BALI/MetDataProcessing/UtilityTools/')
-import statistics_tools as stats
+#sys.path.append('/home/dmilodow/DataStore_DTM/BALI/MetDataProcessing/UtilityTools/')
+#import statistics_tools as stats
+from scipy import stats
 
 # start by defining input files
 las_file = 'Carbon_plot_point_cloud_buffer.las'
@@ -346,6 +347,48 @@ for pp in range(0,N_plots):
 #----------------------------------------------------------------------------------------------------------------
 # Figure 5 - Comparing LAI from hemiphotos against integrated LAD from the different methods
 # Plot up the subplot-level estimates, in addition to the 
+
+# Also include some regression analysis to get relationship between hemiphotos and LIDAR metrics.  Assume power
+# law for the first instance since the relationship appears non linear
+MacHorn_all = np.zeros(n_subplots*N_plots)
+rad_all = np.zeros(n_subplots*N_plots)
+hemiphot_all = np.zeros(n_subplots*N_plots)
+ii = 0
+for pp in range(0, N_plots):
+    for ss in range(0,n_subplots):
+        MacHorn_all[ii] = MacArthurHorn_LAI[Plots[pp]]
+        rad_all[ii] = radiative_DTM_LAI[Plots[pp]][ss,-1]
+        hemiphot_all[ii] = Hemisfer_LAI[Plots[pp]][ss]
+        ii+=1
+
+log_MH = np.log(MacHorn_all)
+log_rad = np.log(rad_all)
+log_hemi = np.log(hemiphot_all)
+
+b_MH, loga_MH, r_MH, p_MH, serr_MH = stats.linregress(log_hemi,log_MH)
+model_log_MH = b_MH*log_hemi + loga_MH
+error_MH = log_MH-model_log_MH
+MSE_MH = np.mean(error_MH**2)
+CF_MH = np.exp(MSE_MH/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+a_MH = np.exp(loga_MH)
+
+b_rad, loga_rad, r_rad, p_rad, serr_rad = stats.linregress(log_hemi,log_rad)
+model_log_rad = b_rad*log_hemi + loga_rad
+error_rad = log_rad-model_log_rad
+MSE_rad = np.mean(error_rad**2)
+CF_rad = np.exp(MSE_rad/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+a_rad = np.exp(loga_rad)
+
+print "========================================"
+print " hemiphoto -> MacArthur-Horn"
+print " LAD_MH = ", a_MH, " x LAD_hemi^", b_MH
+print " R^2 = ", r_MH**2, "; p = ", p_MH
+
+print " hemiphoto -> radiative transfer model"
+print " LAD_rad = ", a_rad, " x LAD_hemi^", b_rad
+print " R^2 = ", r_rad**2, "; p = ", p_rad
+
+
 plt.figure(5, facecolor='White',figsize=[9,4])
 ax5a = plt.subplot2grid((1,3),(0,0))
 ax5a.set_xlabel('LAI$_{Hemisfer}$')

@@ -11,7 +11,6 @@ las_file = 'Carbon_plot_point_cloud_buffer.las'
 
 # define the xy coordinates of the location of interest
 target_xy = [577631.951,526731.5143] # replace with x and y coordinates of site - this point is located in the middle of LFE
-target_xy = [577601.951,526741.5143] # replace with x and y coordinates of site - this point is located in the middle of LFE
 radius = 10. # this defines the neighbourhood radius for sampling the point cloud.  Suggest a value of 10 m to start with.
 
 # this set of parameters gets used by both MacArthur-Horn and the radiative transfer model
@@ -33,7 +32,7 @@ sample_pts = lidar.filter_lidar_data_by_neighbourhood(lidar_pts,target_xy,radius
 
 # MacArthur-Horn method (Stark et al., 2012)
 heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sample_pts, max_height, layer_thickness)
-LAD_MacArthurHorn = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
+LAD_MacArthurHorn = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
 mask = heights <= minimum_height
 LAD_MacArthurHorn[mask] = 0
 LAI_MacArthurHorn = np.sum(LAD_MacArthurHorn)

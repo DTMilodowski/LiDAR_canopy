@@ -324,3 +324,14 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
     u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n)
     
     return u,n,I,U
+
+
+
+# Overall wrapper for radiative transfer model
+def calculate_LAD_rad_DTM_full(sample_pts,max_height,layer_thickness,minimum_height,max_return,leaf_angle_dist='spherical'):
+    heights = np.arange(0,max_height+1,layer_thickness)
+    u,n,I,U = calculate_LAD_DTM(sample_pts,heights,max_return,leaf_angle_dist)
+    LAD_rad=u[::-1]
+    mask = heights <= minimum_height
+    LAD_rad[mask]=0
+    return heights, LAD_rad

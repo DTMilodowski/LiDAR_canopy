@@ -12,22 +12,22 @@ las_file = sys.argv[3]
 
 # define the xy coordinates of the location of interest
 #target_xy = [577601.951,526741.5143] # replace with x and y coordinates of site - this point is located in the middle of LFE
-target_xy=[sys.argv[1],sys.argv[2]]
+target_xy=[float(sys.argv[1]),float(sys.argv[2])]
 
 #radius = 10. # this defines the neighbourhood radius for sampling the point cloud.  Suggest a value of 10 m to start with.
-radius = sys.argv[4]
+radius = float(sys.argv[4])
 # this set of parameters gets used by both MacArthur-Horn and the radiative transfer model
 #max_height = 80
-max_height = sys.argv[5]
+max_height = float(sys.argv[5])
 #layer_thickness = 1
-layer_thickness = sys.argv[7]
+layer_thickness = float(sys.argv[7])
 #minimum_height = 2. # ignore profiles <2 m due to difficulties distinguishing ground return increasing error
-minimum_height = sys.argv[6]
+minimum_height = float(sys.argv[6])
 # this second set of parameters is only used for the radiative transfer model
 #leaf_angle_dist = 'spherical' # other options include 'erectophile' and 'planophile'
 leaf_angle_dist = sys.argv[8]
 #max_return = 3
-max_return = sys.argv[9]
+max_return = int(sys.argv[9])
 
 # output details
 out_file = sys.argv[10]

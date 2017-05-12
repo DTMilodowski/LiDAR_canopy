@@ -31,8 +31,8 @@ def bin_returns(pts, max_height, layer_thickness):
 
     return heights,profile,n_ground_returns
 
-# Use MacArther-Horn method to estimate LAD profile from the lidar return profile.  See methods described by Stark et al., Ecology Letters, 2012
-def estimate_LAD_MacArtherHorn(lidar_profile,n_ground_returns,layer_thickness,k):
+# Use MacArthur-Horn method to estimate LAD profile from the lidar return profile.  See methods described by Stark et al., Ecology Letters, 2012
+def estimate_LAD_MacArthurHorn(lidar_profile,n_ground_returns,layer_thickness,k):
     n_layers = lidar_profile.size    
     S = np.zeros(n_layers+1)
     S[1:]=np.cumsum(lidar_profile)
@@ -104,3 +104,12 @@ def calculate_bestfit_LAD_profile(subplot_coordinate_file,LAI_file,las_file,Plot
     kinc = 0.005
     misfit, ks, best_k_LAD_profiles, best_k = minimise_misfit_for_k(kmin,kmax,kinc,subplot_LAI,subplot_lidar_profiles,n_ground_returns,layer_thickness,minimum_height)
     return heights, best_k_LAD_profiles
+
+
+# A wrapper function that bins returns and then converts to MacArthur-Horn profile
+def estimate_LAD_MacArthurHorn_full(sample_pts,max_height,layer_thickness,minimum_height=2):
+    heights,first_return_profile,n_ground_returns = bin_returns(sample_pts, max_height, layer_thickness)
+    LAD_MacArthurHorn = estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
+    mask = heights <= minimum_height
+    LAD_MacArthurHorn[mask] = 0
+    return LAD_MacArthurHorn

@@ -204,7 +204,6 @@ def moving_polynomial_filter(signal_y,window_width,order=2):
 
 # function to convolve a signal with a gaussian curve (comprising three standard deviations)
 # to provide a signal filter.
-
 def get_gaussian_kernel(sigma):
     x = np.arange(2*3*sigma+1)-3*sigma
     kernel = np.exp(-(x**2)/(2*sigma**2))
@@ -224,3 +223,13 @@ def moving_gaussian_filter(signal_y,sigma):
     y_temp = np.concatenate((firstvals, signal_y, lastvals))
     y_filt = np.convolve(y_temp,kernel,'valid')
     return y_filt
+
+
+
+
+# Calculate Shannon Index
+# for use of this metric to assess canopy structural diversity see MacArthur & MacArthur, 1961; Stark et al., 2012
+def calculate_Shannon_index(P):
+    p=P/P.sum()
+    S = -np.sum(p*np.log(p))
+    return S

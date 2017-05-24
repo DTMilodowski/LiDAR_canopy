@@ -231,5 +231,5 @@ def moving_gaussian_filter(signal_y,sigma):
 # for use of this metric to assess canopy structural diversity see MacArthur & MacArthur, 1961; Stark et al., 2012
 def calculate_Shannon_index(P):
     p=P/P.sum()
-    S = -np.sum(p*np.log(p))
+    S = -np.sum(p[p>0]*np.log(p[p>0]))
     return S

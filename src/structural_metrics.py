@@ -111,6 +111,7 @@ def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1,thresh
     profile = moving_gaussian_filter(vertical_profiles[0],sigma)
     
     peaks, peak_amplitude = find_maxima(heights,profile,threshold)
+    index = np.zeros(peaks.size)
     if plot_profiles:
         plt.figure(1,facecolor='White',figsize=[4,4])
         plt.plot(vertical_profiles[0],heights,'-')
@@ -122,6 +123,7 @@ def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1,thresh
         profile = moving_gaussian_filter(vertical_profiles[i],sigma)
         peaks_this_iter, peak_amplitude = find_maxima(heights,profile,threshold)
         peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
+        index = np.concatenate((index,np.ones(peaks_this_iter.size)*i),axis=0)
         if plot_profiles:
             plt.figure(1,facecolor='White',figsize=[4,4])
             plt.plot(vertical_profiles[i],heights,'-')
@@ -129,7 +131,7 @@ def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1,thresh
             plt.plot(peak_amplitude,peaks_this_iter,'o')
             plt.xlim(xmin=0)
             plt.show()
-    return peaks
+    return peaks, index
 
 def calculate_VSI(peaks):
     # convert number of peaks & their locations in canopy into VSI    

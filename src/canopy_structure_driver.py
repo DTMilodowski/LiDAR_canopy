@@ -192,6 +192,49 @@ for pp in range(0,N_plots):
 
 # next step is to take the canopy profiles and get the vertical and horizontal canopy structural metrics
 # use the 2m profiles - both radiative transfer and MacArthur-Horn versions for comparison
+
+# Load previously saved canopy profiles
+InFile = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/src/output/BALI_subplot_LAD_profiles_MacHorn_1m.npz'
+MacArthurHorn_LAD = np.load(InFile)
+
+peaks= {}
+sp_peaks = {}
+vertical_structural_variance = {}
+frechet_dist = {}
+Sh_v_1ha = {}
+Sh_h_1ha = {}
+Sh_v = {}
+filter_window = 9.
+threshold = 0.05
+
+for pp in range(0,N_plots):
+    print Plots[pp]
+    plot_name = Plots[pp]
+    print "\t- getting vertical metrics"
+    peak_heights, subplot = structure.retrieve_peaks_gaussian_convolution(MacArthurHorn_LAD[plot_name],heights,sigma=2,plot_profiles=False)
+    peaks[plot_name] = peak_heights.size/25.                                           
+    # get variance in layer heights
+    vertical_structural_variance[plot_name] = structure.calculate_vertical_structural_variance(peak_heights)
+
+    # get Shannon index
+    Sh_v_1ha[plot_name] = structure.calculate_Shannon_index(np.mean(MacArthurHorn_LAD[plot_name],axis=0))
+    Sh_h_1ha[plot_name] = structure.calculate_Shannon_index(np.sum(MacArthurHorn_LAD[plot_name],axis=1))
+    subplot_shannon = np.zeros(25)
+    subplot_peaks = np.zeros(25)
+    for ss in range(0,25):
+        subplot_shannon[ss]=structure.calculate_Shannon_index(MacArthurHorn_LAD[plot_name][ss,:])
+        subplot_peaks[ss] = peak_heights[subplot==ss].size
+    Sh_v[plot_name]=subplot_shannon.copy()
+    sp_peaks[plot_name]= subplot_peaks.copy()
+
+
+colour = ['#46E900','#1A2BCE','#E0007F']
+rgb = [[70,233,0],[26,43,206],[224,0,127]]
+labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
+
+
+
+"""
 peaks_MH = {}
 peaks_MH_2m = {}
 vertical_structural_variance_MH = {}
@@ -207,7 +250,7 @@ for pp in range(0,N_plots):
     plot_name = Plots[pp]
     print "\t- getting vertical metrics"
     peak_heights_MH = structure.retrieve_peaks_gaussian_convolution(MacArthurHorn_LAD[plot_name],heights,sigma=2,plot_profiles=True)
-    peak_heights_rad = structure.retrieve_peaks_gaussian_convolution(radiative_DTM_LAD[plot_name][:,:,-1],heights_rad,sigma=2,plot_profiles=True)
+    peak_heights_rad = structure.retrieve_peaks_gaussian_convolution(radiative_DTM_LAD[plot_name][:,:,-1],heights_rad,sigma=2,plot_profiles=False)
     peak_heights_MH_2m = structure.retrieve_peaks_gaussian_convolution(MacArthurHorn_LAD_2m[plot_name],heights_2m)
     peak_heights_rad_2m = structure.retrieve_peaks_gaussian_convolution(radiative_LAD_2m[plot_name][:,:,-1],heights_rad_2m)
     peaks_MH[plot_name] = peak_heights_MH.size
@@ -217,7 +260,7 @@ for pp in range(0,N_plots):
     # get variance in layer heights
     vertical_structural_variance_MH[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_MH)
     vertical_structural_variance_rad[plot_name] = structure.calculate_vertical_structural_variance(peak_heights_rad)
-
+"""
 
 """
 
@@ -252,3 +295,55 @@ for pp in range(0,N_plots):
     frechet_dist_rad[plot_name] = structure.calculate_mean_Frechet_distance(radiative_DTM_LAD[plot_name][:,:,-1],heights_rad)
 """
 
+
+sys.path.append('/home/dmilodow/DataStore_DTM/USEFUL_PYTHON_STUFF/generic_plotting/src/')
+import violin_plot as plt2
+
+# Fourth violin plots of LAI Mac-Horn and LAI-hemisfer
+
+colors = [ '#45E900','#45E900','#45E900','#45E900','#1A2CCE','#1A2CCE','#E0007F','#E0007F']
+
+plt.figure(4, facecolor='White',figsize=[4,4])
+#ax1 = plt.subplot2grid((2,1),(0,0))
+ax1 = plt.subplot2grid((1,1),(0,0))
+#ax2 = plt.subplot2grid((2,1),(1,0),sharex=ax1)
+#x_offs = [0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5]   
+x_offs = [5.0,10.0,15.0,20.0,25.0,30.0,35.0,40.0]
+
+for pp in range(0,N_plots):
+    plt2.violin_plot(ax1,Sh_v[plot[pp]],color=colors[pp],alpha='0.8',x_offset=x_offs[pp])
+    #plt2.violin_plot(ax1,sp_peaks[plot[pp]],color=colors[pp],alpha='0.8',x_offset=x_offs[pp])
+    
+# configure plot
+#ax1.annotate('a - Number of canopy layers', xy=(0.05,0.95), xycoords='axes fraction',horizontalalignment='left', verticalalignment='top', fontsize=rcParams['font.size']+2,backgroundcolor='white') 
+ax1.annotate('Canopy Shannon diversity index', xy=(0.05,0.95), xycoords='axes fraction',horizontalalignment='left', verticalalignment='top', fontsize=rcParams['font.size']+2,backgroundcolor='white') 
+
+#ax1.set_ylabel('Number of layers',fontsize=axis_size)
+ax1.set_ylabel('Shannon index',fontsize=axis_size)
+
+x_locs = x_offs
+ax1.set_xticks(x_locs)
+xticks=ax1.get_xticks().tolist()
+xticks[0]='Belian'
+xticks[1]='Seraya'
+xticks[2]='DC1'
+xticks[3]='DC2'
+xticks[4]='E'
+xticks[5]='LF'
+xticks[6]='B North'
+xticks[7]='B South'
+ax1.set_xticklabels(xticks,rotation=90,fontsize=axis_size)
+ax1.set_ylim(ymax=4.5)
+#ax2.set_xticklabels(xticks,rotation=90,fontsize=axis_size)
+
+#xticklabels = ax1.get_xticklabels()
+#plt.setp(xticklabels,visible=False)
+
+plt.subplots_adjust(hspace=0.001,wspace=0.001)
+
+plt.tight_layout()
+plt.savefig('Vertical_structural_diversity_metrics.png')
+
+
+plt.show()
+                             

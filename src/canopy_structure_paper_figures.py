@@ -380,18 +380,18 @@ for pp in range(0,3):
 
     # plot detto profile
     for i in range(0,n_subplots):
-        axes3[pp].fill_betweenx(heights,0,radiative_LAD[Plot_name][i,:],color=colour[0],alpha=0.05)
-    axes3[pp].plot(np.mean(radiative_LAD[Plot_name],axis=0),heights,'-',c=colour[0],linewidth=2)
+        axes3[pp].fill_betweenx(heights,0,radiative_LAD[Plot_name][i,:],color=colour[1],alpha=0.05)
+    axes3[pp].plot(np.mean(radiative_LAD[Plot_name],axis=0),heights,'-',c=colour[1],linewidth=2)
 
     # plot corrective radiative transfer profile
     for i in range(0,n_subplots):
-        axes4[pp].fill_betweenx(heights,0,radiative_LAD_DTM[Plot_name][i,:],color=colour[0],alpha=0.05)
-    axes4[pp].plot(np.mean(radiative_LAD_DTM[Plot_name],axis=0),heights,'-',c=colour[0],linewidth=2)
+        axes4[pp].fill_betweenx(heights,0,radiative_LAD_DTM[Plot_name][i,:],color=colour[1],alpha=0.05)
+    axes4[pp].plot(np.mean(radiative_LAD_DTM[Plot_name],axis=0),heights,'-',c=colour[1],linewidth=2)
 
     # field inventory
     for i in range(0,n_subplots):
-        axes5.fill_betweenx(heights,0,inventory_LAD[Plot_name][i,:],color=colour[1],alpha=0.05)
-    axes5.plot(np.mean(inventory_LAD[Plot_name],axis=0),heights,'-',c=colour[1],linewidth=2)
+        axes5.fill_betweenx(heights,0,inventory_LAD[Plot_name][i,:],color=colour[2],alpha=0.05)
+    axes5.plot(np.mean(inventory_LAD[Plot_name],axis=0),heights,'-',c=colour[2],linewidth=2)
 
 ax4k.set_xlim(xmin=0,xmax=0.7)
 ax4l.locator_params(axis='x',nbins=5)
@@ -409,5 +409,65 @@ plt.setp(xticklabels,visible=False)
 
 plt.tight_layout()
 plt.savefig(output_dir+'fig4_plot_LAD_profiles.png')
+
+
+#--------------------------------------------------------------------------------------
+# Figure 5: LAI vs. hemiphotos
+plt.figure(5, facecolor='White',figsize=[9,4])
+ax5a = plt.subplot2grid((1,3),(0,0))
+ax5a.set_xlabel('LAI$_{Hemisfer}$')
+ax5a.set_ylabel('LAI$_{MacArthur-Horn}$')
+ax5a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax5a.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+for i in range(0,N_plots):
+    ax5a.plot(Hemisfer_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color=colour[0],alpha=0.5)
+
+for i in range(0,N_plots):
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
+    ax5a.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),x_err,y_err,'o',color='black')
+ax5a.plot(LAI_hemi_mod, LAI_MH_mod, '-', color = 'k')
+
+
+ax5b = plt.subplot2grid((1,3),(0,1), sharex=ax5a, sharey=ax5a)
+ax5b.annotate('b - radiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax5b.set_xlabel('LAI$_{Hemisfer}$')
+ax5b.set_ylabel('LAI$_{rad}$')
+ax5b.plot([0,20],[0,20],'--',color='black',alpha=0.3)
+for i in range(0,N_plots):
+    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]][:,-1],'.',color='0.5',alpha=0.5)
+    ax5b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,-1],'.',color=colour[1],alpha=0.5)
+
+for i in range(0,N_plots):
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err1=np.std(radiative_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
+    y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
+    ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err1,marker='o',color='black',mfc='white')
+    ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err2,marker='o',color='black')
+
+ax5b.plot(LAI_hemi_mod, LAI_rad_mod, '-', color = 'k')
+
+
+ax5c = plt.subplot2grid((1,3),(0,2), sharex=ax5a)
+ax5c.annotate('c - field inventory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax5c.set_xlabel('LAI$_{Hemisfer}$')
+ax5c.set_ylabel('Canopy Volume / $m^3m^{-2}$')
+
+for i in range(0,N_plots):
+    ax5c.plot(Hemisfer_LAI[Plots[i]],inventory_LAI[Plots[i]],'.',color=colour[2],alpha=0.5)
+
+for i in range(0,N_plots):
+    x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
+    ax5c.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(inventory_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker='o',color='black')
+
+
+ax5a.set_xlim((0,10))
+ax5a.set_ylim((0,20))
+ax5c.set_ylim(ymin=0)
+plt.tight_layout()
+plt.savefig(output_dir+'fig5_LAI_hemiphoto_comparison.png')
+
+
 plt.show()
 

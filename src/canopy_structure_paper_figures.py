@@ -523,7 +523,7 @@ plt.savefig(output_dir+'fig6_LAI_hemiphoto_comparison.png')
 # Figure 7: LAI vs. canopy volume
 plt.figure(7, facecolor='White',figsize=[9,4])
 ax7a = plt.subplot2grid((1,3),(0,0))
-ax7a.set_xlabel('Canopy Volume / $m^3m^{-2}$')
+ax7a.set_xlabel('crown volume / $m^3m^{-2}$')
 ax7a.set_ylabel('LAI')
 ax7a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 for i in range(0,N_plots):
@@ -537,7 +537,7 @@ for i in range(0,N_plots):
 
 ax7b = plt.subplot2grid((1,3),(0,1), sharex=ax8a, sharey=ax8a)
 ax7b.annotate('b - radiative transfer (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax7b.set_xlabel('Canopy Volume / m$^3$m^{-2}$')
+ax7b.set_xlabel('crown volume / m$^3$m^{-2}$')
 ax7b.set_ylabel('LAI')
 for k in range(1,3):
     for i in range(0,N_plots):
@@ -555,7 +555,7 @@ for k in range(1,3):
 ax7c = plt.subplot2grid((1,3),(0,2), sharex=ax8a, sharey=ax8a)
 ax7c.annotate('c - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax7c.set_ylabel('LAI')
-ax7c.set_xlabel('Canopy Volume / $m^3m^{-2}$')
+ax7c.set_xlabel('crown volume / $m^3m^{-2}$')
 for k in range(1,3):
     for i in range(0,N_plots):
         ax7c.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)

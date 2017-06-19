@@ -230,21 +230,60 @@ plt.show()
 # the canopy, defined as the transmittance ratio.
  
 # A figure illustrating transmittance ratio between successive returns 
-plt.figure(1, facecolor='White',figsize=[4,4])
-ax1 = plt.subplot2grid((1,1),(0,0))
-ax1.set_xlabel('return number')
-ax1.set_ylabel('transmittance ratio')
+plt.figure(2, facecolor='White',figsize=[4,4])
+ax2 = plt.subplot2grid((1,1),(0,0))
+ax2.set_xlabel('return number')
+ax2.set_ylabel('transmittance ratio')
 for i in range(0,4):
     if i==0:
-        ax1.plot(1,1,'o',color='blue')
+        ax2.plot(1,1,'o',color='blue')
     else:
         N_veg = float(np.all((all_lidar_pts[:,3]==i,all_lidar_pts[:,4]==1),axis=0).sum())
         N_i = float((all_lidar_pts[:,3]==i+1).sum())
-        ax1.plot(i+1,N_i/N_veg,'o',color='#46E900')
-ax1.set_ylim(0,1.1)
-ax1.set_xlim(0,5)
+        ax2.plot(i+1,N_i/N_veg,'o',color='#1A2BCE')
+
+ax2.set_ylim(0,1.1)
+ax2.set_xlim(0,5)
 plt.tight_layout()
 plt.savefig(output_dir+'fig2_transmittance_ratios.png')
 
+#-----------------------------------------------------------------------------------------
+# Figure 3- Allometric relationships used to construct the inventory-based LAD profiles.
+plt.figure(3,facecolor='White',figsize=[9,3])
+ax3a = plt.subplot2grid((1,3),(0,0))
+ax3a.set_ylabel('Crown Depth / m')
+ax3a.set_xlabel('Height / m')
+ax3a.annotate('a - Height-Crown Depth', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax3a.plot(H,D,'.',color='#1A2BCE',alpha=0.1)
+H_mod = np.linspace(0.,H.max(),1000)
+D_mod = CF*a*H_mod**b
+ax3a.plot(H_mod,D_mod,'-',color='black')
+eq = '$D=%.3fH^{%.3f}$' % (CF*a, b)
+ax3a.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=10)
+
+ax3b = plt.subplot2grid((1,3),(0,1))
+ax3b.annotate('b - DBH-Crown Area', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax3b.set_xlabel('DBH / cm')
+ax3b.set_ylabel('Crown Area / m$^2$')
+ax3b.plot(field_data['DBH_field'],field_data['CrownArea'],'.',color='#1A2BCE',alpha=0.1)
+DBH_mod = np.linspace(0.,np.nanmax(field_data['DBH_field']),1000)
+CA_mod = CF_A*a_A*DBH_mod**b_A
+ax3b.plot(DBH_mod,CA_mod,'-',color='black')
+eq = '$A=%.3fDBH^{%.3f}$' % (CF_A*a_A, b_A)
+ax3b.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=10)
+
+ax3c = plt.subplot2grid((1,3),(0,2),sharex=ax3b)
+ax3c.annotate('c - DBH-Height', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax3c.set_xlabel('DBH / cm')
+ax3c.set_ylabel('Height / m')
+ax3c.plot(field_data['DBH_field'],field_data['Height_field'],'.',color='#1A2BCE',alpha=0.1)
+Ht_mod = CF_ht*a_ht*DBH_mod**b_ht
+ax3c.plot(DBH_mod,Ht_mod,'-',color='black')
+eq = '$H=%.3fDBH^{%.3f}$' % (CF_ht*a_ht, b_ht)
+ax3c.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=10)
+
+
+plt.tight_layout()
+plt.savefig(output_dir+'fig3_allometric_relationships.png')
 
 

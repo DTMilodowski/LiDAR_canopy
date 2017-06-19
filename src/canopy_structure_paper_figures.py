@@ -575,6 +575,10 @@ ax7a.set_ylim((0,20))
 plt.tight_layout()
 plt.savefig(output_dir+'fig7_LiDAR_LAI_canopy_volume_comparison.png')
 
+#--------------------------------------------------------------------------------------
+#Figure 8:  Plot total basal area against LAI from the two preferred methods (to do)
+
+
 
 plt.show()
 

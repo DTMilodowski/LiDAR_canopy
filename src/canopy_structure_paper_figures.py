@@ -287,3 +287,127 @@ plt.tight_layout()
 plt.savefig(output_dir+'fig3_allometric_relationships.png')
 
 
+#-----------------------------------------------------------------------------------------
+# Figure 4: Canopy profile comparisons across the gradient
+plt.figure(4, facecolor='White',figsize=[8,12])
+# Belian
+# - returns
+ax4a = plt.subplot2grid((3,5),(0,0))
+ax4a.annotate('a - LiDAR return profile', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4a.annotate('MAO01', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+ax4a.set_ylim(0,80)
+ax4a.set_ylabel('Height / m',fontsize=axis_size)
+# - MacHorn
+ax4b = plt.subplot2grid((3,5),(0,1),sharey=ax4a)
+ax4b.annotate('b - MacArthur-Horn LAD', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+# - Detto
+ax4c = plt.subplot2grid((3,5),(0,2),sharey=ax4a,sharex=4b)
+ax4c.annotate('c - radiative transfer (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+# - Corrected rad trans
+ax4d = plt.subplot2grid((3,5),(0,3),sharey=ax4a,sharex=4b)
+ax4d.annotate('d - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+# - Inventory
+ax4e = plt.subplot2grid((3,5),(0,4),sharey=ax4a)
+ax4e.annotate('e - crown volume', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+# LF
+# - returns
+ax4f = plt.subplot2grid((3,5),(1,0), sharex = ax4a, sharey = ax4a)
+ax4f.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4f.annotate('SAF04', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+ax4f.set_ylim(0,80)
+ax4f.set_ylabel('Height / m',fontsize=axis_size)
+# - MacHorn
+ax4g = plt.subplot2grid((3,5),(1,1),sharey=ax4a)
+ax4g.annotate('g', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+# - Detto
+ax4h = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=4b)
+ax4h.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+# - Corrected rad trans
+ax4i = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=4b)
+ax4i.annotate('i', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+# - Inventory
+ax4j = plt.subplot2grid((3,5),(1,4),sharey=ax4a)
+ax4j.annotate('j', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+
+# B North
+# - returns
+ax4k = plt.subplot2grid((3,5),(1,0), sharex = ax4a, sharey = ax4a)
+ax4k.annotate('k', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4k.annotate('SAF02', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+ax4k.set_ylim(0,80)
+ax4k.set_ylabel('Height / m',fontsize=axis_size)
+ax4k.set_xlabel('Number of returns (x1000)',fontsize=axis_size)
+# - MacHorn
+ax4l = plt.subplot2grid((3,5),(1,1),sharey=ax4a)
+ax4l.annotate('l', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4l.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
+
+# - Detto
+ax4m = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=4b)
+ax4m.annotate('m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4m.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
+# - Corrected rad trans
+ax4n = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=4b)
+ax4n.annotate('n', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4n.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
+# - Inventory
+ax4o = plt.subplot2grid((3,5),(1,4),sharey=ax4a)
+ax4o.annotate('o', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4o.set_xlabel('Crown Volume / m$^3$m$^{-2}m$^{-1}$')
+
+fig2_plots = ['Belian', 'LF', 'B North']
+axes1 = [ax1a, ax1f, ax1k]
+axes2 = [ax1b, ax1g, ax1l]
+axes3 = [ax1c, ax1h, ax1m]
+axes4 = [ax1d, ax1i, ax1n]
+axes5 = [ax1e, ax1j, ax1o]
+for pp in range(0,3):
+    Plot_name = fig2_plots[pp]
+    
+    # plot lidar profile
+    return_dist_adj = np.sum(lidar_profiles_adjusted[Plot_name],axis=0)
+    return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
+    labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
+    for k in range(0,max_return):
+        axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1,label=labels[k])
+
+    # plot macarthur horn profile
+    for i in range(0,n_subplots):
+        axes2[pp].fill_betweenx(heights,0,MacArthurHorn_LAD[Plot_name][i,:],color=colour[0],alpha=0.05)
+    axes2[pp].plot(np.mean(MacArthurHorn_LAD[Plot_name],axis=0),heights,'-',c=colour[0],linewidth=2)
+
+    # plot detto profile
+    for i in range(0,n_subplots):
+        axes3[pp].fill_betweenx(heights,0,radiative_LAD[Plot_name][i,:],color=colour[0],alpha=0.05)
+    axes3[pp].plot(np.mean(radiative_LAD[Plot_name],axis=0),heights,'-',c=colour[0],linewidth=2)
+
+    # plot corrective radiative transfer profile
+    for i in range(0,n_subplots):
+        axes4[pp].fill_betweenx(heights,0,radiative_LAD_DTM[Plot_name][i,:],color=colour[0],alpha=0.05)
+    axes4[pp].plot(np.mean(radiative_LAD_DTM[Plot_name],axis=0),heights,'-',c=colour[0],linewidth=2)
+
+    # field inventory
+    for i in range(0,n_subplots):
+        axes5.fill_betweenx(heights,0,inventory_LAD[Plot_name][i,:],color=colour[1],alpha=0.05)
+    axes5.plot(np.mean(inventory_LAD[Plot_name],axis=0),heights,'-',c=colour[1],linewidth=2)
+
+ax4k.set_xlim(xmin=0,xmax=0.7)
+ax4l.locator_params(axis='x',nbins=5)
+ax4m.locator_params(axis='x',nbins=5)
+ax4n.locator_params(axis='x',nbins=5)
+ax4o.locator_params(axis='x',nbins=5)
+ax4p.locator_params(axis='x',nbins=5)
+
+
+yticklabels = ax4b.get_yticklabels() + ax4c.get_yticklabels() + ax4d.get_yticklabels() + ax4e.get_yticklabels() + ax4g.get_yticklabels() + ax4hc.get_yticklabels() + ax4i.get_yticklabels() + ax4j.get_yticklabels() + ax4l.get_yticklabels() + ax4m.get_yticklabels() + ax4n.get_yticklabels() + ax4o.get_yticklabels()
+xticklabels = ax4a.get_xticklabels() + ax4b.get_xticklabels() + ax4c.get_xticklabels() + ax4d.get_xticklabels() + ax4e.get_xticklabels() + ax4f.get_xticklabels() + ax4g.get_xticklabels() + ax4hc.get_xticklabels() + ax4i.get_xticklabels() + ax4j.get_xticklabels() 
+
+plt.setp(yticklabels,visible=False)
+plt.setp(xticklabels,visible=False)
+
+plt.tight_layout()
+plt.savefig(output_dir+'fig4_plot_LAD_profiles.png')
+plt.show()
+

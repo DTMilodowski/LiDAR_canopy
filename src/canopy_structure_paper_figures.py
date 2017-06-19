@@ -224,3 +224,27 @@ plt.tight_layout()
 plt.savefig(output_dir+'fig1_plot_pointclouds.png')
 plt.show()
 
+#-----------------------------------------------------------------------------------------
+# Figure 2: Transmission ratios
+# This figure plots the number of vegetation returns that propagate through further into
+# the canopy, defined as the transmittance ratio.
+ 
+# A figure illustrating transmittance ratio between successive returns 
+plt.figure(1, facecolor='White',figsize=[4,4])
+ax1 = plt.subplot2grid((1,1),(0,0))
+ax1.set_xlabel('return number')
+ax1.set_ylabel('transmittance ratio')
+for i in range(0,4):
+    if i==0:
+        ax1.plot(1,1,'o',color='blue')
+    else:
+        N_veg = float(np.all((all_lidar_pts[:,3]==i,all_lidar_pts[:,4]==1),axis=0).sum())
+        N_i = float((all_lidar_pts[:,3]==i+1).sum())
+        ax1.plot(i+1,N_i/N_veg,'o',color='#46E900')
+ax1.set_ylim(0,1.1)
+ax1.set_xlim(0,5)
+plt.tight_layout()
+plt.savefig(output_dir+'fig2_transmittance_ratios.png')
+
+
+

@@ -520,8 +520,60 @@ plt.savefig(output_dir+'fig6_LAI_hemiphoto_comparison.png')
 
 
 #--------------------------------------------------------------------------------------
-# Figure 6: LAI vs. canopy volume
+# Figure 7: LAI vs. canopy volume
+plt.figure(7, facecolor='White',figsize=[9,4])
+ax7a = plt.subplot2grid((1,3),(0,0))
+ax7a.set_xlabel('Canopy Volume / $m^3m^{-2}$')
+ax7a.set_ylabel('LAI')
+ax7a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+for i in range(0,N_plots):
+    ax7a.plot(inventory_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color=colour[0],alpha=0.5)
 
+for i in range(0,N_plots):
+    x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
+    ax7a.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker='o',color='black')
+
+
+ax7b = plt.subplot2grid((1,3),(0,1), sharex=ax8a, sharey=ax8a)
+ax7b.annotate('b - radiative transfer (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax7b.set_xlabel('Canopy Volume / m$^3$m^{-2}$')
+ax7b.set_ylabel('LAI')
+for k in range(1,3):
+    for i in range(0,N_plots):
+        ax7b.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+
+for k in range(1,3):
+    for i in range(0,N_plots):
+        x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
+        y_err=np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
+        if i==0:
+            ax7b.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=labels[k])
+        else:
+            ax7b.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
+
+ax7c = plt.subplot2grid((1,3),(0,2), sharex=ax8a, sharey=ax8a)
+ax7c.annotate('c - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax7c.set_ylabel('LAI')
+ax7c.set_xlabel('Canopy Volume / $m^3m^{-2}$')
+for k in range(1,3):
+    for i in range(0,N_plots):
+        ax7c.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+
+for k in range(1,3):
+    for i in range(0,N_plots):
+        x_err=np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
+        y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
+        if i==0:
+            ax7c.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=labels[k])
+        else:
+            ax7c.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
+            
+ax7c.legend(loc=4)
+
+ax7a.set_ylim((0,20))
+plt.tight_layout()
+plt.savefig(output_dir+'fig7_LiDAR_LAI_canopy_volume_comparison.png')
 
 
 plt.show()

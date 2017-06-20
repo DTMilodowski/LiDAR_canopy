@@ -301,10 +301,10 @@ ax4a.set_ylabel('Height / m',fontsize=axis_size)
 ax4b = plt.subplot2grid((3,5),(0,1),sharey=ax4a)
 ax4b.annotate('b - MacArthur-Horn LAD', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 # - Detto
-ax4c = plt.subplot2grid((3,5),(0,2),sharey=ax4a,sharex=4b)
+ax4c = plt.subplot2grid((3,5),(0,2),sharey=ax4a,sharex=ax4b)
 ax4c.annotate('c - radiative transfer (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 # - Corrected rad trans
-ax4d = plt.subplot2grid((3,5),(0,3),sharey=ax4a,sharex=4b)
+ax4d = plt.subplot2grid((3,5),(0,3),sharey=ax4a,sharex=ax4b)
 ax4d.annotate('d - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 # - Inventory
 ax4e = plt.subplot2grid((3,5),(0,4),sharey=ax4a)
@@ -321,10 +321,10 @@ ax4f.set_ylabel('Height / m',fontsize=axis_size)
 ax4g = plt.subplot2grid((3,5),(1,1),sharey=ax4a)
 ax4g.annotate('g', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 # - Detto
-ax4h = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=4b)
+ax4h = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=ax4b)
 ax4h.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 # - Corrected rad trans
-ax4i = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=4b)
+ax4i = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=ax4b)
 ax4i.annotate('i', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 # - Inventory
 ax4j = plt.subplot2grid((3,5),(1,4),sharey=ax4a)
@@ -345,11 +345,11 @@ ax4l.annotate('l', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='non
 ax4l.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
 
 # - Detto
-ax4m = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=4b)
+ax4m = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=ax4b)
 ax4m.annotate('m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4m.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
 # - Corrected rad trans
-ax4n = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=4b)
+ax4n = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=ax4b)
 ax4n.annotate('n', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4n.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
 # - Inventory

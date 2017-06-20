@@ -181,10 +181,7 @@ labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
 # Belian
 ax1a = plt.subplot2grid((3,1),(0,0))
 ax1a.annotate('a - Maliau Reserve, MAO01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax1a.set_ylim(0,80)
-ax1a.set_xlim(0,140)
 ax1a.set_ylabel('Height / m',fontsize=axis_size)
-ax1a.legend(loc=1,fontsize=axis_size)
 
 # LF
 ax1b = plt.subplot2grid((3,1),(1,0),sharey=ax1a,sharex=ax1a)
@@ -220,9 +217,12 @@ for pp in range(0,3):
             axes[pp].scatter(points_x,points_z,marker='o',c=colours,edgecolors='none',s=2)#,label=labels[k])
             axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=2,label=labels[k])
 
+ax1a.set_ylim(0,80)
+ax1a.set_xlim(0,140)
+ax1a.legend(loc=1,fontsize=axis_size)
 plt.tight_layout()
 plt.savefig(output_dir+'fig1_plot_pointclouds.png')
-plt.show()
+
 
 #-----------------------------------------------------------------------------------------
 # Figure 2: Transmission ratios
@@ -293,32 +293,35 @@ plt.figure(4, facecolor='White',figsize=[8,12])
 # Belian
 # - returns
 ax4a = plt.subplot2grid((3,5),(0,0))
-ax4a.annotate('a - LiDAR return profile', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4a.annotate('MAO01', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
-ax4a.set_ylim(0,80)
+ax4a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4a.annotate('MAO01', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+ax4a.annotate('LiDAR returns', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 ax4a.set_ylabel('Height / m',fontsize=axis_size)
 # - MacHorn
 ax4b = plt.subplot2grid((3,5),(0,1),sharey=ax4a)
-ax4b.annotate('b - MacArthur-Horn LAD', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4b.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 # - Detto
 ax4c = plt.subplot2grid((3,5),(0,2),sharey=ax4a,sharex=ax4b)
-ax4c.annotate('c - radiative transfer (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4c.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4c.annotate('rad. trans.\n(Detto)', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 # - Corrected rad trans
 ax4d = plt.subplot2grid((3,5),(0,3),sharey=ax4a,sharex=ax4b)
-ax4d.annotate('d - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4d.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4d.annotate('rad. trans.\n(new)', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 # - Inventory
 ax4e = plt.subplot2grid((3,5),(0,4),sharey=ax4a)
-ax4e.annotate('e - crown volume', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4e.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4e.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 
 # LF
 # - returns
 ax4f = plt.subplot2grid((3,5),(1,0), sharex = ax4a, sharey = ax4a)
 ax4f.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4f.annotate('SAF04', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
-ax4f.set_ylim(0,80)
 ax4f.set_ylabel('Height / m',fontsize=axis_size)
 # - MacHorn
-ax4g = plt.subplot2grid((3,5),(1,1),sharey=ax4a)
+ax4g = plt.subplot2grid((3,5),(1,1),sharey=ax4a, sharex=ax4b)
 ax4g.annotate('g', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 # - Detto
 ax4h = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=ax4b)
@@ -327,42 +330,41 @@ ax4h.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='non
 ax4i = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=ax4b)
 ax4i.annotate('i', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 # - Inventory
-ax4j = plt.subplot2grid((3,5),(1,4),sharey=ax4a)
+ax4j = plt.subplot2grid((3,5),(1,4),sharey=ax4a,sharex=ax4e)
 ax4j.annotate('j', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 
 # B North
 # - returns
-ax4k = plt.subplot2grid((3,5),(1,0), sharex = ax4a, sharey = ax4a)
+ax4k = plt.subplot2grid((3,5),(2,0), sharex = ax4a, sharey = ax4a)
 ax4k.annotate('k', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4k.annotate('SAF02', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
-ax4k.set_ylim(0,80)
 ax4k.set_ylabel('Height / m',fontsize=axis_size)
-ax4k.set_xlabel('Number of returns (x1000)',fontsize=axis_size)
+ax4k.set_xlabel('Number of returns\n(x1000)',fontsize=axis_size,horizontalalignment='center')
 # - MacHorn
-ax4l = plt.subplot2grid((3,5),(1,1),sharey=ax4a)
+ax4l = plt.subplot2grid((3,5),(2,1),sharey=ax4a, sharex=ax4b)
 ax4l.annotate('l', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4l.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
+ax4l.set_xlabel('LAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
 
 # - Detto
-ax4m = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=ax4b)
+ax4m = plt.subplot2grid((3,5),(2,2),sharey=ax4a,sharex=ax4b)
 ax4m.annotate('m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4m.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
+ax4m.set_xlabel('LAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
 # - Corrected rad trans
-ax4n = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=ax4b)
+ax4n = plt.subplot2grid((3,5),(2,3),sharey=ax4a,sharex=ax4b)
 ax4n.annotate('n', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4n.set_xlabel('LAD / m$^2$m$^{-2}m$^{-1}$',fontsize=axis_size)
+ax4n.set_xlabel('LAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
 # - Inventory
-ax4o = plt.subplot2grid((3,5),(1,4),sharey=ax4a)
+ax4o = plt.subplot2grid((3,5),(2,4),sharey=ax4a,sharex=ax4e)
 ax4o.annotate('o', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4o.set_xlabel('Crown Volume / m$^3$m$^{-2}m$^{-1}$')
+ax4o.set_xlabel('Crown Volume\n(m$^3$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
 
 fig2_plots = ['Belian', 'LF', 'B North']
-axes1 = [ax1a, ax1f, ax1k]
-axes2 = [ax1b, ax1g, ax1l]
-axes3 = [ax1c, ax1h, ax1m]
-axes4 = [ax1d, ax1i, ax1n]
-axes5 = [ax1e, ax1j, ax1o]
+axes1 = [ax4a, ax4f, ax4k]
+axes2 = [ax4b, ax4g, ax4l]
+axes3 = [ax4c, ax4h, ax4m]
+axes4 = [ax4d, ax4i, ax4n]
+axes5 = [ax4e, ax4j, ax4o]
 for pp in range(0,3):
     Plot_name = fig2_plots[pp]
     
@@ -380,49 +382,56 @@ for pp in range(0,3):
 
     # plot detto profile
     for i in range(0,n_subplots):
-        axes3[pp].fill_betweenx(heights,0,radiative_LAD[Plot_name][i,:],color=colour[1],alpha=0.05)
-    axes3[pp].plot(np.mean(radiative_LAD[Plot_name],axis=0),heights,'-',c=colour[1],linewidth=2)
+        axes3[pp].fill_betweenx(heights_rad,0,radiative_LAD[Plot_name][i,:,-1][::-1],color=colour[1],alpha=0.05)
+    axes3[pp].plot(np.mean(radiative_LAD[Plot_name][:,:,-1],axis=0)[::-1],heights_rad,'-',c=colour[1],linewidth=2)
 
     # plot corrective radiative transfer profile
     for i in range(0,n_subplots):
-        axes4[pp].fill_betweenx(heights,0,radiative_LAD_DTM[Plot_name][i,:],color=colour[1],alpha=0.05)
-    axes4[pp].plot(np.mean(radiative_LAD_DTM[Plot_name],axis=0),heights,'-',c=colour[1],linewidth=2)
+        axes4[pp].fill_betweenx(heights_rad,0,radiative_DTM_LAD[Plot_name][i,:,-1][::-1],color=colour[1],alpha=0.05)
+    axes4[pp].plot(np.mean(radiative_DTM_LAD[Plot_name][:,:,-1],axis=0)[::-1],heights_rad,'-',c=colour[1],linewidth=2)
 
     # field inventory
     for i in range(0,n_subplots):
-        axes5.fill_betweenx(heights,0,inventory_LAD[Plot_name][i,:],color=colour[2],alpha=0.05)
-    axes5.plot(np.mean(inventory_LAD[Plot_name],axis=0),heights,'-',c=colour[2],linewidth=2)
+        axes5[pp].fill_betweenx(heights,0,inventory_LAD[Plot_name][i,:],color=colour[2],alpha=0.05)
+    axes5[pp].plot(np.mean(inventory_LAD[Plot_name],axis=0),heights,'-',c=colour[2],linewidth=2)
 
-ax4k.set_xlim(xmin=0,xmax=0.7)
+
+
+ax4a.set_ylim(0,80)
+ax4a.set_xlim(0,29)
+ax4a.legend(loc='lower right')
+ax4b.set_xlim(xmin=0,xmax=0.7)
+
 ax4l.locator_params(axis='x',nbins=5)
 ax4m.locator_params(axis='x',nbins=5)
 ax4n.locator_params(axis='x',nbins=5)
 ax4o.locator_params(axis='x',nbins=5)
-ax4p.locator_params(axis='x',nbins=5)
+ax4k.locator_params(axis='x',nbins=5)
 
 
-yticklabels = ax4b.get_yticklabels() + ax4c.get_yticklabels() + ax4d.get_yticklabels() + ax4e.get_yticklabels() + ax4g.get_yticklabels() + ax4hc.get_yticklabels() + ax4i.get_yticklabels() + ax4j.get_yticklabels() + ax4l.get_yticklabels() + ax4m.get_yticklabels() + ax4n.get_yticklabels() + ax4o.get_yticklabels()
-xticklabels = ax4a.get_xticklabels() + ax4b.get_xticklabels() + ax4c.get_xticklabels() + ax4d.get_xticklabels() + ax4e.get_xticklabels() + ax4f.get_xticklabels() + ax4g.get_xticklabels() + ax4hc.get_xticklabels() + ax4i.get_xticklabels() + ax4j.get_xticklabels() 
+yticklabels = ax4b.get_yticklabels() + ax4c.get_yticklabels() + ax4d.get_yticklabels() + ax4e.get_yticklabels() + ax4g.get_yticklabels() + ax4h.get_yticklabels() + ax4i.get_yticklabels() + ax4j.get_yticklabels() + ax4l.get_yticklabels() + ax4m.get_yticklabels() + ax4n.get_yticklabels() + ax4o.get_yticklabels()
+xticklabels = ax4a.get_xticklabels() + ax4b.get_xticklabels() + ax4c.get_xticklabels() + ax4d.get_xticklabels() + ax4e.get_xticklabels() + ax4f.get_xticklabels() + ax4g.get_xticklabels() + ax4h.get_xticklabels() + ax4i.get_xticklabels() + ax4j.get_xticklabels() 
 
 plt.setp(yticklabels,visible=False)
 plt.setp(xticklabels,visible=False)
+plt.subplots_adjust(hspace=0.1, wspace = 0.1)
 
-plt.tight_layout()
+#plt.tight_layout()
 plt.savefig(output_dir+'fig4_plot_LAD_profiles.png')
-
+plt.show()
 
 #--------------------------------------------------------------------------------------
 # Figure 5: comparison of LAD profiles
-plt.figure(5, facecolor='White',figsize=[9,5])
+plt.figure(5, facecolor='White',figsize=[9,4])
 ax5a = plt.subplot2grid((1,2),(0,0))
-ax5a.set_xlabel('LAI$_{MacArthur-Horn}$')
-ax5a.set_ylabel('LAI$_{rad}$')
+ax5a.set_xlabel('LAI$_{MacArthur-Horn}$',fontsize=axis_size)
+ax5a.set_ylabel('LAI$_{rad}$',fontsize=axis_size)
 ax5a.annotate('a - radiative transfer (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax5a.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 for i in range(0,N_plots):
     for k in range(1,max_return):
-        ax7a.plot(MacArthurHorn_LAI[Plots[i]],radiative_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+        ax5a.plot(MacArthurHorn_LAI[Plots[i]],radiative_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
     
 for i in range(0,N_plots):
     for k in range(1,max_return):
@@ -430,9 +439,9 @@ for i in range(0,N_plots):
         y_err=np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
         ax5a.errorbar(np.mean(MacArthurHorn_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
 
-ax5b = plt.subplot2grid((1,2),(0,1), sharex = ax7a, sharey = ax7a)
-ax5b.set_xlabel('LAI$_{MacArthur-Horn}$')
-ax5b.set_ylabel('LAI$_{rad}$')
+ax5b = plt.subplot2grid((1,2),(0,1), sharex = ax5a, sharey = ax5a)
+ax5b.set_xlabel('LAI$_{MacArthur-Horn}$',fontsize=axis_size)
+ax5b.set_ylabel('LAI$_{rad}$',fontsize=axis_size)
 ax5b.annotate('b - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax5b.plot([0,20],[0,20],'--',color='black',alpha=0.3)
@@ -463,8 +472,8 @@ plt.savefig(output_dir+'fig5_lidar_LAI_comparison.png')
 # Figure 6: LAI vs. hemiphotos
 plt.figure(6, facecolor='White',figsize=[9,4])
 ax6a = plt.subplot2grid((1,3),(0,0))
-ax6a.set_xlabel('LAI$_{Hemisfer}$')
-ax6a.set_ylabel('LAI$_{MacArthur-Horn}$')
+ax6a.set_xlabel('LAI$_{Hemisfer}$',fontsize=axis_size)
+ax6a.set_ylabel('LAI$_{MacArthur-Horn}$',fontsize=axis_size)
 ax6a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax6a.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 for i in range(0,N_plots):
@@ -474,13 +483,13 @@ for i in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
     y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
     ax6a.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),x_err,y_err,'o',color='black')
-ax6a.plot(LAI_hemi_mod, LAI_MH_mod, '-', color = 'k')
+#ax6a.plot(LAI_hemi_mod, LAI_MH_mod, '-', color = 'k')
 
 
 ax6b = plt.subplot2grid((1,3),(0,1), sharex=ax6a, sharey=ax6a)
 ax6b.annotate('b - radiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax6b.set_xlabel('LAI$_{Hemisfer}$')
-ax6b.set_ylabel('LAI$_{rad}$')
+ax6b.set_xlabel('LAI$_{Hemisfer}$',fontsize=axis_size)
+ax6b.set_ylabel('LAI$_{rad}$',fontsize=axis_size)
 ax6b.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 for i in range(0,N_plots):
     ax6b.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]][:,-1],'.',color='0.5',alpha=0.5)
@@ -493,13 +502,13 @@ for i in range(0,N_plots):
     ax6b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err1,marker='o',color='black',mfc='white')
     ax6b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err2,marker='o',color='black')
 
-ax6b.plot(LAI_hemi_mod, LAI_rad_mod, '-', color = 'k')
+#ax6b.plot(LAI_hemi_mod, LAI_rad_mod, '-', color = 'k')
 
 
 ax6c = plt.subplot2grid((1,3),(0,2), sharex=ax6a)
 ax6c.annotate('c - field inventory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax6c.set_xlabel('LAI$_{Hemisfer}$')
-ax6c.set_ylabel('Canopy Volume / $m^3m^{-2}$')
+ax6c.set_xlabel('LAI$_{Hemisfer}$',fontsize=axis_size)
+ax6c.set_ylabel('Canopy Volume / m$^3$m$^{-2}$',fontsize=axis_size)
 
 for i in range(0,N_plots):
     ax6c.plot(Hemisfer_LAI[Plots[i]],inventory_LAI[Plots[i]],'.',color=colour[2],alpha=0.5)
@@ -523,8 +532,8 @@ plt.savefig(output_dir+'fig6_LAI_hemiphoto_comparison.png')
 # Figure 7: LAI vs. canopy volume
 plt.figure(7, facecolor='White',figsize=[9,4])
 ax7a = plt.subplot2grid((1,3),(0,0))
-ax7a.set_xlabel('crown volume / $m^3m^{-2}$')
-ax7a.set_ylabel('LAI')
+ax7a.set_xlabel('crown volume / m$^3$m$^{-2}$',fontsize=axis_size)
+ax7a.set_ylabel('LAI',fontsize=axis_size)
 ax7a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 for i in range(0,N_plots):
     ax7a.plot(inventory_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color=colour[0],alpha=0.5)
@@ -535,13 +544,13 @@ for i in range(0,N_plots):
     ax7a.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker='o',color='black')
 
 
-ax7b = plt.subplot2grid((1,3),(0,1), sharex=ax8a, sharey=ax8a)
+ax7b = plt.subplot2grid((1,3),(0,1), sharex=ax7a, sharey=ax7a)
 ax7b.annotate('b - radiative transfer (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax7b.set_xlabel('crown volume / m$^3$m^{-2}$')
-ax7b.set_ylabel('LAI')
+ax7b.set_xlabel('crown volume / m$^3$m$^{-2}$',fontsize=axis_size)
+ax7b.set_ylabel('LAI',fontsize=axis_size)
 for k in range(1,3):
     for i in range(0,N_plots):
-        ax7b.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+        ax7b.plot(inventory_LAI[Plots[i]],radiative_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
 
 for k in range(1,3):
     for i in range(0,N_plots):
@@ -552,10 +561,10 @@ for k in range(1,3):
         else:
             ax7b.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
 
-ax7c = plt.subplot2grid((1,3),(0,2), sharex=ax8a, sharey=ax8a)
+ax7c = plt.subplot2grid((1,3),(0,2), sharex=ax7a, sharey=ax7a)
 ax7c.annotate('c - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax7c.set_ylabel('LAI')
-ax7c.set_xlabel('crown volume / $m^3m^{-2}$')
+ax7c.set_ylabel('LAI',fontsize=axis_size)
+ax7c.set_xlabel('crown volume / m$^3$m$^{-2}$',fontsize=axis_size)
 for k in range(1,3):
     for i in range(0,N_plots):
         ax7c.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)

@@ -29,7 +29,7 @@ field_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_DANUM_carb
 LAI_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_LAI_fromHemisphericalPhotos.csv'
 
 # also define output directory (for saving figures)
-output_dir = './Figures/'
+output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/Figures/'
 
 # define important parameters for canopy profile estimation
 Plots = ['LF','E','Belian','Seraya','B North','B South','DC1','DC2']
@@ -579,6 +579,4 @@ plt.savefig(output_dir+'fig7_LiDAR_LAI_canopy_volume_comparison.png')
 #Figure 8:  Plot total basal area against LAI from the two preferred methods (to do)
 
 
-
-plt.show()
 

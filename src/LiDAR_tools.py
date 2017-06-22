@@ -82,10 +82,10 @@ def get_lasfile_bbox(las_file):
     lasFile = las.file.File(las_file,mode='r')
     max_xyz = lasFile.header.max
     min_xyz = lasFile.header.min
-    UR = np.asarray[max_xyz[0],max_xyz[1]]
-    LR = np.asarray[max_xyz[0],min_xyz[1]]
-    UL = np.asarray[min_xyz[0],max_xyz[1]]
-    LL = np.asarray[min_xyz[0],min_xyz[1]]
+    UR = np.asarray([max_xyz[0],max_xyz[1]])
+    LR = np.asarray([max_xyz[0],min_xyz[1]])
+    UL = np.asarray([min_xyz[0],max_xyz[1]])
+    LL = np.asarray([min_xyz[0],min_xyz[1]])
     
     return UR, LR, UL, LL
 
@@ -96,11 +96,13 @@ def find_las_files_by_polygon(file_list,polygon):
     n_files = las_files.size
     for i in range(0,n_files):
         UR, LR, UL, LL = get_lasfile_bbox(las_files[i])
-        in_pts = np.asarray(UR,LR,UL,LL)
-        x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
+        las_box = np.asarray([UR,LR,LL,UL])
+        x,y,inside = points_in_poly(polygon[:,0],polygon[:,1],las_box)
         if inside.sum()>0:
             keep.append(las_files[i])
-    print keep
+    print 'las tiles to load in:', len(keep)
+    for ll in range(0,len(keep)):
+        print keep[ll]
     return keep
 
 # load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.

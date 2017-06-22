@@ -117,13 +117,18 @@ def load_lidar_data_by_polygon(file_list,polygon):
         for i in range(1,n_files):
             tile_pts = load_lidar_data(keep_files[i])
             tile_pts_filt = filter_lidar_data_by_polygon(tile_pts,polygon)
-            pts = np.concatenate(pts,tile_pts_filt,axis=0)
+            pts = np.concatenate((pts,tile_pts_filt),axis=0)
 
     print "loaded ", pts[:,0].size, " points"
     return pts
 
 # Similar to above but using a focal point (specified by xy) and neighbourhood (specified by radius) to find .las tiles rather than using an input polygon
-def load_lidar_data_by_polygon(file_list,xy,radius):
+def find_las_files_by_neighbourhood(file_list,xy,radius):
+    polygon = np.asarray([[xy[0]+radius,xy[1]+radius], [xy[0]+radius,xy[1]-radius], [xy[0]-radius,xy[1]-radius], [xy[0]-radius,xy[1]+radius]])
+    keep = find_las_files_by_polygon(file_list,polygon)
+    return keep
+
+def load_lidar_data_by_neighbourhood(file_list,xy,radius):
     polygon = np.asarray([[xy[0]+radius,xy[1]+radius], [xy[0]+radius,xy[1]-radius], [xy[0]-radius,xy[1]-radius], [xy[0]-radius,xy[1]+radius]])
     pts = load_lidar_data_by_polygon(file_list,polygon)
     return pts

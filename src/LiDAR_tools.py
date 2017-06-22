@@ -134,7 +134,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius):
     keep_files = find_las_files_by_polygon(file_list,polygon)
     n_files = len(keep_files)
     if n_files == 0:
-        print 'WARNING: No files within specified polygon - try again'
+        print 'WARNING: No files within specified neighbourhood - try again'
     else:
         tile_pts = load_lidar_data(keep_files[0])
         pts = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)

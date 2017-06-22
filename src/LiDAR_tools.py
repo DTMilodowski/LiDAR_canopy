@@ -122,7 +122,23 @@ def load_lidar_data_by_polygon(file_list,polygon):
     print "loaded ", pts[:,0].size, " points"
     return pts
 
+# Similar to above but using a focal point (specified by xy) and neighbourhood (specified by radius) to find .las tiles rather than using an input polygon
+def load_lidar_data_by_polygon(file_list,xy,radius):
+    polygon = np.asarray([[xy[0]+radius,xy[1]+radius], [xy[0]+radius,xy[1]-radius], [xy[0]-radius,xy[1]-radius], [xy[0]-radius,xy[1]+radius])
+    keep_files = find_las_files_by_polygon(file_list,polygon)
+    n_files = len(keep_files)
+    if n_files == 0:
+        print 'WARNING: No files within specified polygon - try again'
+    else:
+        tile_pts = load_lidar_data(keep_files[0])
+        pts = filter_lidar_data_by_polygon(tile_pts,polygon)
+        for i in range(1,n_files):
+            tile_pts = load_lidar_data(keep_files[i])
+            tile_pts_filt = filter_lidar_data_by_polygon(tile_pts,polygon)
+            pts = np.concatenate(pts,tile_pts_filt,axis=0)
 
+    print "loaded ", pts[:,0].size, " points"
+    return pts
 
 # This function writes a set of lidar returns into a csv file, so that the same 
 # point cloud samples can be loaded into different software packages

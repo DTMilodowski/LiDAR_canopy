@@ -11,9 +11,14 @@ import auxilliary_functions as aux
 import LiDAR_MacHorn_LAD_profiles as LAD1
 import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import inventory_based_LAD_profiles as field
+import least_squares_fitting as lstsq
 
 from matplotlib import rcParams
 from datetime import datetime
+
+sys.path.append('/home/dmilodow/DataStore_DTM/BALI/SPA_BALI_data_and_analysis/scripts/field_data/')
+import load_field_data as cen
+
 # Set up some basiic parameters for the plots
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['arial']
@@ -172,6 +177,37 @@ for pp in range(0,N_plots):
 #----------------------------------------------------------------------------------------
 # Figure 1: Sample point clouds for three sites: Belian, LF, B North
 
+# first up, going to need to find affine transformation to rotate the point cloud for
+# easy plotting
+
+# The GPS coordinates for the plot locations can be used to find this transformation matrix
+gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
+datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32','f16','f16','f16','f16')}
+plot_coords = np.genfromtxt(gps_pts_file, delimiter = ',',dtype=datatype)
+plot_coords['plot'][plot_coords['plot']=='danum_1'] = 'DC1'
+plot_coords['plot'][plot_coords['plot']=='danum_2'] = 'DC2'
+plot_coords['plot'][plot_coords['plot']=='maliau_belian'] = 'Belian'
+plot_coords['plot'][plot_coords['plot']=='maliau_seraya'] = 'Seraya'
+plot_coords['plot'][plot_coords['plot']=='B_north'] = 'B North'
+plot_coords['plot'][plot_coords['plot']=='B_south'] = 'B South'
+plot_coords['plot'][plot_coords['plot']=='LFE'] = 'LF'
+
+affine = {}
+for pp in range(0, N_plots):
+    # first get points for a given plot and build matrices - note that I've reversed xy and xy_prime in this case to reverse the rotation-translation
+    mask = plot_coords['plot']==Plots[pp]
+    x = plot_coords['x_prime'][mask]
+    y = plot_coords['y_prime'][mask]
+    x_prime = plot_coords['x'][mask]
+    y_prime = plot_coords['y'][mask]
+    affine[Plots[pp]]=lstsq.least_squares_affine_matrix(x,y,x_prime,y_prime)
+
+    Xi = np.asarray([plot_point_cloud[Plots[pp]][:,0],plot_point_cloud[Plots[pp]][:,1],np.ones(plot_point_cloud[Plots[pp]].shape[0])])
+    Xi_prime = np.dot(affine[Plots[pp]],Xi)
+
+    plot_point_cloud[Plots[pp]][:,0]=Xi_prime[0]
+    plot_point_cloud[Plots[pp]][:,1]=Xi_prime[1]
+
 plt.figure(1, facecolor='White',figsize=[8,12])
 
 colour = ['#46E900','#1A2BCE','#E0007F']
@@ -182,43 +218,43 @@ labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
 ax1a = plt.subplot2grid((3,1),(0,0))
 ax1a.annotate('a - Maliau Reserve, MAO01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax1a.set_ylabel('Height / m',fontsize=axis_size)
+plt.gca().set_aspect('equal', adjustable='box-forced')
 
 # LF
 ax1b = plt.subplot2grid((3,1),(1,0),sharey=ax1a,sharex=ax1a)
 ax1b.annotate('b - SAFE landscape, SAF04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax1b.set_ylabel('Height / m',fontsize=axis_size)
+plt.gca().set_aspect('equal', adjustable='box-forced')
 
 # B North
 ax1c = plt.subplot2grid((3,1),(2,0),sharey=ax1a,sharex=ax1a)
 ax1c.annotate('c - SAFE landscape, SAF02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax1c.set_ylabel('Height / m',fontsize=axis_size)
 ax1c.set_xlabel('Horizontal distance / m',fontsize=axis_size)
+plt.gca().set_aspect('equal', adjustable='box-forced')
 
 fig1_plots = ['Belian', 'LF', 'B North']
 axes = [ax1a, ax1b, ax1c]
 for pp in range(0,3):
-        plot_lidar_pts = plot_point_cloud[fig1_plots[pp]]
-        for k in range(0,max_return):
+    plot_lidar_pts = plot_point_cloud[fig1_plots[pp]]
+    for k in range(0,max_return):
     
-            points_x = plot_lidar_pts[plot_lidar_pts[:,3]==k+1][:,0]-np.min(plot_lidar_pts[:,0])
-            points_z = plot_lidar_pts[plot_lidar_pts[:,3]==k+1][:,2]
-            points_y = plot_lidar_pts[plot_lidar_pts[:,3]==k+1][:,1]-np.min(plot_lidar_pts[:,1])
-
-            points_x_sub = points_x[points_y<=20]
-            points_z_sub = points_z[points_y<=20]
-            points_y_sub = points_z[points_y<=20]
-
-            alpha_max = 0.2
-            colours = np.zeros((points_x.size,4))
-            colours[:,0]=rgb[k][0]/255.
-            colours[:,1]=rgb[k][1]/255.
-            colours[:,2]=rgb[k][2]/255.
-            colours[:,3]=alpha_max*(1-points_y/(points_y.max()+1))
-            axes[pp].scatter(points_x,points_z,marker='o',c=colours,edgecolors='none',s=2)#,label=labels[k])
-            axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=2,label=labels[k])
+        mask = np.all((plot_lidar_pts[:,0]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,1]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,3]==k+1),axis=0)
+        points_x = plot_lidar_pts[mask][:,0]#-np.min(plot_lidar_pts[:,0])
+        points_z = plot_lidar_pts[mask][:,2]
+        points_y = plot_lidar_pts[mask][:,1]#-np.min(plot_lidar_pts[:,1])
+        
+        alpha_max = 0.2
+        colours = np.zeros((points_x.size,4))
+        colours[:,0]=rgb[k][0]/255.
+        colours[:,1]=rgb[k][1]/255.
+        colours[:,2]=rgb[k][2]/255.
+        colours[:,3]=alpha_max*(1-points_y/(points_y.max()+1))
+        axes[pp].scatter(points_x,points_z,marker='o',c=colours,edgecolors='none',s=2)#,label=labels[k])
+        axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=2,label=labels[k])
 
 ax1a.set_ylim(0,80)
-ax1a.set_xlim(0,140)
+ax1a.set_xlim(0,100)
 ax1a.legend(loc=1,fontsize=axis_size)
 plt.tight_layout()
 plt.savefig(output_dir+'fig1_plot_pointclouds.png')
@@ -422,7 +458,7 @@ plt.show()
 
 #--------------------------------------------------------------------------------------
 # Figure 5: comparison of LAD profiles
-plt.figure(5, facecolor='White',figsize=[9,4])
+plt.figure(5, facecolor='White',figsize=[7,4])
 ax5a = plt.subplot2grid((1,2),(0,0))
 ax5a.set_xlabel('LAI$_{MacArthur-Horn}$',fontsize=axis_size)
 ax5a.set_ylabel('LAI$_{rad}$',fontsize=axis_size)
@@ -587,5 +623,92 @@ plt.savefig(output_dir+'fig7_LiDAR_LAI_canopy_volume_comparison.png')
 #--------------------------------------------------------------------------------------
 #Figure 8:  Plot total basal area against LAI from the two preferred methods (to do)
 
+census_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_TreeCensus.csv'
+census = cen.collate_plot_level_census_data(census_file)
+
+BA = {}
+Plots_SAFE = ['Belian', 'Seraya', 'LF', 'E','B North', 'B South']
+Plots_Danum = ['DC1', 'DC2']
+plot_colour = {}
+plot_colour['Belian']=colour[0]
+plot_colour['Seraya']=colour[0]
+plot_colour['DC1']=colour[0]
+plot_colour['DC2']=colour[0]
+plot_colour['LF']=colour[1]
+plot_colour['E']=colour[1]
+plot_colour['B North']=colour[2]
+plot_colour['B South']=colour[2]
+
+plot_marker = {}
+plot_marker['Belian']='o'
+plot_marker['Seraya']='v'
+plot_marker['DC1']='^'
+plot_marker['DC2']='s'
+plot_marker['LF']='o'
+plot_marker['E']='v'
+plot_marker['B North']='o'
+plot_marker['B South']='v'
+
+for pp in range(0,len(Plots_SAFE):)
+    temp_BA = np.zeros(n_subplots)
+    for ss in range(0,n_subplots):
+        # check basal area
+        temp_BA[ss] = census[Plots_SAFE[pp]]['BasalArea'][ss,0]*25/100**2
+    BA[Plots_SAFE[pp]]=temp_BA.copy()
+
+for pp in range(0,len(Plots_Danum)):
+    temp_BA = np.zeros(n_subplots)
+    for ss in range(0,n_subplots):
+        indices = np.all((field_data['plot']==Plots_Danum[pp],field_data['subplot']==ss+1),axis=0)
+        temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*25./100**2
+    BA[Plots_Danum[pp]]=temp_BA.copy()
+
+plt.figure(8, facecolor='White',figsize=[7,4])
+ax8a = plt.subplot2grid((1,2),(0,0))
+ax8a.set_xlabel('basal area / m$^2$ha$^{-1}$',fontsize=axis_size)
+ax8a.set_ylabel('LAI',fontsize=axis_size)
+ax8a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+for i in range(0,N_plots):
+    ax8a.plot(MacArthurHorn_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color=plot_colour[Plots[i]],alpha=0.5)
+
+for i in range(0,N_plots):
+    x_err=np.std(BA[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
+    ax8a.errorbar(np.mean(BA[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker=plot_marker[Plots[i]],color=plot_colour[Plots[i]], edgecolour='black')
 
 
+ax8b = plt.subplot2grid((1,3),(0,2), sharex=ax8a, sharey=ax8a)
+ax8b.annotate('c - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax8b.set_ylabel('LAI',fontsize=axis_size)
+ax8b.set_xlabel('basal area / m$^2$ha$^{-1}$',fontsize=axis_size)
+
+k = -1
+for i in range(0,N_plots):
+    ax8b.plot(BA[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+
+for i in range(0,N_plots):
+    x_err=np.std(BA[Plots[i]])/np.sqrt(n_subplots)
+    y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
+    ax8b.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker=plot_marker[Plots[i]],color=plot_colour[Plots[i]], edgecolour='black')
+
+ax8a.set_ylim((0,20))
+plt.tight_layout()
+plt.savefig(output_dir+'fig8_LiDAR_LAI_BasalArea_comparison.png')
+
+
+#--------------------------------------------------------------------------------------
+# Now put together a table that has all the LAI estimates
+f = open('BALI_LAI_table',"w") #opens file
+f.write("Plot, BasalArea, error, CrownVolume, error, LAI_MH, error, LAI_Detto, error, LAI_new, error, LAI_hemisfer\n")
+for i in range(0,N_plots):
+    f.write(Plots[i]+", ")
+    f.write(np.mean(BA[Plots[i]])+", "+np.std(BA[Plots[i]])/n_subplots + ", ")
+    f.write(np.mean(inventory_LAI[Plots[i]])+", "+np.std(inventory_LAI[Plots[i]])/n_subplots + ", ")
+    f.write(np.mean(MacArthurHorn_LAI[Plots[i]])+", "+np.std(MacArthurHorn_LAI[Plots[i]])/n_subplots + ", ")
+    f.write(np.mean(radiative_LAI[Plots[i]])+", "+np.std(radiative_LAI[Plots[i]])/n_subplots + ", ")
+    f.write(np.mean(radiative_DTM_LAI[Plots[i]])+", "+np.std(radiative_DTM_LAI[Plots[i]])/n_subplots + ", ")
+    f.write(np.mean(LAI_hemisfer[Plots[i]])+", "+np.std(LAI_hemisfer[Plots[i]])/n_subplots + "\n")
+
+    f.write(str(subplot_bbox_alt[i][9]))
+    f.write("\n")

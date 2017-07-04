@@ -104,3 +104,12 @@ def least_squares_affine_matrix(x,y,x_prime,y_prime,shear=False):
     affine[2,2]=1
         
     return affine
+
+
+# Apply affine transformation
+def apply_affine_transformation(x,y,affine):
+    
+    X = np.asarray([x,y,np.ones(x.size)])
+    X_prime = np.dot(X)
+    
+    return X_prime[0], X_prime[1]

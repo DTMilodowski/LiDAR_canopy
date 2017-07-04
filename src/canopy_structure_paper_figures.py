@@ -240,7 +240,7 @@ for pp in range(0,3):
     for k in range(0,max_return):
     
         mask = np.all((plot_lidar_pts[:,0]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,1]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,3]==k+1),axis=0)
-        points_x = plot_lidar_pts[mask][:,0]#-np.min(plot_lidar_pts[:,0])
+        points_x = 100-plot_lidar_pts[mask][:,0]#-np.min(plot_lidar_pts[:,0])
         points_z = plot_lidar_pts[mask][:,2]
         points_y = plot_lidar_pts[mask][:,1]#-np.min(plot_lidar_pts[:,1])
         
@@ -249,8 +249,8 @@ for pp in range(0,3):
         colours[:,0]=rgb[k][0]/255.
         colours[:,1]=rgb[k][1]/255.
         colours[:,2]=rgb[k][2]/255.
-        colours[:,3]=alpha_max*(1-points_y/(points_y.max()+1))
-        axes[pp].scatter(points_x,points_z,marker='o',c=colours,edgecolors='none',s=2)#,label=labels[k])
+        colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
+        axes[pp].scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=2)#,label=labels[k])
         axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=2,label=labels[k])
 
 ax1a.set_ylim(0,80)

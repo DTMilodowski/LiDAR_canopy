@@ -649,17 +649,18 @@ plot_marker['E']='v'
 plot_marker['B North']='o'
 plot_marker['B South']='v'
 
-for pp in range(0,len(Plots_SAFE):)
+for pp in range(0,len(Plots_SAFE)):
     temp_BA = np.zeros(n_subplots)
     for ss in range(0,n_subplots):
         # check basal area
         temp_BA[ss] = census[Plots_SAFE[pp]]['BasalArea'][ss,0]*25/100**2
+    temp_BA[np.isnan(temp_BA)]=0
     BA[Plots_SAFE[pp]]=temp_BA.copy()
 
 for pp in range(0,len(Plots_Danum)):
     temp_BA = np.zeros(n_subplots)
     for ss in range(0,n_subplots):
-        indices = np.all((field_data['plot']==Plots_Danum[pp],field_data['subplot']==ss+1),axis=0)
+        indices = np.all((field_data['plot']==Plots_Danum[pp],field_data['subplot']==ss+1,np.isfinite(field_data['DBH'])),axis=0)
         temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*25./100**2
     BA[Plots_Danum[pp]]=temp_BA.copy()
 
@@ -670,45 +671,44 @@ ax8a.set_ylabel('LAI',fontsize=axis_size)
 ax8a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 for i in range(0,N_plots):
-    ax8a.plot(MacArthurHorn_LAI[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color=plot_colour[Plots[i]],alpha=0.5)
+    ax8a.plot(BA[Plots[i]],MacArthurHorn_LAI[Plots[i]],'.',color=plot_colour[Plots[i]],alpha=0.5)
 
 for i in range(0,N_plots):
     x_err=np.std(BA[Plots[i]])/np.sqrt(n_subplots)
     y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
-    ax8a.errorbar(np.mean(BA[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker=plot_marker[Plots[i]],color=plot_colour[Plots[i]], edgecolour='black')
+    ax8a.errorbar(np.mean(BA[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker=plot_marker[Plots[i]],markerfacecolor=plot_colour[Plots[i]], markeredgecolor='black',ecolor='black',linestyle='None')
 
 
-ax8b = plt.subplot2grid((1,3),(0,2), sharex=ax8a, sharey=ax8a)
-ax8b.annotate('c - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax8b = plt.subplot2grid((1,2),(0,1), sharex=ax8a, sharey=ax8a)
+ax8b.annotate('b - radiative transfer (new)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax8b.set_ylabel('LAI',fontsize=axis_size)
 ax8b.set_xlabel('basal area / m$^2$ha$^{-1}$',fontsize=axis_size)
 
 k = -1
 for i in range(0,N_plots):
-    ax8b.plot(BA[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
+    ax8b.plot(BA[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=plot_colour[Plots[i]],alpha=0.5)
 
 for i in range(0,N_plots):
     x_err=np.std(BA[Plots[i]])/np.sqrt(n_subplots)
     y_err=np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
-    ax8b.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker=plot_marker[Plots[i]],color=plot_colour[Plots[i]], edgecolour='black')
+    ax8b.errorbar(np.mean(BA[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker=plot_marker[Plots[i]],markerfacecolor=plot_colour[Plots[i]], markeredgecolor='black',ecolor='black',linestyle='None',label = Plots[i])
 
 ax8a.set_ylim((0,20))
+ax8b.legend(loc=1,fontsize=axis_size-2)
 plt.tight_layout()
 plt.savefig(output_dir+'fig8_LiDAR_LAI_BasalArea_comparison.png')
 
 
 #--------------------------------------------------------------------------------------
 # Now put together a table that has all the LAI estimates
-f = open('BALI_LAI_table',"w") #opens file
+f = open('BALI_LAI_table.csv',"w") #opens file
 f.write("Plot, BasalArea, error, CrownVolume, error, LAI_MH, error, LAI_Detto, error, LAI_new, error, LAI_hemisfer\n")
 for i in range(0,N_plots):
     f.write(Plots[i]+", ")
-    f.write(np.mean(BA[Plots[i]])+", "+np.std(BA[Plots[i]])/n_subplots + ", ")
-    f.write(np.mean(inventory_LAI[Plots[i]])+", "+np.std(inventory_LAI[Plots[i]])/n_subplots + ", ")
-    f.write(np.mean(MacArthurHorn_LAI[Plots[i]])+", "+np.std(MacArthurHorn_LAI[Plots[i]])/n_subplots + ", ")
-    f.write(np.mean(radiative_LAI[Plots[i]])+", "+np.std(radiative_LAI[Plots[i]])/n_subplots + ", ")
-    f.write(np.mean(radiative_DTM_LAI[Plots[i]])+", "+np.std(radiative_DTM_LAI[Plots[i]])/n_subplots + ", ")
-    f.write(np.mean(LAI_hemisfer[Plots[i]])+", "+np.std(LAI_hemisfer[Plots[i]])/n_subplots + "\n")
-
-    f.write(str(subplot_bbox_alt[i][9]))
-    f.write("\n")
+    f.write(str(np.mean(BA[Plots[i]]))+", "+str(np.std(BA[Plots[i]])/n_subplots) + ", ")
+    f.write(str(np.mean(inventory_LAI[Plots[i]]))+", "+str(np.std(inventory_LAI[Plots[i]])/n_subplots) + ", ")
+    f.write(str(np.mean(MacArthurHorn_LAI[Plots[i]]))+", "+str(np.std(MacArthurHorn_LAI[Plots[i]])/n_subplots) + ", ")
+    f.write(str(np.mean(radiative_LAI[Plots[i]]))+", "+str(np.std(radiative_LAI[Plots[i]])/n_subplots) + ", ")
+    f.write(str(np.mean(radiative_DTM_LAI[Plots[i]]))+", "+str(np.std(radiative_DTM_LAI[Plots[i]])/n_subplots) + ", ")
+    f.write(str(np.mean(Hemisfer_LAI[Plots[i]]))+", "+str(np.std(Hemisfer_LAI[Plots[i]])/n_subplots) + "\n")
+f.close()

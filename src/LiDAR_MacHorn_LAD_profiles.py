@@ -24,6 +24,7 @@ def bin_returns(pts, max_height, layer_thickness):
 
     # bin data
     bin = can_pts[:,2]//layer_thickness
+    bin = bin.astype(int)
 
     for i in range(0,n_returns):
         if bin[i]<n_bins and bin[i]>=0: # in case there are some spuriously high returns outside the permitted range

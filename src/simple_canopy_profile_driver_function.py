@@ -5,12 +5,12 @@ import LiDAR_radiative_transfer_LAD_profiles as LAD2
 from matplotlib import pyplot as plt
 
 # start by defining input files
-las_file = 'Carbon_plot_point_cloud_buffer.las'
+las_file = '../data/Carbon_plot_point_cloud_buffer.las'
 
 # define important parameters for canopy profile estimation
 
 # define the xy coordinates of the location of interest
-target_xy = [577601.951,526741.5143] # replace with x and y coordinates of site - this point is located in the middle of LFE
+target_xy = [577601.951,526741.5143] # replace with x and y coordinates of site - this point is located in the middle of B_north
 radius = 10. # this defines the neighbourhood radius for sampling the point cloud.  Suggest a value of 10 m to start with.
 
 # this set of parameters gets used by both MacArthur-Horn and the radiative transfer model

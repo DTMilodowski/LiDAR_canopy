@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 #las_file = 'Carbon_plot_point_cloud_buffer.las'
 las_file = sys.argv[3]
 # define important parameters for canopy profile estimation
-print sys.argv
+#print sys.argv
 # define the xy coordinates of the location of interest
 #target_xy = [577601.951,526741.5143] # replace with x and y coordinates of site - this point is located in the middle of LFE
 target_xy=[float(sys.argv[1]),float(sys.argv[2])]
@@ -37,9 +37,10 @@ out_file = sys.argv[11]
 
 # load LiDAR point cloud and clip to neighbourhood around a specified point
 lidar_pts = lidar.load_lidar_data(las_file)
-sample_pts = lidar.filter_lidar_data_by_neighbourhood(lidar_pts,target_xy,radius)
+sample_pts = lidar_pts # we assume that all fitering has already been done.
 
- # sample_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,polygon) # there is also scope to clip point clouds using a polygon if preferred, but for camera trap, point centres are probably better options.
+#sample_pts = lidar.filter_lidar_data_by_neighbourhood(lidar_pts,target_xy,radius)
+#sample_pts = lidar.filter_lidar_data_by_polygon(lidar_pts,polygon) # there is also scope to clip point clouds using a polygon if preferred, but for camera trap, point centres are probably better options.
 
 
 

@@ -135,7 +135,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     th = np.unique(A)
     S  = th.size
     K  = int(R.max())
-
+    
     # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
     # and return number
     if n.size == 0:
@@ -147,6 +147,26 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
                 use2 = A[use1]==th[j]
                 for k in range(0,K):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
+
+
+    ##### New test -> find all scan angles for which there are no returns, and remove these scan angles from the inversion, as
+    #                 we don't have the required info at this scan angle to make this calculation.  This happens very rarely -
+    #                 i.e. cases where there are very few returns at all at this scan angle.  Future efforts could go further
+    #                 here by removing scan angles for which the number of 1st returns falls below a threshold, rather than 0.
+    n0_test = np.sum(n[:,:,0],axis=0)
+    if np.sum(n0_test==0)>0:
+        S_old = th.size
+        S = S_old-np.sum(n0_test==0)
+        th = th[n0_test>0]
+        S = th.size
+        # rebuild n, but without scan angles missing all first returns
+        n = np.zeros((M,S,K),dtype='float')
+        for i in range(0,M):
+            use1 = np.all((z0>=zi[i],z0<zi[i]+dz),axis=0)
+            for j in range(0,S):
+                use2 = A[use1]==th[j]
+                for k in range(0,K):
+                    n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok        
 
     ##### New test -> let's add 1 to all 1st return bins for which there are also other returns
     for s in range(0,S):
@@ -162,7 +182,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     control = np.zeros((M,S))
     n0 = np.zeros(S,dtype='float')
     for i in range(0,S):
-        n0[i]=np.sum(n[:,i,0])
+        n0[i]=np.sum(n[:,i,0])  # n0 defines the number of first returns for a given scan angle
         n1=np.sum(n[:,i,:],axis=1)
         for j in range(0,K):
             I[:,i,j]=1-np.cumsum(n[:,i,j])/n0[i]
@@ -244,12 +264,14 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
 # LAD = leaf angle distribution in radians
 def Gfunction(LAD,ze,zi):
     ze = np.abs(ze)*np.pi/180.
-    th = np.linspace(0.00000001,np.pi/2.,101,endpoint=True)
+    if ze == 0:
+        ze+=0.0000000001 # arbitrary addition here to prevent error messages.  In practice, this doesn't actually have an impact, because 1/tan(0.00000000001) is >> 1, and therefore this gets filtered out a few lines later.
+    th = np.linspace(0.0000000001,np.pi/2.,101,endpoint=True)
     A = np.cos(ze)*np.cos(th)
     J = 1./np.tan(th)*1./np.tan(ze)
     use = np.abs(J)<=1
-    phi = np.arccos(J)
-    A[use] = np.cos(th[use])*np.cos(ze)*(1+(2/np.pi)*(np.tan(phi[use])-phi[use]))
+    phi = np.arccos(J[use])
+    A[use] = np.cos(th[use])*np.cos(ze)*(1+(2/np.pi)*(np.tan(phi)-phi))
     
 
     if LAD == 'planophile':
@@ -324,3 +346,14 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
     u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n)
     
     return u,n,I,U
+
+
+
+# Overall wrapper for radiative transfer model
+def calculate_LAD_rad_DTM_full(sample_pts,max_height,layer_thickness,minimum_height,max_return,leaf_angle_dist='spherical'):
+    heights = np.arange(0,max_height+1,layer_thickness)
+    u,n,I,U = calculate_LAD_DTM(sample_pts,heights,max_return,leaf_angle_dist)
+    LAD_rad=u[::-1]
+    mask = heights <= minimum_height
+    LAD_rad[mask]=0
+    return heights, LAD_rad

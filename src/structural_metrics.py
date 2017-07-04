@@ -111,6 +111,7 @@ def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1,thresh
     profile = moving_gaussian_filter(vertical_profiles[0],sigma)
     
     peaks, peak_amplitude = find_maxima(heights,profile,threshold)
+    index = np.zeros(peaks.size)
     if plot_profiles:
         plt.figure(1,facecolor='White',figsize=[4,4])
         plt.plot(vertical_profiles[0],heights,'-')
@@ -122,6 +123,7 @@ def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1,thresh
         profile = moving_gaussian_filter(vertical_profiles[i],sigma)
         peaks_this_iter, peak_amplitude = find_maxima(heights,profile,threshold)
         peaks = np.concatenate((peaks,peaks_this_iter),axis=0)
+        index = np.concatenate((index,np.ones(peaks_this_iter.size)*i),axis=0)
         if plot_profiles:
             plt.figure(1,facecolor='White',figsize=[4,4])
             plt.plot(vertical_profiles[i],heights,'-')
@@ -129,7 +131,7 @@ def retrieve_peaks_gaussian_convolution(vertical_profiles,heights,sigma=1,thresh
             plt.plot(peak_amplitude,peaks_this_iter,'o')
             plt.xlim(xmin=0)
             plt.show()
-    return peaks
+    return peaks, index
 
 def calculate_VSI(peaks):
     # convert number of peaks & their locations in canopy into VSI    
@@ -204,7 +206,6 @@ def moving_polynomial_filter(signal_y,window_width,order=2):
 
 # function to convolve a signal with a gaussian curve (comprising three standard deviations)
 # to provide a signal filter.
-
 def get_gaussian_kernel(sigma):
     x = np.arange(2*3*sigma+1)-3*sigma
     kernel = np.exp(-(x**2)/(2*sigma**2))
@@ -224,3 +225,13 @@ def moving_gaussian_filter(signal_y,sigma):
     y_temp = np.concatenate((firstvals, signal_y, lastvals))
     y_filt = np.convolve(y_temp,kernel,'valid')
     return y_filt
+
+
+
+
+# Calculate Shannon Index
+# for use of this metric to assess canopy structural diversity see MacArthur & MacArthur, 1961; Stark et al., 2012
+def calculate_Shannon_index(P):
+    p=P/P.sum()
+    S = -np.sum(p[p>0]*np.log(p[p>0]))
+    return S

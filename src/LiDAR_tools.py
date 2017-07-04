@@ -82,10 +82,10 @@ def get_lasfile_bbox(las_file):
     lasFile = las.file.File(las_file,mode='r')
     max_xyz = lasFile.header.max
     min_xyz = lasFile.header.min
-    UR = np.asarray[max_xyz[0],max_xyz[1]]
-    LR = np.asarray[max_xyz[0],min_xyz[1]]
-    UL = np.asarray[min_xyz[0],max_xyz[1]]
-    LL = np.asarray[min_xyz[0],min_xyz[1]]
+    UR = np.asarray([max_xyz[0],max_xyz[1]])
+    LR = np.asarray([max_xyz[0],min_xyz[1]])
+    UL = np.asarray([min_xyz[0],max_xyz[1]])
+    LL = np.asarray([min_xyz[0],min_xyz[1]])
     
     return UR, LR, UL, LL
 
@@ -96,11 +96,13 @@ def find_las_files_by_polygon(file_list,polygon):
     n_files = las_files.size
     for i in range(0,n_files):
         UR, LR, UL, LL = get_lasfile_bbox(las_files[i])
-        in_pts = np.asarray(UR,LR,UL,LL)
-        x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
+        las_box = np.asarray([UR,LR,LL,UL])
+        x,y,inside = points_in_poly(polygon[:,0],polygon[:,1],las_box)
         if inside.sum()>0:
             keep.append(las_files[i])
-    print keep
+    print 'las tiles to load in:', len(keep)
+    for ll in range(0,len(keep)):
+        print keep[ll]
     return keep
 
 # load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.
@@ -115,12 +117,34 @@ def load_lidar_data_by_polygon(file_list,polygon):
         for i in range(1,n_files):
             tile_pts = load_lidar_data(keep_files[i])
             tile_pts_filt = filter_lidar_data_by_polygon(tile_pts,polygon)
-            pts = np.concatenate(pts,tile_pts_filt,axis=0)
+            pts = np.concatenate((pts,tile_pts_filt),axis=0)
 
     print "loaded ", pts[:,0].size, " points"
     return pts
 
+# Similar to above but using a focal point (specified by xy) and neighbourhood (specified by radius) to find .las tiles rather than using an input polygon
+def find_las_files_by_neighbourhood(file_list,xy,radius):
+    polygon = np.asarray([[xy[0]+radius,xy[1]+radius], [xy[0]+radius,xy[1]-radius], [xy[0]-radius,xy[1]-radius], [xy[0]-radius,xy[1]+radius]])
+    keep = find_las_files_by_polygon(file_list,polygon)
+    return keep
 
+def load_lidar_data_by_neighbourhood(file_list,xy,radius):
+    polygon = np.asarray([[xy[0]+radius,xy[1]+radius], [xy[0]+radius,xy[1]-radius], [xy[0]-radius,xy[1]-radius], [xy[0]-radius,xy[1]+radius]])
+
+    keep_files = find_las_files_by_polygon(file_list,polygon)
+    n_files = len(keep_files)
+    if n_files == 0:
+        print 'WARNING: No files within specified neighbourhood - try again'
+    else:
+        tile_pts = load_lidar_data(keep_files[0])
+        pts = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
+        for i in range(1,n_files):
+            tile_pts = load_lidar_data(keep_files[i])
+            tile_pts_filt = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
+            pts = np.concatenate((pts,tile_pts_filt),axis=0)
+
+    print "loaded ", pts[:,0].size, " points"
+    return pts
 
 # This function writes a set of lidar returns into a csv file, so that the same 
 # point cloud samples can be loaded into different software packages

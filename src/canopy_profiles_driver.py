@@ -12,8 +12,9 @@ import LiDAR_MacHorn_LAD_profiles as LAD1
 import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import inventory_based_LAD_profiles as field
 
-sys.path.append('/home/dmilodow/DataStore_DTM/BALI/MetDataProcessing/UtilityTools/')
-import statistics_tools as stats
+#sys.path.append('/home/dmilodow/DataStore_DTM/BALI/MetDataProcessing/UtilityTools/')
+#import statistics_tools as stats
+from scipy import stats
 
 # start by defining input files
 las_file = 'Carbon_plot_point_cloud_buffer.las'
@@ -31,7 +32,7 @@ N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
 max_return = 3
-layer_thickness = 2.#1
+layer_thickness = 1.#2.
 n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 plot_area = 10.**4
@@ -118,7 +119,7 @@ for pp in range(0,N_plots):
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
-        LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArtherHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
+        LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, 1.)
 
         # now get field inventory estimate
         mask = np.all((field_data['plot']==Plot_name,field_data['subplot']==subplot_labels[Plot_name][i]),axis=0)
@@ -273,7 +274,7 @@ for pp in range(0,N_plots):
     ax3c.locator_params(axis='x',nbins=5)
 
     plt.tight_layout()
-    plt.savefig(output_dir+Plot_name+'_LAD_radiative_kmax_'+str(max_return)+'.png')
+    #plt.savefig(output_dir+Plot_name+'_LAD_radiative_kmax_'+str(max_return)+'.png')
     plt.show()
 
 #----------------------------------------------------------------------------------------------------------------
@@ -346,6 +347,90 @@ for pp in range(0,N_plots):
 #----------------------------------------------------------------------------------------------------------------
 # Figure 5 - Comparing LAI from hemiphotos against integrated LAD from the different methods
 # Plot up the subplot-level estimates, in addition to the 
+
+# Also include some regression analysis to get relationship between hemiphotos and LIDAR metrics.  Assume power
+# law for the first instance since the relationship appears non linear
+MacHorn_all = np.zeros(n_subplots*N_plots)
+rad_all = np.zeros(n_subplots*N_plots)
+hemiphot_all = np.zeros(n_subplots*N_plots)
+ii = 0
+for pp in range(0, N_plots):
+    for ss in range(0,n_subplots):
+        MacHorn_all[ii] = MacArthurHorn_LAI[Plots[pp]][ss]
+        rad_all[ii] = radiative_DTM_LAI[Plots[pp]][ss,-1]
+        hemiphot_all[ii] = Hemisfer_LAI[Plots[pp]][ss]
+        ii+=1
+
+log_MH = np.log(MacHorn_all)
+log_rad = np.log(rad_all)
+log_hemi = np.log(hemiphot_all)
+
+b_MH, loga_MH, r_MH, p_MH, serr_MH = stats.linregress(log_hemi,log_MH)
+model_log_MH = b_MH*log_hemi + loga_MH
+error_MH = log_MH-model_log_MH
+MSE_MH = np.mean(error_MH**2)
+CF_MH = np.exp(MSE_MH/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+a_MH = np.exp(loga_MH)
+
+b_rad, loga_rad, r_rad, p_rad, serr_rad = stats.linregress(log_hemi,log_rad)
+model_log_rad = b_rad*log_hemi + loga_rad
+error_rad = log_rad-model_log_rad
+MSE_rad = np.mean(error_rad**2)
+CF_rad = np.exp(MSE_rad/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+a_rad = np.exp(loga_rad)
+
+print "========================================"
+print " hemiphoto -> MacArthur-Horn"
+print " LAD_MH = ", a_MH, " x LAD_hemi^", b_MH
+print " R^2 = ", r_MH**2, "; p = ", p_MH
+
+print " hemiphoto -> radiative transfer model"
+print " LAD_rad = ", a_rad, " x LAD_hemi^", b_rad
+print " R^2 = ", r_rad**2, "; p = ", p_rad
+print "========================================"
+
+# Repeat for plot-level (1 ha) averages
+MacHorn_ha = np.zeros(N_plots)
+rad_ha = np.zeros(N_plots)
+hemiphot_ha = np.zeros(N_plots)
+
+for pp in range(0, N_plots):
+    MacHorn_ha[pp] = np.mean(MacArthurHorn_LAI[Plots[pp]])
+    rad_ha[pp] = np.mean(radiative_DTM_LAI[Plots[pp]][:,-1])
+    hemiphot_ha[pp] = np.mean(Hemisfer_LAI[Plots[pp]])
+
+log_MH_ha = np.log(MacHorn_ha)
+log_rad_ha = np.log(rad_ha)
+log_hemi_ha = np.log(hemiphot_ha)
+
+b_MH, loga_MH, r_MH, p_MH, serr_MH = stats.linregress(log_hemi_ha,log_MH_ha)
+model_log_MH = b_MH*log_hemi + loga_MH
+error_MH = log_MH-model_log_MH
+MSE_MH = np.mean(error_MH**2)
+CF_MH = np.exp(MSE_MH/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+a_MH = np.exp(loga_MH)
+
+b_rad, loga_rad, r_rad, p_rad, serr_rad = stats.linregress(log_hemi_ha,log_rad_ha)
+model_log_rad = b_rad*log_hemi + loga_rad
+error_rad = log_rad-model_log_rad
+MSE_rad = np.mean(error_rad**2)
+CF_rad = np.exp(MSE_rad/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+a_rad = np.exp(loga_rad)
+print "========================================"
+print " hemiphoto -> MacArthur-Horn"
+print " LAD_MH = ", CF_MH*a_MH, " x LAD_hemi^", b_MH
+print " R^2 = ", r_MH**2, "; p = ", p_MH
+
+print " hemiphoto -> radiative transfer model"
+print " LAD_rad = ", CF_rad*a_rad, " x LAD_hemi^", b_rad
+print " R^2 = ", r_rad**2, "; p = ", p_rad
+print "========================================"
+
+# Now create some model values for plotting alongside data
+LAI_hemi_mod = np.arange(np.min(hemiphot_all),np.max(hemiphot_all),0.001)
+LAI_rad_mod = CF_rad*a_rad*LAI_hemi_mod**b_rad
+LAI_MH_mod = CF_MH*a_MH*LAI_hemi_mod**b_MH
+
 plt.figure(5, facecolor='White',figsize=[9,4])
 ax5a = plt.subplot2grid((1,3),(0,0))
 ax5a.set_xlabel('LAI$_{Hemisfer}$')
@@ -359,6 +444,7 @@ for i in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
     y_err=np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
     ax5a.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),x_err,y_err,'o',color='black')
+ax5a.plot(LAI_hemi_mod, LAI_MH_mod, '-', color = 'k')
 
 
 ax5b = plt.subplot2grid((1,3),(0,1), sharex=ax5a, sharey=ax5a)
@@ -376,6 +462,8 @@ for i in range(0,N_plots):
     y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
     ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err1,marker='o',color='black',mfc='white')
     ax5b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err2,marker='o',color='black')
+
+ax5b.plot(LAI_hemi_mod, LAI_rad_mod, '-', color = 'k')
 
 
 ax5c = plt.subplot2grid((1,3),(0,2), sharex=ax5a)
@@ -397,7 +485,7 @@ ax5a.set_xlim((0,10))
 ax5a.set_ylim((0,20))
 ax5c.set_ylim(ymin=0)
 plt.tight_layout()
-plt.savefig(output_dir+'GEM_subplot_LAI_comparison.png')
+#plt.savefig(output_dir+'GEM_subplot_LAI_comparison.png')
 plt.show()
 
 

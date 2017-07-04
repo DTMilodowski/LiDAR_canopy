@@ -59,3 +59,48 @@ def twoD_least_squares_polynomial(x,y,z,order=1):
     b = Z.copy()
     coeff, r, rank, s = np.linalg.lstsq(A, b)
     return coeff
+
+# perform a least squares affine transformation to map a set of coordinates x,y to a transformed coordinate set x',y'.
+# input arguments:
+#   x -       the original x coordinate
+#   y -       the original y coordinate 
+#   x_prime - the target x coordinate
+#   y_prime - the target y coordinate
+#   shear   - a flag to determine whether points can be sheared in addition 
+#             to rotation and translation (default is False)
+def least_squares_affine_matrix(x,y,x_prime,y_prime,shear=False):
+    # first get points for a given plot and build matrices
+    n_points = x.size
+    A=np.zeros((2*n_points,6))
+    b=np.zeros(2*n_points)
+    
+    for ii in range(0,n_points):
+        A[ii,0]=x[ii]
+        A[ii,1]=y[ii]
+        A[ii,2]=1
+
+        A[ii+n_points,3]=x[ii]
+        A[ii+n_points,4]=y[ii]
+        A[ii+n_points,5]=1
+
+        b[ii] = x_prime[ii]
+        b[ii+n_points] = y_prime[ii]
+
+    # now perform least squares inversion to find parameters of the optimal 2D rotation-translation affine transformation
+    h, res, rank, s = np.linalg.lstsq(A,b)
+    print  '%.3f' % h[0], '\t%.3f' % h[1], '\t%.3f' % h[2]
+    print  '%.3f' % h[3], '\t%.3f' % h[4], '\t%.3f' % h[5]
+    print '0\t0\t1'
+    # now construct the affine transformation matrix
+    affine = np.zeros((3,3))
+    affine[0,0]=h[0]
+    affine[0,1]=h[1]
+    affine[0,2]=h[2]
+    affine[1,0]=h[3]
+    affine[1,1]=h[4]
+    affine[1,2]=h[5]
+    affine[2,0]=0
+    affine[2,1]=0
+    affine[2,2]=1
+        
+    return affine

@@ -266,7 +266,7 @@ plt.savefig(output_dir+'fig1_plot_pointclouds.png')
 # the canopy, defined as the transmittance ratio.
  
 # A figure illustrating transmittance ratio between successive returns 
-plt.figure(2, facecolor='White',figsize=[4,4])
+plt.figure(2, facecolor='White',figsize=[3,3])
 ax2 = plt.subplot2grid((1,1),(0,0))
 ax2.set_xlabel('return number')
 ax2.set_ylabel('transmittance ratio')
@@ -701,14 +701,123 @@ plt.savefig(output_dir+'fig8_LiDAR_LAI_BasalArea_comparison.png')
 
 #--------------------------------------------------------------------------------------
 # Now put together a table that has all the LAI estimates
-f = open('BALI_LAI_table.csv',"w") #opens file
-f.write("Plot, BasalArea, error, CrownVolume, error, LAI_MH, error, LAI_Detto, error, LAI_new, error, LAI_hemisfer\n")
+f = open(output_dir+'BALI_LAI_table.csv',"w") #opens file
+f.write("Plot, BasalArea, error, CrownVolume, error, LAI_MH, error, LAI_Detto, error,  LAI_Detto, error, LAI_new, error, LAI_new, error, LAI_hemisfer\n")
 for i in range(0,N_plots):
     f.write(Plots[i]+", ")
-    f.write(str(np.mean(BA[Plots[i]]))+", "+str(np.std(BA[Plots[i]])/n_subplots) + ", ")
-    f.write(str(np.mean(inventory_LAI[Plots[i]]))+", "+str(np.std(inventory_LAI[Plots[i]])/n_subplots) + ", ")
-    f.write(str(np.mean(MacArthurHorn_LAI[Plots[i]]))+", "+str(np.std(MacArthurHorn_LAI[Plots[i]])/n_subplots) + ", ")
-    f.write(str(np.mean(radiative_LAI[Plots[i]]))+", "+str(np.std(radiative_LAI[Plots[i]])/n_subplots) + ", ")
-    f.write(str(np.mean(radiative_DTM_LAI[Plots[i]]))+", "+str(np.std(radiative_DTM_LAI[Plots[i]])/n_subplots) + ", ")
-    f.write(str(np.mean(Hemisfer_LAI[Plots[i]]))+", "+str(np.std(Hemisfer_LAI[Plots[i]])/n_subplots) + "\n")
+    f.write(str(np.mean(BA[Plots[i]]))+", "+str(np.std(BA[Plots[i]])/np.sqrt(n_subplots)) + ", ")
+    f.write(str(np.mean(inventory_LAI[Plots[i]]))+", "+str(np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)) + ", ")
+    f.write(str(np.mean(MacArthurHorn_LAI[Plots[i]]))+", "+str(np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)) + ", ")
+    f.write(str(np.mean(radiative_LAI[Plots[i]][:,1]))+", "+str(np.std(radiative_LAI[Plots[i]][:,1])/np.sqrt(n_subplots)) + ", ")
+    f.write(str(np.mean(radiative_LAI[Plots[i]][:,2]))+", "+str(np.std(radiative_LAI[Plots[i]][:,2])/np.sqrt(n_subplots)) + ", ")
+    f.write(str(np.mean(radiative_DTM_LAI[Plots[i]][:,1]))+", "+str(np.std(radiative_DTM_LAI[Plots[i]][:,1])/np.sqrt(n_subplots)) + ", ")
+    f.write(str(np.mean(radiative_DTM_LAI[Plots[i]][:,2]))+", "+str(np.std(radiative_DTM_LAI[Plots[i]][:,2])/np.sqrt(n_subplots)) + ", ")
+    f.write(str(np.mean(Hemisfer_LAI[Plots[i]]))+", "+str(np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)) + "\n")
 f.close()
+
+
+
+#--------------------------------------------------------------------------------------
+# Supplementary figures
+figS_plots = ['Seraya', 'DC1', 'DC2','E', 'B South']
+figS_codes = ['MAO02', 'DAN04', 'DAN05', 'SAF03', 'SAF01']
+for pp in range(0,5):
+    Plot_name = figS_plots[pp]
+    plt.figure(9, facecolor='White',figsize=[8,12])
+    axSa = plt.subplot2grid((3,5),(0,0),rowspan=2, colspan=5)
+    axSa.annotate('a - ' + figS_codes[pp], xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axSa.set_ylabel('Height / m',fontsize=axis_size)
+    axSa.set_xlabel('Horizontal distance / m',fontsize=axis_size)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plot_lidar_pts = plot_point_cloud[figS_plots[pp]]
+    for k in range(0,max_return):
+    
+        mask = np.all((plot_lidar_pts[:,0]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,1]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,3]==k+1),axis=0)
+        points_x = 100-plot_lidar_pts[mask][:,0]
+        points_z = plot_lidar_pts[mask][:,2]
+        points_y = plot_lidar_pts[mask][:,1]
+        
+        alpha_max = 0.2
+        colours = np.zeros((points_x.size,4))
+        colours[:,0]=rgb[k][0]/255.
+        colours[:,1]=rgb[k][1]/255.
+        colours[:,2]=rgb[k][2]/255.
+        colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
+        axSa.scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=2)
+        axSa.scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=2,label=labels[k])
+
+    axSa.set_ylim(0,80)
+    axSa.set_xlim(0,100)
+    axSa.legend(loc=1,fontsize=axis_size)
+
+    axSb = plt.subplot2grid((3,5),(2,0), sharey = axSa)
+    axSb.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axSb.set_ylabel('Height / m',fontsize=axis_size)
+    axSb.set_xlabel('Number of returns\n(x1000)',fontsize=axis_size,horizontalalignment='center')
+    # - MacHorn
+    axSc = plt.subplot2grid((3,5),(2,1),sharey=axSa)
+    axSc.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axSc.set_xlabel('LAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+
+    # - Detto
+    axSd = plt.subplot2grid((3,5),(2,2),sharey=axSa,sharex=axSc)
+    axSd.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axSd.set_xlabel('LAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    # - Corrected rad trans
+    axSe = plt.subplot2grid((3,5),(2,3),sharey=axSa,sharex=axSc)
+    axSe.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axSe.set_xlabel('LAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    # - Inventory
+    axSf = plt.subplot2grid((3,5),(2,4),sharey=axSa)
+    axSf.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axSf.set_xlabel('Crown Volume\n(m$^3$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    
+    # plot lidar profile
+    return_dist_adj = np.sum(lidar_profiles_adjusted[Plot_name],axis=0)
+    return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
+    labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
+    for k in range(0,max_return):
+        axSb.plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1,label=labels[k])
+
+    # plot macarthur horn profile
+    for i in range(0,n_subplots):
+        axSc.fill_betweenx(heights,0,MacArthurHorn_LAD[Plot_name][i,:],color=colour[0],alpha=0.05)
+    axSc.plot(np.mean(MacArthurHorn_LAD[Plot_name],axis=0),heights,'-',c=colour[0],linewidth=2)
+
+    # plot detto profile
+    for i in range(0,n_subplots):
+        axSd.fill_betweenx(heights_rad,0,radiative_LAD[Plot_name][i,:,-1][::-1],color=colour[1],alpha=0.05)
+    axSd.plot(np.mean(radiative_LAD[Plot_name][:,:,-1],axis=0)[::-1],heights_rad,'-',c=colour[1],linewidth=2)
+
+    # plot corrective radiative transfer profile
+    for i in range(0,n_subplots):
+        axSe.fill_betweenx(heights_rad,0,radiative_DTM_LAD[Plot_name][i,:,-1][::-1],color=colour[1],alpha=0.05)
+    axSe.plot(np.mean(radiative_DTM_LAD[Plot_name][:,:,-1],axis=0)[::-1],heights_rad,'-',c=colour[1],linewidth=2)
+
+    # field inventory
+    for i in range(0,n_subplots):
+        axSf.fill_betweenx(heights,0,inventory_LAD[Plot_name][i,:],color=colour[2],alpha=0.05)
+    axSf.plot(np.mean(inventory_LAD[Plot_name],axis=0),heights,'-',c=colour[2],linewidth=2)
+
+
+
+    axSa.set_ylim(0,80)
+    axSb.set_xlim(0,29)
+    axSc.set_xlim(xmin=0,xmax=0.7)
+    axSf.set_xlim(xmin=0,xmax=2.0)
+
+    axSb.locator_params(axis='x',nbins=5)
+    axSc.locator_params(axis='x',nbins=5)
+    axSd.locator_params(axis='x',nbins=5)
+    axSe.locator_params(axis='x',nbins=5)
+    axSf.locator_params(axis='x',nbins=5)
+
+
+    yticklabels = axSc.get_yticklabels() + axSd.get_yticklabels() + axSe.get_yticklabels() + axSf.get_yticklabels()
+
+    plt.setp(yticklabels,visible=False)
+    plt.subplots_adjust(wspace = 0.1)
+
+    plt.savefig(output_dir+'figS'+str(pp+1)+'_plot_pointclouds.png')
+
+

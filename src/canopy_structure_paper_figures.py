@@ -332,7 +332,7 @@ plt.figure(4, facecolor='White',figsize=[8,12])
 # - returns
 ax4a = plt.subplot2grid((3,5),(0,0))
 ax4a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4a.annotate('MAO01, OG', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+#ax4a.annotate('MAO01, OG', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 ax4a.annotate('LiDAR returns', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 ax4a.set_ylabel('Height / m',fontsize=axis_size)
 # - MacHorn
@@ -343,6 +343,7 @@ ax4b.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgro
 ax4c = plt.subplot2grid((3,5),(0,2),sharey=ax4a,sharex=ax4b)
 ax4c.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4c.annotate('rad. trans.\n(Detto)', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+ax4c.set_title('Old-growth forest, MAO01', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 # - Corrected rad trans
 ax4d = plt.subplot2grid((3,5),(0,3),sharey=ax4a,sharex=ax4b)
 ax4d.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -356,7 +357,7 @@ ax4e.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroun
 # - returns
 ax4f = plt.subplot2grid((3,5),(1,0), sharex = ax4a, sharey = ax4a)
 ax4f.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4f.annotate('SAF04, ML', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+#ax4f.annotate('SAF04, ML', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 ax4f.set_ylabel('Height / m',fontsize=axis_size)
 # - MacHorn
 ax4g = plt.subplot2grid((3,5),(1,1),sharey=ax4a, sharex=ax4b)
@@ -364,6 +365,7 @@ ax4g.annotate('g', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='non
 # - Detto
 ax4h = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=ax4b)
 ax4h.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax4h.set_title('Moderately logged forest, SAF04', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 # - Corrected rad trans
 ax4i = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=ax4b)
 ax4i.annotate('i', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -376,7 +378,7 @@ ax4j.annotate('j', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='non
 # - returns
 ax4k = plt.subplot2grid((3,5),(2,0), sharex = ax4a, sharey = ax4a)
 ax4k.annotate('k', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4k.annotate('SAF02, HL', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+#ax4k.annotate('SAF02, HL', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 ax4k.set_ylabel('Height / m',fontsize=axis_size)
 ax4k.set_xlabel('Number of returns\n(x1000)',fontsize=axis_size,horizontalalignment='center')
 # - MacHorn
@@ -388,6 +390,7 @@ ax4l.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalig
 ax4m = plt.subplot2grid((3,5),(2,2),sharey=ax4a,sharex=ax4b)
 ax4m.annotate('m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4m.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+ax4h.set_title('Heavily logged forest, SAF02', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 # - Corrected rad trans
 ax4n = plt.subplot2grid((3,5),(2,3),sharey=ax4a,sharex=ax4b)
 ax4n.annotate('n', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -452,7 +455,7 @@ xticklabels = ax4a.get_xticklabels() + ax4b.get_xticklabels() + ax4c.get_xtickla
 
 plt.setp(yticklabels,visible=False)
 plt.setp(xticklabels,visible=False)
-plt.subplots_adjust(hspace=0.1, wspace = 0.1)
+plt.subplots_adjust(hspace=0.3, wspace = 0.1)
 
 #plt.tight_layout()
 plt.savefig(output_dir+'fig4_plot_LAD_profiles.png')
@@ -720,7 +723,6 @@ m_MH, c_MH, r_MH, p_MH, err_MH = stats.linregress(basalarea,MH_LAI)
 m_radDTM, c_radDTM, r_radDTM, p_radDTM,  err_radDTM = stats.linregress(basalarea,radDTM_LAI)
 ax8a.annotate('R$^2$=' + '%.3f' % r_MH**2, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 ax8b.annotate('R$^2$=' + '%.3f' % r_radDTM**2, xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
-stats_str = 'R$^2$=' + '%.3f' % r1**2 + p1str + '\nR$^2$=' + '%.3f' % r2**2 + p2str + '\nR$^2$=' + '%.3f' % r**2 + pstr
 
 plt.tight_layout()
 plt.savefig(output_dir+'fig8_LiDAR_LAI_BasalArea_comparison.png')

@@ -343,7 +343,7 @@ ax4b.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgro
 ax4c = plt.subplot2grid((3,5),(0,2),sharey=ax4a,sharex=ax4b)
 ax4c.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4c.annotate('rad. trans.\n(Detto)', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
-ax4c.set_title('Old-growth forest, MAO01', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+ax4c.set_title('Old-growth forest, MAO01', fontsize=10)
 # - Corrected rad trans
 ax4d = plt.subplot2grid((3,5),(0,3),sharey=ax4a,sharex=ax4b)
 ax4d.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -365,7 +365,7 @@ ax4g.annotate('g', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='non
 # - Detto
 ax4h = plt.subplot2grid((3,5),(1,2),sharey=ax4a,sharex=ax4b)
 ax4h.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-ax4h.set_title('Moderately logged forest, SAF04', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+ax4h.set_title('Moderately logged forest, SAF04', fontsize=10)
 # - Corrected rad trans
 ax4i = plt.subplot2grid((3,5),(1,3),sharey=ax4a,sharex=ax4b)
 ax4i.annotate('i', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -390,7 +390,7 @@ ax4l.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalig
 ax4m = plt.subplot2grid((3,5),(2,2),sharey=ax4a,sharex=ax4b)
 ax4m.annotate('m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4m.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
-ax4h.set_title('Heavily logged forest, SAF02', xy=(0.95,0.89), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
+ax4h.set_title('Heavily logged forest, SAF02', fontsize=10)
 # - Corrected rad trans
 ax4n = plt.subplot2grid((3,5),(2,3),sharey=ax4a,sharex=ax4b)
 ax4n.annotate('n', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)

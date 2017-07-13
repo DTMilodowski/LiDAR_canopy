@@ -195,7 +195,8 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         ###Apply correction factor for limited available return
         ##U[:,i,0]=U[:,i,0]*I[:,i,K-1]
         ##---------------
-        ## Update below - applying correction factor across all available returns???
+        ## Update below - applying correction factor across all available returns, as indicated in
+        ## equation 5 from their paper
         for k in range(0,K):
             U[:,i,k]=U[:,i,k]*I[:,i,-1]
         control[:,i]=n1>0

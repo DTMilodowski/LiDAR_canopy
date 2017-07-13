@@ -549,7 +549,7 @@ for i in range(0,N_plots):
 ax6c = plt.subplot2grid((1,3),(0,2), sharex=ax6a)
 ax6c.annotate('c - field inventory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax6c.set_xlabel('PAI$_{Hemisfer}$',fontsize=axis_size)
-ax6c.set_ylabel('Canopy Volume / m$^3$m$^{-2}$',fontsize=axis_size)
+ax6c.set_ylabel('crown volume / m$^3$m$^{-2}$',fontsize=axis_size)
 
 for i in range(0,N_plots):
     ax6c.plot(Hemisfer_LAI[Plots[i]],inventory_LAI[Plots[i]],'.',color=colour[2],alpha=0.5)

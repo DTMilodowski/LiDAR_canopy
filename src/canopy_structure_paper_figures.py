@@ -89,7 +89,7 @@ for pp in range(0,N_plots):
     bbox_polygon = aux.get_bounding_box(coord_pairs)
     plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon)    
     plot_point_cloud[Plots[pp]]=plot_lidar_pts.copy()
-    print "canopy height = ", np.percentile(plot_lidar_pts[:,2],99), "m"
+    print "canopy height = ", np.percentile(plot_lidar_pts[plot_lidar_pts[:,3]==1,2],99), "m"
 
     # get some subplot-level information
     n_subplots = subplot_polygons[Plot_name].shape[0]
@@ -456,7 +456,7 @@ plt.subplots_adjust(hspace=0.1, wspace = 0.1)
 
 #plt.tight_layout()
 plt.savefig(output_dir+'fig4_plot_LAD_profiles.png')
-plt.show()
+#plt.show()
 
 #--------------------------------------------------------------------------------------
 # Figure 5: comparison of LAD profiles
@@ -710,11 +710,11 @@ ax8b.legend(loc=1,fontsize=axis_size-2)
 # get R-sq for 1 ha plots
 basalarea = np.zeros(N_plots)
 MH_LAI = np.zeros(N_plots)
-radDTM_LAI = np.zeros(plots)
+radDTM_LAI = np.zeros(N_plots)
 for i in range(0,N_plots):
-    basalarea[i]=BA[Plots[i]]
-    MH_LAI[i] = MacArthurHorn_LAI[Plots[i]]
-    radDTM_LAI[i] = radiative_DTM_LAI[Plots[i]]
+    basalarea[i]=np.mean(BA[Plots[i]])
+    MH_LAI[i] = np.mean(MacArthurHorn_LAI[Plots[i]])
+    radDTM_LAI[i] = np.mean(radiative_DTM_LAI[Plots[i]])
 
 m_MH, c_MH, r_MH, p_MH, err_MH = stats.linregress(basalarea,MH_LAI)
 m_radDTM, c_radDTM, r_radDTM, p_radDTM,  err_radDTM = stats.linregress(basalarea,radDTM_LAI)

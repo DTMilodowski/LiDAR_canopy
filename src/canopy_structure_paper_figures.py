@@ -390,7 +390,7 @@ ax4l.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalig
 ax4m = plt.subplot2grid((3,5),(2,2),sharey=ax4a,sharex=ax4b)
 ax4m.annotate('m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4m.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
-ax4h.set_title('Heavily logged forest, SAF02', fontsize=10)
+ax4m.set_title('Heavily logged forest, SAF02', fontsize=10)
 # - Corrected rad trans
 ax4n = plt.subplot2grid((3,5),(2,3),sharey=ax4a,sharex=ax4b)
 ax4n.annotate('n', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -455,7 +455,7 @@ xticklabels = ax4a.get_xticklabels() + ax4b.get_xticklabels() + ax4c.get_xtickla
 
 plt.setp(yticklabels,visible=False)
 plt.setp(xticklabels,visible=False)
-plt.subplots_adjust(hspace=0.3, wspace = 0.1)
+plt.subplots_adjust(hspace=0.2, wspace = 0.1)
 
 #plt.tight_layout()
 plt.savefig(output_dir+'fig4_plot_LAD_profiles.png')
@@ -708,7 +708,7 @@ for i in range(0,N_plots):
     ax8b.errorbar(np.mean(BA[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker=plot_marker[Plots[i]],markerfacecolor=plot_colour[Plots[i]], markeredgecolor='black',ecolor='black',linestyle='None',label = plot_label[Plots[i]])
 
 ax8a.set_ylim((0,20))
-ax8b.legend(loc=1,fontsize=axis_size-2)
+ax8b.legend(loc='lower right',fontsize=axis_size-2)
 
 # get R-sq for 1 ha plots
 basalarea = np.zeros(N_plots)

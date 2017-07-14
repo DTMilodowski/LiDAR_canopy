@@ -154,3 +154,60 @@ def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, 
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
 
+
+#---------------------------------------
+# SMALL SAFE PLOTS DATA
+# some code to load in the survey data on small stems from the small SAFE plots
+def load_SAFE_small_plot_data(filename):
+    datatype = {'names': ('Block', 'Plot', 'TreeID', 'DBH', 'Height', 'CrownRadius'), 'formats': ('S3','i8','S8','f16','f16','f16')}
+    data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
+    
+    block_dict = {}
+    blocks = np.unique(data['Block'])
+
+    # some basic params
+    bin_width = 0.5
+
+    for bb in range(0,blocks.size):
+        mask = data['Block']==blocks[bb]
+        plots = np.unique(data['Plot'][mask])
+        
+        DBH = np.arange(0.,10.,bin_width)+bin_width/2.
+
+        n_stems = np.zeros((DBH.size,plots.size))
+        sum_height = np.zeros((DBH.size,plots.size))
+        n_height = np.zeros((DBH.siz,plots.size))
+        sum_area = np.zeros((DBH.size,plots.size))
+        n_area = np.zeros((DBH.size,plots.size))
+
+        for pp in range(0,plots.size):
+            mask2 = np.all((data['Block']==blocks[bb],data['Plot']==plots[pp]),axis=0)            
+            n_trees = mask2.sum()
+
+            # loop through trees and only look at trees < 10 cm DBH
+            for tt in range(n_trees):
+                dbh = data['DBH'][mask2][tt]
+                if dbh<10.:
+                    ii = np.floor(dbh/bin_width)
+                    n_stems[ii,pp]+=1.
+                    ht = data['Height'][mask2][tt]
+                    if np.isfinite(ht):
+                        sum_height[ii,pp]+=ht
+                        n_height[ii,pp]+=1
+                    rad = data['CrownRadius'][mask2][tt]
+                    if np.isfinite(rad):
+                        sum_area[ii,pp]+=np.pi*rad**2
+                        n_area[ii,pp]+=1
+
+        # get plot means
+        mean_height = sum_height/n_height
+        mean_area = sum_area/n_area
+
+        # plot
+        crown_geometry = {}
+        crown_geometry['n_stems'] = np.mean(n_stems,axis=1)
+        crown_geometry['height'] = np.mean(mean_height,axis=1)
+        crown_geometry['area'] = np.mean(mean_area,axis=1)
+        block_dict[blocks[bb]]= crown_geometry
+        
+    return

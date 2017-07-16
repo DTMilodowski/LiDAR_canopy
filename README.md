@@ -5,7 +5,8 @@ This repository hosts a python library to extract quantitative information about
 ## What is in the repository?
 This repository hosts code currently under development.  Consequently, there are many different modules, many of which are surplus to requirements for calculating basic metrics.  For now, I won't give a comprehensive list of the enclosed routines, but rather provide pointers for intrepid explorers to start navigating their way through the core modules.
 
-- LiDAR_tools.py : a bunch of useful tools to interact with LiDAR in python.  Includes interfacing with laspy for i/o and spatial filtering of LiDAR returns based on neighbourhood or polygon boundaries
+- LiDAR_io.py : Interfacing with laspy for i/o and spatial filtering of LiDAR returns based on neighbourhood or polygon boundaries; also constructs kdtrees
+- LiDAR_tools.py : a bunch of useful tools to interact with LiDAR in python includes spatial filtering of LiDAR returns based on neighbourhood or polygon boundaries.
 - auxilliary_functions.py : some generic useful stuff
 - LiDAR_MacHorn_LAD_profiles.py : this code calculates the vertical leaf area distribution (_sensu stricto_ plant area distribution) using the method proposed by Stark et al. [Ecology Letters, 2012], which utilises the MacArthur-Horn-based approach to invert the vertical distribution of first returns
 - LiDAR_radiative_transfer_LAD_profiles.py : this code calculates the vertical leaf area distribution (_sensu stricto_ plant area distribution) using the method proposed by Detto et al. [Journal of Geophysical Research, 2015], which inverts LiDAR distributions based on a stochastic radiative transfer model.  This includes modifications to the model by me to account for variable absorption of LiDAR pulses by canopy material.

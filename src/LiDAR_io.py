@@ -31,26 +31,27 @@ def get_lasfile_bbox(las_file):
 #          - a list of trees
 def load_lidar_data(las_file,max_pts_per_tree = 10**6):
     lasFile = las.file.File(las_file,mode='r')
-    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank),dtype='float16').transpose()
+    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank)).transpose().astype('float16')
     pts = pts[pts[:,2]>=0,:]
 
     # now create kdtrees :-)
-    npts = pts.size
-    ntrees = np.ceil(npts/float(max_pts_per_tree));
+    npts = pts.shape[0]
+    ntrees = np.ceil(npts/float(max_pts_per_tree))
+    print npts,ntrees, int(ntrees)
     trees = []
-    starting_ids = np.zeros(n_trees,dtype='int')
+    starting_ids = []
     
     for tt in range(0,ntrees):
         i0=tt*max_pts_per_tree
         i1 = (tt+1)*max_pts_per_tree
-        if i1 < pts.size:
+        if i1 < pts.shape[0]:
             trees.append(spatial.cKDTree(pts[i0:i1,0:2],leafsize=32,balanced_tree=True))
         else:
             trees.append(spatial.cKDTree(pts[i0:,0:2],leafsize=32,balanced_tree=True))
-        starting_ids[tt] = i0
+        starting_ids.append(i0)
 
     print "loaded ", pts[:,0].size, " points"
-    return pts, starting_ids, trees
+    return pts, np.asarray(starting_ids,dtype='int'), trees
 
 
 #----------------------------------------------------------------------------
@@ -96,7 +97,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
         pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
 
         # now create kdtrees
-        npts = pts.size
+        npts = pts.shape[0]
         ntrees = np.ceil(npts/float(max_pts_per_tree));
         trees = []
         starting_ids = []
@@ -119,7 +120,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
             pts_ = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
 
             # create kdtrees
-            npts = pts_.size
+            npts = pts_.shape[0]
             ntrees = np.ceil(npts/float(max_pts_per_tree));
             trees = []
             starting_ids = []
@@ -128,7 +129,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
             for tt in range(0,ntrees):
                 i0=tt*max_pts_per_tree
                 i1 = (tt+1)*max_pts_per_tree
-                if i1 < pts_.size:
+                if i1 < pts_.shape[0]:
                     trees.append(spatial.cKDTree(pts_[i0:i1,0:2],leafsize=32,balanced_tree=True))
                 else:
                     trees.append(spatial.cKDTree(pts_[i0:,0:2],leafsize=32,balanced_tree=True))
@@ -137,7 +138,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
             # and finally concatenate the pts with previous ones
             pts = np.concatenate((pts,pts_),axis=0)
 
-    print "loaded ", pts[:,0].size, " points"
+    print "loaded ", pts.shape[0], " points"
     return pts, np.asarray(starting_ids,dtype='int'), trees
 
 #----------------------------------------------------------------------------
@@ -165,7 +166,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**
         pts = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
 
         # now create kdtrees
-        npts = pts.size
+        npts = pts.shape[0]
         ntrees = np.ceil(npts/float(max_pts_per_tree));
         trees = []
         starting_ids = []
@@ -174,7 +175,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**
         for tt in range(0,ntrees):
             i0=tt*max_pts_per_tree
             i1 = (tt+1)*max_pts_per_tree
-            if i1 < pts.size:
+            if i1 < pts.shape[0]:
                 trees.append(spatial.cKDTree(pts[i0:i1,0:2],leafsize=32,balanced_tree=True))
             else:
                 trees.append(spatial.cKDTree(pts[i0:,0:2],leafsize=32,balanced_tree=True))
@@ -186,7 +187,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**
             pts_ = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
 
             # create kdtrees
-            npts = pts_.size
+            npts = pts_.shape[0]
             ntrees = np.ceil(npts/float(max_pts_per_tree));
             trees = []
             starting_ids = []
@@ -195,7 +196,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**
             for tt in range(0,ntrees):
                 i0=tt*max_pts_per_tree
                 i1 = (tt+1)*max_pts_per_tree
-                if i1 < pts_.size:
+                if i1 < pts_.shape[0]:
                     trees.append(spatial.cKDTree(pts_[i0:i1,0:2],leafsize=32,balanced_tree=True))
                 else:
                     trees.append(spatial.cKDTree(pts_[i0:,0:2],leafsize=32,balanced_tree=True))

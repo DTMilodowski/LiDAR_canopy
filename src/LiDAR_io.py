@@ -10,6 +10,18 @@ import laspy as las
 from scipy import spatial
 
 
+# get bounding box from las file
+def get_lasfile_bbox(las_file):
+    lasFile = las.file.File(las_file,mode='r')
+    max_xyz = lasFile.header.max
+    min_xyz = lasFile.header.min
+    UR = np.asarray([max_xyz[0],max_xyz[1]])
+    LR = np.asarray([max_xyz[0],min_xyz[1]])
+    UL = np.asarray([min_xyz[0],max_xyz[1]])
+    LL = np.asarray([min_xyz[0],min_xyz[1]])
+    
+    return UR, LR, UL, LL
+
 # Load lidar data => x,y,z,return,class, scan angle
 # Also creates kd-trees to host data.
 # Returns: - a numpy array containing the points
@@ -35,6 +47,5 @@ def load_lidar_data(las_file,max_pts_per_tree = 10**6):
         starting_ids[tt] = i0
 
     print "loaded ", pts[:,0].size, " points"
-    return pts, starting_ids, 
-
+    return pts, starting_ids, trees
 

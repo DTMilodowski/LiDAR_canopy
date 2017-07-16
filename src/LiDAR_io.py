@@ -143,3 +143,66 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
 #----------------------------------------------------------------------------
 # Next here are scripts that use a point and circular neighbourhood instead
 #----------------------------------------------------------------------------
+# Similar to above but using a focal point (specified by xy) and neighbourhood (specified by radius) to find .las tiles rather than using an input polygon
+def find_las_files_by_neighbourhood(file_list,xy,radius):
+    polygon = np.asarray([[xy[0]+radius,xy[1]+radius], [xy[0]+radius,xy[1]-radius], [xy[0]-radius,xy[1]-radius], [xy[0]-radius,xy[1]+radius]])
+    keep = find_las_files_by_polygon(file_list,polygon)
+    return keep
+
+def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**6):
+    keep_files = find_las_files_by_neighbourhood(file_list,xy,radius)
+    n_files = len(keep_files)
+    trees = []
+    starting_ids = []
+
+    if n_files == 0:
+        print 'WARNING: No files within specified neighbourhood - try again'
+        pts = np.array([])
+
+    else:
+        # first tile
+        tile_pts = load_lidar_data(keep_files[0])
+        pts = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
+
+        # now create kdtrees
+        npts = pts.size
+        ntrees = np.ceil(npts/float(max_pts_per_tree));
+        trees = []
+        starting_ids = []
+        id = 0
+    
+        for tt in range(0,ntrees):
+            i0=tt*max_pts_per_tree
+            i1 = (tt+1)*max_pts_per_tree
+            if i1 < pts.size:
+                trees.append(spatial.cKDTree(pts[i0:i1,0:2],leafsize=32,balanced_tree=True))
+            else:
+                trees.append(spatial.cKDTree(pts[i0:,0:2],leafsize=32,balanced_tree=True))
+            starting_ids.append(id+i0)
+
+        # and loop through the remaining tiles
+        for i in range(1,n_files):
+            tile_pts = load_lidar_data(keep_files[i])
+            pts_ = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
+
+            # create kdtrees
+            npts = pts_.size
+            ntrees = np.ceil(npts/float(max_pts_per_tree));
+            trees = []
+            starting_ids = []
+            id = 0
+    
+            for tt in range(0,ntrees):
+                i0=tt*max_pts_per_tree
+                i1 = (tt+1)*max_pts_per_tree
+                if i1 < pts_.size:
+                    trees.append(spatial.cKDTree(pts_[i0:i1,0:2],leafsize=32,balanced_tree=True))
+                else:
+                    trees.append(spatial.cKDTree(pts_[i0:,0:2],leafsize=32,balanced_tree=True))
+                starting_ids.append(id+i0)
+
+            # and finally concatenate the pts with previous ones
+            pts = np.concatenate((pts,pts_),axis=0)
+
+    print "loaded ", pts[:,0].size, " points"
+    return pts

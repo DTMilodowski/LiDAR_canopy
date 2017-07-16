@@ -145,13 +145,3 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius):
 
     print "loaded ", pts[:,0].size, " points"
     return pts
-
-# This function writes a set of lidar returns into a csv file, so that the same 
-# point cloud samples can be loaded into different software packages
-def points_to_csv(pts,outfile):
-    n_pts,temp = pts.shape
-    f = open(outfile,"w") #opens file
-    f.write("X, Y, Z, k, Class, A\n")
-    for i in range(0,n_pts):
-        f.write(str(pts[i,0])+','+str(pts[i,1])+','+str(pts[i,2])+','+str(pts[i,3])+','+str(pts[i,4])+','+str(pts[i,5])+'\n')
-    f.close()

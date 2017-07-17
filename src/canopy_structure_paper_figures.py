@@ -33,6 +33,7 @@ subplot_coordinate_file = 'BALI_subplot_coordinates_corrected.csv'
 allometry_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Regional/Allometry/Crown_depth_data_SEAsia.csv'
 field_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_DANUM_carbonplots_FieldMapcensus2016.csv'
 LAI_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_LAI_fromHemisphericalPhotos.csv'
+stems_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_small_plot_tree_data.csv'
 
 # also define output directory (for saving figures)
 output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/Figures/'
@@ -76,6 +77,10 @@ field_data = field.load_crown_survey_data(field_file)
 a, b, CF, r_sq, p, H, D = field.retrieve_crown_allometry(allometry_file)
 a_ht, b_ht, CF_ht, a_A, b_A, CF_A = field.calculate_allometric_equations_from_survey(field_data)
 
+# load stem data
+stem_data = field.load_SAFE_small_plot_data(stems_file)
+
+
 # load LAI estimates from hemiphotos
 field_LAI = aux.load_field_LAI(LAI_file)
 
@@ -113,12 +118,30 @@ for pp in range(0,N_plots):
     # set up array to hold the hemisfer LAI estimate
     LAI_hemisfer = np.zeros(n_subplots)
 
+
+    # Also get estimate of lower canopy volume from small SAFE plots
+    if Plot_name in ['Belian','Seraya','DC1','DC2']:
+        block = 'VJR'
+    elif Plot_name in ['B North', 'B South']:
+        block = 'B'
+    elif Plot_name == 'E':
+        block = 'E'
+    elif Plot_name == 'LF':
+        block = 'LF'
+    else:
+        block = '?'
+
+    Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_small_plots(stem_data[block]['dbh'],stem_data[block]['height'],stem_data[block]['stem_density'],a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+    smallstem_LAD_profile = field.calculate_LAD_profiles_from_stem_size_distributions(heights, Area, Depth, Ht, StemDensity, beta)
+
+    pt_count = 0.
     # loop through subplots, calculating both return profiles and LAD distributions
     for i in range(0,n_subplots):
         #print "Subplot: ", subplot_labels[Plot_name][i]
         subplot_index = subplot_labels[Plot_name][i]-1
         # filter lidar points into subplot
         sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_polygons[Plot_name][i,:,:])
+        pt_count += sp_pts.shape[0]
         # first of all, loop through the return numbers to calculate the radiative LAD profiles
         for rr in range(0,max_return):
             max_k=rr+1
@@ -141,10 +164,12 @@ for pp in range(0,N_plots):
         mask = np.all((field_data['plot']==Plot_name,field_data['subplot']==subplot_labels[Plot_name][i]),axis=0)
         Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
         field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
+        field_LAD_profiles[subplot_index,:]+=smallstem_LAD_profile
         # now load in the LAI estimates from the hemispherical photographs
         Hemisfer_mask = np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)
         LAI_hemisfer[subplot_index] = field_LAI['LAI'][Hemisfer_mask]
-
+    
+    print "average point density = ", pt_count/10.**4, " pts/m^2"
     # now we have looped through and created the different profiles, need to account for any NaN's and apply minimum height
     # to the LAD distributions
     # - set NaN values to zero
@@ -418,23 +443,23 @@ for pp in range(0,3):
 
     # plot macarthur horn profile
     for i in range(0,n_subplots):
-        axes2[pp].fill_betweenx(heights,0,MacArthurHorn_LAD[Plot_name][i,:],color=colour[0],alpha=0.05)
-    axes2[pp].plot(np.mean(MacArthurHorn_LAD[Plot_name],axis=0),heights,'-',c=colour[0],linewidth=2)
+        axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],alpha=0.05)
+    axes2[pp].plot(np.mean(MacArthurHorn_LAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[0],linewidth=2)
 
     # plot detto profile
     for i in range(0,n_subplots):
-        axes3[pp].fill_betweenx(heights_rad,0,radiative_LAD[Plot_name][i,:,-1][::-1],color=colour[1],alpha=0.05)
-    axes3[pp].plot(np.mean(radiative_LAD[Plot_name][:,:,-1],axis=0)[::-1],heights_rad,'-',c=colour[1],linewidth=2)
+        axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
+    axes3[pp].plot(np.mean(radiative_LAD[Plot_name][:,:-3,-1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
     # plot corrective radiative transfer profile
     for i in range(0,n_subplots):
-        axes4[pp].fill_betweenx(heights_rad,0,radiative_DTM_LAD[Plot_name][i,:,-1][::-1],color=colour[1],alpha=0.05)
-    axes4[pp].plot(np.mean(radiative_DTM_LAD[Plot_name][:,:,-1],axis=0)[::-1],heights_rad,'-',c=colour[1],linewidth=2)
+        axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
+    axes4[pp].plot(np.mean(radiative_DTM_LAD[Plot_name][:,:-3,-1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
     # field inventory
     for i in range(0,n_subplots):
-        axes5[pp].fill_betweenx(heights,0,inventory_LAD[Plot_name][i,:],color=colour[2],alpha=0.05)
-    axes5[pp].plot(np.mean(inventory_LAD[Plot_name],axis=0),heights,'-',c=colour[2],linewidth=2)
+        axes5[pp].fill_betweenx(heights[2:],0,inventory_LAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
+    axes5[pp].plot(np.mean(inventory_LAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
 
 
 
@@ -809,23 +834,23 @@ for pp in range(0,5):
 
     # plot macarthur horn profile
     for i in range(0,n_subplots):
-        axSc.fill_betweenx(heights,0,MacArthurHorn_LAD[Plot_name][i,:],color=colour[0],alpha=0.05)
-    axSc.plot(np.mean(MacArthurHorn_LAD[Plot_name],axis=0),heights,'-',c=colour[0],linewidth=2)
+        axSc.fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],alpha=0.05)
+    axSc.plot(np.mean(MacArthurHorn_LAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[0],linewidth=2)
 
     # plot detto profile
     for i in range(0,n_subplots):
-        axSd.fill_betweenx(heights_rad,0,radiative_LAD[Plot_name][i,:,-1][::-1],color=colour[1],alpha=0.05)
-    axSd.plot(np.mean(radiative_LAD[Plot_name][:,:,-1],axis=0)[::-1],heights_rad,'-',c=colour[1],linewidth=2)
+        axSd.fill_betweenx(heights_rad[3:],0,radiative_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
+    axSd.plot(np.mean(radiative_LAD[Plot_name][:,:-3,-1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
     # plot corrective radiative transfer profile
     for i in range(0,n_subplots):
-        axSe.fill_betweenx(heights_rad,0,radiative_DTM_LAD[Plot_name][i,:,-1][::-1],color=colour[1],alpha=0.05)
-    axSe.plot(np.mean(radiative_DTM_LAD[Plot_name][:,:,-1],axis=0)[::-1],heights_rad,'-',c=colour[1],linewidth=2)
+        axSe.fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
+    axSe.plot(np.mean(radiative_DTM_LAD[Plot_name][:,:-3,-1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
     # field inventory
     for i in range(0,n_subplots):
-        axSf.fill_betweenx(heights,0,inventory_LAD[Plot_name][i,:],color=colour[2],alpha=0.05)
-    axSf.plot(np.mean(inventory_LAD[Plot_name],axis=0),heights,'-',c=colour[2],linewidth=2)
+        axSf.fill_betweenx(heights[2:],0,inventory_LAD[Plot_name][i,:][2:],color=colour[2],alpha=0.05)
+    axSf.plot(np.mean(inventory_LAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
 
 
 

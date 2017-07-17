@@ -157,8 +157,9 @@ def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, 
 
 #---------------------------------------
 # SMALL SAFE PLOTS DATA
-# some code to load in the survey data on small stems from the small SAFE plots
-def load_SAFE_small_plot_data(filename):
+# some code to load in the survey data on small stems from the small SAFE plots.
+# Numbers of stems are given as a  per-metre density
+def load_SAFE_small_plot_data(filename, plot_area=25.*25.):
     datatype = {'names': ('Block', 'Plot', 'TreeID', 'DBH', 'Height', 'CrownRadius'), 'formats': ('S3','i8','S8','f16','f16','f16')}
     data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
     
@@ -176,7 +177,7 @@ def load_SAFE_small_plot_data(filename):
 
         n_stems = np.zeros((DBH.size,plots.size))
         sum_height = np.zeros((DBH.size,plots.size))
-        n_height = np.zeros((DBH.siz,plots.size))
+        n_height = np.zeros((DBH.size,plots.size))
         sum_area = np.zeros((DBH.size,plots.size))
         n_area = np.zeros((DBH.size,plots.size))
 
@@ -194,20 +195,69 @@ def load_SAFE_small_plot_data(filename):
                     if np.isfinite(ht):
                         sum_height[ii,pp]+=ht
                         n_height[ii,pp]+=1
-                    rad = data['CrownRadius'][mask2][tt]
-                    if np.isfinite(rad):
-                        sum_area[ii,pp]+=np.pi*rad**2
-                        n_area[ii,pp]+=1
+                    #rad = data['CrownRadius'][mask2][tt]
+                    #if np.isfinite(rad):
+                    #    sum_area[ii,pp]+=np.pi*rad**2
+                    #    n_area[ii,pp]+=1.
 
         # get plot means
         mean_height = sum_height/n_height
-        mean_area = sum_area/n_area
+        #mean_area = sum_area/n_area
 
         # plot
         crown_geometry = {}
-        crown_geometry['n_stems'] = np.mean(n_stems,axis=1)
-        crown_geometry['height'] = np.mean(mean_height,axis=1)
-        crown_geometry['area'] = np.mean(mean_area,axis=1)
+        crown_geometry['dbh'] = DBH[1:]
+        crown_geometry['stem_density'] = np.mean(n_stems,axis=1)[1:]/plot_area
+        crown_geometry['height'] = np.mean(mean_height,axis=1)[1:]
+        #crown_geometry['area'] = np.mean(mean_area,axis=1)[1:]
         block_dict[blocks[bb]]= crown_geometry
         
-    return
+    return block_dict
+
+# some code to get crown dimensions for stem size distributions 
+def calculate_crown_dimensions_small_plots(DBH,Ht,stem_density,a_ht, b_ht, CF_ht, a_area, b_area, CF_area, a_depth, b_depth, CF_depth):
+
+    # Get rid of bins with no trees
+    Ht = Ht[stem_density>0]
+    DBH = DBH[stem_density>0]
+    stem_density = stem_density[stem_density>0]
+
+    # Gapfill record with local allometry
+    # Heights
+    mask = np.isnan(Ht)
+    Ht[mask] = CF_ht*a_ht*DBH[mask]**b_ht
+    #Crown areas
+    Area = CF_area*a_area*DBH**b_area
+    # Apply canopy depth model
+    Depth = CF_depth*a_depth*Ht**b_depth
+
+    # Remove any existing nodata values (brought forwards from input data
+    mask = np.all((~np.isnan(Depth),~np.isnan(Ht),~np.isnan(Area)),axis=0)
+    Depth = Depth[mask]
+    Ht = Ht[mask]
+    Area = Area[mask]
+    return Ht, Area, Depth, stem_density
+
+# calculate the crown profiles from the stem size distributions
+def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, Ht, stem_density, beta, leafA_per_unitV=1.):
+
+    r_max = np.sqrt(Area/np.pi)
+    layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
+    N_layers = canopy_layers.size
+    CanopyV = np.zeros(N_layers)
+    pi=np.pi
+    zeros = np.zeros(Ht.size)
+    # Formula for volume of revolution of power law function r = alpha*D^beta:
+    #                 V = pi*(r_max/D_max^beta)^2/(2*beta+1) * (D2^(2beta+1) - D1^(2beta+1))
+    #                 where alpha = (r_max/D_max^beta)^2
+    for i in range(0,N_layers):
+        ht_u = canopy_layers[i]
+        ht_l = ht_u-layer_thickness
+        mask = np.all((Ht>=ht_l,Ht-D<=ht_u),axis=0)
+        d1 = np.max((Ht-ht_u,zeros),axis=0)
+        d2 = np.min((Ht-ht_l,D),axis=0)
+        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta)**2/(2*beta+1) * (d2[mask]**(2*beta+1) - d1[mask]**(2*beta+1))*stem_density[mask] )
+
+    LAD = CanopyV*leafA_per_unitV
+    return LAD
+

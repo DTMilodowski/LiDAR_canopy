@@ -101,3 +101,22 @@ def get_bounding_box_with_buffer(coordinate_list,buffer_width):
     bbox[3,0]=left
     bbox[3,1]=bottom
     return bbox
+
+
+# write R-squared and p-value
+def get_rsquared_annotation(x,y):
+    
+    m, c, r, p, err = stats.linregress(x,y)
+    p_str = ''
+    if  p <= 0.001:
+        p_str='***'
+    elif  p <= 0.01:
+        p_str='**'
+    elif  p <= 0.05:
+        p_str='*'
+    elif p <= 0.1:
+        p_str='$^.$'
+    
+    annotation = '$R^2 = %3.f' + p_str, % r**2
+
+    return annotation

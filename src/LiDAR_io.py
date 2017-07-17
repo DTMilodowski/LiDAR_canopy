@@ -30,26 +30,7 @@ def load_lidar_data(las_file):
     pts = pts[pts[:,2]>=0,:]
     print "loaded ", pts[:,0].size, " points"
     return pts
-    """
-    # now create kdtrees :-)
-    npts = pts.shape[0]
-    ntrees = int(np.ceil(npts/float(max_pts_per_tree)))
-    print npts,ntrees, int(ntrees)
-    trees = []
-    starting_ids = []
-    
-    for tt in range(0,ntrees):
-        i0=tt*max_pts_per_tree
-        i1 = (tt+1)*max_pts_per_tree
-        if i1 < pts.shape[0]:
-            trees.append(spatial.cKDTree(pts[i0:i1,0:2],leafsize=32,balanced_tree=True))
-        else:
-            trees.append(spatial.cKDTree(pts[i0:,0:2],leafsize=32,balanced_tree=True))
-        starting_ids.append(i0)
 
-    print "loaded ", pts[:,0].size, " points"
-    return pts, np.asarray(starting_ids,dtype='int'), trees
-    """
 # a similar script, but now only loading points within bbox into memory
 def load_lidar_data_by_bbox(las_file,N,S,E,W):
     lasFile = las.file.File(las_file,mode='r')

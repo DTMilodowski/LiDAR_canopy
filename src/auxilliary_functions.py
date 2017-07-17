@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy import stats
 ###################################################################################
 # This set of functions provides some auxilliary tools needed for some of the
 # LAD profiles analysis
@@ -117,6 +117,6 @@ def get_rsquared_annotation(x,y):
     elif p <= 0.1:
         p_str='$^.$'
     
-    annotation = '$R^2 = %3.f' % r**2
+    annotation = '$R^2$ = %.3f' % r**2
     annotation = annotation + p_str
     return annotation

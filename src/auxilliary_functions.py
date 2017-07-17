@@ -117,6 +117,6 @@ def get_rsquared_annotation(x,y):
     elif p <= 0.1:
         p_str='$^.$'
     
-    annotation = '$R^2 = %3.f' + p_str, % r**2
-
+    annotation = '$R^2 = %3.f' % r**2
+    annotation = annotation + p_str
     return annotation

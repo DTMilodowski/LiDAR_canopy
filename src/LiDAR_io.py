@@ -98,6 +98,7 @@ def find_las_files_by_polygon(file_list,polygon):
     return keep
 
 # load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.
+# polygon is a 2D array with N_pts*rows and two cols (x,y)
 def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
     keep_files = find_las_files_by_polygon(file_list,polygon)
     n_files = len(keep_files)
@@ -111,6 +112,10 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
                               
     # otherwise, we have work to do!
     else:
+        W = polygon[:,0].min()
+        E = polygon[:,0].max()
+        S = polygon[:,1].min()
+        N = polygon[:,1].max()
         tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W)
         pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
                 

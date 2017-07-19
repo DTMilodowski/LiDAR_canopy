@@ -36,8 +36,8 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W):
     lasFile = las.file.File(las_file,mode='r')
 
     # conditions for points to be included
-    X_valid = np.logical_and((lasFile.x <= E), (inFile.x >= W))
-    Y_valid = np.logical_and((inFile.y <= N), (inFile.y >= S))
+    X_valid = np.logical_and((lasFile.x <= E), (lasFile.x >= W))
+    Y_valid = np.logical_and((lasFile.y <= N), (lasFile.y >= S))
     Z_valid = lasFile.z >= 0
     ii = np.where(np.logical_and(X_valid, Y_valid, Z_valid))
 
@@ -130,6 +130,22 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
 
     print "loaded ", pts.shape[0], " points"
     return pts, starting_ids, trees
+
+# equivalent file but for a single las file
+def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6):
+    W = polygon[:,0].min()
+    E = polygon[:,0].max()
+    S = polygon[:,1].min()
+    N = polygon[:,1].max()
+    tile_pts = load_lidar_data_by_bbox(lasfile,N,S,E,W)
+    pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
+    
+    # now create KDTrees
+    starting_ids, trees = create_KDTree(pts)
+
+    print "loaded ", pts.shape[0], " points"
+    return pts, starting_ids, trees
+
 
 #----------------------------------------------------------------------------
 # Next here are scripts that use a point and circular neighbourhood instead

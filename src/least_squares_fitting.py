@@ -110,6 +110,6 @@ def least_squares_affine_matrix(x,y,x_prime,y_prime,shear=False):
 def apply_affine_transformation(x,y,affine):
     
     X = np.asarray([x,y,np.ones(x.size)])
-    X_prime = np.dot(X)
+    X_prime = np.dot(affine,X)
     
     return X_prime[0], X_prime[1]

@@ -26,7 +26,7 @@ def get_lasfile_bbox(las_file):
 # Returns: - a numpy array containing the points
 def load_lidar_data(las_file):
     lasFile = las.file.File(las_file,mode='r')
-    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank)).transpose().astype('float16')
+    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank)).transpose().astype('float32')
     pts = pts[pts[:,2]>=0,:]
     print "loaded ", pts[:,0].size, " points"
     return pts
@@ -41,7 +41,7 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W):
     Z_valid = lasFile.z >= 0
     ii = np.where(np.logical_and(X_valid, Y_valid, Z_valid))
 
-    pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii])).transpose().astype('float16')
+    pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii])).transpose().astype('float32')
     print "loaded ", pts[:,0].size, " points"
     return pts
 
@@ -68,7 +68,6 @@ def create_KDTree(pts,max_pts_per_tree = 10**6):
             trees.append(spatial.cKDTree(pts[i0:,0:2],leafsize=32,balanced_tree=True))
         starting_ids.append(i0)
 
-    print "loaded ", pts[:,0].size, " points"
     return np.asarray(starting_ids,dtype='int'), trees
 
 
@@ -139,7 +138,6 @@ def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6):
     N = polygon[:,1].max()
     tile_pts = load_lidar_data_by_bbox(lasfile,N,S,E,W)
     pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
-    
     # now create KDTrees
     starting_ids, trees = create_KDTree(pts)
 

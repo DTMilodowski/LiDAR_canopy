@@ -27,10 +27,17 @@ alt_plot = 'maliau_belian'
 
 max_height = 80.
 heights = np.arange(0.,max_height)+1
+heights_rad = np.arange(0,max_height+1)
 n_layers = heights.size
 plot_width = 100.
 sample_res = np.array([1.,2.,5.,10.,20.,25.,50.,100.])
 keys = ['1','2','5','10','20','25','50','100']
+kappa = 0.72
+max_k = 3
+
+area = 10.**4
+target_point_density = np.array([5., 10., 15., 20., 25., 30., 35., 40.])
+target_points = area*target_point_density
 
 #---------------------------------------------------------------------------------------------------------------
 # Load the data etc.
@@ -85,10 +92,37 @@ for ss in range(0,sample_res.size):
 
     # for each of the subplots, clip point cloud and model PAD
     n_subplots = len(subplot)
-    PAD_MH = np.zeros(n_layers,n_subplots+2)
-    PAD_rad1 = np.zeros(n_layers,n_subplots+2)
-    PAD_rad2 = np.zeros(n_layers,n_subplots+2)
+    PAD_MH = np.zeros(n_iter,n_subplots,n_layers)
+    PAD_rad1 = np.zeros(n_iter,n_subplots,n_layers)
+    PAD_rad2 = np.zeros(n_iter,n_subplots,n_layers)
     
     plot_lidar_pts = lidar.filter_lidar_data_by_polygon(pts,bbox_polygon)
-    
+    shots = np.unique(plot_lidar_pts[:,-1]) # get shot ID
 
+    for ii in range(0,n_iter):
+        # subsample the point cloud
+        shots_iter = np.random.choice(shots,size=shot_spacing)
+        mask = np.nonzero(plot_lidar_pts[:,-1][:,None] == shots_iter)[1]
+        pts_iter = plot_lidar_pts[mask,:]
+        # now loop through and get the metrics
+        for pp in range(0,n_subplots):
+            sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter,subplot[pp])
+
+            heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
+            PAD_MH[ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+
+            u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
+            PAD_rad1[ii,pp,:]=u.copy()
+        
+            u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
+            PAD_rad2[ii,pp,:]=u.copy()
+       
+    # now plot the layers of interest
+    # i) the mean profile from all iterations with 50% and 95% CI
+
+    # ii) the standard deviation (or 50% and 95% CI) of each vertical layer
+    # this gives an indication of the reliability of the profile at a given canopy depth
+
+    # iii) PAI vs resolution at different shot spacings
+
+    # iv) PAI vs shot spacing at different resolutions

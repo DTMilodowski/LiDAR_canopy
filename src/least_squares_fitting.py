@@ -88,9 +88,9 @@ def least_squares_affine_matrix(x,y,x_prime,y_prime,shear=False):
 
     # now perform least squares inversion to find parameters of the optimal 2D rotation-translation affine transformation
     h, res, rank, s = np.linalg.lstsq(A,b)
-    print  '%.3f' % h[0], '\t%.3f' % h[1], '\t%.3f' % h[2]
-    print  '%.3f' % h[3], '\t%.3f' % h[4], '\t%.3f' % h[5]
-    print '0\t0\t1'
+    #print  '%.3f' % h[0], '\t%.3f' % h[1], '\t%.3f' % h[2]
+    #print  '%.3f' % h[3], '\t%.3f' % h[4], '\t%.3f' % h[5]
+    #print '0\t0\t1'
     # now construct the affine transformation matrix
     affine = np.zeros((3,3))
     affine[0,0]=h[0]

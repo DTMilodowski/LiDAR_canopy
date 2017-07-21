@@ -24,15 +24,16 @@ def get_lasfile_bbox(las_file):
 
 # Load lidar data => x,y,z,return,class, scan angle
 # Returns: - a numpy array containing the points
-def load_lidar_data(las_file):
+def load_lidar_data(las_file,print_npts=True):
     lasFile = las.file.File(las_file,mode='r')
     pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank, lasFile.gps_time)).transpose().astype('float32')
     pts = pts[pts[:,2]>=0,:]
-    print "loaded ", pts[:,0].size, " points"
+    if print_npts:
+        print "loaded ", pts[:,0].size, " points"
     return pts
 
 # a similar script, but now only loading points within bbox into memory
-def load_lidar_data_by_bbox(las_file,N,S,E,W):
+def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
     lasFile = las.file.File(las_file,mode='r')
 
     # conditions for points to be included
@@ -42,7 +43,8 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W):
     ii = np.where(np.logical_and(X_valid, Y_valid, Z_valid))
 
     pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii], lasFile.gps_time[ii])).transpose().astype('float32')
-    print "loaded ", pts[:,0].size, " points"
+    if print_npts:
+        print "loaded ", pts[:,0].size, " points"
     return pts
 
 #---------------------------------------------------------------------------
@@ -55,7 +57,7 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W):
 def create_KDTree(pts,max_pts_per_tree = 10**6):
     npts = pts.shape[0]
     ntrees = int(np.ceil(npts/float(max_pts_per_tree)))
-    print npts,ntrees, int(ntrees)
+    #print npts,ntrees, int(ntrees)
     trees = []
     starting_ids = []
     
@@ -115,7 +117,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
         E = polygon[:,0].max()
         S = polygon[:,1].min()
         N = polygon[:,1].max()
-        tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W)
+        tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False)
         pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
                 
         # now repeat for subsequent tiles
@@ -136,7 +138,7 @@ def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6):
     E = polygon[:,0].max()
     S = polygon[:,1].min()
     N = polygon[:,1].max()
-    tile_pts = load_lidar_data_by_bbox(lasfile,N,S,E,W)
+    tile_pts = load_lidar_data_by_bbox(lasfile,N,S,E,W,print_npts=False)
     pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
     # now create KDTrees
     starting_ids, trees = create_KDTree(pts)
@@ -166,7 +168,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**
 
     else:
         # first tile
-        tile_pts = load_lidar_data(keep_files[0])
+        tile_pts = load_lidar_data(keep_files[0],print_npts==False)
         pts = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
         # and loop through the remaining tiles
         for i in range(1,n_files):

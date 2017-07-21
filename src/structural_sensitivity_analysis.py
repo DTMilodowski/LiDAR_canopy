@@ -26,18 +26,20 @@ plot = 'Belian'
 alt_plot = 'maliau_belian'
 
 max_height = 80.
+layer_thickness = 1.
 heights = np.arange(0.,max_height)+1
 heights_rad = np.arange(0,max_height+1)
 n_layers = heights.size
 plot_width = 100.
-sample_res = np.array([1.,2.,5.,10.,20.,25.,50.,100.])
-keys = ['1','2','5','10','20','25','50','100']
+sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
+keys = ['2m','5m','10m','20m','25m','50m','100m']
 kappa = 0.72
 max_k = 3
 n_iter = 1000
 
 area = 10.**4
 target_point_density = np.array([5., 10., 15., 20., 25., 30., 35., 40.])
+keys_2 = ['5','10','15','20','25','30','35','40']
 target_points = area*target_point_density
 
 #---------------------------------------------------------------------------------------------------------------
@@ -50,13 +52,12 @@ pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox)
 n_returns = pts.size
 n_shots = np.sum(pts[:,3]==1)
 target_shots = (np.ceil(target_points*n_shots/float(n_returns))).astype('int')
+shots = np.unique(pts[:,-1]) # get unique GPS times to collate points associated with same pulse
 
-PAD_profiles_MH = {}
-PAD_profiles_rad1 = {}
-PAD_profiles_rad2 = {}
-
-
+# Loop through all the spatial scales of interest
 for ss in range(0,sample_res.size):
+    subplots = {}
+    print sample_res[ss]
     # Now create the subplot grids
     rows = int(plot_width/sample_res[ss])
     cols = int(plot_width/sample_res[ss])
@@ -91,35 +92,62 @@ for ss in range(0,sample_res.size):
         for j in range(0,cols):
             bbox = [ [x_prime[i,j], x_prime[i+1,j], x_prime[i+1,j+1], x_prime[i,j+1], x_prime[i,j]],
                      [y_prime[i,j], y_prime[i+1,j], y_prime[i+1,j+1], y_prime[i,j+1], y_prime[i,j]] ]
-            subplot.append( np.asarray(bbox) )
+            subplot.append( np.asarray(bbox).transpose() )
+
+    subplots[keys[ss]] = subplot
+
+# now do the sensitivity analysis 
+
+PAD_profiles_MH = {}
+PAD_profiles_rad1 = {}
+PAD_profiles_rad2 = {}
 
 
-    # for each of the subplots, clip point cloud and model PAD
-    n_subplots = len(subplot)
-    PAD_MH = np.zeros(n_iter,n_subplots,n_layers)
-    PAD_rad1 = np.zeros(n_iter,n_subplots,n_layers)
-    PAD_rad2 = np.zeros(n_iter,n_subplots,n_layers)
-
-    shots = np.unique(pts[:,-1]) # get unique GPS times to collate points associated with same pulse
-
-    for ii in range(0,n_iter):
-        # subsample the point cloud
-        shots_iter = np.random.choice(shots,size=shot_spacing)
-        mask = np.nonzero(plot_lidar_pts[:,-1][:,None] == shots_iter)[1]
-        pts_iter = plot_lidar_pts[mask,:]
-        # now loop through and get the metrics
-        for pp in range(0,n_subplots):
-            sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter,subplot[pp])
-
-            heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
-            PAD_MH[ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-
-            u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
-            PAD_rad1[ii,pp,:]=u.copy()
+pt_dens_MH = {} 
+pt_dens_rad1 = {} 
+pt_dens_rad2 = {} 
+# Loop through all the target point densities
+for dd in range(0,target_points.size):
         
-            u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
-            PAD_rad2[ii,pp,:]=u.copy()
+    # iterate through all iterations, so that we sample point cloud minimum number of times
+    for ii in range(0,n_iter):
+        print ii, n_iter
+        # subsample the point cloud
+        shots_iter = np.random.choice(shots,size=shot_spacing[ss])
+        mask = np.where(np.in1d(pts[:,-1],shots_iter))[0]
+        pts_iter = pts[mask,:]
+
+        # loop through each sampling resolution 
+        for ss in range(0,sample_res.size):
+
+            n_subplots = len(subplot)
+            PAD_MH = np.zeros((n_iter,n_subplots,n_layers))
+            PAD_rad1 = np.zeros((n_iter,n_subplots,n_layers))
+            PAD_rad2 = np.zeros((n_iter,n_subplots,n_layers))
+        
+            # for each of the subplots, clip point cloud and model PAD and get the metrics
+            for pp in range(0,n_subplots):
+                print pp
+                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter,subplot[pp])
+
+                heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
+                PAD_MH[ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+
+                u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
+                PAD_rad1[ii,pp,:]=u[::-1][1:].copy()
+        
+                u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
+                PAD_rad2[ii,pp,:]=u[::-1][1:].copy()
        
+        pt_dens_MH[keys_2[dd]] = PAD_MH.copy() 
+        pt_dens_rad1[keys_2[dd]] = PAD_rad1.copy()
+        pt_dens_rad2[keys_2[dd]] = PAD_rad2.copy()
+
+    # store all profiles in relevant dictionary
+    PAD_profiles_MH[keys[ss]] = pt_dens_MH
+    PAD_profiles_rad1[keys[ss]] = pt_dens_rad1
+    PAD_profiles_rad2[keys[ss]] = pt_dens_rad2
+
     # now plot the layers of interest
     # i) the mean profile from all iterations with 50% and 95% CI
 

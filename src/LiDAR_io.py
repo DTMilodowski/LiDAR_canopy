@@ -41,7 +41,7 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W):
     Z_valid = lasFile.z >= 0
     ii = np.where(np.logical_and(X_valid, Y_valid, Z_valid))
 
-    pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii], lasFile.gps_time)).transpose().astype('float32')
+    pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii], lasFile.gps_time[ii])).transpose().astype('float32')
     print "loaded ", pts[:,0].size, " points"
     return pts
 

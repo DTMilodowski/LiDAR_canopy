@@ -26,7 +26,7 @@ def get_lasfile_bbox(las_file):
 # Returns: - a numpy array containing the points
 def load_lidar_data(las_file):
     lasFile = las.file.File(las_file,mode='r')
-    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank)).transpose().astype('float32')
+    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank, lasFile.gps_time)).transpose().astype('float32')
     pts = pts[pts[:,2]>=0,:]
     print "loaded ", pts[:,0].size, " points"
     return pts

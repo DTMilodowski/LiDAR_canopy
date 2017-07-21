@@ -12,7 +12,7 @@ import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import inventory_based_LAD_profiles as field
 import least_squares_fitting as lstsq
 from scipy import stats
-
+import time
 
 #---------------------------------------------------------------------------------------------------------------
 # Some filenames & params
@@ -31,15 +31,17 @@ heights = np.arange(0.,max_height)+1
 heights_rad = np.arange(0,max_height+1)
 n_layers = heights.size
 plot_width = 100.
-sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
-keys = ['2m','5m','10m','20m','25m','50m','100m']
+#sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
+#keys = ['2m','5m','10m','20m','25m','50m','100m']
+sample_res = np.array([5.,10.,20.,25.,50.,100.])
+keys = ['5m','10m','20m','25m','50m','100m']
 kappa = 0.72
 max_k = 3
-n_iter = 1000
+n_iter = 100
 
 area = 10.**4
-target_point_density = np.array([5., 10., 15., 20., 25., 30., 35., 40.])
-keys_2 = ['5','10','15','20','25','30','35','40']
+target_point_density = np.array([5., 10., 15., 20., 25., 30., 40.])
+keys_2 = ['5','10','15','20','25','30','40']
 target_points = area*target_point_density
 
 #---------------------------------------------------------------------------------------------------------------
@@ -49,14 +51,19 @@ affine=lstsq.least_squares_affine_matrix(plot_coordinates['x'][mask],plot_coordi
 plot_bbox = np.array(lstsq.apply_affine_transformation(plot_coordinates['x'][mask],plot_coordinates['y'][mask],affine)).transpose()
 
 pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox)
-n_returns = pts.size
-n_shots = np.sum(pts[:,3]==1)
+n_returns = pts.shape[0]
+shots = np.unique(pts[:,-1]) 
+n_shots=shots.size
 target_shots = (np.ceil(target_points*n_shots/float(n_returns))).astype('int')
-shots = np.unique(pts[:,-1]) # get unique GPS times to collate points associated with same pulse
+shots = np.unique(pts[:,-1]) 
+
+subplots = {}
+PAD_profiles_MH = {}
+PAD_profiles_rad1 = {}
+PAD_profiles_rad2 = {}
 
 # Loop through all the spatial scales of interest
 for ss in range(0,sample_res.size):
-    subplots = {}
     print sample_res[ss]
     # Now create the subplot grids
     rows = int(plot_width/sample_res[ss])
@@ -96,57 +103,86 @@ for ss in range(0,sample_res.size):
 
     subplots[keys[ss]] = subplot
 
-# now do the sensitivity analysis 
-
-PAD_profiles_MH = {}
-PAD_profiles_rad1 = {}
-PAD_profiles_rad2 = {}
-
-
-pt_dens_MH = {} 
-pt_dens_rad1 = {} 
-pt_dens_rad2 = {} 
-# Loop through all the target point densities
-for dd in range(0,target_points.size):
-        
-    # iterate through all iterations, so that we sample point cloud minimum number of times
-    for ii in range(0,n_iter):
-        print ii, n_iter
-        # subsample the point cloud
-        shots_iter = np.random.choice(shots,size=shot_spacing[ss])
-        mask = np.where(np.in1d(pts[:,-1],shots_iter))[0]
-        pts_iter = pts[mask,:]
-
-        # loop through each sampling resolution 
-        for ss in range(0,sample_res.size):
-
-            n_subplots = len(subplot)
-            PAD_MH = np.zeros((n_iter,n_subplots,n_layers))
-            PAD_rad1 = np.zeros((n_iter,n_subplots,n_layers))
-            PAD_rad2 = np.zeros((n_iter,n_subplots,n_layers))
-        
-            # for each of the subplots, clip point cloud and model PAD and get the metrics
-            for pp in range(0,n_subplots):
-                print pp
-                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter,subplot[pp])
-
-                heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
-                PAD_MH[ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-
-                u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
-                PAD_rad1[ii,pp,:]=u[::-1][1:].copy()
-        
-                u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
-                PAD_rad2[ii,pp,:]=u[::-1][1:].copy()
-       
-        pt_dens_MH[keys_2[dd]] = PAD_MH.copy() 
-        pt_dens_rad1[keys_2[dd]] = PAD_rad1.copy()
-        pt_dens_rad2[keys_2[dd]] = PAD_rad2.copy()
+    n_subplots=len(subplot)
+    PAD = np.zeros((n_iter,n_subplots,n_layers))
+    # set up dictionaries to hold the profiles
+    pt_dens_MH={}
+    pt_dens_rad1={}
+    pt_dens_rad2={}
+    for dd in range(0,target_points.size):       
+        pt_dens_MH[keys_2[dd]] = PAD.copy() 
+        pt_dens_rad1[keys_2[dd]] = PAD.copy()
+        pt_dens_rad2[keys_2[dd]] = PAD.copy()
 
     # store all profiles in relevant dictionary
-    PAD_profiles_MH[keys[ss]] = pt_dens_MH
-    PAD_profiles_rad1[keys[ss]] = pt_dens_rad1
-    PAD_profiles_rad2[keys[ss]] = pt_dens_rad2
+    PAD_profiles_MH[keys[ss]] = pt_dens_MH.copy()
+    PAD_profiles_rad1[keys[ss]] = pt_dens_rad1.copy()
+    PAD_profiles_rad2[keys[ss]] = pt_dens_rad2.copy()
+    
+
+PAD = None
+
+#-----------------------------------------------------
+# now do the sensitivity analysis 
+# Loop through all the target point densities
+for dd in range(0,target_points.size):
+    print 'target point density = ', target_point_density[dd]
+    # iterate through all iterations, so that we sample point cloud minimum number of times
+    for ii in range(0,n_iter):
+        start_time = time.time()
+        print 'iteration ', ii+1,'/',n_iter, ' for point density ', dd+1,' of ', target_points.size 
+        # subsample the point cloud - this is tricky because we are sampling with replacement, but for
+        # every sample there could be up to kmax returns!  All these returns need to be pulled out so
+        # that we are resampling by pulse, not point
+        shots_iter = np.random.choice(shots,size=target_shots[dd])
+        mask = np.in1d(pts[:,-1],shots_iter)
+        pts_iter = pts[mask,:]
+
+        #-------------------
+        # this chunk of code makes sure that pulses sampled multiple times are properly accounted for 
+        temp_shots = shots_iter.copy()
+        vals, idx_start= np.unique(temp_shots, return_index=True)
+        temp_shots = np.delete(temp_shots,idx_start)
+        count =1
+        while temp_shots.size>0:
+            count+=1
+            mask = np.in1d(pts[:,-1],temp_shots)
+            pts_iter = np.concatenate((pts_iter,pts[mask,:]))
+            vals, idx_start= np.unique(temp_shots, return_index=True)
+            temp_shots = np.delete(temp_shots,idx_start)
+        #-------------------
+        
+        #print '\t\t', target_point_density[dd],'-' , pts_iter.shape[0]/100.**2 , count
+        starting_ids, trees = io.create_KDTree(pts_iter) 
+        # loop through each sampling resolution 
+        for ss in range(0,sample_res.size):
+            print '\t - sample res = ', keys[ss]
+            n_subplots = len(subplots[keys[ss]])
+            # for each of the subplots, clip point cloud and model PAD and get the metrics
+            for pp in range(0,n_subplots):
+                # query the tree to locate points of interest
+                # note that we will only have one tree for number of points in sensitivity analysis  
+                centre_x = np.mean(subplots[keys[ss]][pp][0:4,0])
+                centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
+                radius = np.sqrt(sample_res[ss]**2/2.)              
+                ids = trees[0].query_ball_point([centre_x,centre_y], radius)
+                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp])
+                #------
+                heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
+                PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+                #------
+                u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
+                PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
+                #------
+                u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
+                PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
+        end_time = time.time()
+        print '\t loop time = ', end_time - start_time
+
+
+np.save("MH_sensitivity.npy", PAD_profiles_MH)
+np.save("rad1_sensitivity.npy", PAD_profiles_rad1)
+np.save("rad2_sensitivity.npy", PAD_profiles_rad2)
 
     # now plot the layers of interest
     # i) the mean profile from all iterations with 50% and 95% CI

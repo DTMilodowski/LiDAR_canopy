@@ -34,6 +34,7 @@ sample_res = np.array([1.,2.,5.,10.,20.,25.,50.,100.])
 keys = ['1','2','5','10','20','25','50','100']
 kappa = 0.72
 max_k = 3
+n_iter = 1000
 
 area = 10.**4
 target_point_density = np.array([5., 10., 15., 20., 25., 30., 35., 40.])
@@ -46,6 +47,9 @@ affine=lstsq.least_squares_affine_matrix(plot_coordinates['x'][mask],plot_coordi
 plot_bbox = np.array(lstsq.apply_affine_transformation(plot_coordinates['x'][mask],plot_coordinates['y'][mask],affine)).transpose()
 
 pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox)
+n_returns = pts.size
+n_shots = np.sum(pts[:,3]==1)
+target_shots = (np.ceil(target_points*n_shots/float(n_returns))).astype('int')
 
 PAD_profiles_MH = {}
 PAD_profiles_rad1 = {}
@@ -95,9 +99,8 @@ for ss in range(0,sample_res.size):
     PAD_MH = np.zeros(n_iter,n_subplots,n_layers)
     PAD_rad1 = np.zeros(n_iter,n_subplots,n_layers)
     PAD_rad2 = np.zeros(n_iter,n_subplots,n_layers)
-    
-    plot_lidar_pts = lidar.filter_lidar_data_by_polygon(pts,bbox_polygon)
-    shots = np.unique(plot_lidar_pts[:,-1]) # get shot ID
+
+    shots = np.unique(pts[:,-1]) # get unique GPS times to collate points associated with same pulse
 
     for ii in range(0,n_iter):
         # subsample the point cloud

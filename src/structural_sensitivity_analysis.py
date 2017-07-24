@@ -472,5 +472,160 @@ plt.show()
 
                                                                                                   
 # 3) PAI vs resolution at different shot spacings
+N_res = len(pkeys)
 
-# 4) PAI vs shot spacing at different resolutions
+plt.figure(3, facecolor='White',figsize=[9,8])
+ax3a = plt.subplot2grid((3,3),(0,0))
+ax3a.set_ylabel('PAI',fontsize=axis_size)
+ax3a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax3b = plt.subplot2grid((3,3),(0,1),sharex=ax3a)
+ax3b.set_title('Point density = 5 pts m$^{-2}$', fontsize=10)
+ax3b.annotate('b - rad. trans. (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax3c = plt.subplot2grid((3,3),(0,2),sharex=ax3a)
+ax3c.annotate('c - rad. trans (modified)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+boxplot_a=[]
+boxplot_b=[]
+boxplot_c=[]
+for kk in range(0,N_res):
+    PAI_MH= np.sum(np.mean(PAD_profiles_MH[pkeys[kk]]['5'],axis=1)[:,2:],axis=1)  
+    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[pkeys[kk]]['5'],axis=1)[:,2:],axis=1)  
+    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[pkeys[kk]]['5'],axis=1)[:,2:],axis=1)  
+    boxplot_a.append(PAI_MH.copy())
+    boxplot_b.append(PAI_rad1.copy())
+    boxplot_c.append(PAI_rad2.copy())
+
+bpa = ax3a.boxplot(boxplot_a, patch_artist=True)
+bpb = ax3b.boxplot(boxplot_b, patch_artist=True)
+bpc = ax3c.boxplot(boxplot_c, patch_artist=True)
+
+bps=[bpa,bpb,bpc]
+edge_colour = ['#30A000','#0B1681','#960055']
+flier_colour = ['#85EE58','#636FDA','#E756A8']
+for bb in range(0,3):
+    bp = bps[bb]
+    for box in bp['boxes']:
+        box.set( color=edge_colour[bb])
+        box.set( facecolor = colour[bb] )
+    for whisker in bp['whiskers']:
+        whisker.set(color=edge_colour[bb])
+    for cap in bp['caps']:
+        cap.set(color=edge_colour[bb])
+    for median in bp['medians']:
+        median.set(color='white')
+    for flier in bp['fliers']:
+        flier.set(marker='o', color=flier_colour[bb], alpha=0.5)
+
+
+
+ax3d = plt.subplot2grid((3,3),(1,0),sharex=ax3a,sharey=ax3a)
+ax3d.set_ylabel('PAI',fontsize=axis_size)
+ax3d.annotate('d - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax3e = plt.subplot2grid((3,3),(1,1),sharex=ax3a,sharey=ax3b)
+ax3e.set_title('Point density = 20 pts m$^{-2}$', fontsize=10)
+ax3e.annotate('e - rad. trans. (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax3f = plt.subplot2grid((3,3),(1,2),sharex=ax3a,sharey=ax3c)
+ax3f.annotate('f - rad. trans (modified)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+boxplot_d=[]
+boxplot_e=[]
+boxplot_f=[]
+for kk in range(0,N_res):
+
+    PAI_MH= np.sum(np.mean(PAD_profiles_MH[pkeys[kk]]['20'],axis=1)[:,2:],axis=1)  
+    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[pkeys[kk]]['20'],axis=1)[:,2:],axis=1)  
+    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[pkeys[kk]]['20'],axis=1)[:,2:],axis=1)  
+    boxplot_d.append(PAI_MH.copy())
+    boxplot_e.append(PAI_rad1.copy())
+    boxplot_f.append(PAI_rad2.copy())
+
+bpd = ax3d.boxplot(boxplot_d, patch_artist=True)
+bpe = ax3e.boxplot(boxplot_e, patch_artist=True)
+bpf = ax3f.boxplot(boxplot_f, patch_artist=True)
+
+bps=[bpd,bpe,bpf]
+edge_colour = ['#30A000','#0B1681','#960055']
+flier_colour = ['#85EE58','#636FDA','#E756A8']
+for bb in range(0,3):
+    bp = bps[bb]
+    for box in bp['boxes']:
+        box.set( color=edge_colour[bb])
+        box.set( facecolor = colour[bb] )
+    for whisker in bp['whiskers']:
+        whisker.set(color=edge_colour[bb])
+    for cap in bp['caps']:
+        cap.set(color=edge_colour[bb])
+    for median in bp['medians']:
+        median.set(color='white')
+    for flier in bp['fliers']:
+        flier.set(marker='o', color=flier_colour[bb], alpha=0.5)
+
+ax3g = plt.subplot2grid((3,3),(2,0),sharex=ax3a,sharey=ax3a)
+ax3g.set_ylabel('PAI',fontsize=axis_size)
+ax3g.annotate('g - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax3g.set_xlabel('Spatial resolution / m$^2$',fontsize=axis_size)
+
+ax3h = plt.subplot2grid((3,3),(2,1),sharex=ax3a,sharey=ax3b)
+ax3h.set_title('Point density = 40 pts m$^{-2}$', fontsize=10)
+ax3h.annotate('h - rad. trans. (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax3h.set_xlabel('Spatial resolution / m$^2$',fontsize=axis_size)
+
+ax3i = plt.subplot2grid((3,3),(2,2),sharex=ax3a,sharey=ax3c)
+ax3i.annotate('i - rad. trans (modified)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax3i.set_xlabel('Spatial resolution / m$^2$',fontsize=axis_size)
+
+boxplot_g=[]
+boxplot_h=[]
+boxplot_i=[]
+for kk in range(0,N_res):
+
+    PAI_MH= np.sum(np.mean(PAD_profiles_MH[pkeys[kk]]['40'],axis=1)[:,2:],axis=1)  
+    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[pkeys[kk]]['40'],axis=1)[:,2:],axis=1)  
+    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[pkeys[kk]]['40'],axis=1)[:,2:],axis=1)  
+    boxplot_g.append(PAI_MH.copy())
+    boxplot_h.append(PAI_rad1.copy())
+    boxplot_i.append(PAI_rad2.copy())
+
+bpg = ax3g.boxplot(boxplot_g, patch_artist=True)
+bph = ax3h.boxplot(boxplot_h, patch_artist=True)
+bpi = ax3i.boxplot(boxplot_i, patch_artist=True)
+
+bps=[bpg,bph,bpi]
+edge_colour = ['#30A000','#0B1681','#960055']
+flier_colour = ['#85EE58','#636FDA','#E756A8']
+for bb in range(0,3):
+    bp = bps[bb]
+    for box in bp['boxes']:
+        box.set( color=edge_colour[bb])
+        box.set( facecolor = colour[bb] )
+    for whisker in bp['whiskers']:
+        whisker.set(color=edge_colour[bb])
+    for cap in bp['caps']:
+        cap.set(color=edge_colour[bb])
+    for median in bp['medians']:
+        median.set(color='white')
+    for flier in bp['fliers']:
+        flier.set(marker='o', color=flier_colour[bb], alpha=0.5)
+
+x_locs = [1,2,3,4,5]
+ax3c.set_xticks(x_locs)
+xticks=ax3c.get_xticks().tolist()
+xticks=pkeys
+ax3c.set_xticklabels(xticks,fontsize=axis_size)
+
+xticklabels = ax3a.get_xticklabels() + ax3b.get_xticklabels() + ax3c.get_xticklabels() + ax3d.get_xticklabels() + ax3e.get_xticklabels() + ax3f.get_xticklabels()
+
+yticklabels = ax3h.get_yticklabels() + ax3b.get_yticklabels() + ax3c.get_yticklabels() + ax3i.get_yticklabels() + ax3e.get_yticklabels() + ax3f.get_yticklabels()
+ax3a.set_ylim(5,11)
+ax3b.set_ylim(0,11)
+ax3c.set_ylim(5,25)
+
+plt.setp(xticklabels,visible=False)
+plt.subplots_adjust(wspace = 0.3,hspace=0.2)
+
+
+plt.show()

@@ -4,6 +4,8 @@
 import numpy as np
 import sys
 from matplotlib import pyplot as plt
+from matplotlib import rcParams
+
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
@@ -13,6 +15,13 @@ import inventory_based_LAD_profiles as field
 import least_squares_fitting as lstsq
 from scipy import stats
 import time
+
+# Set up some basiic parameters for the plots
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['arial']
+rcParams['font.size'] = 8
+rcParams['legend.numpoints'] = 1
+axis_size = rcParams['font.size']+2
 
 #---------------------------------------------------------------------------------------------------------------
 # Some filenames & params
@@ -184,12 +193,149 @@ np.save("MH_sensitivity.npy", PAD_profiles_MH)
 np.save("rad1_sensitivity.npy", PAD_profiles_rad1)
 np.save("rad2_sensitivity.npy", PAD_profiles_rad2)
 
-    # now plot the layers of interest
-    # i) the mean profile from all iterations with 50% and 95% CI
+# now plot the layers of interest           
+# 1a) the mean profile from all iterations with 50% and 95% CI
+PAD_profiles_MH = np.load("MH_sensitivity.npy")[()]
+PAD_profiles_rad1 = np.load("rad1_sensitivity.npy")[()]
+PAD_profiles_rad2 = np.load("rad2_sensitivity.npy")[()]
 
-    # ii) the standard deviation (or 50% and 95% CI) of each vertical layer
-    # this gives an indication of the reliability of the profile at a given canopy depth
 
-    # iii) PAI vs resolution at different shot spacings
+colour = ['#46E900','#1A2BCE','#E0007F']
 
-    # iv) PAI vs shot spacing at different resolutions
+plt.figure(1, facecolor='White',figsize=[9,6])
+ax1a = plt.subplot2grid((2,5),(0,0))
+ax1a.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1a.set_ylabel('height / m',fontsize=axis_size)
+ax1a.annotate('a - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1b = plt.subplot2grid((2,5),(0,1),sharex=ax1a,sharey=ax1a)
+ax1b.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1b.annotate('b - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1c = plt.subplot2grid((2,5),(0,2),sharex=ax1a,sharey=ax1a)
+ax1c.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1c.annotate('c - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+                                                       
+ax1d = plt.subplot2grid((2,5),(0,3),sharex=ax1a,sharey=ax1a)
+ax1d.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1d.annotate('d - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+                                                       
+ax1e = plt.subplot2grid((2,5),(0,4),sharex=ax1a,sharey=ax1a)
+ax1e.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1e.annotate('e - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+                                                            
+# loop through the subplots
+sp = [ax1a,ax1b,ax1c,ax1d,ax1e]
+pkeys = ['5m','10m','20m','50m','100m']
+for pp in range(0,len(sp)):
+  rad2_sp = np.mean(PAD_profiles_rad2[pkeys[pp]]['40'],axis=1)  
+  rad2 = np.mean(rad2_sp,axis=0)
+  rad2perc = np.percentile(rad2_sp,[2.5,25,75,95.5],axis=0)
+  sp[pp].fill_betweenx(heights[2:],rad2perc[0][2:],rad2perc[3][2:],color=colour[2],alpha=0.3)
+  sp[pp].fill_betweenx(heights[2:],rad2perc[1][2:],rad2perc[2][2:],color=colour[2],alpha=0.3)
+ 
+  rad1_sp = np.mean(PAD_profiles_rad1[pkeys[pp]]['40'],axis=1)  
+  rad1 = np.mean(rad1_sp,axis=0)
+  rad1perc = np.percentile(rad1_sp,[2.5,25,75,95.5],axis=0)
+  sp[pp].fill_betweenx(heights[2:],rad1perc[0][2:],rad1perc[3][2:],color=colour[1],alpha=0.3)
+  sp[pp].fill_betweenx(heights[2:],rad1perc[1][2:],rad1perc[2][2:],color=colour[1],alpha=0.3)
+ 
+  MH_sp = np.mean(PAD_profiles_MH[pkeys[pp]]['40'],axis=1)  
+  MH = np.mean(MH_sp,axis=0)
+  MHperc = np.percentile(MH_sp,[2.5,25,75,95.5],axis=0)
+  sp[pp].fill_betweenx(heights[2:],MHperc[0][2:],MHperc[3][2:],color=colour[0],alpha=0.3)
+  sp[pp].fill_betweenx(heights[2:],MHperc[1][2:],MHperc[2][2:],color=colour[0],alpha=0.3)
+
+  if pp+1==len(sp):
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1, label = 'MacArthur-Horn')
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1, label = 'rad trans (Detto)')
+    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1, label = 'rad trans (modified)') 
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1)
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1)
+    sp[pp].legend(loc='upper right')
+  else:                
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1)
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1)
+    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1)
+
+# 1b) the widths of the 50% (solid) and 95% (dashed) confidence intervals of each vertical layer
+# this gives an indication of the reliability of the profile at a given canopy depth
+ax1f = plt.subplot2grid((2,5),(1,0),sharey=ax1a)
+ax1f.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1f.set_ylabel('height / m',fontsize=axis_size)
+ax1f.annotate('f - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1g = plt.subplot2grid((2,5),(1,1),sharex=ax1f,sharey=ax1a)
+ax1g.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1g.annotate('g - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1h = plt.subplot2grid((2,5),(1,2),sharex=ax1f,sharey=ax1a)
+ax1h.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1h.annotate('h - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+                                                       
+ax1i = plt.subplot2grid((2,5),(1,3),sharex=ax1f,sharey=ax1a)
+ax1i.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1i.annotate('i - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+                                                       
+ax1j = plt.subplot2grid((2,5),(1,4),sharex=ax1f,sharey=ax1a)
+ax1j.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1j.annotate('j - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+sp = [ax1f,ax1g,ax1h,ax1i,ax1j]
+for pp in range(0,len(sp)):
+  MHl = np.percentile(PAD_profiles_MH[pkeys[pp]]['40'],2.5,axis=0)
+  MH25 = np.percentile(PAD_profiles_MH[pkeys[pp]]['40'],25,axis=0)
+  MH75 = np.percentile(PAD_profiles_MH[pkeys[pp]]['40'],75,axis=0)
+  MHu = np.percentile(PAD_profiles_MH[pkeys[pp]]['40'],97.5,axis=0)
+  MH_95CI = np.mean(MHu-MHl,axis=0)
+  MH_50CI = np.mean(MH75-MH25,axis=0)
+  sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1)
+  sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1)
+  
+  rad1l = np.percentile(PAD_profiles_rad1[pkeys[pp]]['40'],2.5,axis=0)
+  rad125 = np.percentile(PAD_profiles_rad1[pkeys[pp]]['40'],25,axis=0)
+  rad175 = np.percentile(PAD_profiles_rad1[pkeys[pp]]['40'],75,axis=0)
+  rad1u = np.percentile(PAD_profiles_rad1[pkeys[pp]]['40'],97.5,axis=0)
+  rad1_95CI = np.mean(rad1u-rad1l,axis=0)
+  rad1_50CI = np.mean(rad175-rad125,axis=0)
+  sp[pp].plot(rad1_95CI[2:],heights[2:],':',c=colour[1],linewidth=1)
+  sp[pp].plot(rad1_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1)
+
+  rad2l = np.percentile(PAD_profiles_rad2[pkeys[pp]]['40'],2.5,axis=0)
+  rad225 = np.percentile(PAD_profiles_rad2[pkeys[pp]]['40'],25,axis=0)
+  rad275 = np.percentile(PAD_profiles_rad2[pkeys[pp]]['40'],75,axis=0)
+  rad2u = np.percentile(PAD_profiles_rad2[pkeys[pp]]['40'],97.5,axis=0)
+  rad2_95CI = np.mean(rad2u-rad2l,axis=0)
+  rad2_50CI = np.mean(rad275-rad225,axis=0)
+  if pp+1==len(sp):
+    sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1,label='95% CI')
+    sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1,label='50% CI')
+    sp[pp].legend(loc = 'upper right')
+  else:
+    sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1)
+    sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1)
+                      
+ax1a.set_ylim(0,80)
+ax1a.set_xlim(0,0.7)
+ax1f.set_xlim(0,0.7)
+ax1a.locator_params(axis='x',nbins=5)
+ax1b.locator_params(axis='x',nbins=5)
+ax1c.locator_params(axis='x',nbins=5)
+ax1d.locator_params(axis='x',nbins=5)
+ax1e.locator_params(axis='x',nbins=5)
+ax1f.locator_params(axis='x',nbins=5)
+ax1g.locator_params(axis='x',nbins=5)
+ax1h.locator_params(axis='x',nbins=5)
+ax1i.locator_params(axis='x',nbins=5)
+ax1j.locator_params(axis='x',nbins=5)
+
+yticklabels = ax1b.get_yticklabels() + ax1c.get_yticklabels() + ax1d.get_yticklabels() + ax1e.get_yticklabels() + ax1g.get_yticklabels() + ax1h.get_yticklabels() + ax1i.get_yticklabels() + ax1j.get_yticklabels()
+plt.setp(yticklabels,visible=False)
+plt.subplots_adjust(hspace=0.2, wspace = 0.1)
+plt.show()
+            
+# 2) Equivalent plots but this time using different point densities at target resolution          
+                                                                                                  
+# 3) PAI vs resolution at different shot spacings
+
+# 4) PAI vs shot spacing at different resolutions

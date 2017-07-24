@@ -46,7 +46,7 @@ sample_res = np.array([5.,10.,20.,25.,50.,100.])
 keys = ['5m','10m','20m','25m','50m','100m']
 kappa = 0.72
 max_k = 3
-n_iter = 100
+n_iter = 250
 
 area = 10.**4
 target_point_density = np.array([5., 10., 15., 20., 25., 30., 40.])
@@ -472,8 +472,7 @@ plt.show()
 
                                                                                                   
 # 3) PAI vs resolution at different shot spacings
-N_res = len(pkeys)
-
+N_res = len(keys)
 plt.figure(3, facecolor='White',figsize=[9,8])
 ax3a = plt.subplot2grid((3,3),(0,0))
 ax3a.set_ylabel('PAI',fontsize=axis_size)
@@ -611,10 +610,10 @@ for bb in range(0,3):
     for flier in bp['fliers']:
         flier.set(marker='o', color=flier_colour[bb], alpha=0.5)
 
-x_locs = [1,2,3,4,5]
+x_locs = [1,2,3,4,5,6]
 ax3c.set_xticks(x_locs)
 xticks=ax3c.get_xticks().tolist()
-xticks=pkeys
+xticks=keys
 ax3c.set_xticklabels(xticks,fontsize=axis_size)
 
 xticklabels = ax3a.get_xticklabels() + ax3b.get_xticklabels() + ax3c.get_xticklabels() + ax3d.get_xticklabels() + ax3e.get_xticklabels() + ax3f.get_xticklabels()

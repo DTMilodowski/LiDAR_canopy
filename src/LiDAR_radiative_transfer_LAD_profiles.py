@@ -148,7 +148,6 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
                 for k in range(0,K):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
-
     ##### New test -> find all scan angles for which there are no returns, and remove these scan angles from the inversion, as
     #                 we don't have the required info at this scan angle to make this calculation.  This happens very rarely -
     #                 i.e. cases where there are very few returns at all at this scan angle.  Future efforts could go further
@@ -294,7 +293,15 @@ def Gfunction(LAD,ze,zi):
 # "missing information" from the LiDAR returns, especially within the lower canopy
 # that manifests itself as a negative bias in leaf area lower in the canopy.
 
-def calculate_LAD_DTM(pts,zi,max_k,tl):
+def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
+
+    # First check -  if there are not sufficient later returns, then the results from their
+    # inclusion are likely to be poor.  In the simplest case, there are not enought returns
+    # at k=kmax, irrespective of scan angle. Therefore, we decrease kmax to compensate.
+    while np.all((np.sum(pts[:,3]==max_k)<min_returns, max_k>1)):
+        print '\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1
+        max_k-=1
+
     #print "Calculating LAD using radiative tranfer model"
     # first unpack pts
     keep = pts[:,3]<=max_k
@@ -320,6 +327,52 @@ def calculate_LAD_DTM(pts,zi,max_k,tl):
             use2 = A[use1]==th[j]
             for k in range(0,K):
                 n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
+
+    # Second check! 
+    # Now loop through the scan angles and aggregate scan angles where there are not sufficient returns
+    # to reliably invert profile - this is usually determined by the number of returns for k=kmax
+    N_k_per_A = np.sum(n,axis=0)
+    N_per_A = np.sum(N_k_per_A,axis=1)
+    test = np.min(N_k_per_A,axis=1)
+    th_fail = th[test<min_returns]
+    th_pass = th[test>=min_returns]
+    # if all theta bins fail test, then abandon all theta info
+    N_fail = th_fail.size
+    if N_fail == S:
+        print '\t\t WARNING: not sufficient returns for any of ', S, 'scan angles to invert independently therefore aggregating all scan angles'
+        S=1
+        th=np.array(np.sum(th*N_per_A)/float(np.sum(N_per_A))).reshape(1)
+        A[:] = th
+        n = np.sum(n,axis=1).reshape(M,S,K)
+        pts[keep,5]=th
+
+    # Otherwise aggregate th_fail into nearest th until no more scan angles fail test.
+    elif N_fail>0:
+        print '\t\t WARNING: not enough returns for ', N_fail ,'/',S,' scan angles.  Aggregating with neighbouring scan angles'
+        for tt in range(0,N_fail):
+            # find nearest passing bin
+            idx = (np.abs(th_pass-th_fail[tt])).argmin()
+
+            n_Afail = (A==th_fail[tt]).sum()
+            idx_Afail = A==th_fail[tt]
+            n_Apass = (A==th_pass[idx]).sum()
+            idx_Apass = A==th_pass[idx]
+            
+            # weighted average for th_pass           
+            th_pass[idx] = (th_pass[idx]*n_Apass + th_fail[tt]*n_Afail)/float(n_Apass + n_Afail)
+            A[np.any((idx_Afail,idx_Apass),axis=0)] = th_pass[idx]
+
+        #Rebuild n    
+        pts[keep,5]=A.copy()
+        th = np.unique(A)
+        S  = th.size
+        n = np.zeros((M,S,K))
+        for i in range(0,M):
+            use1 = np.all((z0>=zi[i],z0<zi[i]+dz),axis=0)
+            for j in range(0,S):
+                use2 = A[use1]==th[j]
+                for k in range(0,K):
+                    n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
     #derive correction factor for different return numbers for each scan angle
     #CF = np.zeros(K)

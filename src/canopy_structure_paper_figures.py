@@ -148,14 +148,14 @@ for pp in range(0,N_plots):
             max_k=rr+1
             u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
             LAD_rad[subplot_index,:,rr]=u.copy()
-        lidar_return_profiles[subplot_index,:,:] = np.sum(n.copy(),axis=1)
+        lidar_return_profiles[subplot_index,:,:n.shape[2]] = np.sum(n.copy(),axis=1)
 
         # now repeat but for adjusted profiles, accounting for imperfect penetration of LiDAR pulses into canopy
         for rr in range(0,max_return):
             max_k=rr+1
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
             LAD_rad_DTM[subplot_index,:,rr]=u.copy()
-        lidar_return_profiles_adj[subplot_index,:,:] = np.sum(n.copy(),axis=1)
+        lidar_return_profiles_adj[subplot_index,:,:n.shape[2]] = np.sum(n.copy(),axis=1)
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
@@ -468,12 +468,12 @@ for pp in range(0,3):
     # plot detto profile
     for i in range(0,n_subplots):
         axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
-    axes3[pp].plot(np.mean(radiative_LAD[Plot_name][:,:-3,-1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+    axes3[pp].plot(np.mean(radiative_LAD[Plot_name][:,:-3,1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
     # plot corrective radiative transfer profile
     for i in range(0,n_subplots):
         axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
-    axes4[pp].plot(np.mean(radiative_DTM_LAD[Plot_name][:,:-3,-1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+    axes4[pp].plot(np.mean(radiative_DTM_LAD[Plot_name][:,:-3,1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
     # field inventory
     for i in range(0,n_subplots):
@@ -594,15 +594,15 @@ ax6b.set_xlabel('PAI$_{Hemisfer}$',fontsize=axis_size)
 ax6b.set_ylabel('PAI$_{rad}$',fontsize=axis_size)
 ax6b.plot([0,20],[0,20],'--',color='black',alpha=0.3)
 for i in range(0,N_plots):
-    ax6b.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]][:,-1],'.',color='0.5',alpha=0.5)
-    ax6b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,-1],'.',color=colour[1],alpha=0.5)
+    ax6b.plot(Hemisfer_LAI[Plots[i]],radiative_LAI[Plots[i]][:,1],'.',color='0.5',alpha=0.5)
+    ax6b.plot(Hemisfer_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,1],'.',color=colour[1],alpha=0.5)
 
 for i in range(0,N_plots):
     x_err=np.std(Hemisfer_LAI[Plots[i]])/np.sqrt(n_subplots)
-    y_err1=np.std(radiative_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
-    y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,-1])/np.sqrt(n_subplots)
-    ax6b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err1,marker='o',color='black',mfc='white')
-    ax6b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,-1]),xerr=x_err,yerr=y_err2,marker='o',color='black')
+    y_err1=np.std(radiative_LAI[Plots[i]][:,1])/np.sqrt(n_subplots)
+    y_err2=np.std(radiative_DTM_LAI[Plots[i]][:,1])/np.sqrt(n_subplots)
+    ax6b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,1]),xerr=x_err,yerr=y_err1,marker='o',color='black',mfc='white')
+    ax6b.errorbar(np.mean(Hemisfer_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,1]),xerr=x_err,yerr=y_err2,marker='o',color='black')
 
 #ax6b.plot(LAI_hemi_mod, LAI_rad_mod, '-', color = 'k')
 
@@ -637,7 +637,7 @@ plt.show()
 # annotate with stats
 r_sq_a = aux.get_rsquared_annotation(vol,mh)
 r_sq_b=  [aux.get_rsquared_annotation(vol,rad2),aux.get_rsquared_annotation(vol,rad3)]
-r_sq_c = [aux.get_rsquared_annotation(vol,radDTM3),aux.get_rsquared_annotation(vol,radDTM3)]
+r_sq_c = [aux.get_rsquared_annotation(vol,radDTM2),aux.get_rsquared_annotation(vol,radDTM3)]
 
 plt.figure(7, facecolor='White',figsize=[9,4])
 ax7a = plt.subplot2grid((1,3),(0,0))
@@ -699,7 +699,7 @@ plt.tight_layout()
 plt.savefig(output_dir+'fig7_LiDAR_LAI_canopy_volume_comparison.png')
 plt.show()
 #--------------------------------------------------------------------------------------
-#Figure 8:  Plot total basal area against LAI from the two preferred methods (to do)
+#Figure 8:  Plot total basal area against LAI from the two preferred methods
 
 census_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_TreeCensus.csv'
 census = cen.collate_plot_level_census_data(census_file)
@@ -771,7 +771,7 @@ ax8b.annotate('b - radiative transfer (modified)', xy=(0.05,0.95), xycoords='axe
 ax8b.set_ylabel('PAI',fontsize=axis_size)
 ax8b.set_xlabel('basal area / m$^2$ha$^{-1}$',fontsize=axis_size)
 
-k = -1
+k = 1
 for i in range(0,N_plots):
     ax8b.plot(BA[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=plot_colour[Plots[i]],alpha=0.5)
 
@@ -889,12 +889,12 @@ for pp in range(0,5):
     # plot detto profile
     for i in range(0,n_subplots):
         axSd.fill_betweenx(heights_rad[3:],0,radiative_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
-    axSd.plot(np.mean(radiative_LAD[Plot_name][:,:-3,-1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+    axSd.plot(np.mean(radiative_LAD[Plot_name][:,:-3,1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
     # plot corrective radiative transfer profile
     for i in range(0,n_subplots):
         axSe.fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
-    axSe.plot(np.mean(radiative_DTM_LAD[Plot_name][:,:-3,-1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+    axSe.plot(np.mean(radiative_DTM_LAD[Plot_name][:,:-3,1],axis=0)[::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
     # field inventory
     for i in range(0,n_subplots):

@@ -45,7 +45,7 @@ plot_width = 100.
 sample_res = np.array([5.,10.,20.,25.,50.,100.])
 keys = ['5m','10m','20m','25m','50m','100m']
 kappa = 0.72
-max_k = 3
+max_k = 2
 n_iter = 250
 
 area = 10.**4
@@ -489,9 +489,9 @@ boxplot_a=[]
 boxplot_b=[]
 boxplot_c=[]
 for kk in range(0,N_res):
-    PAI_MH= np.sum(np.mean(PAD_profiles_MH[pkeys[kk]]['5'],axis=1)[:,2:],axis=1)  
-    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[pkeys[kk]]['5'],axis=1)[:,2:],axis=1)  
-    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[pkeys[kk]]['5'],axis=1)[:,2:],axis=1)  
+    PAI_MH= np.sum(np.mean(PAD_profiles_MH[keys[kk]]['5'],axis=1)[:,2:],axis=1)  
+    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[keys[kk]]['5'],axis=1)[:,2:],axis=1)  
+    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[keys[kk]]['5'],axis=1)[:,2:],axis=1)  
     boxplot_a.append(PAI_MH.copy())
     boxplot_b.append(PAI_rad1.copy())
     boxplot_c.append(PAI_rad2.copy())
@@ -535,9 +535,9 @@ boxplot_e=[]
 boxplot_f=[]
 for kk in range(0,N_res):
 
-    PAI_MH= np.sum(np.mean(PAD_profiles_MH[pkeys[kk]]['20'],axis=1)[:,2:],axis=1)  
-    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[pkeys[kk]]['20'],axis=1)[:,2:],axis=1)  
-    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[pkeys[kk]]['20'],axis=1)[:,2:],axis=1)  
+    PAI_MH= np.sum(np.mean(PAD_profiles_MH[keys[kk]]['20'],axis=1)[:,2:],axis=1)  
+    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[keys[kk]]['20'],axis=1)[:,2:],axis=1)  
+    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[keys[kk]]['20'],axis=1)[:,2:],axis=1)  
     boxplot_d.append(PAI_MH.copy())
     boxplot_e.append(PAI_rad1.copy())
     boxplot_f.append(PAI_rad2.copy())
@@ -582,9 +582,9 @@ boxplot_h=[]
 boxplot_i=[]
 for kk in range(0,N_res):
 
-    PAI_MH= np.sum(np.mean(PAD_profiles_MH[pkeys[kk]]['40'],axis=1)[:,2:],axis=1)  
-    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[pkeys[kk]]['40'],axis=1)[:,2:],axis=1)  
-    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[pkeys[kk]]['40'],axis=1)[:,2:],axis=1)  
+    PAI_MH= np.sum(np.mean(PAD_profiles_MH[keys[kk]]['40'],axis=1)[:,2:],axis=1)  
+    PAI_rad1= np.sum(np.mean(PAD_profiles_rad1[keys[kk]]['40'],axis=1)[:,2:],axis=1)  
+    PAI_rad2= np.sum(np.mean(PAD_profiles_rad2[keys[kk]]['40'],axis=1)[:,2:],axis=1)  
     boxplot_g.append(PAI_MH.copy())
     boxplot_h.append(PAI_rad1.copy())
     boxplot_i.append(PAI_rad2.copy())

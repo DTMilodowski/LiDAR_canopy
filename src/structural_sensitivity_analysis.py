@@ -40,8 +40,6 @@ heights = np.arange(0.,max_height)+1
 heights_rad = np.arange(0,max_height+1)
 n_layers = heights.size
 plot_width = 100.
-#sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
-#keys = ['2m','5m','10m','20m','25m','50m','100m']
 sample_res = np.array([5.,10.,20.,25.,50.,100.])
 keys = ['5m','10m','20m','25m','50m','100m']
 kappa = 0.72
@@ -202,7 +200,7 @@ PAD_profiles_rad2 = np.load("rad2_sensitivity.npy")[()]
 
 colour = ['#46E900','#1A2BCE','#E0007F']
 
-plt.figure(1, facecolor='White',figsize=[9,6])
+plt.figure(1, facecolor='White',figsize=[9,9])
 ax1a = plt.subplot2grid((2,5),(0,0))
 ax1a.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax1a.set_ylabel('height / m',fontsize=axis_size)
@@ -246,40 +244,40 @@ for pp in range(0,len(sp)):
   sp[pp].fill_betweenx(heights[2:],MHperc[0][2:],MHperc[3][2:],color=colour[0],alpha=0.3)
   sp[pp].fill_betweenx(heights[2:],MHperc[1][2:],MHperc[2][2:],color=colour[0],alpha=0.3)
 
-  if pp+1==len(sp):
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1, label = 'MacArthur-Horn')
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1, label = 'rad trans (Detto)')
-    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1, label = 'rad trans (modified)') 
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1)
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1)
-    sp[pp].legend(loc='upper right')
+  if pp==2:
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5, label = 'rad trans (Detto)')
+    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5, label = 'rad trans (modified)') 
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+    sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=3)
   else:                
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1)
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1)
-    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1)
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
+    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5)
 
 # 1b) the widths of the 50% (solid) and 95% (dashed) confidence intervals of each vertical layer
 # this gives an indication of the reliability of the profile at a given canopy depth
 ax1f = plt.subplot2grid((2,5),(1,0),sharey=ax1a)
-ax1f.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1f.set_xlabel('CI / %',fontsize=axis_size)
 ax1f.set_ylabel('height / m',fontsize=axis_size)
-ax1f.annotate('f - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax1f.annotate('f - 5 m', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 
 ax1g = plt.subplot2grid((2,5),(1,1),sharex=ax1f,sharey=ax1a)
-ax1g.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
-ax1g.annotate('g - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax1g.set_xlabel('CI / %',fontsize=axis_size)
+ax1g.annotate('g - 10 m', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 
 ax1h = plt.subplot2grid((2,5),(1,2),sharex=ax1f,sharey=ax1a)
-ax1h.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
-ax1h.annotate('h - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax1h.set_xlabel('CI / %',fontsize=axis_size)
+ax1h.annotate('h - 20 m', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
                                                        
 ax1i = plt.subplot2grid((2,5),(1,3),sharex=ax1f,sharey=ax1a)
-ax1i.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
-ax1i.annotate('i - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax1i.set_xlabel('CI / %',fontsize=axis_size)
+ax1i.annotate('i - 50 m', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
                                                        
 ax1j = plt.subplot2grid((2,5),(1,4),sharex=ax1f,sharey=ax1a)
-ax1j.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
-ax1j.annotate('j - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax1j.set_xlabel('CI / %',fontsize=axis_size)
+ax1j.annotate('j - 100 m', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 
 sp = [ax1f,ax1g,ax1h,ax1i,ax1j]
 for pp in range(0,len(sp)):
@@ -287,37 +285,53 @@ for pp in range(0,len(sp)):
   MH25 = np.percentile(PAD_profiles_MH[pkeys[pp]]['40'],25,axis=0)
   MH75 = np.percentile(PAD_profiles_MH[pkeys[pp]]['40'],75,axis=0)
   MHu = np.percentile(PAD_profiles_MH[pkeys[pp]]['40'],97.5,axis=0)
-  MH_95CI = np.mean(MHu-MHl,axis=0)
-  MH_50CI = np.mean(MH75-MH25,axis=0)
+  MH_95CI_i = ((MHu-MHl)/np.mean(PAD_profiles_MH[pkeys[pp]]['40'],axis=0))*100.
+  MH_50CI_i = ((MH75-MH25)/np.mean(PAD_profiles_MH[pkeys[pp]]['40'],axis=0))*100.
+  MH_95CI = np.nansum(MH_95CI_i,axis=0)/np.sum(np.isfinite(MH_95CI_i),axis=0)
+  MH_50CI = np.nansum(MH_50CI_i,axis=0)/np.sum(np.isfinite(MH_50CI_i),axis=0)
   sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1)
   sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1)
+  if pp==2:
+      sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1,label='MacArthur-Horn 95% CI')
+      sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1,label='MacArthur-Horn 50% CI')
+  else:
+      sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1)
+      sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1)
   
   rad1l = np.percentile(PAD_profiles_rad1[pkeys[pp]]['40'],2.5,axis=0)
   rad125 = np.percentile(PAD_profiles_rad1[pkeys[pp]]['40'],25,axis=0)
   rad175 = np.percentile(PAD_profiles_rad1[pkeys[pp]]['40'],75,axis=0)
   rad1u = np.percentile(PAD_profiles_rad1[pkeys[pp]]['40'],97.5,axis=0)
-  rad1_95CI = np.mean(rad1u-rad1l,axis=0)
-  rad1_50CI = np.mean(rad175-rad125,axis=0)
-  sp[pp].plot(rad1_95CI[2:],heights[2:],':',c=colour[1],linewidth=1)
-  sp[pp].plot(rad1_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1)
+  rad1_95CI_i = ((rad1u-rad1l)/np.mean(PAD_profiles_rad1[pkeys[pp]]['40'],axis=0))*100.
+  rad1_50CI_i = ((rad175-rad125)/np.mean(PAD_profiles_rad1[pkeys[pp]]['40'],axis=0))*100.
+  rad1_95CI = np.nansum(rad1_95CI_i,axis=0)/np.sum(np.isfinite(rad1_95CI_i),axis=0)
+  rad1_50CI = np.nansum(rad1_50CI_i,axis=0)/np.sum(np.isfinite(rad1_50CI_i),axis=0)
+  if pp==2:
+      sp[pp].plot(rad1_95CI[2:],heights[2:],':',c=colour[1],linewidth=1,label='rad. trans. (Detto) 95% CI')
+      sp[pp].plot(rad1_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1,label='rad. trans. (Detto) 50% CI')
+  else:
+      sp[pp].plot(rad1_95CI[2:],heights[2:],':',c=colour[1],linewidth=1)
+      sp[pp].plot(rad1_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1)
 
   rad2l = np.percentile(PAD_profiles_rad2[pkeys[pp]]['40'],2.5,axis=0)
   rad225 = np.percentile(PAD_profiles_rad2[pkeys[pp]]['40'],25,axis=0)
   rad275 = np.percentile(PAD_profiles_rad2[pkeys[pp]]['40'],75,axis=0)
   rad2u = np.percentile(PAD_profiles_rad2[pkeys[pp]]['40'],97.5,axis=0)
-  rad2_95CI = np.mean(rad2u-rad2l,axis=0)
-  rad2_50CI = np.mean(rad275-rad225,axis=0)
-  if pp+1==len(sp):
-    sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1,label='95% CI')
-    sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1,label='50% CI')
-    sp[pp].legend(loc = 'upper right')
+  rad2_95CI_i = ((rad2u-rad2l)/np.mean(PAD_profiles_rad2[pkeys[pp]]['40'],axis=0))*100.
+  rad2_50CI_i = ((rad275-rad225)/np.mean(PAD_profiles_rad2[pkeys[pp]]['40'],axis=0))*100.
+  rad2_95CI = np.nansum(rad2_95CI_i,axis=0)/np.sum(np.isfinite(rad2_95CI_i),axis=0)
+  rad2_50CI = np.nansum(rad2_50CI_i,axis=0)/np.sum(np.isfinite(rad2_50CI_i),axis=0)
+  if pp==2:
+      sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1,label='rad. trans. (mod) 95% CI')
+      sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1,label='rad. trans. (mod) 50% CI')
+      lgd = sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=3)#(loc='upper right')
   else:
-    sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1)
-    sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1)
+      sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1)
+      sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1)
                       
 ax1a.set_ylim(0,80)
 ax1a.set_xlim(0,0.7)
-ax1f.set_xlim(0,0.7)
+ax1f.set_xlim(0,520)
 ax1a.locator_params(axis='x',nbins=5)
 ax1b.locator_params(axis='x',nbins=5)
 ax1c.locator_params(axis='x',nbins=5)
@@ -331,14 +345,15 @@ ax1j.locator_params(axis='x',nbins=5)
 
 yticklabels = ax1b.get_yticklabels() + ax1c.get_yticklabels() + ax1d.get_yticklabels() + ax1e.get_yticklabels() + ax1g.get_yticklabels() + ax1h.get_yticklabels() + ax1i.get_yticklabels() + ax1j.get_yticklabels()
 plt.setp(yticklabels,visible=False)
-plt.subplots_adjust(hspace=0.2, wspace = 0.1)
+plt.subplots_adjust(hspace=0.4, wspace = 0.1, bottom = 0.2)
+plt.savefig('PAD_resolution_sensitivity.png')
 plt.show()
 
 
 #==============================================================================================            
 # 2) Equivalent plots but this time using different point densities at target resolution          
 pkeys=['5','10','15','20','25','30','40']
-plt.figure(2, facecolor='White',figsize=[9,6])
+plt.figure(2, facecolor='White',figsize=[9,9])
 ax2a = plt.subplot2grid((2,5),(0,0))
 ax2a.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax2a.set_ylabel('height / m',fontsize=axis_size)
@@ -382,78 +397,92 @@ for pp in range(0,len(sp)):
   sp[pp].fill_betweenx(heights[2:],MHperc[0][2:],MHperc[3][2:],color=colour[0],alpha=0.3)
   sp[pp].fill_betweenx(heights[2:],MHperc[1][2:],MHperc[2][2:],color=colour[0],alpha=0.3)
 
-  if pp+1==len(sp):
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1, label = 'MacArthur-Horn')
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1, label = 'rad trans (Detto)')
-    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1, label = 'rad trans (modified)') 
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1)
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1)
-    sp[pp].legend(loc='upper right')
+  if pp==2:
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5, label = 'rad trans (Detto)')
+    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5, label = 'rad trans (modified)') 
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+    sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=3)#(loc='upper right')
   else:                
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1)
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1)
-    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1)
+    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
+    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5)
 
 # 1b) the widths of the 50% (solid) and 95% (dashed) confidence intervals of each vertical layer
 # this gives an indication of the reliability of the profile at a given canopy depth
 ax2f = plt.subplot2grid((2,5),(1,0),sharey=ax2a)
-ax2f.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
+ax2f.set_xlabel('CI / %',fontsize=axis_size)
 ax2f.set_ylabel('height / m',fontsize=axis_size)
-ax2f.annotate('f - 5 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2f.annotate('f - 5 pts m$^{-2}$', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 
 ax2g = plt.subplot2grid((2,5),(1,1),sharex=ax2f,sharey=ax2a)
-ax2g.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
-ax2g.annotate('g - 10 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2g.set_xlabel('CI / %',fontsize=axis_size)
+ax2g.annotate('g - 10 pts m$^{-2}$', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 
 ax2h = plt.subplot2grid((2,5),(1,2),sharex=ax2f,sharey=ax2a)
-ax2h.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
-ax2h.annotate('h - 20 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2h.set_xlabel('CI / %',fontsize=axis_size)
+ax2h.annotate('h - 20 pts m$^{-2}$', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
                                                        
 ax2i = plt.subplot2grid((2,5),(1,3),sharex=ax2f,sharey=ax2a)
-ax2i.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
-ax2i.annotate('i - 30 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2i.set_xlabel('CI / %',fontsize=axis_size)
+ax2i.annotate('i - 30 pts m$^{-2}$', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
                                                        
 ax2j = plt.subplot2grid((2,5),(1,4),sharex=ax2f,sharey=ax2a)
-ax2j.set_xlabel('CI / m$^2$m$^{-3}$',fontsize=axis_size)
-ax2j.annotate('j - 40 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2j.set_xlabel('CI / %',fontsize=axis_size)
+ax2j.annotate('j - 40 pts m$^{-2}$', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 
 sp = [ax2f,ax2g,ax2h,ax2i,ax2j]
 for pp in range(0,len(sp)):
-  MHl = np.percentile(PAD_profiles_MH['20m'][pkeys[pp]],2.5,axis=0)
-  MH25 = np.percentile(PAD_profiles_MH['20m'][pkeys[pp]],25,axis=0)
-  MH75 = np.percentile(PAD_profiles_MH['20m'][pkeys[pp]],75,axis=0)
-  MHu = np.percentile(PAD_profiles_MH['20m'][pkeys[pp]],97.5,axis=0)
-  MH_95CI = np.mean(MHu-MHl,axis=0)
-  MH_50CI = np.mean(MH75-MH25,axis=0)
-  sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1)
-  sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1)
+    MHl = np.percentile(PAD_profiles_MH['20m'][pkeys[pp]],2.5,axis=0)
+    MH25 = np.percentile(PAD_profiles_MH['20m'][pkeys[pp]],25,axis=0)
+    MH75 = np.percentile(PAD_profiles_MH['20m'][pkeys[pp]],75,axis=0)
+    MHu = np.percentile(PAD_profiles_MH['20m'][pkeys[pp]],97.5,axis=0)
+    MH_95CI_i = ((MHu-MHl)/np.mean(PAD_profiles_MH['20m'][pkeys[pp]],axis=0))*100.
+    MH_50CI_i = ((MH75-MH25)/np.mean(PAD_profiles_MH['20m'][pkeys[pp]],axis=0))*100.
+    MH_95CI = np.nansum(MH_95CI_i,axis=0)/np.sum(np.isfinite(MH_95CI_i),axis=0)
+    MH_50CI = np.nansum(MH_50CI_i,axis=0)/np.sum(np.isfinite(MH_50CI_i),axis=0)
+    if pp==2:
+        sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1,label='MacArthur-Horn 95% CI')
+        sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1,label='MacArthur-Horn 50% CI')
+    else:
+        sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1)
+        sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1)
   
-  rad1l = np.percentile(PAD_profiles_rad1['20m'][pkeys[pp]],2.5,axis=0)
-  rad125 = np.percentile(PAD_profiles_rad1['20m'][pkeys[pp]],25,axis=0)
-  rad175 = np.percentile(PAD_profiles_rad1['20m'][pkeys[pp]],75,axis=0)
-  rad1u = np.percentile(PAD_profiles_rad1['20m'][pkeys[pp]],97.5,axis=0)
-  rad1_95CI = np.mean(rad1u-rad1l,axis=0)
-  rad1_50CI = np.mean(rad175-rad125,axis=0)
-  sp[pp].plot(rad1_95CI[2:],heights[2:],':',c=colour[1],linewidth=1)
-  sp[pp].plot(rad1_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1)
+    rad1l = np.percentile(PAD_profiles_rad1['20m'][pkeys[pp]],2.5,axis=0)
+    rad125 = np.percentile(PAD_profiles_rad1['20m'][pkeys[pp]],25,axis=0)
+    rad175 = np.percentile(PAD_profiles_rad1['20m'][pkeys[pp]],75,axis=0)
+    rad1u = np.percentile(PAD_profiles_rad1['20m'][pkeys[pp]],97.5,axis=0)
+    rad1_95CI_i = ((rad1u-rad1l)/np.mean(PAD_profiles_rad1['20m'][pkeys[pp]],axis=0))*100.
+    rad1_50CI_i = ((rad175-rad125)/np.mean(PAD_profiles_rad1['20m'][pkeys[pp]],axis=0))*100.
+    rad1_95CI = np.nansum(rad1_95CI_i,axis=0)/np.sum(np.isfinite(rad1_95CI_i),axis=0)
+    rad1_50CI = np.nansum(rad1_50CI_i,axis=0)/np.sum(np.isfinite(rad1_50CI_i),axis=0)
+    if pp==2:
+        sp[pp].plot(rad1_95CI[2:],heights[2:],':',c=colour[1],linewidth=1,label='rad. trans. (Detto) 95% CI')
+        sp[pp].plot(rad1_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1,label='rad. trans. (Detto) 50% CI')
+    else:
+        sp[pp].plot(rad1_95CI[2:],heights[2:],':',c=colour[1],linewidth=1)
+        sp[pp].plot(rad1_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1)
 
-  rad2l = np.percentile(PAD_profiles_rad2['20m'][pkeys[pp]],2.5,axis=0)
-  rad225 = np.percentile(PAD_profiles_rad2['20m'][pkeys[pp]],25,axis=0)
-  rad275 = np.percentile(PAD_profiles_rad2['20m'][pkeys[pp]],75,axis=0)
-  rad2u = np.percentile(PAD_profiles_rad2['20m'][pkeys[pp]],97.5,axis=0)
-  rad2_95CI = np.mean(rad2u-rad2l,axis=0)
-  rad2_50CI = np.mean(rad275-rad225,axis=0)
-  if pp+1==len(sp):
-    sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1,label='95% CI')
-    sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1,label='50% CI')
-    sp[pp].legend(loc = 'upper right')
-  else:
-    sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1)
-    sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1)
+    rad2l = np.percentile(PAD_profiles_rad2['20m'][pkeys[pp]],2.5,axis=0)
+    rad225 = np.percentile(PAD_profiles_rad2['20m'][pkeys[pp]],25,axis=0)
+    rad275 = np.percentile(PAD_profiles_rad2['20m'][pkeys[pp]],75,axis=0)
+    rad2u = np.percentile(PAD_profiles_rad2['20m'][pkeys[pp]],97.5,axis=0)
+    rad2_95CI_i = ((rad2u-rad2l)/np.mean(PAD_profiles_rad2['20m'][pkeys[pp]],axis=0))*100.
+    rad2_50CI_i = ((rad275-rad225)/np.mean(PAD_profiles_rad2['20m'][pkeys[pp]],axis=0))*100.
+    rad2_95CI = np.nansum(rad2_95CI_i,axis=0)/np.sum(np.isfinite(rad2_95CI_i),axis=0)
+    rad2_50CI = np.nansum(rad2_50CI_i,axis=0)/np.sum(np.isfinite(rad2_50CI_i),axis=0)
+    if pp==2:
+        sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1,label='rad. trans. (mod) 95% CI')
+        sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1,label='rad. trans. (mod) 50% CI')
+        sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=3)#(loc='upper right')
+    else:
+        sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1)
+        sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1)
                       
 ax2a.set_ylim(0,80)
 ax2a.set_xlim(0,0.7)
-ax2f.set_xlim(0,0.7)
+ax2f.set_xlim(0,520)
 ax2a.locator_params(axis='x',nbins=5)
 ax2b.locator_params(axis='x',nbins=5)
 ax2c.locator_params(axis='x',nbins=5)
@@ -467,13 +496,14 @@ ax2j.locator_params(axis='x',nbins=5)
 
 yticklabels = ax2b.get_yticklabels() + ax2c.get_yticklabels() + ax2d.get_yticklabels() + ax2e.get_yticklabels() + ax2g.get_yticklabels() + ax2h.get_yticklabels() + ax2i.get_yticklabels() + ax2j.get_yticklabels()
 plt.setp(yticklabels,visible=False)
-plt.subplots_adjust(hspace=0.2, wspace = 0.1)
+plt.subplots_adjust(hspace=0.4, wspace = 0.1, bottom = 0.2)
+plt.savefig('PAD_point_density_sensitivity.png')
 plt.show()
 
                                                                                                   
 # 3) PAI vs resolution at different shot spacings
 N_res = len(keys)
-plt.figure(3, facecolor='White',figsize=[9,8])
+plt.figure(3, facecolor='White',figsize=[9,9])
 ax3a = plt.subplot2grid((3,3),(0,0))
 ax3a.set_ylabel('PAI',fontsize=axis_size)
 ax3a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -620,11 +650,11 @@ xticklabels = ax3a.get_xticklabels() + ax3b.get_xticklabels() + ax3c.get_xtickla
 
 yticklabels = ax3h.get_yticklabels() + ax3b.get_yticklabels() + ax3c.get_yticklabels() + ax3i.get_yticklabels() + ax3e.get_yticklabels() + ax3f.get_yticklabels()
 ax3a.set_ylim(5,11)
-ax3b.set_ylim(0,11)
-ax3c.set_ylim(5,25)
+ax3b.set_ylim(2,10)
+ax3c.set_ylim(6,20)
 
 plt.setp(xticklabels,visible=False)
-plt.subplots_adjust(wspace = 0.3,hspace=0.2)
-
+plt.subplots_adjust(wspace = 0.4,hspace=0.2)
+plt.savefig('PAI_sensitivity.png')
 
 plt.show()

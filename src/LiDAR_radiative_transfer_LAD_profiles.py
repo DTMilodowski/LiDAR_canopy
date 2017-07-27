@@ -168,11 +168,13 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok        
 
     ##### New test -> let's add 1 to all 1st return bins for which there are also other returns
+    print n[54,:,:]
     for s in range(0,S):
         n1_test=np.sum(n[:,s,:],axis=1)   # this replicates code used in loop below for calculating penetration functions
         mask = np.all((n1_test>0,n[:,s,0]==0),axis=0) # this finds all layers for which there are no first returns, but 2nd and 3rd returns present.  This leads to a beta value of zero resulting in a nan in the ultimate distribution of u.  I add an arbitrary single return to this canopy layer, since this enables the calculation an estimate of LAD in this layer rather than setting it as zero when it is known that there are reflections at this level.
         n[mask,s,0] = 1
 
+    print n[54,:,:]
     # calculate penetration functions for each scan angle
     #print "\tCalculating penetration functions"
     I = np.zeros((M,S,K),dtype='float')
@@ -196,9 +198,13 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         ##---------------
         ## Update below - applying correction factor across all available returns, as indicated in
         ## equation 5 from their paper
+        print '---------'
+        print n[54,i,:],n1[54],n[54,i,:]/n1[54]
+        print U[54,i,:]
         for k in range(0,K):
             U[:,i,k]=U[:,i,k]*I[:,i,-1]
         control[:,i]=n1>0
+        print U[54,i,:]
         ##---------------
         G[:,i]=Gfunction(tl,th[i],zi)
     # Compute LAD from ensemble across scan angles
@@ -219,6 +225,10 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
             alpha[i]= 1.-np.inner(I[i,use,0],w)
             # Eq 8b
             beta[i] = np.inner((U[i,use,0]*G[i,use]/np.abs(np.cos(np.conj(th[use])/180*np.pi))),w)
+            if i ==54:
+                print '==========================================================='
+                print i, U[i,use,0], beta[i]
+                print '==========================================================='
     
     #### In Detto's original code, interpolation is used to traverse nodata gaps.  I am not sure why this 
     ### approach was used as nodata gaps arise when the number of returns within a given canopy layer is 
@@ -252,6 +262,8 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         # Eq 6
         if beta[i]!=0:
             u[i] = (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)
+            if i == 54:
+                print i, alpha[i], beta[i], np.inner(beta[:i],u[:i]*dz), alpha[i]-np.inner(beta[:i],u[:i]*dz), (alpha[i]-np.inner(beta[:i],u[:i]*dz))/(beta[i]*dz)
         if u[i]<0:
             u[i]=0
     #print u
@@ -327,7 +339,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
             use2 = A[use1]==th[j]
             for k in range(0,K):
                 n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
-
+    #print n.sum(axis=0)
     # Second check! 
     # Now loop through the scan angles and aggregate scan angles where there are not sufficient returns
     # to reliably invert profile - this is usually determined by the number of returns for k=kmax
@@ -373,7 +385,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
                 use2 = A[use1]==th[j]
                 for k in range(0,K):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
-
+    #print n.sum(axis=0)
     #derive correction factor for different return numbers for each scan angle
     #CF = np.zeros(K)
     CF = np.zeros((S,K))
@@ -396,7 +408,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
             else:
                 CF[s,k]=N_veg_kprev/N_k
             n[:,s,k]*=np.product(CF[s,:this_k])
-
+    #print n.sum(axis=0)
     u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n)
     
     return u,n,I,U

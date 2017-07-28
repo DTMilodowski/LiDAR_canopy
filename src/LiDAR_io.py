@@ -107,8 +107,6 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
     E = polygon[:,0].max()
     S = polygon[:,1].min()
     N = polygon[:,1].max()
-    print 'W: %.3f; E: %.3f; S: %.3f; N: %.3f' % (W,E,S,N)
-
     if laz_files:
         keep_files = find_laz_files_by_polygon(file_list,polygon)
     else:
@@ -169,9 +167,8 @@ def find_laz_files_by_polygon(file_list,polygon):
     for i in range(0,n_files):
         os.system("las2las %s temp.las" % laz_files[i])
         UR, LR, UL, LL = get_lasfile_bbox('temp.las')
-        print 'W: %.3f; E: %.3f; S: %.3f; N: %.3f' % (LL[0],UR[0],LL[1],UR[1]) ## We have an issue with this test
         las_box = np.asarray([UR,LR,LL,UL])
-        x,y,inside = lidar.points_in_poly(polygon[:,0],polygon[:,1],las_box)
+        x,y,inside = lidar.points_in_poly(las_box[:,0],las_box[:,1],polygon)
         if inside.sum()>0:
             keep.append(laz_files[i])
         os.system("rm temp.las")

@@ -91,7 +91,7 @@ def find_las_files_by_polygon(file_list,polygon):
     for i in range(0,n_files):
         UR, LR, UL, LL = get_lasfile_bbox(las_files[i])
         las_box = np.asarray([UR,LR,LL,UL])
-        x,y,inside = lidar.points_in_poly(las_box[:,0],las_box[:,1],polygon)
+        x,y,inside = lidar.points_in_poly(las_box[:,0],las_box[:,1],polygon) # fix this test
         if inside.sum()>0:
             keep.append(las_files[i])
     print 'las tiles to load in:', len(keep)

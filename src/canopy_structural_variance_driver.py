@@ -32,10 +32,18 @@ layer_thickness = 1
 
 # Open shapefile and get points & bounding box for ROI
 shapefile= fiona.open(pts_shp)
-N_pts = len(list(shapefile))
+
+N_pts = len(shapefile)
+features = list(shapefile)
 pts = np.zeros((N_pts,2))
+pt_camera = np.empty(N_pts,dtype='S16')
+pt_scale = np.zeros(N_pts)
 for pp in range(0,N_pts):
-    pts[pp,:]=np.asarray(list(shapefile)[pp]['geometry']['coordinates'])
+    pts[pp,:]=np.asarray(features[pp]['geometry']['coordinates'])
+    pt_camera[pp]=np.asarray(features[pp]['properties']['id'])
+    pt_scale[pp]=np.asarray(features[pp]['properties']['scale'])
+
+
 
 W,S,E,N = shapefile.bounds
 W-=radius

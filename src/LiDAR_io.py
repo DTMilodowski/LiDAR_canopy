@@ -7,6 +7,7 @@
 ## number of points. 
 import numpy as np
 import laspy as las
+import os
 from scipy import spatial
 import LiDAR_tools as lidar
 
@@ -99,9 +100,13 @@ def find_las_files_by_polygon(file_list,polygon):
     return keep
 
 # load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.
-# polygon is a 2D array with N_pts*rows and two cols (x,y)
-def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
-    keep_files = find_las_files_by_polygon(file_list,polygon)
+# polygon is a 2D array with N_pts*rows and two cols (x,y).
+# I've added a fudge to deal with laz files, which uses las2las from lastools to create a temporary .las file before reading with laspy. Undoubtedly not the most elegant solution, but it works :-) 
+def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_files=False):
+    if laz_files:
+        keep_files = find_laz_files_by_polygon(file_list,polygon)
+    else:
+        keep_files = find_las_files_by_polygon(file_list,polygon)
     n_files = len(keep_files)
     trees = []
     starting_ids = np.asarray([])
@@ -117,7 +122,12 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
         E = polygon[:,0].max()
         S = polygon[:,1].min()
         N = polygon[:,1].max()
-        tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False)
+        if laz_files:
+            os.system("las2las %s temp.las" % keep_files[i])
+            tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
+            os.system("rm temp.las")
+        else:
+            tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False)  
         pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
                 
         # now repeat for subsequent tiles
@@ -131,7 +141,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6):
 
     print "loaded ", pts.shape[0], " points"
     return pts, starting_ids, trees
-
+    
 # equivalent file but for a single las file
 def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6):
     W = polygon[:,0].min()
@@ -147,6 +157,25 @@ def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6):
     return pts, starting_ids, trees
 
 
+# equivalent scripts for laz files - calls las2las to transform to .las files
+# before reading in with laspy
+def find_laz_files_by_polygon(file_list,polygon):
+    laz_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
+    keep = []
+    n_files = laz_files.size
+    for i in range(0,n_files):
+        os.system("las2las %s temp.las" % laz_files[i])
+        UR, LR, UL, LL = get_lasfile_bbox('temp.las')
+        las_box = np.asarray([UR,LR,LL,UL])
+        x,y,inside = lidar.points_in_poly(polygon[:,0],polygon[:,1],las_box)
+        if inside.sum()>0:
+            keep.append(laz_files[i])
+        os.system("rm temp.las")
+    print 'las tiles to load in:', len(keep)
+    for ll in range(0,len(keep)):
+        print keep[ll]
+    return keep
+    
 #----------------------------------------------------------------------------
 # Next here are scripts that use a point and circular neighbourhood instead
 #----------------------------------------------------------------------------

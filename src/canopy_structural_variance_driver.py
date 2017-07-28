@@ -19,8 +19,9 @@ rcParams['legend.numpoints'] = 1
 axis_size = rcParams['font.size']+2
 
 # Some files
-las_list = 'lastile_list.csv' ## CHANGE AS REQUIRED
-pts_shp = 'sample_points.shp' ## CHANGE AS REQUIRED
+las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_laz_files/laz_list.txt' ## CHANGE AS REQUIRED
+pts_shp = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/CameraTraps/OM2015_16.shp' ## CHANGE AS REQUIRED
+laz_files = True ## CHANGE AS REQUIRED
 
 # Some parameters
 radius = 10.

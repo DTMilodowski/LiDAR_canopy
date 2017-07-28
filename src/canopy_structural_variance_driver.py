@@ -45,7 +45,7 @@ N+=radius
 # Read in LiDAR points for region of interest
 # - first find the tiles
 polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
-lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(lastile_list,polygon)
+lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(lastile_list,polygon, laz_files=True)
 N_trees = len(trees)
 
 

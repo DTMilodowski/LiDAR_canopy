@@ -124,7 +124,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
     # otherwise, we have work to do!
     else:
         if laz_files:
-            os.system("las2las %s temp.las" % keep_files[i])
+            os.system("las2las %s temp.las" % keep_files[0])
             tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
             os.system("rm temp.las")
         else:

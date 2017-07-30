@@ -25,10 +25,10 @@ laz_files = True ## CHANGE AS REQUIRED
 
 # Some parameters
 radius = 10.
-max_height = 80.
+max_height = 80.        
+layer_thickness = 1
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
-layer_thickness = 1
 
 # Open shapefile and get points & bounding box for ROI
 shapefile= fiona.open(pts_shp)

@@ -132,8 +132,13 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
         pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
                 
         # now repeat for subsequent tiles
-        for i in range(1,n_files):
-            tile_pts = load_lidar_data(keep_files[i])
+        for i in range(1,n_files):      
+            if laz_files:
+                os.system("las2las %s temp.las" % keep_files[i])
+                tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
+                os.system("rm temp.las")
+            else:                
+                tile_pts = load_lidar_data_by_bbox(keep_files[i],N,S,E,W,print_npts=False)
             pts_ = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
             pts = np.concatenate((pts,pts_),axis=0)
     

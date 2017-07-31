@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import stats
 import sys
+import os
 from matplotlib import pyplot as plt
 import fiona
 import LiDAR_io as io
@@ -72,3 +73,5 @@ for pp in range(0,N_pts):
     PAD[pp,:] = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
         
 # Compute metrics...
+https://silo.plantsci.cam.ac.uk/index.php/s/bAgsGgnUbLbrWei/download?path=%2F&files=SAFE_buf10m_545000_514000_chm.laz
+https://silo.plantsci.cam.ac.uk/index.php/s/bAgsGgnUbLbrWei/download?path=%2F&files=SAFE_buf10m_545000_515000_chm.laz

@@ -1,6 +1,7 @@
 ## This library hosts functions to quantify aspects of the canopy structure, for example canopy heterogeneity 
 ## in the horizontal and vertical dimensions.
 import numpy as np
+from scipy import stats
 import least_squares_fitting as lstsq
 from matplotlib import pyplot as plt
 #--------------------------------------------------------------------------------------------------------------
@@ -252,3 +253,8 @@ def calculate_canopy_shape(heights,density):
     P = heights[density==density.max()][0]
     return H, P, P/H
 
+# Calculate moments
+def calculate_moments_of_distribution(heights,density):
+    dist = stats.rv_discrete(values=(heights,density))
+    mean,std,skew,kurt = dist.stats(moments='mvsk')
+    return mean,std,skew,kurt

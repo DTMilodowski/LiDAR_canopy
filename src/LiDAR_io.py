@@ -162,7 +162,6 @@ def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6):
     print "loaded ", pts.shape[0], " points"
     return pts, starting_ids, trees
 
-
 # equivalent scripts for laz files - calls las2las to transform to .las files
 # before reading in with laspy
 def find_laz_files_by_polygon(file_list,polygon):

@@ -238,7 +238,7 @@ def calculate_Shannon_index(P):
 
 
 # Other useful structural metrics
-# Canopy Shape, 
+# Canopy Shape [Asner et al., Biogeosciences, 2014]
 def calculate_canopy_shape(heights,density):
     # make sure profiles are orientated correctly
     if heights[0]>heights[1]:
@@ -251,3 +251,4 @@ def calculate_canopy_shape(heights,density):
     H = heights[cumulative_density>=99_perc][0]
     P = heights[density==density.max()][0]
     return H, P, P/H
+

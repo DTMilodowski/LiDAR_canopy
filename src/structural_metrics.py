@@ -240,6 +240,11 @@ def calculate_Shannon_index(P):
 
 # Other useful structural metrics
 # Canopy Shape [Asner et al., Biogeosciences, 2014]
+# P is the height at which there is a maximum "canopy volume"
+# H is the 99th percentile of the height distribution
+# Asner and following papers use the LiDAR point cloud, but this doesn't really tell you about actual vegetation distribution
+# Could also consider using the derived plant area profiles, although even then, unclear whether more useful than distribution
+# moments
 def calculate_canopy_shape(heights,density):
     # make sure profiles are orientated correctly
     if heights[0]>heights[1]:
@@ -254,7 +259,21 @@ def calculate_canopy_shape(heights,density):
     return H, P, P/H
 
 # Calculate moments
+# Descriptive statistics to characterise distributions
+# Mean is obvious
+# Std deviation tells you about spread around the mean
+# Skew tells you about distribution within the profile (e.g. heavy tailed etc.)
+# Kurtosis tells you about "peakiness of distribution"
 def calculate_moments_of_distribution(heights,density):
     dist = stats.rv_discrete(values=(heights,density))
     mean,std,skew,kurt = dist.stats(moments='mvsk')
     return mean,std,skew,kurt
+
+# Calculate number of canopy layers based on regions of continuous PAD [Clark et al., Ecology Letters, 2008]
+# This is trying to replicate the field process of counting canopy layers
+# simpler and easier to interpret than picking peaks from smoothed distributions
+def calculate_number_of_contiguous_layers(heights,density,minimum_density):
+    is_layer = np.zeros(heights.size+1)
+    is_layer[:-1] = density>=minimum_density
+    n_layers = np.sum(is_layer[:-1]-is_layer[1:]==1)
+    return n_layers

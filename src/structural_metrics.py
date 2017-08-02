@@ -235,3 +235,19 @@ def calculate_Shannon_index(P):
     p=P/P.sum()
     S = -np.sum(p[p>0]*np.log(p[p>0]))
     return S
+
+
+# Other useful structural metrics
+# Canopy Shape, 
+def calculate_canopy_shape(heights,density):
+    # make sure profiles are orientated correctly
+    if heights[0]>heights[1]:
+        heights = heights[::-1]
+        density = density[::-1]
+    
+    cumulative_density = np.cumsum(density)
+    
+    99_perc = 0.99*cumulative_density[-1]
+    H = heights[cumulative_density>=99_perc][0]
+    P = heights[density==density.max()][0]
+    return H, P, P/H

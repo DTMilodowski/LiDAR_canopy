@@ -83,11 +83,13 @@ for cc in range(0,N_cameras):
 
     # Now loop through the shapefile points and sample defined radius, before extracting canopy profiles
     for pp in range(0,N_pts_iter):
+        print pp
         # retrieve point clouds samples        
         sample_pts = []
         for tt in range(0,N_trees):
             ids = trees[tt].query_ball_point(pts_iter[pp], radius)
-            sample_pts.append(lidar_pts[ids+starting_ids_for_trees[tt]])
+            if len(ids)>0:
+                sample_pts.append(lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]])
         sample_pts = np.asarray(sample_pts)
         # calculate PAD profile
         heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)

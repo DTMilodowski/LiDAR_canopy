@@ -132,7 +132,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
         pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
                 
         # now repeat for subsequent tiles
-        for i in range(1,n_files):      
+        for i in range(1,n_files):    
             if laz_files:
                 os.system("las2las %s temp.las" % keep_files[i])
                 tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
@@ -141,11 +141,11 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
                 tile_pts = load_lidar_data_by_bbox(keep_files[i],N,S,E,W,print_npts=False)
             pts_ = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
             pts = np.concatenate((pts,pts_),axis=0)
-    
+
     # now create KDTrees
     starting_ids, trees = create_KDTree(pts)
 
-    print "loaded ", pts.shape[0], " points"
+    print "loaded ", pts.shape[0], " points into ", len(trees), " KDTrees"
     return pts, starting_ids, trees
     
 # equivalent file but for a single las file

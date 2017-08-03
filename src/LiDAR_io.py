@@ -84,7 +84,7 @@ def create_KDTree(pts,max_pts_per_tree = 10**6):
 #----------------------------------------------------------------------------
 
 # find all las files from a list that are located within a specified polygon
-def find_las_files_by_polygon(file_list,polygon):
+def find_las_files_by_polygon(file_list,polygon,print_keep=False):
     las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
     keep = []
     n_files = las_files.size
@@ -94,24 +94,25 @@ def find_las_files_by_polygon(file_list,polygon):
         x,y,inside = lidar.points_in_poly(las_box[:,0],las_box[:,1],polygon) # fix this test
         if inside.sum()>0:
             keep.append(las_files[i])
-    print 'las tiles to load in:', len(keep)
-    for ll in range(0,len(keep)):
-        print keep[ll]
+    if print_keep:
+        print 'las tiles to load in:', len(keep)
+        for ll in range(0,len(keep)):
+            print keep[ll]
     return keep
 
 # load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.
 # polygon is a 2D array with N_pts*rows and two cols (x,y).
 # I've added a fudge to deal with laz files, which uses las2las from lastools to create a temporary .las file before reading with laspy. Undoubtedly not the most elegant solution, but it works :-) 
-def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_files=False):
+def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_files=False,print_keep=False):
     W = polygon[:,0].min()
     E = polygon[:,0].max()
     S = polygon[:,1].min()
     N = polygon[:,1].max()
     if laz_files:
-        keep_files = find_laz_files_by_polygon(file_list,polygon)
+        keep_files = find_laz_files_by_polygon(file_list,polygon,print_keep)
     else:
-        keep_files = find_las_files_by_polygon(file_list,polygon)
-    print keep_files
+        keep_files = find_las_files_by_polygon(file_list,polygon,print_keep)
+
     n_files = len(keep_files)
     trees = []
     starting_ids = np.asarray([])
@@ -149,13 +150,13 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
     return pts, starting_ids, trees
     
 # equivalent file but for a single las file
-def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6):
+def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6,print_keep=False):
     W = polygon[:,0].min()
     E = polygon[:,0].max()
     S = polygon[:,1].min()
     N = polygon[:,1].max()
     tile_pts = load_lidar_data_by_bbox(lasfile,N,S,E,W,print_npts=False)
-    pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
+    pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon,print_keep)
     # now create KDTrees
     starting_ids, trees = create_KDTree(pts)
 
@@ -164,7 +165,7 @@ def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6):
 
 # equivalent scripts for laz files - calls las2las to transform to .las files
 # before reading in with laspy
-def find_laz_files_by_polygon(file_list,polygon):
+def find_laz_files_by_polygon(file_list,polygon,print_keep=False):
     laz_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
     keep = []
     n_files = laz_files.size
@@ -176,9 +177,10 @@ def find_laz_files_by_polygon(file_list,polygon):
         if inside.sum()>0:
             keep.append(laz_files[i])
         os.system("rm temp.las")
-    print 'las tiles to load in:', len(keep)
-    for ll in range(0,len(keep)):
-        print keep[ll]
+    if print_keep:
+        print 'las tiles to load in:', len(keep)
+        for ll in range(0,len(keep)):
+            print keep[ll]
     return keep
     
 #----------------------------------------------------------------------------

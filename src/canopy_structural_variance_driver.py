@@ -7,7 +7,7 @@ import fiona
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
-import LiDAR_MacHorn_LAD_profiles as PAD
+import LiDAR_MacHorn_LAD_profiles as PAD1
 import structural_metrics as struct
 
 from matplotlib import rcParams
@@ -65,7 +65,7 @@ for cc in range(0,N_cameras):
     # Read in LiDAR points for region of interest
     # - first find the tiles
     polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
-    lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(las_list,polygon, laz_files=laz_files)
+    lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 8*10**5, laz_files=laz_files)
     N_trees = len(trees)
 
     PAD = np.zeros((N_pts_iter, heights.size))
@@ -83,27 +83,29 @@ for cc in range(0,N_cameras):
 
     # Now loop through the shapefile points and sample defined radius, before extracting canopy profiles
     for pp in range(0,N_pts_iter):
-        print pp
         # retrieve point clouds samples        
-        sample_pts = []
+        sample_pts = np.array([])
         for tt in range(0,N_trees):
             ids = trees[tt].query_ball_point(pts_iter[pp], radius)
             if len(ids)>0:
-                sample_pts.append(lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]])
-        sample_pts = np.asarray(sample_pts)
+                if sample_pts.size==0:
+                    sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
+                else:
+                    sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
+
         # calculate PAD profile
-        heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
-        PAD[pp,:] = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+        heights,first_return_profile,n_ground_returns = PAD1.bin_returns(sample_pts, max_height, layer_thickness)
+        PAD[pp,:] = PAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
         PAD[pp,heights<min_height]=0
 
         # Compute metrics...
         PAI[pp] = np.sum(PAD[pp,:])
-        pt_dens[pp] = sample_pts.shape[0]/(np.pi*radius*2.)
+        pt_dens[pp] = sample_pts.shape[0]/(np.pi*radius**2.)
         temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD[pp,:])
         mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD[pp,:])
         n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD[pp,:],min_PAD)
-        frechet[pp] = struct.calculate_mean_Frechet_distance()
-        height[pp] = np.percentile(sample_pts[sample_pts[sample_pts[:,3]==1],2],99)
+        frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD[0,:],PAD[pp,:]]),heights)
+        height[pp] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
         Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
 
     # store into summary dictionary

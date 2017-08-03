@@ -253,8 +253,8 @@ def calculate_canopy_shape(heights,density):
     
     cumulative_density = np.cumsum(density)
     
-    99_perc = 0.99*cumulative_density[-1]
-    H = heights[cumulative_density>=99_perc][0]
+    perc99 = 0.99*cumulative_density[-1]
+    H = heights[cumulative_density>=perc99][0]
     P = heights[density==density.max()][0]
     return H, P, P/H
 

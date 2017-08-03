@@ -122,7 +122,7 @@ for cc in range(0,N_cameras):
     camera_dict['scale'] = scale_iter.copy()
     camera_dict['height'] = height.copy()
     camera_dict['pt_density'] = pt_dens.copy()
-    camera_dict['shape'] = shape.copy()
+    camera_dict['shape'] = shape_PAD.copy()
     camera_dict['mean_ht'] = mean_ht.copy()
     camera_dict['std_dev'] = sd.copy()
     camera_dict['skew'] = skew.copy()

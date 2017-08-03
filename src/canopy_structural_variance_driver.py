@@ -19,7 +19,7 @@ rcParams['legend.numpoints'] = 1
 axis_size = rcParams['font.size']+2
 
 # Some files
-las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list.txt' ## CHANGE AS REQUIRED
+las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt' ## CHANGE AS REQUIRED
 pts_shp = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/CameraTraps/OM2015_16.shp' ## CHANGE AS REQUIRED
 laz_files = False ## CHANGE AS REQUIRED
 

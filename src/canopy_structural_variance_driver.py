@@ -49,7 +49,7 @@ cameras = np.unique(pt_camera)
 N_cameras = cameras.size
 structure_dict={}
 for cc in range(0,N_cameras):
-    camera_dict
+    camera_dict = {}
     mask = pt_camera==cameras[cc]
     pts_iter = pts[mask,:]
     N_pts_iter = pts_iter.shape[0]
@@ -58,7 +58,7 @@ for cc in range(0,N_cameras):
     #W,S,E,N = shapefile.bounds
     
     W=np.min(pts_iter[:,0])-radius
-    S=mp.min(pts_iter[:,1])-radius
+    S=np.min(pts_iter[:,1])-radius
     E=np.max(pts_iter[:,0])+radius
     N=np.max(pts_iter[:,1])+radius
 

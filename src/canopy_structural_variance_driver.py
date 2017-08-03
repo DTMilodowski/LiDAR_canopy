@@ -23,6 +23,10 @@ las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list
 pts_shp = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/CameraTraps/OM2015_16.shp' ## CHANGE AS REQUIRED
 laz_files = False ## CHANGE AS REQUIRED
 
+# some output files
+profile_file = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/CameraTraps/PAD_profiles_for_SAFE_camera_traps.csv'
+stats_file = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/CameraTraps/Structural_stats_for_SAFE_camera_traps.csv'
+
 # Some parameters
 min_PAD = 0.1
 radius = 10.
@@ -115,10 +119,56 @@ for cc in range(0,N_cameras):
     camera_dict['height'] = height.copy()
     camera_dict['pt_density'] = pt_dens.copy()
     camera_dict['shape'] = shape.copy()
+    camera_dict['mean_ht'] = mean_ht.copy()
     camera_dict['std_dev'] = sd.copy()
     camera_dict['skew'] = skew.copy()
     camera_dict['kurtosis'] = kurt.copy()
     camera_dict['n_layers'] = n_layers.copy()
-    camera_dict['frechet'] = frechet.copy()
-    camera_dict['ShannonIndex'] = Shannon.copy()
+    camera_dict['Frechet'] = frechet.copy()
+    camera_dict['Shannon'] = Shannon.copy()
     structure_dict[cameras[cc]] = camera_dict
+
+
+# finally write two output files 1) the profiles; 2) the stats
+f = open(profile_file,"w") #opens file
+f.write("height, ")
+for cc in range(0,N_cameras):
+    cam=cameras[cc]
+    PAD = structure_dict[cam]['PAD']
+    n_profiles = PAD.shape[0]
+    for pp in range(0,n_profiles):
+        f.write(cam+'_'+str(pp+1).zfill(3)+', ')
+    f.write("\n")
+
+for ll in range(0,heights.size):
+    f.write(heights[ll]+', ')
+    for cc in range(0,N_cameras):
+        cam=cameras[cc]
+        PAD = structure_dict[cam]['PAD']
+        n_profiles = PAD.shape[0]
+        for pp in range(0,n_profiles):
+            f.write('%.5f' % PAD[pp,ll])
+        f.write("\n")
+f.close()
+
+f = open(stats_file,"w") #opens file
+f.write("profile, camera, scale, point_density, canopy_height, PAI, n_layers, canopy_shape, mean_PAD, std_PAD, skew_PAD, kurtosis_PAD, Frechet_distance, Shannon_index\n")
+for cc in range(0,N_cameras):
+    cam=cameras[cc]
+    PAI = structure_dict[cam]['PAI']
+    scale = structure_dict[cam]['scale']
+    height = structure_dict[cam]['height']
+    density = structure_dict[cam]['pt_density']
+    layers = structure_dict[cam]['n_layers']
+    shape = structure_dict[cam]['shape']
+    mean_ht = structure_dict[cam]['mean_ht']
+    sd = structure_dict[cam]['std_dev']
+    skew = structure_dictp[cam]['skew']
+    kurt = structure_dictp[cam]['kurtosis']
+    fr = structure_dictp[cam]['Frechet']
+    Shan = structure_dictp[cam]['Shannon']
+    n_profiles = PAI.size
+    for pp in range(0,n_profiles):
+        f.write('%s, %s, %.0f, %.5f, %.5f, %.5f, %.0f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f , %.5f\n' % (cam+'_'+str(pp+1).zfill(3), cam, scale[pp], density[pp], height[pp], PAI[pp], layers[pp], shape[pp], mean_ht[pp], sd[pp], skew[pp], kurt[pp], fr[pp], Shan[pp]))
+
+f.close()

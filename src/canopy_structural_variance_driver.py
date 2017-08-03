@@ -37,6 +37,7 @@ heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
 
 # Open shapefile and get points & bounding box for ROI
+print 'Loading sample locations from shapefile'
 shapefile= fiona.open(pts_shp)
 
 N_pts = len(shapefile)
@@ -52,7 +53,10 @@ for pp in range(0,N_pts):
 cameras = np.unique(pt_camera)
 N_cameras = cameras.size
 structure_dict={}
+
+print 'Starting loop through camera traps'
 for cc in range(0,N_cameras):
+    print '\tCamera trap: ', cameras[cc], '; number ', cc+1, ' of ', N_cameras
     camera_dict = {}
     mask = pt_camera==cameras[cc]
     pts_iter = pts[mask,:]
@@ -130,6 +134,7 @@ for cc in range(0,N_cameras):
 
 
 # finally write two output files 1) the profiles; 2) the stats
+print "\t writing ", profile_file 
 f = open(profile_file,"w") #opens file
 f.write("height, ")
 for cc in range(0,N_cameras):
@@ -151,6 +156,7 @@ for ll in range(0,heights.size):
         f.write("\n")
 f.close()
 
+print "\t writing ", stats_file 
 f = open(stats_file,"w") #opens file
 f.write("profile, camera, scale, point_density, canopy_height, PAI, n_layers, canopy_shape, mean_PAD, std_PAD, skew_PAD, kurtosis_PAD, Frechet_distance, Shannon_index\n")
 for cc in range(0,N_cameras):

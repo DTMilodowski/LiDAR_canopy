@@ -24,8 +24,10 @@ pts_shp = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/CameraTraps/OM2015_16.sh
 laz_files = False ## CHANGE AS REQUIRED
 
 # Some parameters
+min_PAD = 0.1
 radius = 10.
-max_height = 80.        
+max_height = 80.   
+min_height = 2.     
 layer_thickness = 1
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
@@ -69,16 +71,11 @@ for cc in range(0,N_cameras):
     PAD = np.zeros((N_pts_iter, heights.size))
     PAI = np.zeros(N_pts_iter)
     pt_dens = np.zeros(N_pts_iter)
-    shape_pts = np.zeros(N_pts_iter)
     shape_PAD = np.zeros(N_pts_iter)
-    mean_ht_pts = np.zeros(N_pts_iter)
-    mean_ht_PAD = np.zeros(N_pts_iter)
-    sd_pts = np.zeros(N_pts_iter)
-    sd_PAD = np.zeros(N_pts_iter)
-    skew_pts = np.zeros(N_pts_iter)
-    skew_PAD = np.zeros(N_pts_iter)
-    kurt_pts = np.zeros(N_pts_iter)
-    kurt_PAD = np.zeros(N_pts_iter)
+    mean_ht = np.zeros(N_pts_iter)
+    sd = np.zeros(N_pts_iter)
+    skew = np.zeros(N_pts_iter)
+    kurt = np.zeros(N_pts_iter)
     n_layers = np.zeros(N_pts_iter)
     frechet = np.zeros(N_pts_iter)
     height = np.zeros(N_pts_iter)
@@ -89,14 +86,35 @@ for cc in range(0,N_cameras):
         # retrieve point clouds samples        
         sample_pts = []
         for tt in range(0,N_trees):
-            ids = trees[tt].query_ball_point(pts[pp], radius)
+            ids = trees[tt].query_ball_point(pts_iter[pp], radius)
             sample_pts.append(lidar_pts[ids+starting_ids_for_trees[tt]])
-        
+        sample_pts = np.asarray(sample_pts)
         # calculate PAD profile
-        heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts[pp], max_height, layer_thickness)
+        heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
         PAD[pp,:] = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+        PAD[pp,heights<min_height]=0
+
         # Compute metrics...
-        
+        PAI[pp] = np.sum(PAD[pp,:])
+        pt_dens[pp] = sample_pts.shape[0]/(np.pi*radius*2.)
+        temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD[pp,:])
+        mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD[pp,:])
+        n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD[pp,:],min_PAD)
+        frechet[pp] = struct.calculate_mean_Frechet_distance()
+        height[pp] = np.percentile(sample_pts[sample_pts[sample_pts[:,3]==1],2],99)
+        Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
 
     # store into summary dictionary
-    camera_dict
+    camera_dict['PAD'] = PAD.copy()
+    camera_dict['PAI'] = PAI.copy()
+    camera_dict['scale'] = scale_iter.copy()
+    camera_dict['height'] = height.copy()
+    camera_dict['pt_density'] = pt_dens.copy()
+    camera_dict['shape'] = shape.copy()
+    camera_dict['std_dev'] = sd.copy()
+    camera_dict['skew'] = skew.copy()
+    camera_dict['kurtosis'] = kurt.copy()
+    camera_dict['n_layers'] = n_layers.copy()
+    camera_dict['frechet'] = frechet.copy()
+    camera_dict['ShannonIndex'] = Shannon.copy()
+    structure_dict[cameras[cc]] = camera_dict

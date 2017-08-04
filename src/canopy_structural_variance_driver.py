@@ -99,7 +99,31 @@ for cc in range(0,N_cameras):
                     sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
                 else:
                     sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
-        if sample_pts.size > 0:
+
+        if sample_pts.size == 0:
+            PAD[pp,:] = -9999
+            PAI[pp] = -9999
+            pt_dens[pp] = 0.
+            temp1, temp2, shape_PAD[pp] = -9999
+            mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
+            n_layers[pp] = -9999
+            frechet[pp] = -9999
+            height[pp] = -9999
+            Shannon[pp] = -9999
+
+        elif np.sum(sample_pts[:,3]==1) == 0:
+            PAD[pp,:] = -9999
+            PAI[pp] = -9999
+            pt_dens[pp] = 0.
+            temp1, temp2, shape_PAD[pp] = -9999
+            mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
+            n_layers[pp] = -9999
+            frechet[pp] = -9999
+            height[pp] = -9999
+            Shannon[pp] = -9999            
+
+        else:
+            print sample_pts.shape, np.sum(sample_pts[:,3]==1)
             # calculate PAD profile
             heights,first_return_profile,n_ground_returns = PAD1.bin_returns(sample_pts, max_height, layer_thickness)
             PAD[pp,:] = PAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
@@ -114,17 +138,6 @@ for cc in range(0,N_cameras):
             frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD[0,:],PAD[pp,:]]),heights)
             height[pp] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
             Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
-        
-        else:
-            PAD[pp,:] = -9999
-            PAI[pp] = -9999
-            pt_dens[pp] = 0.
-            temp1, temp2, shape_PAD[pp] = -9999
-            mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
-            n_layers[pp] = -9999
-            frechet[pp] = -9999
-            height[pp] = -9999
-            Shannon[pp] = -9999
 
         sample_pts=None
 

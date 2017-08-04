@@ -104,8 +104,11 @@ for cc in range(0,N_cameras):
             PAD[pp,:] = -9999
             PAI[pp] = -9999
             pt_dens[pp] = 0.
-            temp1, temp2, shape_PAD[pp] = -9999
-            mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
+            shape_PAD[pp] = -9999
+            mean_ht[pp] = -9999
+            sd[pp] = -9999
+            skew[pp] = -9999
+            kurt[pp] = -9999
             n_layers[pp] = -9999
             frechet[pp] = -9999
             height[pp] = -9999
@@ -115,8 +118,11 @@ for cc in range(0,N_cameras):
             PAD[pp,:] = -9999
             PAI[pp] = -9999
             pt_dens[pp] = 0.
-            temp1, temp2, shape_PAD[pp] = -9999
-            mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
+            shape_PAD[pp] = -9999
+            mean_ht[pp] = -9999
+            sd[pp] = -9999
+            skew[pp] = -9999
+            kurt[pp] = -9999
             n_layers[pp] = -9999
             frechet[pp] = -9999
             height[pp] = -9999

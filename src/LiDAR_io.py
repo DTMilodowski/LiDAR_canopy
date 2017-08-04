@@ -10,6 +10,7 @@ import laspy as las
 import os
 from scipy import spatial
 import LiDAR_tools as lidar
+import time
 
 # get bounding box from las file
 def get_lasfile_bbox(las_file):
@@ -118,6 +119,8 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
     starting_ids = np.asarray([])
 
     # first case scenario that no points in ROI
+    print '\t\tloading tiles...'
+    start=time.time()
     if n_files == 0:
         print 'WARNING: No files within specified polygon - try again'
         pts = np.array([])
@@ -129,7 +132,8 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
             tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
             os.system("rm temp.las")
         else:
-            tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False)  
+            tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False) 
+ 
         pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
                 
         # now repeat for subsequent tiles
@@ -140,11 +144,18 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
                 os.system("rm temp.las")
             else:                
                 tile_pts = load_lidar_data_by_bbox(keep_files[i],N,S,E,W,print_npts=False)
+
             pts_ = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
             pts = np.concatenate((pts,pts_),axis=0)
 
+    end=time.time()
+    print end-start, 's'
     # now create KDTrees
+    print '\t\tbuilding KD-trees...'
+    start=time.time()
     starting_ids, trees = create_KDTree(pts)
+    end=time.time()
+    print  '%.3f s' % end-start
 
     print "loaded ", pts.shape[0], " points into ", len(trees), " KDTrees"
     return pts, starting_ids, trees

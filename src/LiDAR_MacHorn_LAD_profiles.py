@@ -7,7 +7,8 @@ import auxilliary_functions as aux
 def bin_returns(pts, max_height, layer_thickness):
     
     #print pts.shape
-    pts=pts[pts[:,3]==1,:]
+    mask= pts[:,3]==1
+    pts=pts[mask,:]
     
     # calculate n ground points
     n_ground_returns = np.sum(pts[:,4]==2)

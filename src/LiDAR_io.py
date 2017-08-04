@@ -119,7 +119,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
     starting_ids = np.asarray([])
 
     # first case scenario that no points in ROI
-    print '\t\tloading tiles...'
+    print '\t\tloading %.0f tiles...' % n_files
     start=time.time()
     if n_files == 0:
         print 'WARNING: No files within specified polygon - try again'
@@ -149,13 +149,13 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
             pts = np.concatenate((pts,pts_),axis=0)
 
     end=time.time()
-    print end-start, 's'
+    print '\t\t...%.3f s' % (end-start)
     # now create KDTrees
     print '\t\tbuilding KD-trees...'
     start=time.time()
     starting_ids, trees = create_KDTree(pts)
     end=time.time()
-    print  '%.3f s' % (end-start)
+    print  '\t\t...%.3f s' % (end-start)
 
     print "loaded ", pts.shape[0], " points into ", len(trees), " KDTrees"
     return pts, starting_ids, trees

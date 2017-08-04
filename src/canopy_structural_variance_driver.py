@@ -129,7 +129,7 @@ for cc in range(0,N_cameras):
             Shannon[pp] = -9999            
 
         else:
-            print sample_pts.shape, np.sum(sample_pts[:,3]==1)
+            #print sample_pts.shape, np.sum(sample_pts[:,3]==1)
             # calculate PAD profile
             heights,first_return_profile,n_ground_returns = PAD1.bin_returns(sample_pts, max_height, layer_thickness)
             PAD[pp,:] = PAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)

@@ -56,7 +56,7 @@ structure_dict={}
 
 print 'Starting loop through camera traps'
 for cc in range(0,N_cameras):
-    print '\tCamera trap: ', cameras[cc], '; number ', cc+1, ' of ', N_cameras
+    print '\tCamera trap: %s; number %.0f of %.0f' % (cameras[cc], cc+1, N_cameras)
     camera_dict = {}
     mask = pt_camera==cameras[cc]
     pts_iter = pts[mask,:]
@@ -64,7 +64,6 @@ for cc in range(0,N_cameras):
     scale_iter = pt_scale[mask]
 
     #W,S,E,N = shapefile.bounds
-    
     W=np.min(pts_iter[:,0])-radius
     S=np.min(pts_iter[:,1])-radius
     E=np.max(pts_iter[:,0])+radius
@@ -73,7 +72,7 @@ for cc in range(0,N_cameras):
     # Read in LiDAR points for region of interest
     # - first find the tiles
     polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
-    lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 8*10**5, laz_files=laz_files)
+    lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=laz_files)
     N_trees = len(trees)
 
     PAD = np.zeros((N_pts_iter, heights.size))
@@ -100,21 +99,34 @@ for cc in range(0,N_cameras):
                     sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
                 else:
                     sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
+        if sample_pts.size > 0:
+            # calculate PAD profile
+            heights,first_return_profile,n_ground_returns = PAD1.bin_returns(sample_pts, max_height, layer_thickness)
+            PAD[pp,:] = PAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+            PAD[pp,heights<min_height]=0
 
-        # calculate PAD profile
-        heights,first_return_profile,n_ground_returns = PAD1.bin_returns(sample_pts, max_height, layer_thickness)
-        PAD[pp,:] = PAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-        PAD[pp,heights<min_height]=0
+            # Compute metrics...
+            PAI[pp] = np.sum(PAD[pp,:])
+            pt_dens[pp] = sample_pts.shape[0]/(np.pi*radius**2.)
+            temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD[pp,:])
+            mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD[pp,:])
+            n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD[pp,:],min_PAD)
+            frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD[0,:],PAD[pp,:]]),heights)
+            height[pp] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
+            Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
+        
+        else:
+            PAD[pp,:] = -9999
+            PAI[pp] = -9999
+            pt_dens[pp] = 0.
+            temp1, temp2, shape_PAD[pp] = -9999
+            mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
+            n_layers[pp] = -9999
+            frechet[pp] = -9999
+            height[pp] = -9999
+            Shannon[pp] = -9999
 
-        # Compute metrics...
-        PAI[pp] = np.sum(PAD[pp,:])
-        pt_dens[pp] = sample_pts.shape[0]/(np.pi*radius**2.)
-        temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD[pp,:])
-        mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD[pp,:])
-        n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD[pp,:],min_PAD)
-        frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD[0,:],PAD[pp,:]]),heights)
-        height[pp] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
-        Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
+        sample_pts=None
 
     # store into summary dictionary
     camera_dict['PAD'] = PAD.copy()

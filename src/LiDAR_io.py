@@ -149,13 +149,13 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
             pts = np.concatenate((pts,pts_),axis=0)
 
     end=time.time()
-    print '\t\t...%.3f s' % (end-start)
+    print '\t\t\t...%.3f s' % (end-start)
     # now create KDTrees
     print '\t\tbuilding KD-trees...'
     start=time.time()
     starting_ids, trees = create_KDTree(pts)
     end=time.time()
-    print  '\t\t...%.3f s' % (end-start)
+    print  '\t\t\t...%.3f s' % (end-start)
 
     print "loaded ", pts.shape[0], " points into ", len(trees), " KDTrees"
     return pts, starting_ids, trees

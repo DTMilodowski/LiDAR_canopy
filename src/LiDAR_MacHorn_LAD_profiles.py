@@ -5,7 +5,7 @@ import auxilliary_functions as aux
 
 # bin lidar returns 
 def bin_returns(pts, max_height, layer_thickness):
-    # filter the points to leave only first returns - not sure why this is necessary, but Cam group suggest - point for discussion
+    
     #print pts.shape
     pts=pts[pts[:,3]==1,:]
     
@@ -38,7 +38,6 @@ def estimate_LAD_MacArthurHorn(lidar_profile,n_ground_returns,layer_thickness,k)
     S = np.zeros(n_layers+1)
     S[1:]=np.cumsum(lidar_profile)
     S+=n_ground_returns
-    #S+=(2*n_ground_returns) # Harding et al., 2001 correction to account for the fact that ground reflectance is typically lower than canopy
     S[S==0]=1 # This step is required to stop the base of the profile (final return) kicking out errors if there are no ground returns
     S_in = S[1:]
     S_out= S[:-1]

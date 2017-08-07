@@ -177,7 +177,7 @@ for cc in range(0,N_cameras):
     f.write("\n")
 
 for ll in range(0,heights.size):
-    f.write(heights[ll]+', ')
+    f.write('%.1f, ' % heights[ll])
     for cc in range(0,N_cameras):
         cam=cameras[cc]
         PAD = structure_dict[cam]['PAD']

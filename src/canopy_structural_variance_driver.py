@@ -146,7 +146,6 @@ for cc in range(0,N_cameras):
             Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
 
         # Write PAD profiles to file
-        print "\t writing ", profile_file 
         f = open(profile_file+cameras[cc]+".csv","w") #opens file
         f.write("height, ")
         n_profiles = PAD.shape[0]

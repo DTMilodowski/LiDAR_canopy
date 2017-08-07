@@ -24,7 +24,7 @@ pts_shp = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/CameraTraps/OM2015_16.sh
 laz_files = False ## CHANGE AS REQUIRED
 
 # some output files
-profile_file = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/CameraTraps/PAD_profiles_for_SAFE_camera_traps.csv'
+profile_file = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/CameraTraps/PAD_profiles_for_'
 stats_file = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/CameraTraps/Structural_stats_for_SAFE_camera_traps.csv'
 
 # Some parameters
@@ -145,10 +145,26 @@ for cc in range(0,N_cameras):
             height[pp] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
             Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
 
+        # Write PAD profiles to file
+        print "\t writing ", profile_file 
+        f = open(profile_file+cameras[cc]+".csv","w") #opens file
+        f.write("height, ")
+        n_profiles = PAD.shape[0]
+        for pp in range(0,n_profiles):
+            f.write(cameras[cc]+'_'+str(pp+1).zfill(3)+', ')
+        f.write("\n")
+
+        for ll in range(0,heights.size):
+            f.write('%.1f, ' % heights[ll])
+            for pp in range(0,n_profiles):
+                f.write('%.5f' % PAD[pp,ll])
+            f.write("\n")
+        f.close()
+
         sample_pts=None
 
     # store into summary dictionary
-    camera_dict['PAD'] = PAD.copy()
+    #camera_dict['PAD'] = PAD.copy()
     camera_dict['PAI'] = PAI.copy()
     camera_dict['scale'] = scale_iter.copy()
     camera_dict['height'] = height.copy()
@@ -165,6 +181,7 @@ for cc in range(0,N_cameras):
 
 
 # finally write two output files 1) the profiles; 2) the stats
+"""
 print "\t writing ", profile_file 
 f = open(profile_file,"w") #opens file
 f.write("height, ")
@@ -186,6 +203,7 @@ for ll in range(0,heights.size):
             f.write('%.5f' % PAD[pp,ll])
         f.write("\n")
 f.close()
+"""
 
 print "\t writing ", stats_file 
 f = open(stats_file,"w") #opens file

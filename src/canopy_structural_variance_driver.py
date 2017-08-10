@@ -217,10 +217,10 @@ for cc in range(0,N_cameras):
     shape = structure_dict[cam]['shape']
     mean_ht = structure_dict[cam]['mean_ht']
     sd = structure_dict[cam]['std_dev']
-    skew = structure_dictp[cam]['skew']
-    kurt = structure_dictp[cam]['kurtosis']
-    fr = structure_dictp[cam]['Frechet']
-    Shan = structure_dictp[cam]['Shannon']
+    skew = structure_dict[cam]['skew']
+    kurt = structure_dict[cam]['kurtosis']
+    fr = structure_dict[cam]['Frechet']
+    Shan = structure_dict[cam]['Shannon']
     n_profiles = PAI.size
     for pp in range(0,n_profiles):
         f.write('%s, %s, %.0f, %.5f, %.5f, %.5f, %.0f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f , %.5f\n' % (cam+'_'+str(pp+1).zfill(3), cam, scale[pp], density[pp], height[pp], PAI[pp], layers[pp], shape[pp], mean_ht[pp], sd[pp], skew[pp], kurt[pp], fr[pp], Shan[pp]))

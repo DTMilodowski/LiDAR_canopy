@@ -264,10 +264,14 @@ def calculate_canopy_shape(heights,density):
 # Std deviation tells you about spread around the mean
 # Skew tells you about distribution within the profile (e.g. heavy tailed etc.)
 # Kurtosis tells you about "peakiness of distribution"
-def calculate_moments_of_distribution(heights,density):
-    dist = stats.rv_discrete(values=(heights,density))
-    mean,std,skew,kurt = dist.stats(moments='mvsk')
-    return mean,std,skew,kurt
+def calculate_moments_of_distribution(x,p):
+    N = p.sum()
+    u = np.sum(x*p)/N # mean
+    v = np.sum(p*(x-u)**2)/N  # variance
+    s = (np.sum(p*(x-u)**3)/N) / ((np.sum(p*(x-u)**2)/N)**(3/2.))  # skew
+    k = (np.sum(p*(x-u)**4)/N) / ((np.sum(p*(x-u)**2)/N)**(2.)) # kurtosis
+
+    return u,np.sqrt(v),s,k
 
 # Calculate number of canopy layers based on regions of continuous PAD [Clark et al., Ecology Letters, 2008]
 # This is trying to replicate the field process of counting canopy layers

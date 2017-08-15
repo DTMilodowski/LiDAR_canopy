@@ -263,6 +263,62 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
 
 
 #=====================================================================================================================
+# Load in data for SAFE detailed subplot census - all trees >2 cm  - only interested in a subset of the fields
+def load_SAFE_small_stem_census(filename, sp_area=20.**2):
+
+    datatype = {'names': ('Plot', 'Subplot', 'Date', 'Obs','tag', 'DBH_ns', 'DBH_ew', 'H_POM','Height', 'Flag', 'Notes', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9'), 'formats': ('S8','i8','S10','S64','i16','f32','f32','f32','f32','S4','S32','S16','S16','S16','S16','S16','S16','S16','S16','S16')}
+    data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
+
+    # loop through data & remove lianas
+    N = data['Plot'].size
+    mask = np.ones(N)
+    for i in range(0,N):
+        if 'liana' in data['Notes'][i]:
+            mask[i] = 0
+        elif 'Liana' in data['Notes'][i]:
+            mask[i] = 0
+
+    # Remove lianas and dead trees
+    data = data[mask]
+    data = data[data['Flag']!='dead']
+    data = data[data['Flag']!='dead, broken']
+    data = data[data['Flag']!='liana']
+
+    plot_dict = {}
+    plots = np.unique(data['Plot'])
+    
+    for pp in range(plots.size):
+        plot_data = data[data['Plot']==plots[pp]]
+        subplots = np.unique(plot_data['Subplot'])
+ 
+        stem_dict = {}
+    
+        # some basic params
+        bin_width = 0.5
+        n_stems = np.zeros((DBH.size,subplots.size))
+
+        for ss in range(0,subplots.size):
+            mask = plot_data['Subplot']==subplots[ss]
+            n_trees = mask.sum()
+
+            sp_data = plot_data[mask]
+            DBH = np.arange(0.,10.,bin_width)+bin_width/2.        
+
+            # loop through trees and only look at trees < 10 cm DBH
+            for tt in range(n_trees):
+                dbh = (sp_data['DBH_ns'][tt]+sp_data['DBH_ew'][tt])/2.
+                if dbh<10.:
+                    ii = np.floor(dbh/bin_width)
+                    n_stems[ii,subplots[ss]-1]+=1.
+        
+        stem_dict['dbh'] = DBH[1:]
+        stem_dict['stem_density'] = np.mean(n_stems,axis=1)[1:]/plot_area
+        plot_dict[plots[pp]]=stem_dict
+
+    return stem_dict
+
+
+#=====================================================================================================================
 # Load in data for Danum detailed census
 def load_Danum_stem_census(filename, sp_area=20.**2):
 
@@ -316,7 +372,7 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
             dbh = sp_data['DBH4'][m4][tt]
             if dbh<10.:
                 ii = np.floor(dbh/bin_width)
-                n_stems[ii,subplots[ss]]+=1.
+                n_stems[ii,subplots[ss]-1]+=1.
         
         
     stem_dict['dbh'] = DBH[1:]

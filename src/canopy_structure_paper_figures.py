@@ -35,6 +35,10 @@ field_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_DANUM_carb
 LAI_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_LAI_fromHemisphericalPhotos.csv'
 stems_file = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Local/SAFE_small_plot_tree_data.csv'
 
+D1_stemcensus = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Danum/carbon_plot_data_Danum_05042017_DTMformatting_DAN04.csv'
+D2_stemcensus = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Danum/carbon_plot_data_Danum_05042017_DTMformatting_DAN05.csv'
+SAFE_stemcensus = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_plots/SAFE_SmallTreeCensus_year1only.csv'
+
 # also define output directory (for saving figures)
 output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/Figures/'
 
@@ -79,8 +83,10 @@ a, b, CF, r_sq, p, H, D = field.retrieve_crown_allometry(allometry_file)
 a_ht, b_ht, CF_ht, a_A, b_A, CF_A = field.calculate_allometric_equations_from_survey(field_data)
 
 # load stem data
-stem_data = field.load_SAFE_small_plot_data(stems_file)
-
+#stem_data = field.load_SAFE_small_plot_data(stems_file)
+DC1_stem_data = field.load_Danum_stem_census(D1_stemcensus) # all subplots
+DC2_stem_data = field.load_Danum_stem_census(D2_stemcensus) # all subplots
+SAFE_stem_data = field.load_SAFE_small_stem_census(SAFE_stemcensus) # subset of subplots
 
 # load LAI estimates from hemiphotos
 field_LAI = aux.load_field_LAI(LAI_file)

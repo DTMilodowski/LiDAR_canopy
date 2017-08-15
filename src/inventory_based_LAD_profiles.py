@@ -378,3 +378,5 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
     stem_dict['dbh'] = DBH[1:]
     stem_dict['stem_density'] = np.mean(n_stems,axis=1)[1:]/plot_area
     return stem_dict
+
+

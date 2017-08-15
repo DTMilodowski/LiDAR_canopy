@@ -261,3 +261,64 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
     LAD = CanopyV*leafA_per_unitV
     return LAD
 
+
+#=====================================================================================================================
+# Load in data for Danum detailed census
+def load_Danum_stem_census(filename, sp_area=20.**2):
+
+    datatype = {'names': ('Plot', 'Subplot', 'Date', 'x', 'y','tag','spp', 'Nstem', 'DBH1', 'Codes', 'Notes', 'DBH2', 'DBH3', 'DBH4'), 'formats': ('S6','i8','S10','i8','i8','S6','S6','i8','f32','S8','S32','f32','f32','f32')}
+    data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
+
+    subplots = np.unique(data['Subplot'])
+
+    stem_dict = {}
+    
+    # some basic params
+    bin_width = 0.5
+    n_stems = np.zeros((DBH.size,subplots.size))
+
+    for ss in range(0,subplots.size):
+        mask = data['Subplot']==subplots[ss]
+        n_trees = mask.sum()
+
+        sp_data = data[mask]
+        DBH = np.arange(0.,10.,bin_width)+bin_width/2.        
+
+        # loop through trees and only look at trees < 10 cm DBH
+        for tt in range(n_trees):
+            dbh = sp_data['DBH'][tt]
+            if dbh<10.:
+                ii = np.floor(dbh/bin_width)
+                n_stems[ii,subplots[ss]]+=1.
+
+        # loop through 2nd stems
+        m2 = sp_data['DBH2']>0
+        n_trees2 = np.sum(m2)
+        for tt in range(n_trees2):
+            dbh = sp_data['DBH2'][m2][tt]
+            if dbh<10.:
+                ii = np.floor(dbh/bin_width)
+                n_stems[ii,subplots[ss]]+=1.
+        
+        # loop through 3rd stems
+        m3 = sp_data['DBH3']>0
+        n_trees3 = np.sum(m3)
+        for tt in range(n_trees3):
+            dbh = sp_data['DBH3'][m3][tt]
+            if dbh<10.:
+                ii = np.floor(dbh/bin_width)
+                n_stems[ii,subplots[ss]]+=1.
+
+        # loop through 4th stems
+        m4 = sp_data['DBH4']>0
+        n_trees4 = np.sum(m4)
+        for tt in range(n_trees4):
+            dbh = sp_data['DBH4'][m4][tt]
+            if dbh<10.:
+                ii = np.floor(dbh/bin_width)
+                n_stems[ii,subplots[ss]]+=1.
+        
+        
+    stem_dict['dbh'] = DBH[1:]
+    stem_dict['stem_density'] = np.mean(n_stems,axis=1)[1:]/plot_area
+    return stem_dict

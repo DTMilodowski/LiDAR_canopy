@@ -268,7 +268,10 @@ def load_SAFE_small_stem_census(filename, sp_area=20.**2):
 
     datatype = {'names': ('Plot', 'Subplot', 'Date', 'Obs','tag', 'DBH_ns', 'DBH_ew', 'H_POM','Height', 'Flag', 'Notes', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9'), 'formats': ('S8','i8','S10','S64','i16','f32','f32','f32','f32','S4','S32','S16','S16','S16','S16','S16','S16','S16','S16','S16')}
     data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
-
+              
+    data['DBH_ns']/=10. # convert from mm to cm
+    data['DBH_ew']/=10. # convert from mm to cm
+    
     # loop through data & remove lianas
     N = data['Plot'].size
     mask = np.ones(N)
@@ -324,7 +327,10 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
 
     datatype = {'names': ('Plot', 'Subplot', 'Date', 'x', 'y','tag','spp', 'Nstem', 'DBH1', 'Codes', 'Notes', 'DBH2', 'DBH3', 'DBH4'), 'formats': ('S6','i8','S10','i8','i8','S6','S6','i8','f32','S8','S32','f32','f32','f32')}
     data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
-
+    data['DBH1']/=10. # convert from mm to cm
+    data['DBH2']/=10. # convert from mm to cm
+    data['DBH3']/=10. # convert from mm to cm
+    data['DBH4']/=10. # convert from mm to cm
     subplots = np.unique(data['Subplot'])
 
     stem_dict = {}

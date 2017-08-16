@@ -266,20 +266,21 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
 # Load in data for SAFE detailed subplot census - all trees >2 cm  - only interested in a subset of the fields
 def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
 
-    datatype = {'names': ('Plot', 'Subplot', 'Date', 'Obs','tag', 'DBH_ns', 'DBH_ew', 'H_POM','Height', 'Flag', 'Notes', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9'), 'formats': ('S8','i8','S10','S64','i16','f32','f32','f32','f32','S4','S32','S16','S16','S16','S16','S16','S16','S16','S16','S16')}
-    data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
+    datatype = {'names': ('Plot', 'Subplot', 'Date', 'Obs','tag', 'DBH_ns', 'DBH_ew', 'H_POM','Height', 'Flag', 'Notes'), 'formats': ('S8','i8','S10','S64','i16','f32','f32','f32','f32','S4','S32')}
+    data = np.genfromtxt(filename, skiprows = 1, usecols=np.arange(0,11), delimiter = ',',dtype=datatype)
               
     data['DBH_ns']/=10. # convert from mm to cm
     data['DBH_ew']/=10. # convert from mm to cm
     
     # loop through data & remove lianas
     N = data['Plot'].size
-    mask = np.ones(N)
+
+    mask = np.ones(N,dtype='bool')
     for i in range(0,N):
         if 'liana' in data['Notes'][i]:
-            mask[i] = 0
+            mask[i] = False
         elif 'Liana' in data['Notes'][i]:
-            mask[i] = 0
+            mask[i] = False
 
     # Remove lianas and dead trees
     data = data[mask]
@@ -293,14 +294,15 @@ def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
     for pp in range(plots.size):
         plot_data = data[data['Plot']==plots[pp]]
         subplots = np.unique(plot_data['Subplot'])
- 
-        stem_dict = {}
-    
+
         # some basic params
         bin_width = 0.5
+        DBH = np.arange(0.,10.,bin_width)+bin_width/2.
         n_stems_i = np.zeros((DBH.size,subplots.size))
         n_stems = np.zeros((DBH.size,N_subplots))
-        
+
+ 
+        stem_dict = {}
         sp_present = np.zeros(N_subplots,dtype='bool')
 
         for ss in range(0,subplots.size):
@@ -309,8 +311,7 @@ def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
             mask = plot_data['Subplot']==subplots[ss]
             n_trees = mask.sum()
 
-            sp_data = plot_data[mask]
-            DBH = np.arange(0.,10.,bin_width)+bin_width/2.        
+            sp_data = plot_data[mask]    
 
             # loop through trees and only look at trees < 10 cm DBH
             for tt in range(n_trees):
@@ -326,7 +327,7 @@ def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
                 n_stems[:,ss] = average
                 
         stem_dict['dbh'] = DBH[1:]
-        stem_dict['stem_density'] = n_stems[1:,:]/plot_area
+        stem_dict['stem_density'] = n_stems[1:,:]/sp_area
         plot_dict[plots[pp]]=stem_dict
 
     return stem_dict
@@ -343,27 +344,27 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
     data['DBH3']/=10. # convert from mm to cm
     data['DBH4']/=10. # convert from mm to cm
     subplots = np.unique(data['Subplot'])
-    N_subplots = sublots.size
+    N_subplots = subplots.size
                                                                     
     stem_dict = {}
     
-    # some basic params
+    # some basic params 
     bin_width = 0.5
+    DBH = np.arange(0.,10.,bin_width)+bin_width/2.    
     n_stems = np.zeros((DBH.size,N_subplots))
     
     for ss in range(0,N_subplots):
         mask = data['Subplot']==subplots[ss]
         n_trees = mask.sum()
 
-        sp_data = data[mask]
-        DBH = np.arange(0.,10.,bin_width)+bin_width/2.        
+        sp_data = data[mask]   
 
         # loop through trees and only look at trees < 10 cm DBH
         for tt in range(n_trees):
-            dbh = sp_data['DBH'][tt]
+            dbh = sp_data['DBH1'][tt]
             if dbh<10.:
                 ii = np.floor(dbh/bin_width)
-                n_stems[ii,subplots[ss]]+=1.
+                n_stems[ii,subplots[ss]-1]+=1.
 
         # loop through 2nd stems
         m2 = sp_data['DBH2']>0
@@ -372,7 +373,7 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
             dbh = sp_data['DBH2'][m2][tt]
             if dbh<10.:
                 ii = np.floor(dbh/bin_width)
-                n_stems[ii,subplots[ss]]+=1.
+                n_stems[ii,subplots[ss]-1]+=1.
         
         # loop through 3rd stems
         m3 = sp_data['DBH3']>0
@@ -381,7 +382,7 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
             dbh = sp_data['DBH3'][m3][tt]
             if dbh<10.:
                 ii = np.floor(dbh/bin_width)
-                n_stems[ii,subplots[ss]]+=1.
+                n_stems[ii,subplots[ss]-1]+=1.
 
         # loop through 4th stems
         m4 = sp_data['DBH4']>0
@@ -394,7 +395,7 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
         
         
     stem_dict['dbh'] = DBH[1:]
-    stem_dict['stem_density'] = n_stems[1:,:]/plot_area
+    stem_dict['stem_density'] = n_stems[1:,:]/sp_area
     return stem_dict
 
 
@@ -414,7 +415,7 @@ def calculate_crown_dimensions_for_stem_distributions(DBH,stem_density,a_ht, b_h
     # Apply canopy depth model
     Depth = CF_depth*a_depth*Ht**b_depth
 
-    # Remove any existing nodata values (brought forwards from input data
+    # Remove any existing nodata values (brought forwards from input data)
     mask = np.all((~np.isnan(Depth),~np.isnan(Ht),~np.isnan(Area)),axis=0)
     Depth = Depth[mask]
     Ht = Ht[mask]

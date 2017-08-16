@@ -330,7 +330,7 @@ def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
         stem_dict['stem_density'] = n_stems[1:,:]/sp_area
         plot_dict[plots[pp]]=stem_dict
 
-    return stem_dict
+    return plot_dict
 
 
 #=====================================================================================================================

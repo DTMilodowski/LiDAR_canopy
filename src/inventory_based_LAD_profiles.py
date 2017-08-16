@@ -403,7 +403,6 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
 def calculate_crown_dimensions_for_stem_distributions(DBH,stem_density,a_ht, b_ht, CF_ht, a_area, b_area, CF_area, a_depth, b_depth, CF_depth):
 
     # Get rid of bins with no trees
-    Ht = Ht[stem_density>0]
     DBH = DBH[stem_density>0]
     stem_density = stem_density[stem_density>0]
 

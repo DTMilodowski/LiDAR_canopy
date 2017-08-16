@@ -345,7 +345,7 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
     data['DBH4']/=10. # convert from mm to cm
     subplots = np.unique(data['Subplot'])
     N_subplots = subplots.size
-                                                                    
+
     stem_dict = {}
     
     # some basic params 

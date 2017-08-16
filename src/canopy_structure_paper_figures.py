@@ -384,7 +384,7 @@ ax3c.annotate(eq, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none
 
 
 plt.tight_layout()
-plt.savefig(output_dir+'fig3_allometric_relationships.png')
+plt.savefig(output_dir+'fig4_allometric_relationships.png')
 
 
 #-----------------------------------------------------------------------------------------
@@ -520,7 +520,7 @@ plt.setp(xticklabels,visible=False)
 plt.subplots_adjust(hspace=0.2, wspace = 0.1)
 
 #plt.tight_layout()
-plt.savefig(output_dir+'fig4_plot_LAD_profiles.png')
+plt.savefig(output_dir+'fig5_plot_LAD_profiles.png')
 #plt.show()
 
 #--------------------------------------------------------------------------------------
@@ -575,8 +575,8 @@ ax5a.set_xlim((0,20))
 ax5a.set_ylim((0,20))
 
 plt.tight_layout()
-plt.savefig(output_dir+'fig5_lidar_LAI_comparison.png')
-plt.show()
+plt.savefig(output_dir+'fig6_lidar_LAI_comparison.png')
+#plt.show()
 
 #--------------------------------------------------------------------------------------
 # Figure 6: LAI vs. hemiphotos
@@ -644,8 +644,8 @@ ax6a.set_xlim((0,10))
 ax6a.set_ylim((0,20))
 ax6c.set_ylim(ymin=0)
 plt.tight_layout()
-plt.savefig(output_dir+'fig6_LAI_hemiphoto_comparison.png')
-plt.show()
+plt.savefig(output_dir+'fig11_LAI_hemiphoto_comparison.png')
+#plt.show()
 
 
 
@@ -714,8 +714,8 @@ ax7c.legend(loc=4)
 
 ax7a.set_ylim((0,20))
 plt.tight_layout()
-plt.savefig(output_dir+'fig7_LiDAR_LAI_canopy_volume_comparison.png')
-plt.show()
+plt.savefig(output_dir+'fig10_LiDAR_LAI_canopy_volume_comparison.png')
+#plt.show()
 #--------------------------------------------------------------------------------------
 #Figure 8:  Plot total basal area against LAI from the two preferred methods
 
@@ -817,8 +817,8 @@ ax8a.annotate(r_sq_a, xy=(0.95,0.90), xycoords='axes fraction',backgroundcolor='
 ax8b.annotate(r_sq_b, xy=(0.95,0.90), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
 
 plt.tight_layout()
-plt.savefig(output_dir+'fig8_LiDAR_LAI_BasalArea_comparison.png')
-plt.show()
+plt.savefig(output_dir+'fig12_LiDAR_LAI_BasalArea_comparison.png')
+#plt.show()
 #--------------------------------------------------------------------------------------
 # Now put together a table that has all the LAI estimates
 f = open(output_dir+'BALI_LAI_table.csv',"w") #opens file

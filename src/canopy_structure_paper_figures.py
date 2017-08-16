@@ -127,6 +127,7 @@ for pp in range(0,N_plots):
 
 
     # Also get estimate of lower canopy volume from small SAFE plots
+    """
     if Plot_name in ['Belian','Seraya','DC1','DC2']:
         block = 'VJR'
     elif Plot_name in ['B North', 'B South']:
@@ -140,6 +141,7 @@ for pp in range(0,N_plots):
 
     Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_small_plots(stem_data[block]['dbh'],stem_data[block]['height'],stem_data[block]['stem_density'],a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
     smallstem_LAD_profile = field.calculate_LAD_profiles_from_stem_size_distributions(heights, Area, Depth, Ht, StemDensity, beta)
+    """
 
     pt_count = 0.
     # loop through subplots, calculating both return profiles and LAD distributions
@@ -171,6 +173,16 @@ for pp in range(0,N_plots):
         mask = np.all((field_data['plot']==Plot_name,field_data['subplot']==subplot_labels[Plot_name][i]),axis=0)
         Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
         field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
+
+
+        if Plot_name == 'DC1':
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC1_stem_data['dbh'][:,subplot_index],DC1_stem_data['stem_density'][:,subplot_index],a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+        elif Plot_name == 'DC2':
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC2_stem_data['dbh'][:,subplot_index],DC2_stem_data['stem_density'][:,subplot_index],a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+        else:
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(SAFE_stem_data[Plot_name]['dbh'][:,subplot_index],SAFE_stem_data[Plot_name]['stem_density'][:,subplot_index],a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+
+        smallstem_LAD_profile = field.calculate_LAD_profiles_from_stem_size_distributions(heights, Area, Depth, Ht, StemDensity, beta)
         field_LAD_profiles[subplot_index,:]+=smallstem_LAD_profile
         # now load in the LAI estimates from the hemispherical photographs
         Hemisfer_mask = np.all((field_LAI['Subplot']==subplot_labels[Plot_name][i],field_LAI['Plot']==Plot_name),axis=0)

@@ -133,10 +133,14 @@ for cc in range(0,N_cameras):
             # calculate PAD profile
             heights,first_return_profile,n_ground_returns = PAD1.bin_returns(sample_pts, max_height, layer_thickness)
             PAD[pp,:] = PAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-            PAD[pp,heights<min_height]=0
+
+            PAD_iter = PAD[pp,:].copy()
+            PAD0_iter = PAD[0,:].copy()
+            PAD_iter[heights<min_height]=0
+            PAD0_iter[heights<min_height]=0
 
             # Compute metrics...
-            PAI[pp] = np.sum(PAD[pp,:])
+            PAI[pp] = np.sum(PAD_iter)
             pt_dens[pp] = sample_pts.shape[0]/(np.pi*radius**2.)
 
             if PAI[0] == -9999:
@@ -144,7 +148,7 @@ for cc in range(0,N_cameras):
             elif PAI[pp] == 0:
                 frechet = -9999
             else:
-                frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD[0,:],PAD[pp,:]]),heights)
+                frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD0_iter,PAD_iter]),heights)
             height[pp] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
 
             if PAI[pp]==0:
@@ -153,10 +157,10 @@ for cc in range(0,N_cameras):
                 shape_PAD[pp] = -9999
                 mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
             else:
-                Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
-                temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD[pp,:])
-                mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD[pp,:])
-                n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD[pp,:],min_PAD)
+                Shannon[pp] = struct.calculate_Shannon_index(PAD_iter)
+                temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD_iter)
+                mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD_iter)
+                n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD_iter,min_PAD)
 
 
         # Write PAD profiles to file

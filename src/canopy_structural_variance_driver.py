@@ -20,12 +20,12 @@ axis_size = rcParams['font.size']+2
 
 # Some files
 las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt' ## CHANGE AS REQUIRED
-pts_shp = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/CameraTraps/OM2015_16.shp' ## CHANGE AS REQUIRED
+pts_shp = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/CameraTraps/OM2015_50percent.shp' ## CHANGE AS REQUIRED
 laz_files = False ## CHANGE AS REQUIRED
 
 # some output files
 profile_file = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/CameraTraps/PAD_profiles_for_'
-stats_file = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/CameraTraps/Structural_stats_for_SAFE_camera_traps.csv'
+stats_file = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/CameraTraps/Structural_stats_for_SAFE_camera_traps_50perc.csv'
 
 # Some parameters
 min_PAD = 0.1

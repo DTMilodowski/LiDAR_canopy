@@ -138,12 +138,26 @@ for cc in range(0,N_cameras):
             # Compute metrics...
             PAI[pp] = np.sum(PAD[pp,:])
             pt_dens[pp] = sample_pts.shape[0]/(np.pi*radius**2.)
-            temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD[pp,:])
-            mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD[pp,:])
-            n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD[pp,:],min_PAD)
-            frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD[0,:],PAD[pp,:]]),heights)
+
+            if PAI[0] == -9999:
+                frechet[pp] = -9999
+            elif PAI[pp] == 0:
+                frechet = -9999
+            else:
+                frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD[0,:],PAD[pp,:]]),heights)
             height[pp] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
-            Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
+
+            if PAI[pp]==0:
+                Shannon = -9999
+                n_layers[pp] = -9999
+                shape_PAD[pp] = -9999
+                mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
+            else:
+                Shannon[pp] = struct.calculate_Shannon_index(PAD[pp,:])
+                temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD[pp,:])
+                mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD[pp,:])
+                n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD[pp,:],min_PAD)
+
 
         # Write PAD profiles to file
         f = open(profile_file+cameras[cc]+".csv","w") #opens file

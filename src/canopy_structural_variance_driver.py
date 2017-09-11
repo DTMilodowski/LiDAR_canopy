@@ -155,7 +155,10 @@ for cc in range(0,N_cameras):
                 Shannon = -9999
                 n_layers[pp] = -9999
                 shape_PAD[pp] = -9999
-                mean_ht[pp], sd[pp], skew[pp], kurt[pp] = -9999
+                mean_ht[pp] = -9999
+                sd[pp] = -9999
+                skew[pp] = -9999
+                kurt[pp] = -9999
             else:
                 Shannon[pp] = struct.calculate_Shannon_index(PAD_iter)
                 temp1, temp2, shape_PAD[pp] = struct.calculate_canopy_shape(heights,PAD_iter)

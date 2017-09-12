@@ -101,32 +101,32 @@ for cc in range(0,N_cameras):
                     sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
 
         if sample_pts.size == 0:
-            PAD[pp,:] = -9999
-            PAI[pp] = -9999
+            PAD[pp,:] = -9999.
+            PAI[pp] = -9999.
             pt_dens[pp] = 0.
-            shape_PAD[pp] = -9999
-            mean_ht[pp] = -9999
-            sd[pp] = -9999
-            skew[pp] = -9999
-            kurt[pp] = -9999
-            n_layers[pp] = -9999
-            frechet[pp] = -9999
-            height[pp] = -9999
-            Shannon[pp] = -9999
+            shape_PAD[pp] = -9999.
+            mean_ht[pp] = -9999.
+            sd[pp] = -9999.
+            skew[pp] = -9999.
+            kurt[pp] = -9999.
+            n_layers[pp] = -9999.
+            frechet[pp] = -9999.
+            height[pp] = -9999.
+            Shannon[pp] = -9999.
 
         elif np.sum(sample_pts[:,3]==1) == 0:
-            PAD[pp,:] = -9999
-            PAI[pp] = -9999
+            PAD[pp,:] = -9999.
+            PAI[pp] = -9999.
             pt_dens[pp] = 0.
-            shape_PAD[pp] = -9999
-            mean_ht[pp] = -9999
-            sd[pp] = -9999
-            skew[pp] = -9999
-            kurt[pp] = -9999
-            n_layers[pp] = -9999
-            frechet[pp] = -9999
-            height[pp] = -9999
-            Shannon[pp] = -9999            
+            shape_PAD[pp] = -9999.
+            mean_ht[pp] = -9999.
+            sd[pp] = -9999.
+            skew[pp] = -9999.
+            kurt[pp] = -9999.
+            n_layers[pp] = -9999.
+            frechet[pp] = -9999.
+            height[pp] = -9999.
+            Shannon[pp] = -9999.            
 
         else:
             #print sample_pts.shape, np.sum(sample_pts[:,3]==1)
@@ -144,15 +144,15 @@ for cc in range(0,N_cameras):
             pt_dens[pp] = sample_pts.shape[0]/(np.pi*radius**2.)
 
             if PAI[0] == -9999:
-                frechet[pp] = -9999
+                frechet[pp] = -9999.
             elif PAI[pp] == 0:
-                frechet = -9999
+                frechet[pp] = -9999.
             else:
                 frechet[pp] = struct.calculate_mean_Frechet_distance(np.asarray([PAD0_iter,PAD_iter]),heights)
             height[pp] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
 
             if PAI[pp]==0:
-                Shannon = -9999
+                Shannon[pp] = -9999
                 n_layers[pp] = -9999
                 shape_PAD[pp] = -9999
                 mean_ht[pp] = -9999
@@ -165,7 +165,7 @@ for cc in range(0,N_cameras):
                 mean_ht[pp], sd[pp], skew[pp], kurt[pp] = struct.calculate_moments_of_distribution(heights,PAD_iter)
                 n_layers[pp] = struct.calculate_number_of_contiguous_layers(heights,PAD_iter,min_PAD)
 
-
+        """
         # Write PAD profiles to file
         f = open(profile_file+cameras[cc]+".csv","w") #opens file
         f.write("height, ")
@@ -180,7 +180,7 @@ for cc in range(0,N_cameras):
                 f.write(', %.5f' % PAD[pp,ll])
             f.write("\n")
         f.close()
-
+        """
         sample_pts=None
 
     # store into summary dictionary

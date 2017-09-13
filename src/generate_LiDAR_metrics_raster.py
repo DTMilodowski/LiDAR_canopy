@@ -58,6 +58,8 @@ y_coords = np.arange(ymin+raster_res/2.,ymax,raster_res)
 
 rows = y_coords.size
 cols = x_coords.size
+rows = np.arange(y_coords.size)
+cols = np.arange(x_coords.size)
 
 PAI = np.zeros((rows,cols))*np.nan
 pt_density = np.zeros((rows,cols))

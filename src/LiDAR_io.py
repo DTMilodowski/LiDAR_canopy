@@ -25,7 +25,7 @@ def get_lasfile_bbox(las_file):
     return UR, LR, UL, LL
 
 # get bounding box from many las files
-def find_las_files_by_polygon(file_list,polygon,print_keep=False):
+def get_bbox_of_multiple_tiles(file_list,polygon,print_keep=False):
     las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
     n_files = las_files.size
 

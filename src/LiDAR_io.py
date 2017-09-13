@@ -21,7 +21,7 @@ def get_lasfile_bbox(las_file):
     LR = np.asarray([max_xyz[0],min_xyz[1]])
     UL = np.asarray([min_xyz[0],max_xyz[1]])
     LL = np.asarray([min_xyz[0],min_xyz[1]])
-    
+    lasFile.close()
     return UR, LR, UL, LL
 
 # Load lidar data => x,y,z,return,class, scan angle
@@ -32,6 +32,7 @@ def load_lidar_data(las_file,print_npts=True):
     pts = pts[pts[:,2]>=0,:]
     if print_npts:
         print "loaded ", pts[:,0].size, " points"
+    lasFile.close()
     return pts
 
 # a similar script, but now only loading points within bbox into memory
@@ -47,6 +48,7 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
     pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii], lasFile.gps_time[ii])).transpose()
     if print_npts:
         print "loaded ", pts[:,0].size, " points"
+    lasFile.close()
     return pts
 
 #---------------------------------------------------------------------------

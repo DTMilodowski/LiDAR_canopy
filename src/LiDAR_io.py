@@ -24,6 +24,38 @@ def get_lasfile_bbox(las_file):
     lasFile.close()
     return UR, LR, UL, LL
 
+# get bounding box from many las files
+def find_las_files_by_polygon(file_list,polygon,print_keep=False):
+    las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
+    n_files = las_files.size
+
+    lasFile = las.file.File(las_files[0],mode='r')
+    max_xyz = lasFile.header.max
+    min_xyz = lasFile.header.min
+    xmin = min_xyz[0]
+    ymin = min_xyz[1]
+    xmax = max_xyz[0]
+    ymax = max_xyz[1]
+    lasFile.close()
+
+    for i in range(1,n_files):
+        
+        lasFile = las.file.File(las_files[0],mode='r')
+        max_xyz = lasFile.header.max
+        min_xyz = lasFile.header.min
+        xmin = min(xmin,min_xyz[0])
+        ymin = min(ymin,min_xyz[1])
+        xmax = max(xmax,max_xyz[0])
+        ymax = max(ymax,max_xyz[1])
+        lasFile.close()
+
+    UR = np.asarray([xmax,ymax])
+    LR = np.asarray([xmax,ymin])
+    UL = np.asarray([xmin,ymax])
+    LL = np.asarray([xmin,ymin])
+
+    return UR, LR, UL, LL
+
 # Load lidar data => x,y,z,return,class, scan angle
 # Returns: - a numpy array containing the points
 def load_lidar_data(las_file,print_npts=True):

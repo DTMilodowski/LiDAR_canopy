@@ -41,5 +41,32 @@ min_height = 2.
 layer_thickness = 1
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
+raster_res = 5
 
+#-------------------------------------------------------------------------------
+# Phase one - get bounding box of all las tiles.
+UR, LR, UL, LL = io.get_bbox_of_multiple_tiles(las_list)
 
+# Phase two - construct host arrays
+xmin = LL[0]
+xmax = LR[0]
+ymin = LL[1]
+ymax = UL[1]
+
+x_coords = np.arange(xmin+raster_res/2.,xmax,raster_res)
+y_coords = np.arange(ymin+raster_res/2.,ymax,raster_res)
+
+rows = y_coords.size
+cols = x_coords.size
+
+PAI = np.zeros((rows,cols))*np.nan
+pt_density = np.zeros((rows,cols))
+
+# Phase three - loop through las tiles and gradually fill the array
+las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
+n_files = las_files.size
+for i in range(0,n_files):
+    lasFile = las.file.File(las_files[i],mode='r')
+    max_xyz = lasFile.header.max
+    min_xyz = lasFile.header.min
+    lasFile.close()

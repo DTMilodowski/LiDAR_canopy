@@ -33,4 +33,13 @@ laz_files = False ## CHANGE AS REQUIRED
 PAI_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_PAI.tif'
 dens_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_point_density.tif'
 
+# Some parameters
+min_PAD = 0.1
+radius = 10.
+max_height = 80.   
+min_height = 2.     
+layer_thickness = 1
+heights = np.arange(0,max_height,layer_thickness)+layer_thickness
+kappa = 0.7
+
 

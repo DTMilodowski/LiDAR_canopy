@@ -15,7 +15,6 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
     NCols = 0
     #-----------------------------------
 
-
     #-----------------------------------
     # Check orientation of array before writing to raster to ensure 
     # compatibility with GIS platforms.

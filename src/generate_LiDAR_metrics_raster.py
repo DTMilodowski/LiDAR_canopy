@@ -23,6 +23,7 @@ import LiDAR_tools as lidar
 import auxilliary_functions as aux
 import LiDAR_MacHorn_LAD_profiles as PAD
 import structural_metrics as struct
+import raster_io as raster
 
 #-------------------------------------------------------------------------------
 # Input files
@@ -30,8 +31,8 @@ las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list
 laz_files = False ## CHANGE AS REQUIRED
 
 # Output files
-PAI_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_PAI.tif'
-dens_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_point_density.tif'
+PAI_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_PAI'
+dens_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_point_density'
 
 # Some parameters
 min_PAD = 0.1
@@ -42,6 +43,9 @@ layer_thickness = 1
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
 raster_res = 5
+
+# Some georeferencing info
+EPSG = 32650 # WGS84 / UTM 50N
 
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
@@ -138,4 +142,9 @@ for i in range(0,n_files):
                 pt_dens[row_ii,col_ii] = sample_pts.shape[0]/(np.pi*radius**2.)
 
 # Now that the raster is filled, just need to write it to file
+XMinimum = x_coords.min() - raster_res/2.
+YMaximum = y_coords.max() + raster_res/2.
+geoTransform = [ XMinimum, raster_res, 0, YMaximum, 0, -raster_res ]
 
+write_raster_to_GeoTiff(PAI, geoTransform, PAI_raster, EPSG_CODE=EPSG)
+write_raster_to_GeoTiff(pt_dens, geoTransform, dens_raster, EPSG_CODE=EPSG)

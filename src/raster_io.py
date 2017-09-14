@@ -6,12 +6,19 @@ import osr
 import sys
 
 
-# Function to write an EO lab data layer from an array
+# Function to write geotiff from an array
 def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', north_up=True):
+    #-----------------------------------
+    # some dummy variables to be updated
     NBands = 1
     NRows = 0
     NCols = 0
+    #-----------------------------------
 
+
+    #-----------------------------------
+    # Check orientation of array before writing to raster to ensure 
+    # compatibility with GIS platforms.
     if north_up:
         # for north_up array, need the n-s resolution (element 5) to be negative
         if geoTrans[5]>0:
@@ -66,7 +73,9 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
     else:
         print 'array has too many dimensions! Unable to write to raster'
         sys.exit(1)  
-    
+    #-----------------------------------
+
+    #-----------------------------------
     # Write GeoTiff
     driver = gdal.GetDriverByName('GTiff')
     driver.Register()
@@ -82,3 +91,4 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
     dataset.GetRasterBand(1).WriteArray( array )
     dataset = None
     return 0
+    #-----------------------------------

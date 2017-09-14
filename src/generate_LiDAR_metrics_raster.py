@@ -53,13 +53,15 @@ xmax = LR[0]
 ymin = LL[1]
 ymax = UL[1]
 
+LL=None; LR=None; UL=None; UR=None
+
 x_coords = np.arange(xmin+raster_res/2.,xmax,raster_res)
 y_coords = np.arange(ymin+raster_res/2.,ymax,raster_res)
 
 rows = y_coords.size
 cols = x_coords.size
-rows = np.arange(y_coords.size)
-cols = np.arange(x_coords.size)
+rows_ii = np.arange(y_coords.size)
+cols_jj = np.arange(x_coords.size)
 
 PAI = np.zeros((rows,cols))*np.nan
 pt_density = np.zeros((rows,cols))
@@ -68,7 +70,27 @@ pt_density = np.zeros((rows,cols))
 las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
 n_files = las_files.size
 for i in range(0,n_files):
+    # get bbox of specific tile
     lasFile = las.file.File(las_files[i],mode='r')
     max_xyz = lasFile.header.max
     min_xyz = lasFile.header.min
     lasFile.close()
+
+    # buffer this bounding box with the search radius
+    E = max_xyz[0]+radius
+    N = max_xyz[1]+radius
+    W = min_xyz[0]-radius
+    S = min_xyz[1]-radius
+
+    # Read in LiDAR points for region of interest
+    polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
+    lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=laz_files)
+    N_trees = len(trees)
+
+    # Get the positions and indices of grid points within the bounds of the tile
+    row_mask = np.all((y_coords>=min_xyz[1],y_coords<max_xyz[1]),axis=0)
+    col_mask = np.all((x_coords>=min_xyz[0],x_coords<max_xyz[0]),axis=0)
+    x_iter = x_coords[col_mask]
+    y_iter = y_coords[row_mask]
+    rows_iter = rows_ii[row_mask]
+    cols_iter = cols_ii[col_mask]

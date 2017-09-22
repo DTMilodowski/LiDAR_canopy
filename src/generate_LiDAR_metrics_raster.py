@@ -18,6 +18,7 @@
 import numpy as np
 import sys
 import os
+import laspy as las
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
@@ -71,7 +72,7 @@ PAI = np.zeros((rows,cols))*np.nan
 pt_dens = np.zeros((rows,cols))
 
 # Phase three - loop through las tiles and gradually fill the array
-las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
+las_files = np.genfromtxt(las_list,delimiter=',',dtype='S256')
 n_files = las_files.size
 for i in range(0,n_files):
     # get bbox of specific tile
@@ -97,20 +98,20 @@ for i in range(0,n_files):
     x_coords_tile = x_coords[col_mask]
     y_coords_tile = y_coords[row_mask]
     rows_tile = rows_ii[row_mask]
-    cols_tile = cols_ii[col_mask]
+    cols_tile = cols_jj[col_mask]
 
     # Loop through relevant portion of the grid, sampling at each grid square
     for ii in range(0,rows_tile.size):
         y_iter = y_coords_tile[ii]
         row_ii = rows_tile[ii]
         for jj in range(0,cols_tile.size):
-            x_iter = x_coords_tile[ii]
+            x_iter = x_coords_tile[jj]
             col_jj = cols_tile[jj]
 
             # retrieve point clouds samples        
             sample_pts = np.array([])
             for tt in range(0,N_trees):
-                ids = trees[tt].query_ball_point(pts_iter[pp], radius)
+                ids = trees[tt].query_ball_point([x_iter,y_iter], radius)
                 if len(ids)>0:
                     if sample_pts.size==0:
                         sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
@@ -119,27 +120,27 @@ for i in range(0,n_files):
                         
             # Deal with case that there are no returns
             if sample_pts.size == 0:
-                PAI[row_ii,col_ii] = -9999.
-                pt_dens[row_ii,col_ii] = 0.
+                PAI[row_ii,col_jj] = -9999.
+                pt_dens[row_ii,col_jj] = 0.
 
             # Deal with the case that there are no first returns
             elif np.sum(sample_pts[:,3]==1) == 0:
-                PAI[row_ii,col_ii] = -9999.
-                pt_dens[row_ii,col_ii] = 0.
+                PAI[row_ii,col_jj] = -9999.
+                pt_dens[row_ii,col_jj] = 0.
 
             # If we have the returns, then calculate metric of interest - in
             # this case the PAI
             else:
                 # calculate PAD profile
-                heights,first_return_profile,n_ground_returns = PAD1.bin_returns(sample_pts, max_height, layer_thickness)
-                PAD = PAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+                heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
+                PADprof = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
                 
                 # remove lowermost portion of profile
-                PAD_iter = PAD.copy()
+                PAD_iter = PADprof.copy()
                 PAD_iter[heights<min_height]=0
 
-                PAI[row_ii,col_ii] = np.sum(PAD_iter)
-                pt_dens[row_ii,col_ii] = sample_pts.shape[0]/(np.pi*radius**2.)
+                PAI[row_ii,col_jj] = np.sum(PAD_iter)
+                pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(np.pi*radius**2.)
 
 # Now that the raster is filled, just need to write it to file
 XMinimum = x_coords.min() - raster_res/2.

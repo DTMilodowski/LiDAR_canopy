@@ -137,35 +137,36 @@ for i in range(0,n_files):
         
             # If we have the returns, then calculate metric of interest - in
             # this case the PAI
-            if np.all((sample_pts.size == 0,np.sum(sample_pts[:,3]==1) == 0)):
-                # calculate PAD profile
-                heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
-                PADprof = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+            if sample_pts.size > 0:
+                if np.sum(sample_pts[:,3]==1) > 0:
+                    # calculate PAD profile
+                    heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
+                    PADprof = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+                    
+                    # remove lowermost portion of profile
+                    PAD_iter = PADprof.copy()
+                    PAD_iter[heights<min_height]=0
                 
-                # remove lowermost portion of profile
-                PAD_iter = PADprof.copy()
-                PAD_iter[heights<min_height]=0
+                    PAI[row_ii,col_jj] = np.sum(PAD_iter)
 
-                PAI[row_ii,col_jj] = np.sum(PAD_iter)
+                    # vertically distributed PAI
+                    PAI10[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>2,heights<=10),axis=0)])
+                    PAI20[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>10,heights<=20),axis=0)])
+                    PAI30[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>20,heights<=30),axis=0)])
+                    PAI40[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>30,heights<=40),axis=0)])
+                    PAI50[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>40,heights<=50),axis=0)])
+                    PAI60[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>50,heights<=60),axis=0)])
+                    PAI70[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>60,heights<=70),axis=0)])
+                    PAI80[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>70,heights<=80),axis=0)])
 
-                # vertically distributed PAI
-                PAI10[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>2,heights<=10),axis=0)])
-                PAI20[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>10,heights<=20),axis=0)])
-                PAI30[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>20,heights<=30),axis=0)])
-                PAI40[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>30,heights<=40),axis=0)])
-                PAI50[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>40,heights<=50),axis=0)])
-                PAI60[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>50,heights<=60),axis=0)])
-                PAI70[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>60,heights<=70),axis=0)])
-                PAI80[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>70,heights<=80),axis=0)])
-
-                # other metrics
-                pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(np.pi*radius**2.)
-                Shannon[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter)
-                Shape[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter)
-                layers[row_ii,col_jj] = struct.calculate_number_of_contiguous_layers(heights,PAD_iter,min_PAD)
-                can_ht[row_ii,col_jj] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
-                if PAI[row_ii,col_jj]>0:
-                    mean[row_ii,col_jj],std[row_ii,col_jj],skew[row_ii,col_jj],kurt[row_ii,col_jj] = struct.calculate_moments_of_distribution(heights,PAD_iter)
+                    # other metrics
+                    pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(np.pi*radius**2.)
+                    Shannon[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter)
+                    Shape[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter)
+                    layers[row_ii,col_jj] = struct.calculate_number_of_contiguous_layers(heights,PAD_iter,min_PAD)
+                    can_ht[row_ii,col_jj] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
+                    if PAI[row_ii,col_jj]>0:
+                        mean[row_ii,col_jj],std[row_ii,col_jj],skew[row_ii,col_jj],kurt[row_ii,col_jj] = struct.calculate_moments_of_distribution(heights,PAD_iter)
 
 np.savez('SAFE_metrics',point_density=pt_dens,pai=PAI,shannon=Shannon,shape=Shape,pai_02_10m=PAI10,pai_10_20m=PAI20,pai_20_30m=PAI30,pai_30_40m=PAI40,pai_40_50m=PAI50,pai_50_60m=PAI60,pai_60_70m=PAI70,pai_70_80m=PAI80,n_layers=layers, canopy_height = can_ht, mean=mean, std=std, skew=skew,kurt=kurt)
 

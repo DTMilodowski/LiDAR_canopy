@@ -48,7 +48,7 @@ test = np.zeros((rows,cols))*np.nan
 # Phase three - loop through las tiles and gradually fill the array
 las_files = np.genfromtxt(las_list,delimiter=',',dtype='S256')
 n_files = las_files.size
-for i in range(90,n_files):
+for i in range(0,n_files):
     # get bbox of specific tile
     lasFile = las.file.File(las_files[i],mode='r')
     max_xyz = lasFile.header.max

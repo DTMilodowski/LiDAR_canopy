@@ -11,28 +11,15 @@ import auxilliary_functions as aux
 import LiDAR_MacHorn_LAD_profiles as PAD
 import structural_metrics as struct
 import raster_io as raster
+from matplotlib import pyplot as plt
 
 #-------------------------------------------------------------------------------
 # Input files
 las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt' ## CHANGE AS REQUIRED
 laz_files = False ## CHANGE AS REQUIRED
 
-# Output files
-PAI_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_PAI'
-dens_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_point_density'
-
 # Some parameters
-min_PAD = 0.1
 radius = 10.
-max_height = 80.   
-min_height = 2.     
-layer_thickness = 1
-heights = np.arange(0,max_height,layer_thickness)+layer_thickness
-kappa = 0.7
-raster_res = 5
-
-# Some georeferencing info
-EPSG = 32650 # WGS84 / UTM 50N
 
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
@@ -54,8 +41,8 @@ cols = x_coords.size
 rows_ii = np.arange(y_coords.size)
 cols_jj = np.arange(x_coords.size)
 
-PAI = np.zeros((rows,cols))*np.nan
-pt_dens = np.zeros((rows,cols))
+test = np.zeros((rows,cols))*np.nan
+
 
 # Phase three - loop through las tiles and gradually fill the array
 las_files = np.genfromtxt(las_list,delimiter=',',dtype='S256')
@@ -75,9 +62,7 @@ for i in range(0,n_files):
 
     # Read in LiDAR points for region of interest
     polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
-    lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=laz_files)
-    N_trees = len(trees)
-
+    
     # Get the positions and indices of grid points within the bounds of the tile
     row_mask = np.all((y_coords>=min_xyz[1],y_coords<max_xyz[1]),axis=0)
     col_mask = np.all((x_coords>=min_xyz[0],x_coords<max_xyz[0]),axis=0)
@@ -94,36 +79,5 @@ for i in range(0,n_files):
             x_iter = x_coords_tile[jj]
             col_jj = cols_tile[jj]
 
-            # retrieve point clouds samples        
-            sample_pts = np.array([])
-            for tt in range(0,N_trees):
-                ids = trees[tt].query_ball_point([x_iter,y_iter], radius)
-                if len(ids)>0:
-                    if sample_pts.size==0:
-                        sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
-                    else:
-                        sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
-                        
-            # Deal with case that there are no returns
-            if sample_pts.size == 0:
-                PAI[row_ii,col_jj] = -9999.
-                pt_dens[row_ii,col_jj] = 0.
-
-            # Deal with the case that there are no first returns
-            elif np.sum(sample_pts[:,3]==1) == 0:
-                PAI[row_ii,col_jj] = -9999.
-                pt_dens[row_ii,col_jj] = 0.
-
-            # If we have the returns, then calculate metric of interest - in
-            # this case the PAI
-            else:
-                # calculate PAD profile
-                heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
-                PADprof = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-                
-                # remove lowermost portion of profile
-                PAD_iter = PADprof.copy()
-                PAD_iter[heights<min_height]=0
-
-                PAI[row_ii,col_jj] = np.sum(PAD_iter)
-                pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(np.pi*radius**2.)
+            # mark point with iteration number   
+            test[row_ii,col_jj] = ii

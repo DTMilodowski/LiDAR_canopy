@@ -69,7 +69,24 @@ rows_ii = np.arange(y_coords.size)
 cols_jj = np.arange(x_coords.size)
 
 PAI = np.zeros((rows,cols))*np.nan
+PAI10 = np.zeros((rows,cols))*np.nan
+PAI20 = np.zeros((rows,cols))*np.nan
+PAI30 = np.zeros((rows,cols))*np.nan
+PAI40 = np.zeros((rows,cols))*np.nan
+PAI50 = np.zeros((rows,cols))*np.nan
+PAI60 = np.zeros((rows,cols))*np.nan
+PAI70 = np.zeros((rows,cols))*np.nan
+PAI80 = np.zeros((rows,cols))*np.nan
+Shannon = np.zeros((rows,cols))*np.nan
+Shape = np.zeros((rows,cols))*np.nan
+layers = np.zeros((rows,cols))*np.nan
 pt_dens = np.zeros((rows,cols))
+can_ht = np.zeros((rows,cols))*np.nan
+mean = np.zeros((rows,cols))*np.nan
+std = np.zeros((rows,cols))*np.nan
+skew = np.zeros((rows,cols))*np.nan
+kurt = np.zeros((rows,cols))*np.nan
+
 
 # Phase three - loop through las tiles and gradually fill the array
 las_files = np.genfromtxt(las_list,delimiter=',',dtype='S256')
@@ -117,20 +134,10 @@ for i in range(0,n_files):
                         sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
                     else:
                         sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
-                        
-            # Deal with case that there are no returns
-            if sample_pts.size == 0:
-                PAI[row_ii,col_jj] = -9999.
-                pt_dens[row_ii,col_jj] = 0.
-
-            # Deal with the case that there are no first returns
-            elif np.sum(sample_pts[:,3]==1) == 0:
-                PAI[row_ii,col_jj] = -9999.
-                pt_dens[row_ii,col_jj] = 0.
-
+        
             # If we have the returns, then calculate metric of interest - in
             # this case the PAI
-            else:
+            if np.all((sample_pts.size == 0,np.sum(sample_pts[:,3]==1) == 0)):
                 # calculate PAD profile
                 heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
                 PADprof = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
@@ -140,7 +147,27 @@ for i in range(0,n_files):
                 PAD_iter[heights<min_height]=0
 
                 PAI[row_ii,col_jj] = np.sum(PAD_iter)
+
+                # vertically distributed PAI
+                PAI10[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>2,heights<=10),axis=0)])
+                PAI20[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>10,heights<=20),axis=0)])
+                PAI30[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>20,heights<=30),axis=0)])
+                PAI40[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>30,heights<=40),axis=0)])
+                PAI50[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>40,heights<=50),axis=0)])
+                PAI60[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>50,heights<=60),axis=0)])
+                PAI70[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>60,heights<=70),axis=0)])
+                PAI80[row_ii,col_jj] = np.sum(PAD_iter[np.all((heights>70,heights<=80),axis=0)])
+
+                # other metrics
                 pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(np.pi*radius**2.)
+                Shannon[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter)
+                Shape[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter)
+                layers[row_ii,col_jj] = struct.calculate_number_of_contiguous_layers(heights,PAD_iter,min_PAD)
+                can_ht[row_ii,col_jj] = np.percentile(sample_pts[sample_pts[:,3]==1,2],99)
+                if PAI[row_ii,col_jj]>0:
+                    mean[row_ii,col_jj],std[row_ii,col_jj],skew[row_ii,col_jj],kurt[row_ii,col_jj] = struct.calculate_moments_of_distribution(heights,PAD_iter)
+
+np.savez('SAFE_metrics',point_density=pt_dens,pai=PAI,shannon=Shannon,shape=Shape,pai_02_10m=PAI10,pai_10_20m=PAI20,pai_20_30m=PAI30,pai_30_40m=PAI40,pai_40_50m=PAI50,pai_50_60m=PAI60,pai_60_70m=PAI70,pai_70_80m=PAI80,n_layers=layers, canopy_height = can_ht, mean=mean, std=std, skew=skew,kurt=kurt)
 
 # Now that the raster is filled, just need to write it to file
 XMinimum = x_coords.min() - raster_res/2.

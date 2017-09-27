@@ -66,14 +66,22 @@ def load_lidar_data(las_file):#,subplot_coords,max_height,bin_width):
 
 # filter lidar wth polygon
 def filter_lidar_data_by_polygon(in_pts,polygon):
-    x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
-    pts = in_pts[inside,:]
+    pts = np.zeros((0,in_pts.shape[1]))
+    if in_pts.shape[0]>0:
+        x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
+        pts = in_pts[inside,:]
+    else:
+        print "\t\t\t no points in polygon"
     return pts
 
 # filter lidar by circular neighbourhood
 def filter_lidar_data_by_neighbourhood(in_pts,target_xy,radius):
-    x,y,inside =  points_in_radius(in_pts[:,0],in_pts[:,1],target_xy[0],target_xy[1],radius)
-    pts = in_pts[inside,:]
+    pts = np.zeros((0,in_pts.shape[1]))
+    if in_pts.shape[0]>0:
+        x,y,inside =  points_in_radius(in_pts[:,0],in_pts[:,1],target_xy[0],target_xy[1],radius)
+        pts = in_pts[inside,:]
+    else:
+        print "\t\t\t no points in neighbourhood"
     return pts
 
 

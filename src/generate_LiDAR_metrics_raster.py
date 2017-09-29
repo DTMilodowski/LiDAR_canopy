@@ -169,6 +169,11 @@ for i in range(0,n_files):
                     if np.sum(PAD_iter)>0:
                         mean[row_ii,col_jj],std[row_ii,col_jj],skew[row_ii,col_jj],kurt[row_ii,col_jj] = struct.calculate_moments_of_distribution(heights,PAD_iter) # note this function will kick out infs if there is only one layer occupied
 
+            sample_pts=None
+    lidar_pts = None
+    trees = None
+    starting_ids_for_trees = None
+
 np.savez('SAFE_metrics',point_density=pt_dens,pai=PAI,shannon=Shannon,shape=Shape,pai_02_10m=PAI10,pai_10_20m=PAI20,pai_20_30m=PAI30,pai_30_40m=PAI40,pai_40_50m=PAI50,pai_50_60m=PAI60,pai_60_70m=PAI70,pai_70_80m=PAI80,n_layers=layers, canopy_height = can_ht, mean=mean, std=std, skew=skew,kurt=kurt)
 
 # Now that the raster is filled, just need to write it to file

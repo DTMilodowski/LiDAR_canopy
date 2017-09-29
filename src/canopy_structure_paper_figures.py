@@ -280,7 +280,7 @@ labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
 
 # Belian
 ax1a = plt.subplot2grid((3,1),(0,0))
-ax1a.annotate('a - Maliau Reserve, MAO01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax1a.annotate('a - Maliau Reserve, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax1a.set_ylabel('Height / m',fontsize=axis_size)
 plt.gca().set_aspect('equal', adjustable='box-forced')
 
@@ -405,7 +405,7 @@ ax4b.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgro
 ax4c = plt.subplot2grid((3,5),(0,2),sharey=ax4a,sharex=ax4b)
 ax4c.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax4c.annotate('rad. trans.\n(Detto)', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
-ax4c.set_title('Old-growth forest, MAO01', fontsize=10)
+ax4c.set_title('Old-growth forest, MLA01', fontsize=10)
 # - Corrected rad trans
 ax4d = plt.subplot2grid((3,5),(0,3),sharey=ax4a,sharex=ax4b)
 ax4d.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -745,8 +745,8 @@ plot_marker['E']='v'
 plot_marker['B North']='o'
 plot_marker['B South']='v'
 plot_label = {}
-plot_label['Belian']='MAO01'
-plot_label['Seraya']='MAO02'
+plot_label['Belian']='MLA01'
+plot_label['Seraya']='MLA02'
 plot_label['DC1']='DAN04'
 plot_label['DC2']='DAN05'
 plot_label['LF']='SAF04'
@@ -840,7 +840,7 @@ f.close()
 #--------------------------------------------------------------------------------------
 # Supplementary figures
 figS_plots = ['Seraya', 'DC1', 'DC2','E', 'B South']
-figS_codes = ['MAO02', 'DAN04', 'DAN05', 'SAF03', 'SAF01']
+figS_codes = ['MLA02', 'DAN04', 'DAN05', 'SAF03', 'SAF01']
 for pp in range(0,5):
     Plot_name = figS_plots[pp]
     plt.figure(9, facecolor='White',figsize=[8,12])

@@ -176,10 +176,14 @@ for i in range(0,n_files):
 
 np.savez('SAFE_metrics',point_density=pt_dens,pai=PAI,shannon=Shannon,shape=Shape,pai_02_10m=PAI10,pai_10_20m=PAI20,pai_20_30m=PAI30,pai_30_40m=PAI40,pai_40_50m=PAI50,pai_50_60m=PAI60,pai_60_70m=PAI70,pai_70_80m=PAI80,n_layers=layers, canopy_height = can_ht, mean=mean, std=std, skew=skew,kurt=kurt)
 
+metrics = np.load('SAFE_metrics.npz')
+
 # Now that the raster is filled, just need to write it to file
 XMinimum = x_coords.min() - raster_res/2.
 YMaximum = y_coords.max() + raster_res/2.
 geoTransform = [ XMinimum, raster_res, 0, YMaximum, 0, -raster_res ]
 
-write_raster_to_GeoTiff(PAI, geoTransform, PAI_raster, EPSG_CODE=EPSG)
-write_raster_to_GeoTiff(pt_dens, geoTransform, dens_raster, EPSG_CODE=EPSG)
+for kk in range(0,len(metrics.keys())):
+    var = metrics.keys()[kk]
+    print "\t\t\t Saving rasters: %s" % var
+    raster.write_raster_to_GeoTiff(metrics[var], geoTransform, ('SAFE_pointcloud_metrics_5m_%s' % var), EPSG_CODE=str(EPSG))

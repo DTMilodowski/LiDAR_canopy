@@ -187,3 +187,11 @@ for kk in range(0,len(metrics.keys())):
     var = metrics.keys()[kk]
     print "\t\t\t Saving rasters: %s" % var
     raster.write_raster_to_GeoTiff(metrics[var], geoTransform, ('SAFE_pointcloud_metrics_5m_%s' % var), EPSG_CODE=str(EPSG))
+
+"""
+import sys
+sys.path.append('/home/dmilodow/DataStore_DTM/FOREST2020/EOdata/EO_data_processing/src/plot_EO_data/colormap/')
+import colormaps as cmaps
+plt.register_cmap(name='inferno', cmap=cmaps.inferno)
+plt.set_cmap(cmaps.inferno)
+"""

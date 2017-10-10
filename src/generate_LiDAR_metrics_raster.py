@@ -46,7 +46,8 @@ kappa = 0.7
 raster_res = 5
 
 # Some georeferencing info
-EPSG = 32650 # WGS84 / UTM 50N
+utm = 50
+#EPSG = "32650" # WGS84 / UTM 50N
 
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
@@ -186,7 +187,7 @@ geoTransform = [ XMinimum, raster_res, 0, YMaximum, 0, -raster_res ]
 for kk in range(0,len(metrics.keys())):
     var = metrics.keys()[kk]
     print "\t\t\t Saving rasters: %s" % var
-    raster.write_raster_to_GeoTiff(metrics[var], geoTransform, ('SAFE_pointcloud_metrics_5m_%s' % var), EPSG_CODE=str(EPSG))
+    raster.write_raster_to_GeoTiff_UTM(metrics[var], geoTransform, ('SAFE_pointcloud_metrics_5m_%s' % var), utm)
 
 """
 import sys

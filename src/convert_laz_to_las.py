@@ -8,6 +8,7 @@ import os
 # Declare paths
 laz_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Danum/Danum_CHM_laz_tiles'
 las_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Danum'
+remove_laz = True
 
 # create file list
 os.system("ls %s/*.laz > %s/laz_list.txt" % (laz_dir,laz_dir))
@@ -18,6 +19,7 @@ for ii in range(0,N):
     prefix = filename.split('.')[0]
     print "tile %i of %i: %s" % (ii+1,N,prefix)
     las_file = '%s/%s.las' % (las_dir,prefix)
-    os.system("las2las %s %s" % (laz_file, las_file))
-    
+    os.system("las2las %s %s" % (laz_files[ii], las_file))
+    if remove_laz = True:
+        os.system("rm %s" % laz_files[ii])
 print "Done" 

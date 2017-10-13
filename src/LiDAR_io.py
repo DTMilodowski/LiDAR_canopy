@@ -39,7 +39,7 @@ def get_bbox_of_multiple_tiles(file_list,print_keep=False):
     lasFile.close()
 
     for i in range(1,n_files):
-        
+
         lasFile = las.file.File(las_files[i],mode='r')
         max_xyz = lasFile.header.max
         min_xyz = lasFile.header.min

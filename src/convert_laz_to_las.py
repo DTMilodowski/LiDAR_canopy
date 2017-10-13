@@ -6,11 +6,12 @@ import numpy as np
 import os
 
 # Declare paths
-laz_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Danum/Danum_CHM_laz_tiles'
+laz_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Danum/Danum_CHM_laz_no_buffer'
 las_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Danum'
-
+"""
 laz_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Maliau/Maliau_CHM_laz_no_buffer'
 las_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Maliau'
+"""
 remove_laz = True
 
 

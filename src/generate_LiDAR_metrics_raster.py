@@ -28,12 +28,13 @@ import raster_io as raster
 
 #-------------------------------------------------------------------------------
 # Input files
-las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt' ## CHANGE AS REQUIRED
+#las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt' ## CHANGE AS REQUIRED
+las_list = 'maliau_las_list.txt' ## CHANGE AS REQUIRED
 laz_files = False ## CHANGE AS REQUIRED
 
-# Output files
-PAI_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_PAI'
-dens_raster = '/exports/csce/datastore/geos/users/dmilodow/BALI/LiDAR/Data/RasterData/SAFE_point_density'
+# Site ID
+#site = 'SAFE'
+site = 'maliau'
 
 # Some parameters
 min_PAD = 0.1
@@ -177,7 +178,7 @@ for i in range(0,n_files):
 
 np.savez('SAFE_metrics_10m',point_density=pt_dens,pai=PAI,shannon=Shannon,shape=Shape,pai_02_10m=PAI10,pai_10_20m=PAI20,pai_20_30m=PAI30,pai_30_40m=PAI40,pai_40_50m=PAI50,pai_50_60m=PAI60,pai_60_70m=PAI70,pai_70_80m=PAI80,n_layers=layers, canopy_height = can_ht, mean=mean, std=std, skew=skew,kurt=kurt)
 
-metrics = np.load('SAFE_metrics_10m.npz')
+metrics = np.load('%s_metrics_10m.npz' % site)
 
 # Now that the raster is filled, just need to write it to file
 XMinimum = x_coords.min() - raster_res/2.
@@ -187,7 +188,7 @@ geoTransform = [ XMinimum, raster_res, 0, YMaximum, 0, -raster_res ]
 for kk in range(0,len(metrics.keys())):
     var = metrics.keys()[kk]
     print "\t\t\t Saving rasters: %s" % var
-    raster.write_raster_to_GeoTiff_UTM(metrics[var], geoTransform, ('SAFE_pointcloud_metrics_10m_%s' % var), utm)
+    raster.write_raster_to_GeoTiff_UTM(metrics[var], geoTransform, ('%s_pointcloud_metrics_10m_%s' % (site,var)), utm)
 
 """
 import sys

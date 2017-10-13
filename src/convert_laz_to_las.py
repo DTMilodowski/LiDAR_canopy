@@ -13,6 +13,7 @@ laz_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Maliau/Maliau_CHM_laz'
 las_dir = '/disk/scratch/local.2/dmilodow/BALI/LiDAR/Maliau'
 remove_laz = True
 
+
 # create file list
 os.system("ls %s/*.laz > %s/laz_list.txt" % (laz_dir,laz_dir))
 laz_files = np.genfromtxt("%s/laz_list.txt" % laz_dir,delimiter=',',dtype='S256')
@@ -23,6 +24,6 @@ for ii in range(0,N):
     print "tile %i of %i: %s" % (ii+1,N,prefix)
     las_file = '%s/%s.las' % (las_dir,prefix)
     os.system("las2las %s %s" % (laz_files[ii], las_file))
-    if remove_laz = True:
+    if remove_laz:
         os.system("rm %s" % laz_files[ii])
 print "Done" 

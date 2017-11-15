@@ -114,3 +114,13 @@ def estimate_LAD_MacArthurHorn_full(sample_pts,max_height,layer_thickness,minimu
     mask = heights <= minimum_height
     LAD_MacArthurHorn[mask] = 0
     return heights, LAD_MacArthurHorn
+
+
+# A function that returns the analytical solution to the maximum PAI that can be
+# retrieved for a given point density for a specified sampling footprint using
+# the MacArthur-Horn approach. As above, the constant k transforms the effective
+# PAI into the actual PAI
+# This should work with numbers or arrays of input point densities.
+def calculate_analytical_limit(point_density,sample_footprint_area,k):
+    PAI_limit = (1./k)*np.log(point_density*sample_footprint_area)
+    return PAI_limit

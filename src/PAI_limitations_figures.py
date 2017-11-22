@@ -30,6 +30,9 @@ colour = ['#46E900','#1A2BCE','#E0007F']
 import LiDAR_MacHorn_LAD_profiles as MH
 import raster_io as io
 
+# Directory listings
+SAVEDIR = ''
+
 # Load files
 dens_file = 'SAFE_pointcloud_metrics_10m_point_density_data.tif'
 PAI_file = 'SAFE_pointcloud_metrics_10m_pai_data.tif'
@@ -69,18 +72,18 @@ PAImax_30m_10deg = MH.calculate_analytical_limit(dens_a,area[2],k,theta_rad[2])
 # LiDAR
 
 
+
 #-------------------------------------------------------------------------------
 # Figure 2 - this figure presents maps of PAI and point density across the SAFE
 # landscape
-
-fig = plt.figure(2, facecolor='White',figsize=[6,8])
+fig = plt.figure(2, facecolor='White',figsize=[6,9])
 ax2a= plt.subplot2grid((2,1),(0,0))
 ax2a.annotate('a - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-im2a=ax2a.imshow(np.log(dens),cmap='plasma',origin='lower',extent=[W,E,N,S])
+im2a=ax2a.imshow(dens,cmap='plasma',origin='lower',extent=[W,E,N,S])
 cbar2a=plt.colorbar(im2a)
-cbar2a.ax.set_ylabel('$ln$(point density / pts.m$^{-2}$)',fontsize = axis_size)
+cbar2a.ax.set_ylabel('point density / pts m$^{-2}$',fontsize = axis_size)
 cbar2a.solids.set_edgecolor("face")
-ax2a.axis('scaled')
+ax2a.axis('image')
 
 ax2b= plt.subplot2grid((2,1),(1,0))
 ax2b.annotate('b - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -88,7 +91,7 @@ im2b = ax2b.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,N,S])
 cbar2b = plt.colorbar(im2b)
 cbar2b.solids.set_edgecolor("face")
 cbar2b.ax.set_ylabel('PAI',fontsize = axis_size)
-ax2b.axis('scaled')
+ax2b.axis('image')
 plt.tight_layout()
 plt.show()
 plt.savefig(SAVEDIR+'Fig2_SAFE_point_density_PAI_maps.png')

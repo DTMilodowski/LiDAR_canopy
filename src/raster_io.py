@@ -80,7 +80,7 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
     driver.Register()
 
     # set all the relevant geospatial information
-    dataset = driver.Create( OUTFILE_prefix+'_data.tif', NCols, NRows, NBands, gdal.GDT_Float32 )
+    dataset = driver.Create( OUTFILE_prefix+'.tif', NCols, NRows, NBands, gdal.GDT_Float32 )
     dataset.SetGeoTransform( geoTrans )
     srs = osr.SpatialReference()
     srs.SetWellKnownGeogCS( 'EPSG:'+EPSG_CODE )
@@ -177,7 +177,7 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
     driver.Register()
 
     # set all the relevant geospatial information
-    dataset = driver.Create( OUTFILE_prefix+'_data.tif', NCols, NRows, NBands, gdal.GDT_Float32 )
+    dataset = driver.Create( OUTFILE_prefix+'.tif', NCols, NRows, NBands, gdal.GDT_Float32 )
     dataset.SetGeoTransform( geoTrans )
     srs = osr.SpatialReference()
     srs.SetProjCS( prjCS )

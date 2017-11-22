@@ -121,6 +121,6 @@ def estimate_LAD_MacArthurHorn_full(sample_pts,max_height,layer_thickness,minimu
 # the MacArthur-Horn approach. As above, the constant k transforms the effective
 # PAI into the actual PAI
 # This should work with numbers or arrays of input point densities.
-def calculate_analytical_limit(point_density,sample_footprint_area,k):
-    PAI_limit = (1./k)*np.log(point_density*sample_footprint_area)
+def calculate_analytical_limit(point_density,sample_footprint_area,k,theta=0):
+    PAI_limit = (np.cos(theta)/k)*np.log(point_density*sample_footprint_area)
     return PAI_limit

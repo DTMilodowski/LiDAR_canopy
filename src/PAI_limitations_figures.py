@@ -10,6 +10,7 @@ import numpy as np
 
 # import plotting libraries
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import rcParams
 import sys
 sys.path.append('/home/dmilodow/DataStore_DTM/FOREST2020/EOdata/EO_data_processing/src/plot_EO_data/colormap/')
@@ -21,9 +22,9 @@ plt.set_cmap(cmaps.viridis)
 # Set up some basiic parameters for the plots
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['arial']
-rcParams['font.size'] = 8
+rcParams['font.size'] = 16
 rcParams['legend.numpoints'] = 1
-axis_size = rcParams['font.size']+2
+axis_size = rcParams['font.size']+4
 colour = ['#46E900','#1A2BCE','#E0007F']
 
 # import required LiDAR libaries
@@ -39,6 +40,7 @@ PAI_file = 'arrays_for_lombok/SAFE_pointcloud_metrics_10m_pai_data.tif'
 
 dens, geo, coord = io.load_GeoTIFF_band_and_georeferencing(dens_file)
 PAI, geo, coord = io.load_GeoTIFF_band_and_georeferencing(PAI_file)
+dens[np.isnan(PAI)]=np.nan
 
 rows,cols = PAI.shape
 N = geo[3]
@@ -70,9 +72,9 @@ PAImax_30m_10deg = MH.calculate_analytical_limit(dens_a,area[2],k,theta_rad[2])
 # Figure 1 - this figure illustrates the analytical solution presented in this
 # paper describing the threshold PAI that can be detected using discrete return
 # LiDAR
-fig = plt.figure(1, facecolor='White',figsize=[6,3])
+fig = plt.figure(1, facecolor='White',figsize=[12,6])
 ax1a= plt.subplot2grid((1,7),(0,0),colspan=3)
-ax1a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax1a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
 ax1a.set_xlabel('point density / pts m$^{-2}$',fontsize = axis_size)
 ax1a.set_ylabel('PAI$_{max}$',fontsize = axis_size)
 
@@ -82,7 +84,7 @@ ax1a.plot(dens_a,PAImax_30m_00deg,'-',c=colour[2],label = '%.2f ha' % (np.pi*rad
 ax1a.legend(loc='lower right')
 
 ax1b= plt.subplot2grid((1,7),(0,3),colspan=3,sharex=ax1a,sharey=ax1a)
-ax1b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10, color='white')
+ax1b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2, color='white')
 ax1b.set_xlabel('point density / pts m$^{-2}$',fontsize = axis_size)
 ax1b.set_ylabel('PAI',fontsize = axis_size)
 
@@ -92,32 +94,39 @@ ax1c= plt.subplot2grid((1,7),(0,6))
 cb = fig.colorbar(hb, cax=ax1c)
 cb.set_label('log$_{10}$(Number of grid cells)',fontsize = axis_size)
 
-ax1b.plot(dens_a,PAImax_10m_00deg,'-',c='white')
+ax1b.plot(dens_a,PAImax_10m_00deg,'-',c='white',linewidth=2)
 ax1b.set_xlim(0,30)
 ax1b.set_ylim(0,np.nanmax(PAI))
 plt.tight_layout()
 
-plt.savefig(SAVEDIR+'Fig1_SAFE_point_density_vs_PAI.png')
+plt.savefig('Fig1_SAFE_point_density_vs_PAI.png')
 
 #-------------------------------------------------------------------------------
 # Figure 2 - this figure presents maps of PAI and point density across the SAFE
 # landscape
-fig = plt.figure(2, facecolor='White',figsize=[6,9])
+fig = plt.figure(2, facecolor='White',figsize=[12,18])
 ax2a= plt.subplot2grid((2,1),(0,0))
-ax2a.annotate('a - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-im2a=ax2a.imshow(dens,cmap='plasma',origin='lower',extent=[W,E,N,S])
-cbar2a=plt.colorbar(im2a)
-cbar2a.ax.set_ylabel('point density / pts m$^{-2}$',fontsize = axis_size)
-cbar2a.solids.set_edgecolor("face")
+ax2a.annotate('a - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
+im2a=ax2a.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,N,S])
 ax2a.axis('image')
 
+divider2a = make_axes_locatable(ax2a)
+cax2a = divider2a.append_axes("right", size="5%", pad=0.05)
+cbar2a=plt.colorbar(im2a, cax=cax2a)
+cbar2a.ax.set_ylabel('point density / pts m$^{-2}$',fontsize = axis_size)
+cbar2a.solids.set_edgecolor("face")
+
 ax2b= plt.subplot2grid((2,1),(1,0))
-ax2b.annotate('b - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax2b.annotate('b - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
 im2b = ax2b.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,N,S])
-cbar2b = plt.colorbar(im2b)
-cbar2b.solids.set_edgecolor("face")
-cbar2b.ax.set_ylabel('PAI',fontsize = axis_size)
 ax2b.axis('image')
+
+divider2b = make_axes_locatable(ax2b)
+cax2b = divider2b.append_axes("right", size="5%", pad=0.05)
+cbar2b=plt.colorbar(im2b, cax=cax2b)
+cbar2b.ax.set_ylabel('PAI',fontsize = axis_size)
+cbar2b.solids.set_edgecolor("face")
+
 plt.tight_layout()
-plt.savefig(SAVEDIR+'Fig2_SAFE_point_density_PAI_maps.png')
+plt.savefig('Fig2_SAFE_point_density_PAI_maps.png')
 plt.show()

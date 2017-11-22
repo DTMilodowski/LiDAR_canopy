@@ -192,3 +192,26 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
     return 0
     #-----------------------------------
 
+# Simple script to load GeoTIFF 
+def load_GeoTIFF_band_and_georeferencing(File,band_number=1):
+    
+    driver = gdal.GetDriverByName('GTiff')
+    driver.Register()
+
+    try:
+        ds = gdal.Open(File)
+    except RuntimeError, e:
+        print 'unable to open ' + File
+        print e
+        sys.exit(1)
+        
+    source_band = ds.GetRasterBand(band_number)
+    if source_band is None:
+        print "BAND MISSING"
+        sys.exit(1)  
+
+    array = np.array(ds.GetRasterBand(band_number).ReadAsArray(),dtype=np.float64)
+    geoTrans = ds.GetGeoTransform()
+    coord_sys = ds.GetProjectionRef()
+
+    return array, geoTrans, coord_sys

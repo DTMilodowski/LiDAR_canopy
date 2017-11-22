@@ -34,8 +34,8 @@ import raster_io as io
 SAVEDIR = '~/'
 
 # Load files
-dens_file = 'SAFE_pointcloud_metrics_10m_point_density_data.tif'
-PAI_file = 'SAFE_pointcloud_metrics_10m_pai_data.tif'
+dens_file = 'arrays_for_lombok/SAFE_pointcloud_metrics_10m_point_density_data.tif'
+PAI_file = 'arrays_for_lombok/SAFE_pointcloud_metrics_10m_pai_data.tif'
 
 dens, geo, coord = io.load_GeoTIFF_band_and_georeferencing(dens_file)
 PAI, geo, coord = io.load_GeoTIFF_band_and_georeferencing(PAI_file)
@@ -47,7 +47,7 @@ W = geo[0]
 E = geo[0] + (cols+1)*geo[1]
 #-------------------------------------------------------------------------------
 # Get analytical solution
-k = 0.76
+k = 0.7
 theta_deg = np.asarray([0, 5, 10])
 theta_rad = theta_deg*np.pi/180.
 radius = np.asarray([10.,20.,30.])
@@ -98,7 +98,6 @@ ax1b.set_ylim(0,np.nanmax(PAI))
 plt.tight_layout()
 
 plt.savefig(SAVEDIR+'Fig1_SAFE_point_density_vs_PAI.png')
-plt.show()
 
 #-------------------------------------------------------------------------------
 # Figure 2 - this figure presents maps of PAI and point density across the SAFE
@@ -120,5 +119,5 @@ cbar2b.solids.set_edgecolor("face")
 cbar2b.ax.set_ylabel('PAI',fontsize = axis_size)
 ax2b.axis('image')
 plt.tight_layout()
-plt.show()
 plt.savefig(SAVEDIR+'Fig2_SAFE_point_density_PAI_maps.png')
+plt.show()

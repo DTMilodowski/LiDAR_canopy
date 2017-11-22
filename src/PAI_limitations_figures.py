@@ -71,7 +71,7 @@ PAImax_30m_10deg = MH.calculate_analytical_limit(dens_a,area[2],k,theta_rad[2])
 # paper describing the threshold PAI that can be detected using discrete return
 # LiDAR
 fig = plt.figure(1, facecolor='White',figsize=[6,3])
-ax1a= plt.subplot2grid((1,2),(0,0))
+ax1a= plt.subplot2grid((1,5),(0,0),colspan=2)
 ax1a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 ax1a.set_xlabel('point density / pts m$^{-2}$',fontsize = axis_size)
 ax1a.set_ylabel('PAI$_{max}$',fontsize = axis_size)
@@ -81,13 +81,15 @@ ax1a.plot(dens_a,PAImax_20m_00deg,'-',c=colour[1],label = '%.2f ha' % (np.pi*rad
 ax1a.plot(dens_a,PAImax_30m_00deg,'-',c=colour[2],label = '%.2f ha' % (np.pi*radius[2]**2/10.**4))
 ax1a.legend(loc='lower right')
 
-ax1b= plt.subplot2grid((1,2),(0,1),sharex=ax1a,sharey=ax1a)
+ax1b= plt.subplot2grid((1,5),(0,2),colspan=2,sharex=ax1a,sharey=ax1a)
 ax1b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10, color='white')
 ax1b.set_xlabel('point density / pts m$^{-2}$',fontsize = axis_size)
 ax1b.set_ylabel('PAI',fontsize = axis_size)
 
-hb = ax1b.hexbin(dens.reshape(dens.size), PAI.reshape(PAI.size), gridsize=50, bins='log', cmap='plasma')
-cb = fig.colorbar(hb, ax=ax1b)
+hb = ax1b.hexbin(dens.reshape(dens.size), PAI.reshape(PAI.size), gridsize=200, bins='log', cmap='plasma')
+
+ax1c= plt.subplot2grid((1,5),(0,4))
+cb = fig.colorbar(hb, ax=ax1c)
 cb.set_label('log$_{10}$(Number of grid cells)')
 
 ax1b.plot(dens_a,PAImax_10m_00deg,'-',c='white')

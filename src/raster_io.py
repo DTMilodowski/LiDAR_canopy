@@ -214,4 +214,7 @@ def load_GeoTIFF_band_and_georeferencing(File,band_number=1):
     geoTrans = ds.GetGeoTransform()
     coord_sys = ds.GetProjectionRef()
 
+    if geoTrans[-1] < 0:
+        array=np.flipud(array)
+    
     return array, geoTrans, coord_sys

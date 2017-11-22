@@ -31,7 +31,7 @@ import LiDAR_MacHorn_LAD_profiles as MH
 import raster_io as io
 
 # Directory listings
-SAVEDIR = ''
+SAVEDIR = '~/'
 
 # Load files
 dens_file = 'SAFE_pointcloud_metrics_10m_point_density_data.tif'
@@ -90,15 +90,15 @@ hb = ax1b.hexbin(dens.reshape(dens.size), PAI.reshape(PAI.size), gridsize=200, b
 
 ax1c= plt.subplot2grid((1,7),(0,6))
 cb = fig.colorbar(hb, cax=ax1c)
-cb.set_label('log$_{10}$(Number of grid cells)')
+cb.set_label('log$_{10}$(Number of grid cells)',fontsize = axis_size)
 
 ax1b.plot(dens_a,PAImax_10m_00deg,'-',c='white')
-ax1b.set_xlim(0,100)
+ax1b.set_xlim(0,30)
 ax1b.set_ylim(0,np.nanmax(PAI))
 plt.tight_layout()
-plt.show()
 
 plt.savefig(SAVEDIR+'Fig1_SAFE_point_density_vs_PAI.png')
+plt.show()
 
 #-------------------------------------------------------------------------------
 # Figure 2 - this figure presents maps of PAI and point density across the SAFE

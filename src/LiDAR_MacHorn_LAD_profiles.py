@@ -4,11 +4,11 @@ import LiDAR_tools as lidar
 import auxilliary_functions as aux
 
 # bin lidar returns 
-def bin_returns(pts, max_height, layer_thickness):
+def bin_returns(pts_in, max_height, layer_thickness):
     
     #print pts.shape
-    mask= pts[:,3]==1
-    pts=pts[mask,:]
+    mask= pts_in[:,3]==1
+    pts=pts_in[mask,:]
     
     # calculate n ground points
     n_ground_returns = np.sum(pts[:,4]==2)

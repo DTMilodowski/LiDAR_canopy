@@ -88,7 +88,7 @@ ax1b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='non
 ax1b.set_xlabel('point density / pts m$^{-2}$',fontsize = axis_size)
 ax1b.set_ylabel('PAI',fontsize = axis_size)
 
-hb = ax1b.hexbin(dens.reshape(dens.size), PAI.reshape(PAI.size), gridsize=200, bins='log', cmap='plasma')
+hb = ax1b.hexbin(dens[dens<=30].reshape(dens[dens<=30].size), PAI[dens<=30].reshape(PAI[dens<=30].size), gridsize=200, bins='log', cmap='plasma')
 
 ax1c= plt.subplot2grid((1,7),(0,6))
 cb = fig.colorbar(hb, cax=ax1c)
@@ -100,6 +100,7 @@ ax1b.set_ylim(0,np.nanmax(PAI))
 plt.tight_layout()
 
 plt.savefig('Fig1_SAFE_point_density_vs_PAI.png')
+plt.savefig('Fig1_SAFE_point_density_vs_PAI.pdf')
 
 #-------------------------------------------------------------------------------
 # Figure 2 - this figure presents maps of PAI and point density across the SAFE
@@ -129,4 +130,5 @@ cbar2b.solids.set_edgecolor("face")
 
 plt.tight_layout()
 plt.savefig('Fig2_SAFE_point_density_PAI_maps.png')
+plt.savefig('Fig2_SAFE_point_density_PAI_maps.pdf')
 plt.show()

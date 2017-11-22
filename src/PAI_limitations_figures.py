@@ -78,9 +78,9 @@ ax1a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='non
 ax1a.set_xlabel('point density / pts m$^{-2}$',fontsize = axis_size)
 ax1a.set_ylabel('PAI$_{max}$',fontsize = axis_size)
 
-ax1a.plot(dens_a,PAImax_10m_00deg,'-',c=colour[0],label = '%.2f ha' % (np.pi*radius[0]**2/10.**4))
-ax1a.plot(dens_a,PAImax_20m_00deg,'-',c=colour[1],label = '%.2f ha' % (np.pi*radius[1]**2/10.**4))
-ax1a.plot(dens_a,PAImax_30m_00deg,'-',c=colour[2],label = '%.2f ha' % (np.pi*radius[2]**2/10.**4))
+ax1a.plot(dens_a,PAImax_10m_00deg,'-',c=colour[0],label = '%.3f ha' % (np.pi*radius[0]**2/10.**4))
+ax1a.plot(dens_a,PAImax_20m_00deg,'-',c=colour[1],label = '%.3f ha' % (np.pi*radius[1]**2/10.**4))
+ax1a.plot(dens_a,PAImax_30m_00deg,'-',c=colour[2],label = '%.3f ha' % (np.pi*radius[2]**2/10.**4))
 ax1a.legend(loc='lower right')
 
 ax1b= plt.subplot2grid((1,7),(0,3),colspan=3,sharex=ax1a,sharey=ax1a)
@@ -88,7 +88,7 @@ ax1b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='non
 ax1b.set_xlabel('point density / pts m$^{-2}$',fontsize = axis_size)
 ax1b.set_ylabel('PAI',fontsize = axis_size)
 
-hb = ax1b.hexbin(dens[dens<=30].reshape(dens[dens<=30].size), PAI[dens<=30].reshape(PAI[dens<=30].size), gridsize=200, bins='log', cmap='plasma')
+hb = ax1b.hexbin(dens.reshape(dens.size), PAI.reshape(PAI.size), gridsize=(1000,200), bins='log', cmap='plasma')
 
 ax1c= plt.subplot2grid((1,7),(0,6))
 cb = fig.colorbar(hb, cax=ax1c)

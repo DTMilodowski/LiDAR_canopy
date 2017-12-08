@@ -56,6 +56,8 @@ radius = np.asarray([10.,20.,30.])
 area = np.pi*radius**2
 dens_a = np.arange(0.01,np.nanmax(dens),0.01)
 
+PAImax = MH.calculate_analytical_limit(dens,area[0],k,theta_rad[0])
+
 PAImax_10m_00deg = MH.calculate_analytical_limit(dens_a,area[0],k,theta_rad[0])
 PAImax_20m_00deg = MH.calculate_analytical_limit(dens_a,area[1],k,theta_rad[0])
 PAImax_30m_00deg = MH.calculate_analytical_limit(dens_a,area[2],k,theta_rad[0])
@@ -105,28 +107,57 @@ plt.savefig('Fig1_SAFE_point_density_vs_PAI.pdf')
 #-------------------------------------------------------------------------------
 # Figure 2 - this figure presents maps of PAI and point density across the SAFE
 # landscape
-fig = plt.figure(2, facecolor='White',figsize=[12,18])
-ax2a= plt.subplot2grid((2,1),(0,0))
-ax2a.annotate('a - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
-im2a=ax2a.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,N,S])
-ax2a.axis('image')
 
-divider2a = make_axes_locatable(ax2a)
-cax2a = divider2a.append_axes("right", size="5%", pad=0.05)
-cbar2a=plt.colorbar(im2a, cax=cax2a)
-cbar2a.ax.set_ylabel('point density / pts m$^{-2}$',fontsize = axis_size)
-cbar2a.solids.set_edgecolor("face")
+# Load shapefiles
+shapefile_dir = '../Data/Fig1_Shapefiles/'
+land_cover_file = 'HCS_Stratification_DOI.shp'
+vjr_file = 'VJR_prj.shp'
+ea_file = 'EA_prj.shp'
 
-ax2b= plt.subplot2grid((2,1),(1,0))
-ax2b.annotate('b - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
-im2b = ax2b.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,N,S])
+land_cover = shp.Reader(shapefile_dir+land_cover_file)
+ea = shp.Reader(shapefile_dir+ea_file)
+vjr = shp.Reader(shapefile_dir+vjr_file)
+"""
+for shape in sf.shapeRecords():
+    x = [i[0] for i in shape.shape.points[:]]
+    y = [i[1] for i in shape.shape.points[:]]
+    plt.plot(x,y)
+"""
+
+fig = plt.figure(2, facecolor='White',figsize=[12,12])
+
+ax2b= plt.subplot2grid((2,2),(0,1))
+ax2b.annotate('b - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
+im2b=ax2b.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,N,S])
 ax2b.axis('image')
 
 divider2b = make_axes_locatable(ax2b)
 cax2b = divider2b.append_axes("right", size="5%", pad=0.05)
 cbar2b=plt.colorbar(im2b, cax=cax2b)
-cbar2b.ax.set_ylabel('PAI',fontsize = axis_size)
+cbar2b.ax.set_ylabel('point density / pts m$^{-2}$',fontsize = axis_size)
 cbar2b.solids.set_edgecolor("face")
+
+ax2c= plt.subplot2grid((2,2),(1,0))
+ax2c.annotate('c - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
+im2c = ax2c.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,N,S])
+ax2c.axis('image')
+
+divider2c = make_axes_locatable(ax2c)
+cax2c = divider2c.append_axes("right", size="5%", pad=0.05)
+cbar2c=plt.colorbar(im2c, cax=cax2c)
+cbar2c.ax.set_ylabel('PAI',fontsize = axis_size)
+cbar2c.solids.set_edgecolor("face")
+
+ax2d= plt.subplot2grid((3,1),(2,0))
+ax2d.annotate('d - PAI/PAI$_{max}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
+im2d = ax2d.imshow(PAI/PAImax,vmin = 0.85, vmax=1, cmap='plasma',origin='lower',extent=[W,E,N,S])
+ax2d.axis('image')
+
+divider2d = make_axes_locatable(ax2d)
+cax2d = divider2d.append_axes("right", size="5%", pad=0.05)
+cbar2d=plt.colorbar(im2d, cax=cax2d)
+cbar2d.ax.set_ylabel('PAI/PAI$_{max}$',fontsize = axis_size)
+cbar2d.solids.set_edgecolor("face")
 
 plt.tight_layout()
 plt.savefig('Fig2_SAFE_point_density_PAI_maps.png')

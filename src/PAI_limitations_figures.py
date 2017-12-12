@@ -34,6 +34,9 @@ colour = ['#46E900','#1A2BCE','#E0007F']
 
 # import required LiDAR libaries
 import LiDAR_MacHorn_LAD_profiles as MH
+import LiDAR_io as lidar_io
+import LiDAR_tools as lidar
+import auxilliary_functions as aux
 import raster_io as io
 
 # Directory listings
@@ -230,4 +233,106 @@ for tick in ax2d.get_yticklabels():
 plt.tight_layout()
 plt.savefig('Fig2_SAFE_point_density_PAI_maps.png')
 plt.savefig('Fig2_SAFE_point_density_PAI_maps.pdf')
+plt.show()
+
+# Figure 3 - investigating role of point density on PAI estimates made at specific points
+# (controlling for other sources of variation)
+
+las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt'
+laz_files = False
+# Some parameters
+min_PAD = 0.1
+radius = 10.
+area = np.pi*radius**2
+max_height = 80.   
+min_height = 2.     
+layer_thickness = 1
+heights = np.arange(0,max_height,layer_thickness)+layer_thickness
+kappa = 0.7
+n_iterations = 100
+
+target_dens = np.arange(40,0,-1)
+target_points = (np.ceil(area*target_dens)).astype('int')
+n_dens = target_dens.size
+PAI_iter = np.zeros((3,n_dens,n_iterations))
+
+coords = np.array([[565042,522612],[572092,520634],[549913,514144]])
+sample_pts_collated = []
+
+for pp in range(0,3):
+    print "point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1])
+    # define a bounding box around target points to load in point cloud around area of interest
+    E = coords[pp,0]+500
+    N = coords[pp,1]+500
+    W = coords[pp,0]-500
+    S = coords[pp,1]-500
+    # Read in LiDAR points for region of interest
+    polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
+    lidar_pts, starting_ids_for_trees, trees = lidar_io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=laz_files)
+    N_trees = len(trees)
+    # retrieve point clouds samples        
+    sample_pts = np.array([])
+    for tt in range(0,N_trees):
+      ids = trees[tt].query_ball_point(coords[pp], radius)
+      if len(ids)>0:
+        if sample_pts.size==0:
+          sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
+        else:
+          sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
+
+    samples_pts_collated.append(sample_pts.copy())
+    sample_pts = None
+          
+# Now loop through the points again pulling out the metrics
+for pp in range(0,3):
+    # If we have the returns, then calculate metric of interest - in
+    # this case the PAI
+    sample_pts = sample_pts_collated[pp].copy()
+    if sample_pts.size > 0:
+      # keep only first returns
+      sample_pts=sample_pts[sample_pts[:,3]==1,:]
+      if sample_pts.size > 0:
+        sample_ids = np.arange(sample_pts.shape[0])
+        for dd in range(0,n_dens):
+          for ii in range(0,n_iterations):
+            sample_pts_iter = sample_pts[np.random.choice(sample_ids,size=target_points[dd]),:]
+            # calculate PAD profile
+            heights,first_return_profile,n_ground_returns = MH.bin_returns(sample_pts_iter, max_height, layer_thickness)
+            PADprof = MH.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+            
+            # remove lowermost portion of profile
+            PAD_iter = PADprof.copy()
+            PAD_iter[heights<min_height]=0
+            
+            PAI_iter[pp,dd,ii] = np.sum(PAD_iter)
+              
+      else:
+        print "no first returns in neighbourhood"
+    else:
+      print "no returns in neighbourhood"
+
+# Now plot up the results
+PAI_A = np.mean(PAI_iter[0,:,:],axis=1)
+ulim_A = np.mean(PAI_iter[0,:,:],axis=1)+np.std(PAI_iter[0,:,:],axis=1)
+llim_A =  np.mean(PAI_iter[0,:,:],axis=1)-np.std(PAI_iter[0,:,:],axis=1)
+
+PAI_B = np.mean(PAI_iter[1,:,:],axis=1)
+ulim_B = np.mean(PAI_iter[1,:,:],axis=1)+np.std(PAI_iter[1,:,:],axis=1)
+llim_B =  np.mean(PAI_iter[1,:,:],axis=1)-np.std(PAI_iter[1,:,:],axis=1)
+
+PAI_C = np.mean(PAI_iter[2,:,:],axis=1)
+ulim_C = np.mean(PAI_iter[2,:,:],axis=1)+np.std(PAI_iter[2,:,:],axis=1)
+llim_C =  np.mean(PAI_iter[2,:,:],axis=1)-np.std(PAI_iter[2,:,:],axis=1)
+
+fig = plt.figure(3, facecolor='White',figsize=[12,6])
+ax3= plt.subplot2grid((1,1),(0,0))
+ax3.plot(target_dens,PAI_A,'-',c=colour[0],label = 'A')
+ax3.fill_between(target_dens,llim_A,ulim_A,color=colour[0],alpha=0.25)
+ax3.plot(target_dens,PAI_B,'-',c=colour[1],label = 'B')
+ax3.fill_between(target_dens,llim_B,ulim_B,color=colour[0],alpha=0.25)
+ax3.plot(target_dens,PAI_C,'-',c=colour[2],label = 'C')
+ax3.fill_between(target_dens,llim_C,ulim_C,color=colour[0],alpha=0.25)
+ax3.legend(loc='lower right')
+plt.savefig('Figure3_point_density_vs_PAI_pointwise.png')
+plt.savefig('Figure3_point_density_vs_PAI_pointwise.pdf')
 plt.show()

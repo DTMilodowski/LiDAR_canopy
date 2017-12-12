@@ -251,7 +251,7 @@ heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
 n_iterations = 100
 
-target_dens = np.arange(40,0,-1)
+target_dens = np.arange(40,0,-0.2)
 target_points = (np.ceil(area*target_dens)).astype('int')
 n_dens = target_dens.size
 PAI_iter = np.zeros((3,n_dens,n_iterations))
@@ -280,7 +280,7 @@ for pp in range(0,3):
         else:
           sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
 
-    samples_pts_collated.append(sample_pts.copy())
+    sample_pts_collated.append(sample_pts.copy())
     sample_pts = None
           
 # Now loop through the points again pulling out the metrics
@@ -324,15 +324,121 @@ PAI_C = np.mean(PAI_iter[2,:,:],axis=1)
 ulim_C = np.mean(PAI_iter[2,:,:],axis=1)+np.std(PAI_iter[2,:,:],axis=1)
 llim_C =  np.mean(PAI_iter[2,:,:],axis=1)-np.std(PAI_iter[2,:,:],axis=1)
 
-fig = plt.figure(3, facecolor='White',figsize=[12,6])
+fig = plt.figure(3, facecolor='White',figsize=[6,6])
 ax3= plt.subplot2grid((1,1),(0,0))
 ax3.plot(target_dens,PAI_A,'-',c=colour[0],label = 'A')
 ax3.fill_between(target_dens,llim_A,ulim_A,color=colour[0],alpha=0.25)
 ax3.plot(target_dens,PAI_B,'-',c=colour[1],label = 'B')
-ax3.fill_between(target_dens,llim_B,ulim_B,color=colour[0],alpha=0.25)
+ax3.fill_between(target_dens,llim_B,ulim_B,color=colour[1],alpha=0.25)
 ax3.plot(target_dens,PAI_C,'-',c=colour[2],label = 'C')
-ax3.fill_between(target_dens,llim_C,ulim_C,color=colour[0],alpha=0.25)
+ax3.fill_between(target_dens,llim_C,ulim_C,color=colour[2],alpha=0.25)
+ax3.plot(dens_a,PAImax_10m_00deg,'-',c='k',linewidth=2,label = 'limit')
 ax3.legend(loc='lower right')
+ax3.set_xlim(xmin=0,xmax=40)
+ax3.set_xlabel('point density / pts m$^{-2}$', fontsize = axis_size)
+ax3.set_ylabel('PAI', fontsize = axis_size)
+plt.tight_layout()
 plt.savefig('Figure3_point_density_vs_PAI_pointwise.png')
 plt.savefig('Figure3_point_density_vs_PAI_pointwise.pdf')
+plt.show()
+
+# Figure 4 - investigating role of resolution on PAI estimates made at specific points
+# (controlling for other sources of variation)
+
+# first construct sampling grid
+ha = 100
+div = np.array([10.,8.,6.,5.,4.,3.,2.,1.])
+keys = ['10m','12.5m','16.7m','20m','25m','33m','50m','100m']
+res = ha/div
+
+coords_00 = coords-ha/2
+n_grids = res.size
+subplots = {}
+PAI_res = {}
+
+PAI_mean = np.zeros((3,div.size))
+PAI_sd = np.zeros((3,div.size))
+
+for pp in range(0,3):
+  for ss in range(0,n_grids):
+    x = np.arange(coords_00[pp,0],coords_00[pp,0]+ha+1,res[ss])
+    y = np.arange(coords_00[pp,1],coords_00[pp,1]+ha+1,res[ss])
+    
+    xv,yv=np.asarray(np.meshgrid(x,y))
+    rr,cc = xv.shape
+    rr-=1
+    cc-=1
+    subplot = []
+    for i in range(0,rr):
+        for j in range(0,cc):
+            bbox = [ [xv[i,j], xv[i+1,j], xv[i+1,j+1], xv[i,j+1], xv[i,j]],
+                     [yv[i,j], yv[i+1,j], yv[i+1,j+1], yv[i,j+1], yv[i,j]] ]
+            subplot.append( np.asarray(bbox).transpose() )
+
+    subplots[keys[ss]] = subplot
+    
+    n_subplots=len(subplot)
+    PAI_res[keys[ss]] = np.zeros((3,n_subplots))
+
+# now get point clouds
+for pp in range(0,3):
+    print "point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1])
+    # define a bounding box around target points to load in point cloud around area of interest
+    E = coords[pp,0]+500
+    N = coords[pp,1]+500
+    W = coords[pp,0]-500
+    S = coords[pp,1]-500
+    # Read in LiDAR points for region of interest
+    polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
+    lidar_pts, starting_ids_for_trees, trees = lidar_io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=laz_files)
+    N_trees = len(trees)
+    
+    # retrieve point clouds samples around 1 ha plot
+    query_radius = np.ceil(np.sqrt(2.*ha**2))
+    sample_pts = np.array([])
+    for tt in range(0,N_trees):
+      ids = trees[tt].query_ball_point(coords[pp], query_radius)
+      if len(ids)>0:
+        if sample_pts.size==0:
+          sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
+        else:
+          sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
+
+    sample_pts_collated.append(sample_pts[sample_pts[:,3]==1,:])
+    sample_pts = None
+    
+# Now loop through the subplots and sample the point cloud
+for pp in range(0,3):
+    # loop through each sampling resolution
+    sample_pts = sample_pts_collated[pp].copy()
+    for ss in range(0,res.size):
+      print '\t - sample res = ', keys[ss]
+      n_subplots = len(subplots[keys[ss]])
+      rad_ss = np.sqrt(res[ss]**2/2.)              
+      # for each of the subplots, clip point cloud and model PAD and get the metrics
+      for sp in range(0,n_subplots):
+        sp_pts = lidar.filter_lidar_data_by_polygon(sample_pts,subplots[keys[ss]][sp])
+        #------
+        heights,first_return_profile,n_ground_returns = MH.bin_returns(sp_pts, max_height, layer_thickness)
+        PADprof = MH.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, k)
+        # remove lowermost portion of profile
+        PADprof[heights<min_height]=0
+        PAI_res[keys[ss]][pp,sp] = PADprof.sum()
+      PAI_mean[pp,ss] = np.mean(PAI_res[keys[ss]][pp,:])
+      PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:])
+
+
+# Now plot up the results
+fig = plt.figure(3, facecolor='White',figsize=[6,6])
+ax4= plt.subplot2grid((1,1),(0,0))
+ax4.plot(res,PAI_mean[0],'o',c=colour[0],label = 'A')
+ax4.plot(res,PAI_mean[1],'-',c=colour[1],label = 'B')
+ax4.plot(res,PAI_mean[2],'-',c=colour[2],label = 'C')
+ax4.plot(dens_a,PAImax_10m_00deg,'-',c='k',linewidth=2,label = 'limit')
+ax4.legend(loc='lower right')
+ax4.set_xlabel('spatial resolution / m', fontsize = axis_size)
+ax4.set_ylabel('PAI', fontsize = axis_size)
+plt.tight_layout()
+plt.savefig('Figure4_resolution_vs_PAI_pointwise.png')
+plt.savefig('Figure4_resolution_vs_PAI_pointwise.pdf')
 plt.show()

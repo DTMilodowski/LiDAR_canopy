@@ -7,11 +7,14 @@
 # LiDAR"
 #-------------------------------------------------------------------------------
 import numpy as np
+import fiona
 
 # import plotting libraries
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import rcParams
+from matplotlib.patches import Polygon
+from matplotlib.collections import PatchCollection
 import sys
 sys.path.append('/home/dmilodow/DataStore_DTM/FOREST2020/EOdata/EO_data_processing/src/plot_EO_data/colormap/')
 import colormaps as cmaps
@@ -114,9 +117,15 @@ land_cover_file = 'HCS_Stratification_DOI.shp'
 vjr_file = 'VJR_prj.shp'
 ea_file = 'EA_prj.shp'
 
-land_cover = shp.Reader(shapefile_dir+land_cover_file)
-ea = shp.Reader(shapefile_dir+ea_file)
-vjr = shp.Reader(shapefile_dir+vjr_file)
+land_cover = fiona.open(shapefile_dir+land_cover_file)
+ea = fiona.open(shapefile_dir+ea_file)
+vjr = fiona.open(shapefile_dir+vjr_file)
+
+#shape = fiona.open("my_shapefile.shp")
+#print shape.schema
+#first feature of the shapefile
+#first = shape.next()
+#print first # (GeoJSON format)
 """
 for shape in sf.shapeRecords():
     x = [i[0] for i in shape.shape.points[:]]
@@ -126,7 +135,12 @@ for shape in sf.shapeRecords():
 
 fig = plt.figure(2, facecolor='White',figsize=[12,12])
 
-ax2b= plt.subplot2grid((2,2),(0,1))
+ax2a= plt.subplot2grid((2,2),(0,1))
+ax2a.annotate('a - land cover', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
+ax2a.axis('image')
+
+
+ax2b= plt.subplot2grid((2,2),(0,1),sharex=ax2a,sharey=ax2a)
 ax2b.annotate('b - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
 im2b=ax2b.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,N,S])
 ax2b.axis('image')

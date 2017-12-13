@@ -353,7 +353,10 @@ res = ha/div
 
 coords_00 = coords-ha/2
 n_grids = res.size
-subplots = {}
+subplots = []
+subplots.append({})
+subplots.append({})
+subplots.append({})
 PAI_res = {}
 
 PAI_mean = np.zeros((3,div.size))
@@ -365,6 +368,7 @@ for pp in range(0,3):
     y = np.arange(coords_00[pp,1],coords_00[pp,1]+ha+1,res[ss])
     
     xv,yv=np.asarray(np.meshgrid(x,y))
+    
     rr,cc = xv.shape
     rr-=1
     cc-=1
@@ -375,12 +379,15 @@ for pp in range(0,3):
                      [yv[i,j], yv[i+1,j], yv[i+1,j+1], yv[i,j+1], yv[i,j]] ]
             subplot.append( np.asarray(bbox).transpose() )
 
-    subplots[keys[ss]] = subplot
+    subplots[pp][keys[ss]] = subplot
     
     n_subplots=len(subplot)
     PAI_res[keys[ss]] = np.zeros((3,n_subplots))
 
 # now get point clouds
+sample_pts_collated = []
+starting_ids_collated = []
+trees_collated = []
 for pp in range(0,3):
     print "point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1])
     # define a bounding box around target points to load in point cloud around area of interest
@@ -391,33 +398,43 @@ for pp in range(0,3):
     # Read in LiDAR points for region of interest
     polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
     lidar_pts, starting_ids_for_trees, trees = lidar_io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=laz_files)
-    N_trees = len(trees)
-    
-    # retrieve point clouds samples around 1 ha plot
-    query_radius = np.ceil(np.sqrt(2.*ha**2))
-    sample_pts = np.array([])
-    for tt in range(0,N_trees):
-      ids = trees[tt].query_ball_point(coords[pp], query_radius)
-      if len(ids)>0:
-        if sample_pts.size==0:
-          sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
-        else:
-          sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
 
-    sample_pts_collated.append(sample_pts[sample_pts[:,3]==1,:])
-    sample_pts = None
-    
+    sample_pts_collated.append(lidar_pts)
+    starting_ids_collated.append(starting_ids_for_trees)
+    trees_collated.append(trees)
+
 # Now loop through the subplots and sample the point cloud
 for pp in range(0,3):
     # loop through each sampling resolution
-    sample_pts = sample_pts_collated[pp].copy()
+    lidar_pts = sample_pts_collated[pp].copy()
+    starting_ids_for_trees = starting_ids_collated[pp].copy()
+    trees = trees_collated[pp].copy()
+    N_trees = len(trees)
+    
     for ss in range(0,res.size):
       print '\t - sample res = ', keys[ss]
-      n_subplots = len(subplots[keys[ss]])
+      n_subplots = len(subplots[pp][keys[ss]])
       rad_ss = np.sqrt(res[ss]**2/2.)              
       # for each of the subplots, clip point cloud and model PAD and get the metrics
       for sp in range(0,n_subplots):
-        sp_pts = lidar.filter_lidar_data_by_polygon(sample_pts,subplots[keys[ss]][sp])
+        # query the tree to locate points of interest
+        # note that we will only have one tree for number of points in sensitivity analysis  
+        centre_x = np.mean(subplots[keys[ss]][pp][0:4,0])
+        centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
+        radius = np.sqrt(res[ss]**2/2.)
+        # retrieve point clouds samples        
+        sample_pts = np.array([])
+        for tt in range(0,N_trees):
+          ids = trees[tt].query_ball_point(coords[pp], radius)
+          if len(ids)>0:
+            if sample_pts.size==0:
+              sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
+            else:
+              sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
+              
+        # keep only first returns
+        sample_pts=sample_pts[sample_pts[:,3]==1,:]
+        sp_pts = lidar.filter_lidar_data_by_polygon(sample_pts,subplots[pp][keys[ss]][sp])
         #------
         heights,first_return_profile,n_ground_returns = MH.bin_returns(sp_pts, max_height, layer_thickness)
         PADprof = MH.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, k)
@@ -426,18 +443,46 @@ for pp in range(0,3):
         PAI_res[keys[ss]][pp,sp] = PADprof.sum()
       PAI_mean[pp,ss] = np.mean(PAI_res[keys[ss]][pp,:])
       PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:])
-
-
+    
 # Now plot up the results
-fig = plt.figure(3, facecolor='White',figsize=[6,6])
-ax4= plt.subplot2grid((1,1),(0,0))
-ax4.plot(res,PAI_mean[0],'o',c=colour[0],label = 'A')
-ax4.plot(res,PAI_mean[1],'-',c=colour[1],label = 'B')
-ax4.plot(res,PAI_mean[2],'-',c=colour[2],label = 'C')
-ax4.plot(dens_a,PAImax_10m_00deg,'-',c='k',linewidth=2,label = 'limit')
-ax4.legend(loc='lower right')
-ax4.set_xlabel('spatial resolution / m', fontsize = axis_size)
-ax4.set_ylabel('PAI', fontsize = axis_size)
+fig = plt.figure(4, facecolor='White',figsize=[12,6])
+ax4a= plt.subplot2grid((1,2),(0,0))
+ax4a.errorbar(res,PAI_mean[0],'o',yerr=PAI_sd[0],c=colour[0],label = 'A')
+ax4a.errorbar(res,PAI_mean[1],'o',yerr=PAI_sd[1],c=colour[1],label = 'B')
+ax4a.errorbar(res,PAI_mean[2],'o',yerr=PAI_sd[2],c=colour[2],label = 'C')
+ax4a.legend(loc='lower right')
+ax4a.set_xlabel('spatial resolution / m', fontsize = axis_size)
+ax4a.set_ylabel('PAI', fontsize = axis_size)
+
+# Now want to get spatial scaling of canopy variance
+# First create array for 10 m resolution case
+PAI_array_10m = np.zeros((3,10,10))
+for pp in range(0,3):
+  sp = 0
+  for rr in range(0,10):
+    for cc in range(0,10):
+      PAI_array_10m[pp,rr,cc]=PAI_res['10m'][pp,sp]
+      sp+=1
+
+test_res = np.arange(1,11)
+PAI_std_scaling = np.zeros((3,len(test_res)))
+exp_PAI_std_scaling = np.zeros((3,len(test_res)))
+
+for tt in range(0,len(test_res)):
+  for pp in range(0,3):
+    temp_host = np.zeros((10-test_res[tt]+1,10-test_res[tt]+1))
+    print temp_host.shape
+    for rr in range(0,10-test_res[tt]+1):
+      for cc in range(0,10-test_res[tt]+1):
+        temp_host[rr,cc] = np.std(PAI_array_10m[pp,rr:rr+test_res[tt]+1,cc:cc+test_res[tt]+1])
+    #print temp_host.shape
+    PAI_std_scaling[pp,tt] = np.mean(temp_host)
+    exp_PAI_std_scaling[pp,tt] = np.mean(np.exp(temp_host))
+    
+                                  
+  
+    
+
 plt.tight_layout()
 plt.savefig('Figure4_resolution_vs_PAI_pointwise.png')
 plt.savefig('Figure4_resolution_vs_PAI_pointwise.pdf')

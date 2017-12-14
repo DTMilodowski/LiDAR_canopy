@@ -181,6 +181,11 @@ ax2a.annotate('SAFE', xy=(564805,520225), xycoords='data',backgroundcolor='none'
 for tick in ax2a.get_yticklabels():
     tick.set_rotation(90)
 #ax2a.set_xticklabels([])       
+
+for pp in range(0,3):
+  ax2a.plot(coords[pp,0],coords[pp,1],'o',c='white')
+  ax2a.annotate(labels[pp], xy=coords[pp]+250, xycoords='data',color='black')
+
     
 ax2b= plt.subplot2grid((2,2),(0,1))
 ax2b.yaxis.set_major_locator(loc_y)
@@ -188,9 +193,9 @@ ax2b.xaxis.set_major_locator(loc_x)
 ax2b.annotate('b - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
 ax2b.set_xlim(xmin=W,xmax=E)
 ax2b.set_ylim(ymin=S,ymax=N)
-#im2b=ax2b.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,S,N])   
-densm = np.ma.masked_where(np.isnan(dens),dens)
-im2b = ax2b.pcolormesh(X,Y,densm,vmin=0,vmax=30,cmap='plasma')                     
+im2b=ax2b.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,S,N])   
+#densm = np.ma.masked_where(np.isnan(dens),dens)
+#im2b = ax2b.pcolormesh(X,Y,densm,vmin=0,vmax=30,cmap='plasma')                     
 ax2b.axis('image')    
 #ax2b.set_xticklabels([])
 #ax2b.set_yticklabels([])           
@@ -206,18 +211,18 @@ cbar2b.ax.set_ylabel('point density / pts m$^{-2}$',fontsize = axis_size)
 cbar2b.solids.set_edgecolor("face")             
 cbar2b.locator = loc_cb
 cbar2b.update_ticks()
-
+"""
 for pp in range(0,3):
   ax2b.plot(coords[pp,0],coords[pp,1],'o',c='white')
   ax2b.annotate(labels[pp], xy=coords_trans[pp], xycoords='data', xytext=(2, 2), textcoords='offset points',color='white')
-
+"""
 ax2c= plt.subplot2grid((2,2),(1,0))
 ax2c.yaxis.set_major_locator(loc_y)
 ax2c.xaxis.set_major_locator(loc_x)
 ax2c.annotate('c - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-#im2c = ax2c.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,S,N])
-PAIm = np.ma.masked_where(np.isnan(PAI),PAI)
-im2c = ax2c.pcolormesh(X,Y,PAIm,cmap='viridis')
+im2c = ax2c.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,S,N])
+#PAIm = np.ma.masked_where(np.isnan(PAI),PAI)
+#im2c = ax2c.pcolormesh(X,Y,PAIm,cmap='viridis')
 ax2c.axis('image')                                 
 for tick in ax2c.get_yticklabels():
     tick.set_rotation(90)
@@ -229,19 +234,19 @@ cbar2c.ax.set_ylabel('PAI',fontsize = axis_size)
 cbar2c.solids.set_edgecolor("face")             
 cbar2c.locator = loc_cc
 cbar2c.update_ticks()
-
+"""
 for pp in range(0,3):
   ax2c.plot(coords[pp,0],coords[pp,1],'o',c='white')
   ax2c.annotate(labels[pp], xy=coords_trans[pp], xycoords='data', xytext=(2, 2), textcoords='offset points',color='white')
-
+"""
 
 ax2d= plt.subplot2grid((2,2),(1,1))
 ax2d.yaxis.set_major_locator(loc_y)
 ax2d.xaxis.set_major_locator(loc_x)
 ax2d.annotate('d - PAI/PAI$_{max}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-#im2d = ax2d.imshow(PAI/PAImax,vmin = 0.85, vmax=1, cmap='plasma',origin='lower',extent=[W,E,S,N])
-proximity = np.ma.masked_where(np.isnan(PAI),PAI/PAImax)
-im2d = ax2d.pcolormesh(X,Y,proximity,vmin=0.85,vmax=1,cmap='plasma')
+im2d = ax2d.imshow(PAI/PAImax,vmin = 0.85, vmax=1, cmap='plasma',origin='lower',extent=[W,E,S,N])
+#proximity = np.ma.masked_where(np.isnan(PAI),PAI/PAImax)
+#im2d = ax2d.pcolormesh(X,Y,proximity,vmin=0.85,vmax=1,cmap='plasma')
 ax2d.axis('image')
 #ax2d.set_yticklabels([])  
 

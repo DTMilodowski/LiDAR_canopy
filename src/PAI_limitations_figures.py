@@ -50,11 +50,17 @@ dens, geo, coord = io.load_GeoTIFF_band_and_georeferencing(dens_file)
 PAI, geo, coord = io.load_GeoTIFF_band_and_georeferencing(PAI_file)
 dens[np.isnan(PAI)]=np.nan
 
+coords = np.array([[565042,522612],[572092,520634],[549913,514144]])
+labels = ['A','B','C']
+
 rows,cols = PAI.shape
 N = geo[3]
 S = geo[3] + (rows+1)*geo[5]
 W = geo[0]
 E = geo[0] + (cols+1)*geo[1]
+Y, X = np.mgrid[slice(S,N,-geo[5]),slice(W,E,geo[1])]
+
+
 #-------------------------------------------------------------------------------
 # Get analytical solution
 k = 0.7
@@ -150,6 +156,8 @@ ea_poly = ea[0]
 polygon = Polygon(ea_poly['geometry']['coordinates'][0], True,ec='#1A2CCE',fc='None')
 patches.append(polygon)
 
+coords_trans = coords-np.array([W,S])/float(geo[1])+np.array([W,S])
+
 fig = plt.figure(2, facecolor='White',figsize=[12,12]) 
 loc_x = plticker.MultipleLocator(base=10**4) 
 loc_y = plticker.MultipleLocator(base=10**4) 
@@ -178,7 +186,11 @@ ax2b= plt.subplot2grid((2,2),(0,1))
 ax2b.yaxis.set_major_locator(loc_y)
 ax2b.xaxis.set_major_locator(loc_x)
 ax2b.annotate('b - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-im2b=ax2b.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,S,N])                        
+ax2b.set_xlim(xmin=W,xmax=E)
+ax2b.set_ylim(ymin=S,ymax=N)
+#im2b=ax2b.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,S,N])   
+densm = np.ma.masked_where(np.isnan(dens),dens)
+im2b = ax2b.pcolormesh(X,Y,densm,vmin=0,vmax=30,cmap='plasma')                     
 ax2b.axis('image')    
 #ax2b.set_xticklabels([])
 #ax2b.set_yticklabels([])           
@@ -195,11 +207,17 @@ cbar2b.solids.set_edgecolor("face")
 cbar2b.locator = loc_cb
 cbar2b.update_ticks()
 
+for pp in range(0,3):
+  ax2b.plot(coords[pp,0],coords[pp,1],'o',c='white')
+  ax2b.annotate(labels[pp], xy=coords_trans[pp], xycoords='data', xytext=(2, 2), textcoords='offset points',color='white')
+
 ax2c= plt.subplot2grid((2,2),(1,0))
 ax2c.yaxis.set_major_locator(loc_y)
 ax2c.xaxis.set_major_locator(loc_x)
 ax2c.annotate('c - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-im2c = ax2c.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,S,N])
+#im2c = ax2c.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,S,N])
+PAIm = np.ma.masked_where(np.isnan(PAI),PAI)
+im2c = ax2c.pcolormesh(X,Y,PAIm,cmap='viridis')
 ax2c.axis('image')                                 
 for tick in ax2c.get_yticklabels():
     tick.set_rotation(90)
@@ -212,11 +230,18 @@ cbar2c.solids.set_edgecolor("face")
 cbar2c.locator = loc_cc
 cbar2c.update_ticks()
 
+for pp in range(0,3):
+  ax2c.plot(coords[pp,0],coords[pp,1],'o',c='white')
+  ax2c.annotate(labels[pp], xy=coords_trans[pp], xycoords='data', xytext=(2, 2), textcoords='offset points',color='white')
+
+
 ax2d= plt.subplot2grid((2,2),(1,1))
 ax2d.yaxis.set_major_locator(loc_y)
 ax2d.xaxis.set_major_locator(loc_x)
 ax2d.annotate('d - PAI/PAI$_{max}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-im2d = ax2d.imshow(PAI/PAImax,vmin = 0.85, vmax=1, cmap='plasma',origin='lower',extent=[W,E,S,N])
+#im2d = ax2d.imshow(PAI/PAImax,vmin = 0.85, vmax=1, cmap='plasma',origin='lower',extent=[W,E,S,N])
+proximity = np.ma.masked_where(np.isnan(PAI),PAI/PAImax)
+im2d = ax2d.pcolormesh(X,Y,proximity,vmin=0.85,vmax=1,cmap='plasma')
 ax2d.axis('image')
 #ax2d.set_yticklabels([])  
 
@@ -229,7 +254,7 @@ cbar2d.locator = loc_cd
 cbar2d.update_ticks()                
 for tick in ax2d.get_yticklabels():
     tick.set_rotation(90)
-
+    
 plt.tight_layout()
 plt.savefig('Fig2_SAFE_point_density_PAI_maps.png')
 plt.savefig('Fig2_SAFE_point_density_PAI_maps.pdf')
@@ -256,7 +281,6 @@ target_points = (np.ceil(area*target_dens)).astype('int')
 n_dens = target_dens.size
 PAI_iter = np.zeros((3,n_dens,n_iterations))
 
-coords = np.array([[565042,522612],[572092,520634],[549913,514144]])
 sample_pts_collated = []
 
 for pp in range(0,3):
@@ -425,7 +449,7 @@ for pp in range(0,3):
         # retrieve point clouds samples        
         sample_pts = np.array([])
         for tt in range(0,N_trees):
-          ids = trees_collated[pp][tt].query_ball_point(coords[pp], radius)
+          ids = trees_collated[pp][tt].query_ball_point(np.array([centre_x,centre_y]), radius)
           if len(ids)>0:
             if sample_pts.size==0:
               sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
@@ -442,7 +466,13 @@ for pp in range(0,3):
         PADprof[heights<min_height]=0
         PAI_res[keys[ss]][pp,sp] = PADprof.sum()
       PAI_mean[pp,ss] = np.mean(PAI_res[keys[ss]][pp,:])
-      PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:])
+      PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:]) )
+
+PAI_serr = np.zeros(PAI_sd.shape)
+for pp in range(0,3):
+  for ss in range(0,res.size):
+    PAI_serr[pp,ss]=PAI_sd[pp,ss] / np.sqrt(PAI_res[keys[ss]][pp,:].size)
+
 
 # Now want to get spatial scaling of canopy variance
 # First create array for 10 m resolution case
@@ -455,43 +485,55 @@ for pp in range(0,3):
       sp+=1
 
 test_res = np.arange(1,11)
-PAI_std_scaling = np.zeros((3,len(test_res)))
+e = np.zeros((3,len(test_res)))
 bias = np.zeros((3,len(test_res)))
 
 for tt in range(0,len(test_res)):
   for pp in range(0,3):
     temp_host = np.zeros((10-test_res[tt]+1,10-test_res[tt]+1))
-    print temp_host.shape
+    temp_host2 = np.zeros((10-test_res[tt]+1,10-test_res[tt]+1))
     for rr in range(0,10-test_res[tt]+1):
       for cc in range(0,10-test_res[tt]+1):
-        temp_host[rr,cc] = np.std(PAI_array_10m[pp,rr:rr+test_res[tt]+1,cc:cc+test_res[tt]+1])
+        sample_PAI = PAI_array_10m[pp,rr:rr+test_res[tt],cc:cc+test_res[tt]]
+        sample_E = sample_PAI-np.mean(sample_PAI)
+        temp_host2[rr,cc]= np.mean(sample_E)
+        temp_host[rr,cc] = -(1/k)*np.log(np.mean(np.exp(-k*sample_E)))
+        #temp_host[rr,cc] = np.std(PAI_array_10m[pp,rr:rr+test_res[tt]+1,cc:cc+test_res[tt]+1])
     #print temp_host.shape
-    PAI_std_scaling[pp,tt] = np.mean(temp_host)
-    bias[pp,tt] = -(1/k)*np.mean(np.exp(-k*temp_host))
+    #PAI_std_scaling[pp,tt] = np.mean(temp_host)
+    bias[pp,tt] = np.mean(temp_host)
+    e[pp,tt]=np.mean(temp_host2)
+    print pp,tt,bias[pp,tt], e[pp,tt]
                                       
 # now use linear interpolation to estimate bias at each of the resolutions used
-# in this analysis ('10m','12.5m','16.7m','20m','25m','33m','50m','100m')  
+# in this analysis  
 bias_interpolated = np.zeros((3,res.size))    
 for pp in range(0,3):
   for rr in range(0,res.size):
-    res1 = test_res[test_res<=res[rr]][-1]
-    res2 = test_res[test_res>=res[rr]][0]
+    res1 = test_res[test_res*10<=res[rr]][-1]
+    res2 = test_res[test_res*10>=res[rr]][0]
     bias1 = bias[pp,test_res==res1][0]
     bias2 = bias[pp,test_res==res2][0]
-    bias_interpolated[pp,rr] = bias1+(bias2-bias1)*(res[rr]-res1)/(res2-res1)
-
-PAI_corrected = PAI_mean-bias_interpolated    
+    print res[rr],res1,res2
+    if res1!=res2:
+      bias_interpolated[pp,rr] = bias1+(bias2-bias1)*(res[rr]/10-res1)/(res2-res1)
+    else:
+      bias_interpolated[pp,rr] = bias1
+PAI_corrected = PAI_mean-bias_interpolated
 
 # Now plot up the results
-fig = plt.figure(4, facecolor='White',figsize=[6,6])
-ax4a= plt.subplot2grid((1,1),(0,0))
-ax4a.errorbar(res,PAI_mean[0,:],'o',yerr=PAI_sd[0,:],c=colour[0],label = 'A')
-ax4a.errorbar(res,PAI_corrected[0,:],'o',yerr=PAI_sd[0,:],mec=colour[0],mfc='white')
-ax4a.errorbar(res,PAI_mean[1,:],'o',yerr=PAI_sd[1,:],c=colour[1],label = 'B')
-ax4a.errorbar(res,PAI_corrected[1,:],'o',yerr=PAI_sd[1,:],mec=colour[1],mfc='white')
-ax4a.errorbar(res,PAI_mean[2,:],'o',yerr=PAI_sd[2,:],c=colour[2],label = 'C')
-ax4a.errorbar(res,PAI_corrected[2,:],'o',yerr=PAI_sd[2,:],mec=colour[2],mfc='white')
-ax4a.legend(loc='lower right')
+fig = plt.figure(4, facecolor='White',figsize=[7,6])
+ax4a= plt.subplot2grid((1,5),(0,0),colspan=4)
+ax4a.errorbar(res,PAI_mean[0,:],yerr=2*PAI_serr[0,:],marker='o',c=colour[0],label = 'A',linestyle='none')
+ax4a.plot(res,PAI_corrected[0,:],marker='^',c=colour[0],linestyle='none')
+ax4a.axhline(PAI_mean[0,0],c=colour[0],linestyle=':')
+ax4a.errorbar(res,PAI_mean[1,:],yerr=2*PAI_serr[1,:],marker='o',c=colour[1],label = 'B',linestyle='none')
+ax4a.plot(res,PAI_corrected[1,:],marker='^',c=colour[1],linestyle='none')
+ax4a.axhline(PAI_mean[1,0],c=colour[1],linestyle=':')
+ax4a.errorbar(res,PAI_mean[2,:],yerr=2*PAI_serr[2,:],marker='o',c=colour[2],label = 'C',linestyle='none')
+ax4a.plot(res,PAI_corrected[2,:],marker='^',c=colour[2],linestyle='none')
+ax4a.axhline(PAI_mean[2,0],c=colour[2],linestyle=':')
+ax4a.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 ax4a.set_xlabel('spatial resolution / m', fontsize = axis_size)
 ax4a.set_ylabel('PAI', fontsize = axis_size)
 

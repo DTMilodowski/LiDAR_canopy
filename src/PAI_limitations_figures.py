@@ -399,17 +399,17 @@ for pp in range(0,3):
     polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
     lidar_pts, starting_ids_for_trees, trees = lidar_io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=laz_files)
 
-    sample_pts_collated.append(lidar_pts)
-    starting_ids_collated.append(starting_ids_for_trees)
-    trees_collated.append(trees)
+    sample_pts_collated.append(lidar_pts.copy())
+    starting_ids_collated.append(starting_ids_for_trees.copy())
+    trees_collated.append(np.asarray(trees))
 
 # Now loop through the subplots and sample the point cloud
 for pp in range(0,3):
+    print "point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1])
     # loop through each sampling resolution
     lidar_pts = sample_pts_collated[pp].copy()
     starting_ids_for_trees = starting_ids_collated[pp].copy()
-    trees = trees_collated[pp].copy()
-    N_trees = len(trees)
+    N_trees = trees_collated[pp].size
     
     for ss in range(0,res.size):
       print '\t - sample res = ', keys[ss]
@@ -419,13 +419,13 @@ for pp in range(0,3):
       for sp in range(0,n_subplots):
         # query the tree to locate points of interest
         # note that we will only have one tree for number of points in sensitivity analysis  
-        centre_x = np.mean(subplots[keys[ss]][pp][0:4,0])
-        centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
+        centre_x = np.mean(subplots[pp][keys[ss]][sp][0:4,0])
+        centre_y = np.mean(subplots[pp][keys[ss]][sp][0:4,1])
         radius = np.sqrt(res[ss]**2/2.)
         # retrieve point clouds samples        
         sample_pts = np.array([])
         for tt in range(0,N_trees):
-          ids = trees[tt].query_ball_point(coords[pp], radius)
+          ids = trees_collated[pp][tt].query_ball_point(coords[pp], radius)
           if len(ids)>0:
             if sample_pts.size==0:
               sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
@@ -443,16 +443,6 @@ for pp in range(0,3):
         PAI_res[keys[ss]][pp,sp] = PADprof.sum()
       PAI_mean[pp,ss] = np.mean(PAI_res[keys[ss]][pp,:])
       PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:])
-    
-# Now plot up the results
-fig = plt.figure(4, facecolor='White',figsize=[12,6])
-ax4a= plt.subplot2grid((1,2),(0,0))
-ax4a.errorbar(res,PAI_mean[0],'o',yerr=PAI_sd[0],c=colour[0],label = 'A')
-ax4a.errorbar(res,PAI_mean[1],'o',yerr=PAI_sd[1],c=colour[1],label = 'B')
-ax4a.errorbar(res,PAI_mean[2],'o',yerr=PAI_sd[2],c=colour[2],label = 'C')
-ax4a.legend(loc='lower right')
-ax4a.set_xlabel('spatial resolution / m', fontsize = axis_size)
-ax4a.set_ylabel('PAI', fontsize = axis_size)
 
 # Now want to get spatial scaling of canopy variance
 # First create array for 10 m resolution case
@@ -466,7 +456,7 @@ for pp in range(0,3):
 
 test_res = np.arange(1,11)
 PAI_std_scaling = np.zeros((3,len(test_res)))
-exp_PAI_std_scaling = np.zeros((3,len(test_res)))
+bias = np.zeros((3,len(test_res)))
 
 for tt in range(0,len(test_res)):
   for pp in range(0,3):
@@ -477,11 +467,33 @@ for tt in range(0,len(test_res)):
         temp_host[rr,cc] = np.std(PAI_array_10m[pp,rr:rr+test_res[tt]+1,cc:cc+test_res[tt]+1])
     #print temp_host.shape
     PAI_std_scaling[pp,tt] = np.mean(temp_host)
-    exp_PAI_std_scaling[pp,tt] = np.mean(np.exp(temp_host))
-    
-                                  
-  
-    
+    bias[pp,tt] = -(1/k)*np.mean(np.exp(-k*temp_host))
+                                      
+# now use linear interpolation to estimate bias at each of the resolutions used
+# in this analysis ('10m','12.5m','16.7m','20m','25m','33m','50m','100m')  
+bias_interpolated = np.zeros((3,res.size))    
+for pp in range(0,3):
+  for rr in range(0,res.size):
+    res1 = test_res[test_res<=res[rr]][-1]
+    res2 = test_res[test_res>=res[rr]][0]
+    bias1 = bias[pp,test_res==res1][0]
+    bias2 = bias[pp,test_res==res2][0]
+    bias_interpolated[pp,rr] = bias1+(bias2-bias1)*(res[rr]-res1)/(res2-res1)
+
+PAI_corrected = PAI_mean-bias_interpolated    
+
+# Now plot up the results
+fig = plt.figure(4, facecolor='White',figsize=[6,6])
+ax4a= plt.subplot2grid((1,1),(0,0))
+ax4a.errorbar(res,PAI_mean[0,:],'o',yerr=PAI_sd[0,:],c=colour[0],label = 'A')
+ax4a.errorbar(res,PAI_corrected[0,:],'o',yerr=PAI_sd[0,:],mec=colour[0],mfc='white')
+ax4a.errorbar(res,PAI_mean[1,:],'o',yerr=PAI_sd[1,:],c=colour[1],label = 'B')
+ax4a.errorbar(res,PAI_corrected[1,:],'o',yerr=PAI_sd[1,:],mec=colour[1],mfc='white')
+ax4a.errorbar(res,PAI_mean[2,:],'o',yerr=PAI_sd[2,:],c=colour[2],label = 'C')
+ax4a.errorbar(res,PAI_corrected[2,:],'o',yerr=PAI_sd[2,:],mec=colour[2],mfc='white')
+ax4a.legend(loc='lower right')
+ax4a.set_xlabel('spatial resolution / m', fontsize = axis_size)
+ax4a.set_ylabel('PAI', fontsize = axis_size)
 
 plt.tight_layout()
 plt.savefig('Figure4_resolution_vs_PAI_pointwise.png')

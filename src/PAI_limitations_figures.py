@@ -13,6 +13,7 @@ import fiona
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import rcParams
+from matplotlib import cm
 from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 import matplotlib.ticker as plticker
@@ -30,7 +31,14 @@ rcParams['font.sans-serif'] = ['arial']
 rcParams['font.size'] = 16
 rcParams['legend.numpoints'] = 1
 axis_size = rcParams['font.size']+2
-colour = ['#46E900','#1A2BCE','#E0007F']
+
+# code to get trio of nice colourblind friendly colours 
+cmap = cm.get_cmap('plasma')
+scale = np.arange(0.,3.)
+scale /=2.5
+colour = cmap(scale)
+
+#colour = ['#46E900','#1A2BCE','#E0007F']
 
 # import required LiDAR libaries
 import LiDAR_MacHorn_LAD_profiles as MH
@@ -85,18 +93,18 @@ PAImax_20m_10deg = MH.calculate_analytical_limit(dens_a,area[1],k,theta_rad[2])
 PAImax_30m_10deg = MH.calculate_analytical_limit(dens_a,area[2],k,theta_rad[2])
 """
 #-------------------------------------------------------------------------------
-# Figure 1 - this figure illustrates the analytical solution presented in this
+# Figure 2 - this figure illustrates the analytical solution presented in this
 # paper describing the threshold PAI that can be detected using discrete return
 # LiDAR
-fig = plt.figure(1, facecolor='White',figsize=[12,6])
+fig = plt.figure(2, facecolor='White',figsize=[12,6])
 ax1a= plt.subplot2grid((1,7),(0,0),colspan=3)
 ax1a.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size+2)
 ax1a.set_xlabel('point density / pts m$^{-2}$',fontsize = axis_size)
 ax1a.set_ylabel('PAI$_{max}$',fontsize = axis_size)
 
-ax1a.plot(dens_a,PAImax_05m_00deg,'-',c=colour[2],label = '%.3f ha' % (np.pi*radius[2]**2/10.**4))
-ax1a.plot(dens_a,PAImax_10m_00deg,'-',c=colour[0],label = '%.3f ha' % (np.pi*radius[0]**2/10.**4))
-ax1a.plot(dens_a,PAImax_20m_00deg,'-',c=colour[1],label = '%.3f ha' % (np.pi*radius[1]**2/10.**4))
+ax1a.plot(dens_a,PAImax_20m_00deg,dashes=[8, 5],c=colour[2],label = '%.3f ha' % (np.pi*radius[1]**2/10.**4))
+ax1a.plot(dens_a,PAImax_10m_00deg,dashes=[16, 5],c=colour[1],label = '%.3f ha' % (np.pi*radius[0]**2/10.**4))
+ax1a.plot(dens_a,PAImax_05m_00deg,'-',c=colour[0],label = '%.3f ha' % (np.pi*radius[2]**2/10.**4))
 ax1a.legend(loc='lower right')
 
 ax1b= plt.subplot2grid((1,7),(0,3),colspan=3,sharex=ax1a,sharey=ax1a)
@@ -115,11 +123,11 @@ ax1b.set_xlim(0,30)
 ax1b.set_ylim(0,np.nanmax(PAI))
 plt.tight_layout()
 
-plt.savefig('Fig1_SAFE_point_density_vs_PAI.png')
-plt.savefig('Fig1_SAFE_point_density_vs_PAI.pdf')
+plt.savefig('Fig2_SAFE_point_density_vs_PAI.png')
+plt.savefig('Fig2_SAFE_point_density_vs_PAI.pdf')
 
 #-------------------------------------------------------------------------------
-# Figure 2 - this figure presents maps of PAI and point density across the SAFE
+# Figure 1 - this figure presents maps of PAI and point density across the SAFE
 # landscape
 
 # Load shapefiles
@@ -261,8 +269,8 @@ for tick in ax2d.get_yticklabels():
     tick.set_rotation(90)
     
 plt.tight_layout()
-plt.savefig('Fig2_SAFE_point_density_PAI_maps.png')
-plt.savefig('Fig2_SAFE_point_density_PAI_maps.pdf')
+plt.savefig('Fig1_SAFE_point_density_PAI_maps.png')
+plt.savefig('Fig1_SAFE_point_density_PAI_maps.pdf')
 plt.show()
 
 # Figure 3 - investigating role of point density on PAI estimates made at specific points
@@ -355,13 +363,13 @@ llim_C =  np.mean(PAI_iter[2,:,:],axis=1)-np.std(PAI_iter[2,:,:],axis=1)
 
 fig = plt.figure(3, facecolor='White',figsize=[6,6])
 ax3= plt.subplot2grid((1,1),(0,0))
-ax3.plot(target_dens,PAI_A,'-',c=colour[0],label = 'A')
-ax3.fill_between(target_dens,llim_A,ulim_A,color=colour[0],alpha=0.25)
+ax3.plot(target_dens,PAI_A,'-',c=colour[2],label = 'A')
+ax3.fill_between(target_dens,llim_A,ulim_A,color=colour[2],alpha=0.25)
 ax3.plot(target_dens,PAI_B,'-',c=colour[1],label = 'B')
 ax3.fill_between(target_dens,llim_B,ulim_B,color=colour[1],alpha=0.25)
-ax3.plot(target_dens,PAI_C,'-',c=colour[2],label = 'C')
-ax3.fill_between(target_dens,llim_C,ulim_C,color=colour[2],alpha=0.25)
-ax3.plot(dens_a,PAImax_10m_00deg,'-',c='k',linewidth=2,label = 'limit')
+ax3.plot(target_dens,PAI_C,'-',c=colour[0],label = 'C')
+ax3.fill_between(target_dens,llim_C,ulim_C,color=colour[0],alpha=0.25)
+ax3.plot(dens_a,PAImax_10m_00deg,dashes=[8,5],c='k',linewidth=2,label = 'limit')
 ax3.legend(loc='lower right')
 ax3.set_xlim(xmin=0,xmax=40)
 ax3.set_xlabel('point density / pts m$^{-2}$', fontsize = axis_size)
@@ -471,7 +479,7 @@ for pp in range(0,3):
         PADprof[heights<min_height]=0
         PAI_res[keys[ss]][pp,sp] = PADprof.sum()
       PAI_mean[pp,ss] = np.mean(PAI_res[keys[ss]][pp,:])
-      PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:]) )
+      PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:]) 
 
 PAI_serr = np.zeros(PAI_sd.shape)
 for pp in range(0,3):
@@ -529,15 +537,15 @@ PAI_corrected = PAI_mean-bias_interpolated
 # Now plot up the results
 fig = plt.figure(4, facecolor='White',figsize=[7,6])
 ax4a= plt.subplot2grid((1,5),(0,0),colspan=4)
-ax4a.errorbar(res,PAI_mean[0,:],yerr=2*PAI_serr[0,:],marker='o',c=colour[0],label = 'A',linestyle='none')
-ax4a.plot(res,PAI_corrected[0,:],marker='^',c=colour[0],linestyle='none')
-ax4a.axhline(PAI_mean[0,0],c=colour[0],linestyle=':')
+ax4a.errorbar(res,PAI_mean[0,:],yerr=2*PAI_serr[0,:],marker='o',c=colour[2],label = 'A',linestyle='none')
+ax4a.plot(res,PAI_corrected[0,:],marker='^',c=colour[2],linestyle='none')
+ax4a.axhline(PAI_mean[0,0],c=colour[2],linestyle=':')
 ax4a.errorbar(res,PAI_mean[1,:],yerr=2*PAI_serr[1,:],marker='o',c=colour[1],label = 'B',linestyle='none')
 ax4a.plot(res,PAI_corrected[1,:],marker='^',c=colour[1],linestyle='none')
 ax4a.axhline(PAI_mean[1,0],c=colour[1],linestyle=':')
-ax4a.errorbar(res,PAI_mean[2,:],yerr=2*PAI_serr[2,:],marker='o',c=colour[2],label = 'C',linestyle='none')
-ax4a.plot(res,PAI_corrected[2,:],marker='^',c=colour[2],linestyle='none')
-ax4a.axhline(PAI_mean[2,0],c=colour[2],linestyle=':')
+ax4a.errorbar(res,PAI_mean[2,:],yerr=2*PAI_serr[2,:],marker='o',c=colour[0],label = 'C',linestyle='none')
+ax4a.plot(res,PAI_corrected[2,:],marker='^',c=colour[0],linestyle='none')
+ax4a.axhline(PAI_mean[2,0],c=colour[0],linestyle=':')
 ax4a.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 ax4a.set_xlabel('spatial resolution / m', fontsize = axis_size)
 ax4a.set_ylabel('PAI', fontsize = axis_size)

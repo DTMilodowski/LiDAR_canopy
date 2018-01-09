@@ -30,13 +30,15 @@ import raster_io as raster
 # Input files
 #las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt' ## CHANGE AS REQUIRED
 #las_list = 'maliau_las_list.txt' ## CHANGE AS REQUIRED
-las_list = 'danum_las_list.txt' ## CHANGE AS REQUIRED
-laz_files = False ## CHANGE AS REQUIRED
+#las_list = 'danum_las_list.txt' ## CHANGE AS REQUIRED
+las_list = 'sepilok_laz_list.txt' ## CHANGE AS REQUIRED
+laz_files = True ## CHANGE AS REQUIRED
 
 # Site ID
 #site = 'SAFE'
 #site = 'maliau'
-site = 'danum'
+#site = 'danum'
+site = 'sepilok'
 
 # Some parameters
 min_PAD = 0.1
@@ -54,7 +56,7 @@ utm = 50
 
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
-UR, LR, UL, LL = io.get_bbox_of_multiple_tiles(las_list)
+UR, LR, UL, LL = io.get_bbox_of_multiple_tiles(las_list,laz_files)
 
 # Phase two - construct host arrays
 xmin = LL[0]
@@ -98,10 +100,18 @@ n_files = las_files.size
 for i in range(0,n_files):
     print "Processing tile %i of %i" % (i+1,n_files)
     # get bbox of specific tile
-    lasFile = las.file.File(las_files[i],mode='r')
-    max_xyz = lasFile.header.max
-    min_xyz = lasFile.header.min
-    lasFile.close()
+    if laz_files:
+        os.system("las2las %s temp.las" % las_files[0])
+        lasFile = las.file.File('temp.las',mode='r')
+        max_xyz = lasFile.header.max
+        min_xyz = lasFile.header.min
+        lasFile.close()
+        os.system("rm temp.las")
+    else:
+        lasFile = las.file.File(las_files[i],mode='r')
+        max_xyz = lasFile.header.max
+        min_xyz = lasFile.header.min
+        lasFile.close()
 
     # buffer this bounding box with the search radius
     E = max_xyz[0]+radius

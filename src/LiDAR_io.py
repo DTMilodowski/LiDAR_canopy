@@ -24,30 +24,57 @@ def get_lasfile_bbox(las_file):
     lasFile.close()
     return UR, LR, UL, LL
 
-# get bounding box from many las files
-def get_bbox_of_multiple_tiles(file_list,print_keep=False):
+# get bounding box from many las files or laz files
+def get_bbox_of_multiple_tiles(file_list,laz_files=False):
     las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
     n_files = las_files.size
-
-    lasFile = las.file.File(las_files[0],mode='r')
-    max_xyz = lasFile.header.max
-    min_xyz = lasFile.header.min
-    xmin = min_xyz[0]
-    ymin = min_xyz[1]
-    xmax = max_xyz[0]
-    ymax = max_xyz[1]
-    lasFile.close()
-
-    for i in range(1,n_files):
-
-        lasFile = las.file.File(las_files[i],mode='r')
+    
+    if laz_files:
+        os.system("las2las %s temp.las" % las_files[0])
+        lasFile = las.file.File('temp.las',mode='r')
         max_xyz = lasFile.header.max
         min_xyz = lasFile.header.min
-        xmin = min(xmin,min_xyz[0])
-        ymin = min(ymin,min_xyz[1])
-        xmax = max(xmax,max_xyz[0])
-        ymax = max(ymax,max_xyz[1])
+        xmin = min_xyz[0]
+        ymin = min_xyz[1]
+        xmax = max_xyz[0]
+        ymax = max_xyz[1]
         lasFile.close()
+        os.system("rm temp.las")
+
+        for i in range(1,n_files):
+
+            os.system("las2las %s temp.las" % las_files[i])
+            lasFile = las.file.File('temp.las',mode='r')
+            max_xyz = lasFile.header.max
+            min_xyz = lasFile.header.min
+            xmin = min(xmin,min_xyz[0])
+            ymin = min(ymin,min_xyz[1])
+            xmax = max(xmax,max_xyz[0])
+            ymax = max(ymax,max_xyz[1])
+            lasFile.close()
+            os.system("rm temp.las")
+
+    else:
+
+        lasFile = las.file.File(las_files[0],mode='r')
+        max_xyz = lasFile.header.max
+        min_xyz = lasFile.header.min
+        xmin = min_xyz[0]
+        ymin = min_xyz[1]
+        xmax = max_xyz[0]
+        ymax = max_xyz[1]
+        lasFile.close()
+        
+        for i in range(1,n_files):
+
+            lasFile = las.file.File(las_files[i],mode='r')
+            max_xyz = lasFile.header.max
+            min_xyz = lasFile.header.min
+            xmin = min(xmin,min_xyz[0])
+            ymin = min(ymin,min_xyz[1])
+            xmax = max(xmax,max_xyz[0])
+            ymax = max(ymax,max_xyz[1])
+            lasFile.close()
 
     UR = np.asarray([xmax,ymax])
     LR = np.asarray([xmax,ymin])

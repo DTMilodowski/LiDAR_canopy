@@ -33,7 +33,7 @@ site = ['maliaubelian','safee','bso']
 
 # Some parameters
 min_PAD = 0.1
-radius = 10.
+radius = 5.
 max_height = 80.   
 min_height = 2.     
 layer_thickness = 1
@@ -126,5 +126,5 @@ for ss in range(0,3):
 
     # Now that the raster is filled, just need to write it to file
     print "\t\t\t Saving rasters"
-    raster.write_raster_to_GeoTiff_UTM(PAI, geoTransform, ('%s_pointcloud_metrics_10m_PAI' % (site[ss])), utm)
-    raster.write_raster_to_GeoTiff_UTM(pt_dens, geoTransform, ('%s_pointcloud_metrics_10m_point_density' % (site[ss])), utm)
+    raster.write_raster_to_GeoTiff_UTM(PAI, geoTransform, ('%s_pointcloud_metrics_05m_PAI' % (site[ss])), utm)
+    raster.write_raster_to_GeoTiff_UTM(pt_dens, geoTransform, ('%s_pointcloud_metrics_05m_point_density' % (site[ss])), utm)

@@ -101,7 +101,7 @@ for i in range(0,n_files):
     print "Processing tile %i of %i" % (i+1,n_files)
     # get bbox of specific tile
     if laz_files:
-        os.system("las2las %s temp.las" % las_files[0])
+        os.system("las2las %s temp.las" % las_files[i])
         lasFile = las.file.File('temp.las',mode='r')
         max_xyz = lasFile.header.max
         min_xyz = lasFile.header.min

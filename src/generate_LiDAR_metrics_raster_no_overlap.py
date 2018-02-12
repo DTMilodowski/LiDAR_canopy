@@ -34,14 +34,27 @@ import raster_io as raster
 #las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt' ## CHANGE AS REQUIRED
 #las_list = 'maliau_las_list.txt' ## CHANGE AS REQUIRED
 #las_list = 'danum_las_list.txt' ## CHANGE AS REQUIRED
-las_list = 'sepilok_laz_list.txt' ## CHANGE AS REQUIRED
+#las_list = 'sepilok_laz_list.txt' ## CHANGE AS REQUIRED
+las_list = 'gola_nomo_area_04_lazfiles.txt'
+#las_list = 'gola_lalehun_lazfiles.txt'
+#las_list = 'gola_transects_south_lazfiles.txt'
+#las_list = 'gola_transects_central_lazfiles.txt'
+#las_list = 'gola_central_area_01_02_lazfiles.txt'
+#las_list = 'gola_mayengeima_area_03_lazfiles.txt'
 laz_files = True ## CHANGE AS REQUIRED
 
 # Site ID
 #site = 'SAFE'
 #site = 'maliau'
 #site = 'danum'
-site = 'sepilok'
+#site = 'sepilok'
+site = 'gola_nomo_area_04'
+#site = 'gola_lalehun'
+#site = 'gola_transects_south'
+#site = 'gola_transects_central'
+#site = 'gola_central_area_01_02'
+#site = 'gola_mayengeima_area_03'
+
 
 # Some parameters
 min_PAD = 0.1
@@ -54,7 +67,8 @@ kappa = 0.7
 raster_res = 20
 
 # Some georeferencing info
-utm = 50
+#utm = 50
+utm = 29
 #EPSG = "32650" # WGS84 / UTM 50N
 
 #-------------------------------------------------------------------------------

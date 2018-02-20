@@ -51,24 +51,24 @@ def points_in_radius(x,y,target_x, target_y,radius):
     d2=(x-target_x)**2+(y-target_y)**2
     inside = d2<=radius**2
     return x[inside],y[inside], inside
-        
-
-
-
-# Load lidar data => x,y,z,return,class
-def load_lidar_data(las_file):#,subplot_coords,max_height,bin_width):
-    lasFile = las.file.File(las_file,mode='r')
-    #pts = np.vstack((lasFile.x*lasFile.header.scale[0]+lasFile.header.offset[0], lasFile.y*lasFile.header.scale[1]+lasFile.header.offset[1], lasFile.z*lasFile.header.scale[2]+lasFile.header.offset[2], lasFile.return_num, lasFile.classification)).transpose()
-    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank)).transpose()
-    pts = pts[pts[:,2]>=0,:]
-    print "loaded ", pts[:,0].size, " points"
-    return pts
 
 # filter lidar wth polygon
-def filter_lidar_data_by_polygon(in_pts,polygon):
+# This function has been updated to include an option to filter by first return location.
+# The reason for this is so full collections of returns associated with each LiDAR pulse
+# can be retrieved, which can be an issue at edges in multi-return analyses
+def filter_lidar_data_by_polygon(in_pts,polygon,filter_by_first_return_location = False):
     pts = np.zeros((0,in_pts.shape[1]))
     if in_pts.shape[0]>0:
-        x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
+        if filter_by_first_return_location:
+            # find first returns
+            mask = in_pts[:,3]==1
+            x_temp, y_temp, inside_temp = points_in_poly(in_pts[mask,0],in_pts[mask,1],polygon)
+            shots = np.unique(in_pts[mask,6][inside_temp]) # index 6 refers to GPS time
+            inside = np.in1d(in_pts[:,6],shots) # this function retrieves all points corresponding to this GPS time
+            x = in_pts[inside,0]
+            y = in_pts[inside,1]
+        else:
+            x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
         pts = in_pts[inside,:]
     else:
         print "\t\t\t no points in polygon"
@@ -84,72 +84,3 @@ def filter_lidar_data_by_neighbourhood(in_pts,target_xy,radius):
         print "\t\t\t no points in neighbourhood"
     return pts
 
-
-# get bounding box from las file
-def get_lasfile_bbox(las_file):
-    lasFile = las.file.File(las_file,mode='r')
-    max_xyz = lasFile.header.max
-    min_xyz = lasFile.header.min
-    UR = np.asarray([max_xyz[0],max_xyz[1]])
-    LR = np.asarray([max_xyz[0],min_xyz[1]])
-    UL = np.asarray([min_xyz[0],max_xyz[1]])
-    LL = np.asarray([min_xyz[0],min_xyz[1]])
-    
-    return UR, LR, UL, LL
-
-# find all las files from a list that are located within a specified polygon
-def find_las_files_by_polygon(file_list,polygon):
-    las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
-    keep = []
-    n_files = las_files.size
-    for i in range(0,n_files):
-        UR, LR, UL, LL = get_lasfile_bbox(las_files[i])
-        las_box = np.asarray([UR,LR,LL,UL])
-        x,y,inside = points_in_poly(polygon[:,0],polygon[:,1],las_box)
-        if inside.sum()>0:
-            keep.append(las_files[i])
-    print 'las tiles to load in:', len(keep)
-    for ll in range(0,len(keep)):
-        print keep[ll]
-    return keep
-
-# load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.
-def load_lidar_data_by_polygon(file_list,polygon):
-    keep_files = find_las_files_by_polygon(file_list,polygon)
-    n_files = len(keep_files)
-    if n_files == 0:
-        print 'WARNING: No files within specified polygon - try again'
-    else:
-        tile_pts = load_lidar_data(keep_files[0])
-        pts = filter_lidar_data_by_polygon(tile_pts,polygon)
-        for i in range(1,n_files):
-            tile_pts = load_lidar_data(keep_files[i])
-            tile_pts_filt = filter_lidar_data_by_polygon(tile_pts,polygon)
-            pts = np.concatenate((pts,tile_pts_filt),axis=0)
-
-    print "loaded ", pts[:,0].size, " points"
-    return pts
-
-# Similar to above but using a focal point (specified by xy) and neighbourhood (specified by radius) to find .las tiles rather than using an input polygon
-def find_las_files_by_neighbourhood(file_list,xy,radius):
-    polygon = np.asarray([[xy[0]+radius,xy[1]+radius], [xy[0]+radius,xy[1]-radius], [xy[0]-radius,xy[1]-radius], [xy[0]-radius,xy[1]+radius]])
-    keep = find_las_files_by_polygon(file_list,polygon)
-    return keep
-
-def load_lidar_data_by_neighbourhood(file_list,xy,radius):
-    polygon = np.asarray([[xy[0]+radius,xy[1]+radius], [xy[0]+radius,xy[1]-radius], [xy[0]-radius,xy[1]-radius], [xy[0]-radius,xy[1]+radius]])
-
-    keep_files = find_las_files_by_polygon(file_list,polygon)
-    n_files = len(keep_files)
-    if n_files == 0:
-        print 'WARNING: No files within specified neighbourhood - try again'
-    else:
-        tile_pts = load_lidar_data(keep_files[0])
-        pts = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
-        for i in range(1,n_files):
-            tile_pts = load_lidar_data(keep_files[i])
-            tile_pts_filt = filter_lidar_data_by_neighbourhood(tile_pts,xy,radius)
-            pts = np.concatenate((pts,tile_pts_filt),axis=0)
-
-    print "loaded ", pts[:,0].size, " points"
-    return pts

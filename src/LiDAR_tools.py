@@ -67,6 +67,9 @@ def filter_lidar_data_by_polygon(in_pts,polygon,filter_by_first_return_location 
             inside = np.in1d(in_pts[:,6],shots) # this function retrieves all points corresponding to this GPS time
             x = in_pts[inside,0]
             y = in_pts[inside,1]
+            x_temp=None
+            y_temp=None
+            inside_temp=None
         else:
             x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
         pts = in_pts[inside,:]

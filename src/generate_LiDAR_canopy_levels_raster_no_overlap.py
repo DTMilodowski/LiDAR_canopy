@@ -185,7 +185,7 @@ for i in range(0,n_files):
                     PAI_05_15[row_ii,col_jj] = np.sum(PAD_prof[np.all((heights>5,heights<=15),axis=0)])
                     PAI_15_30[row_ii,col_jj] = np.sum(PAD_prof[np.all((heights>15,heights<=30),axis=0)])
                     PAI_30_45[row_ii,col_jj] = np.sum(PAD_prof[np.all((heights>30,heights<=45),axis=0)])
-                    PAI_45_up[row_ii,col_jj] = np.sum(PAD_prof[np.all((heights>45),axis=0)])
+                    PAI_45_up[row_ii,col_jj] = np.sum(PAD_prof[heights>45])
                     
                     # other metrics
                     pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(raster_res**2.)
@@ -196,8 +196,9 @@ for i in range(0,n_files):
     trees = None
     starting_ids_for_trees = None
 
-PAImax = MH.calculate_analytical_limit(pt_dens,raster_res**2.,kappa,0.)
-    
+PAImax = PAD.calculate_analytical_limit(pt_dens,raster_res**2.,kappa,0.)
+PAImax[np.isnan(PAI)]=np.nan
+
 np.savez('%s_canopy_level_metrics_10m' % site,point_density=pt_dens,pai=PAI,shannon=Shannon,pai_00_02m=PAI_00_02,pai_02_05m=PAI_02_05,pai_05_15m=PAI_05_15,pai_15_30m=PAI_15_30,pai_30_45m=PAI_30_45,pai_45_up=PAI_45_up,PAImax=PAImax)
 
 metrics = np.load('%s_canopy_level_metrics_10m.npz' % site)

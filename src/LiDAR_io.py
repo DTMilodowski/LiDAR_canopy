@@ -83,11 +83,11 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False):
 
     return UR, LR, UL, LL
 
-# Load lidar data => x,y,z,return,class, scan angle
+# Load lidar data => x,y,z,return,class, scan angle, gps_time
 # Returns: - a numpy array containing the points
 def load_lidar_data(las_file,print_npts=True):
     lasFile = las.file.File(las_file,mode='r')
-    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank, lasFile.gps_time[ii])).transpose()
+    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank, lasFile.gps_time)).transpose()
     pts = pts[pts[:,2]>=0,:]
     if print_npts:
         print "loaded ", pts[:,0].size, " points"
@@ -222,13 +222,13 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
     return pts, starting_ids, trees
     
 # equivalent file but for a single las file
-def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6,print_keep=False):
+def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6,print_keep=False,filter_by_first_return_location=False):
     W = polygon[:,0].min()
     E = polygon[:,0].max()
     S = polygon[:,1].min()
     N = polygon[:,1].max()
     tile_pts = load_lidar_data_by_bbox(lasfile,N,S,E,W,print_npts=False)
-    pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon,print_keep)
+    pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon,print_keep,filter_by_first_return_location=filter_by_first_return_location)
     # now create KDTrees
     starting_ids, trees = create_KDTree(pts)
 

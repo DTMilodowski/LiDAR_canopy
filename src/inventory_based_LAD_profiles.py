@@ -571,14 +571,19 @@ def calculate_crown_dimensions_for_stem_distributions(DBH,stem_density,a_ht, b_h
 #=============================================================================================================================
 # 3-dimensional crown models
 # create 3D model of individual crown within a specified environment.
-# Note, assumes periodic boundary conditions, so that crown overlap that exceeds
-# plot extent is added to the opposite side of the plot. Voxels are included if
-# the centre is contained within the crown. This imposes the following constraints:
+# Voxels are included if the centre is contained within the crown.
+# This imposes the following constraints:
+# - The voxel is in crown if:
+#              1) 0 <= z' <= Zmax
+#              2) r <= Rmax/Zmax^beta * z'^beta;
+#   where r = sqrt((x-x0)
 #
-# voxel in crown if:
-#                      1) 0 <= z' <= Zmax
-#                      2) r <= Rmax/Zmax^beta * z'^beta;
-#                                 where r = sqrt((x-x0)
+# Note that we do not have data on crowns for trees outwith each plot
+# that overlap into the plot area. To compensate, we include in our
+# plot-level estimates the full crown volume within each tree inside
+# the plot, even if these overlap outside the plot bounds. This assumes
+# that overlap from trees outwith the plot more or less equals overlap
+# from trees inside the plot beyond the plot footprint.
 #
 # Input variables:
 # - canopy_matrix (the three dimensional matrix representing the canopy space - dimensions x,y,z)
@@ -604,8 +609,46 @@ def generate_3D_crown(canopy_matrix,x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
     
     return crown
 
-# - plot_mask (an optional mask that accounts for non-square plot geometries) 
-def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta,plot_mask=np.empty([])):
-    canopy_matrix = np.zeros((x.size,y.size,z.size),dtype='float')
+# 3-D canopy
+# This function creates 3D crown model by aggregating individual crowns
+# constructed using the above function. It takes in the following input
+# variables:
+# - x,y,z (vectors containing the centre coordinates of each voxel)
+# - x0,y0 (vectors indicating the relative horizontal coordinates of the
+#   surveyed stems)
+# - Z0 (vector containing the depth from the top of the domain to the each
+#   tree top
+# - Zmax (vector containing the maximum crown depth for each tree surveyed)
+# - Rmax (vector containing the maximum radius of the tree)
+# - beta (vector containing the exponents controlling the canopy morphology)
+# - plot_mask (an optional mask that accounts for non-square plot geometries)
+# - buffer (an optional argument that by default is zero, but should be
+#   increased so that it is sufficient to account for crown overlap
+def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta,plot_mask=np.empty([]), buffer=0):
+
+    # first create buffer
+    dx = x[1]-x[0]
+    dy = y[1]-y[0]
+    x_buff = np.arange(x[0]-buffer,x[-1]+buffer,dx)
+    y_buff = np.arange(y[0]-buffer,y[-1]+buffer,dy)
+
+    # now create buffered canopy matrix
+    canopy_matrix = np.zeros((x_buff.size,y_buff.size,z.size),dtype='float')
+
+    # impose plot mask
+    plot_mask_buff = np.zeros(x_buff.size,y_buff.size)
+    plot_mask_buff[int(buffer/dx):x.size,int(buffer/dy):y.size]=[plot_mask.copy()]
     if plot_mask.size > 0:
-        canopy_matrix[plot_mask!=1]=np.nan
+        canopy_matrix[plot_mask_buff!=1]=np.nan
+
+    # Now loop through the trees. For each tree, calculate the crown volume,
+    # then add to the crown map.
+    n_trees = x0.size
+    for tt in range(0,n_trees):
+        canopy_matrix += generate_3D_crown(canopy_matrix,x_buff,y_buff,z,x0[tt],y0[tt],Z0[tt],Zmax[tt],Rmax[tt],beta[tt])
+    
+    # reset PAD in overlapping areas so that PAD = 1. m2 m-3 throughout crowns
+    canopy_matrix[canopy_matrix>1]=1
+
+    return canopy_matrix
+    

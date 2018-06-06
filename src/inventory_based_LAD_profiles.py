@@ -64,7 +64,6 @@ def calculate_prediction_interval(x_i,x_obs,y_obs,m,c,conf):
 # - niter = number of iterations over which to bootstrap
 # - n_i = number of locations x_i (default is 
 # Returns:
-# - y_i = the mean values predicted at x_i
 # - ll and ul = the upper and lower bounds of the confidence interval
 def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs,conf,niter):
 
@@ -103,9 +102,8 @@ def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs
     # confidence intervals simply derived from the distribution of y
     ll=np.percentile(y_i,100*(1-conf)/2.,axis=1)
     ul=np.percentile(y_i,100*(conf+(1-conf)/2.),axis=1)
-    y_i = np.mean(y,axis=1)
 
-    return y_i,ll,ul
+    return ll,ul
     
 # Calculate a prediction based on a linear regression model
 # As above, but this time randomly sampling from prediction interval

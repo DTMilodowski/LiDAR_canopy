@@ -25,6 +25,10 @@ def log_log_linear_regression(x,y,conf=0.95):
     a = np.exp(loga)
     return a, b, CF, r**2, p, x_i, PI_u, PI_l
 
+
+#=================================
+# ANALYTICAL PREDICTION INTERVALS
+
 # Calculate prediction intervals analytically (assumes normal distribution)
 # x_i = x location at which to calculate the prediction interval
 # x_obs = observed x values used to fit model
@@ -49,6 +53,41 @@ def calculate_prediction_interval(x_i,x_obs,y_obs,m,c,conf):
     upper = y_exp+abs(dy)
     lower = y_exp-abs(dy)
     return dy,upper,lower 
+
+# Calculate a prediction based on a linear regression model
+# As above, but this time randomly sampling from prediction interval
+# m = regression slope
+# c = regression interval
+def random_sample_from_regression_model_prediction_interval(x_i,x_obs,y_obs,m,c,array=False):
+    n = x_obs.size
+    y_mod = m*x_obs+c
+    se =  np.sqrt(np.sum((y_mod-y_obs)**2/(n-2)))
+    y_exp = x_i*m+c # expected value of y from model
+    x_mean = x_obs.mean()
+    # randomly draw quantile from t distribution (n-2 degrees of freedom for linear regression)
+    if array:
+        q = np.random.standard_t(n-2,size=x_i.size)
+    else:
+        q = np.random.standard_t(n-2) 
+    dy = q*se*np.sqrt(1+1/n+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
+    y_i = y_exp+dy
+
+    return y_i
+
+# as above, but using log-log space (i.e. power law functions)
+# a = scalar
+# b = exponent
+def random_sample_from_powerlaw_prediction_interval(x_i,x_obs,y_obs,a,b,array=False):
+    if array:
+        logy_i = random_sample_from_regression_model_prediction_interval(np.log(x_i),np.log(x_obs),np.log(y_obs),b,np.log(a),array=True)
+    else:
+        logy_i = random_sample_from_regression_model_prediction_interval(np.log(x_i),np.log(x_obs),np.log(y_obs),b,np.log(a))
+    y_i = np.exp(logy_i)
+    return y_i
+
+
+#=================================
+# BOOTSTRAP TOOLS
 
 # Calculate prediction intervals through bootstrapping and resampling from residuals.
 # The bootstrap model accounts for parameter uncertainty
@@ -105,36 +144,8 @@ def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs
 
     return ll,ul
     
-# Calculate a prediction based on a linear regression model
-# As above, but this time randomly sampling from prediction interval
-# m = regression slope
-# c = regression interval
-def random_sample_from_regression_model_prediction_interval(x_i,x_obs,y_obs,m,c,array=False):
-    n = x_obs.size
-    y_mod = m*x_obs+c
-    se =  np.sqrt(np.sum((y_mod-y_obs)**2/(n-2)))
-    y_exp = x_i*m+c # expected value of y from model
-    x_mean = x_obs.mean()
-    # randomly draw quantile from t distribution (n-2 degrees of freedom for linear regression)
-    if array:
-        q = np.random.standard_t(n-2,size=x_i.size)
-    else:
-        q = np.random.standard_t(n-2) 
-    dy = q*se*np.sqrt(1+1/n+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
-    y_i = y_exp+dy
-
-    return y_i
-
-# as above, but using log-log space (i.e. power law functions)
-# a = scalar
-# b = exponent
-def random_sample_from_powerlaw_prediction_interval(x_i,x_obs,y_obs,a,b,array=False):
-    if array:
-        logy_i = random_sample_from_regression_model_prediction_interval(np.log(x_i),np.log(x_obs),np.log(y_obs),b,np.log(a),array=True)
-    else:
-        logy_i = random_sample_from_regression_model_prediction_interval(np.log(x_i),np.log(x_obs),np.log(y_obs),b,np.log(a))
-    y_i = np.exp(logy_i)
-    return y_i
+#================================
+# INVENTORY BASED PROFILES
 
 # This function reads in the crown allometry data from the database: Falster et al,. 2015; BAAD: a Biomass And Allometry Database for woody plants. Ecology, 96: 1445. doi: 10.1890/14-1889.1
 def retrieve_crown_allometry(filename,conf=0.9):

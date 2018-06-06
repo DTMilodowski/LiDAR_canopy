@@ -154,8 +154,8 @@ def plot_subplot_LAD_profiles(Profiles_in,Heights_in,color_string,label_string,f
     ax_main.yaxis.tick_right()
     ax_main.yaxis.set_label_position("right")
     #plt.tight_layout()
-    plt.savefig(figure_name+".png",format="png")
-    #plt.show()
+    #plt.savefig(figure_name+".png",format="png")
+    plt.show()
 
 # Equivalent function that instead plots profiles of transmittance or absorption through the canopy at both the subplot level and plot averages
 def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_string,figure_name):
@@ -264,8 +264,8 @@ def plot_subplot_transmittance_profiles(Profiles,Heights,color_string,label_stri
     ax_main.yaxis.tick_right()
     ax_main.yaxis.set_label_position("right")
     #plt.tight_layout()
-    plt.savefig(figure_name+".png",format="png")
-    #plt.show()
+    #plt.savefig(figure_name+".png",format="png")
+    plt.show()
 
 # An equivalent function that instead plots profiles of transmittance through the canopy at both the subplot level and plot averages
 def plot_subplot_absorption_profiles(Profiles,Heights,color_string,label_string,figure_name):

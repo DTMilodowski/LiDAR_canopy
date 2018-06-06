@@ -3,9 +3,88 @@
 import numpy as np
 from scipy import stats
 
+# log-log regression with confidence intervals
+def log_log_linear_regression(x,y,conf=0.95):
+    mask = np.all((np.isfinite(x),np.isfinite(y)),axis=0)
+    logx = np.log(x[mask])
+    logy = np.log(y[mask])
+
+    # regression to find power law exponents D = a.H^b
+    b, loga, r, p, serr = stats.linregress(logx,logy)
+    logx_i = np.arange(logx.min(),logx.max(),(logx.max()-logx.min())/1000.)
+    PI,PI_upper,PI_lower = calculate_prediction_interval(logx_i,logx,logy,b,loga,conf)
+
+    x_i = np.exp(logx_i)
+    PI_u = np.exp(PI_upper)
+    PI_l = np.exp(PI_lower)
+    
+    model_logy = b*logx + loga
+    error = logy-model_logy
+    MSE = np.mean(error**2)
+    CF = np.exp(MSE/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+    a = np.exp(loga)
+    return a, b, CF, r**2, p, x_i, PI_u, PI_l
+
+    
+# Calculate prediction intervals
+# x_i = x location at which to calculate the prediction interval
+# x_obs = observed x values used to fit model
+# y_obs = corresponding y values
+# m = gradient
+# c = constant
+# conf = confidence interval
+# returns dy - the confidence interval
+def calculate_prediction_interval(x_i,x_obs,y_obs,m,c,conf):
+    
+    alpha = 1.-conf
+    
+    n = x_obs.size
+    y_mod = m*x_obs+c
+    se =  np.sqrt(np.sum((y_mod-y_obs)**2/(n-2)))
+    x_mean = x_obs.mean()
+    
+    # Quantile of Student's t distribution for p=1-alpha/2
+    q=stats.t.ppf(1.-alpha/2.,n-2)
+    dy = q*se*np.sqrt(1+1/n+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
+    y_exp=m*x_i+c
+    upper = y_exp+abs(dy)
+    lower = y_exp-abs(dy)
+    return dy,upper,lower 
+
+
+# Calculate a prediction based on a linear regression model
+# As above, but this time randomly sampling from prediction interval
+# m = regression slope
+# c = regression interval
+def random_sample_from_regression_model_prediction_interval(x_i,x_obs,y_obs,m,c,array=False):
+    n = x_obs.size
+    y_mod = m*x_obs+c
+    se =  np.sqrt(np.sum((y_mod-y_obs)**2/(n-2)))
+    y_exp = x_i*m+c # expected value of y from model
+    x_mean = x_obs.mean()
+    # randomly draw quantile from t distribution (n-2 degrees of freedom for linear regression)
+    if array:
+        q = np.random.standard_t(n-2,size=x_i.size)
+    else:
+        q = np.random.standard_t(n-2) 
+    dy = q*se*np.sqrt(1+1/n+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
+    y_i = y_exp+dy
+
+    return y_i
+
+# as above, but using log-log space (i.e. power law functions)
+# a = scalar
+# b = exponent
+def random_sample_from_powerlaw_prediction_interval(x_i,x_obs,y_obs,a,b,array=False):
+    if array:
+        logy_i = random_sample_from_regression_model_prediction_interval(np.log(x_i),np.log(x_obs),np.log(y_obs),b,np.log(a),array=True)
+    else:
+        logy_i = random_sample_from_regression_model_prediction_interval(np.log(x_i),np.log(x_obs),np.log(y_obs),b,np.log(a))
+    y_i = np.exp(logy_i)
+    return y_i
 
 # This function reads in the crown allometry data from the database: Falster et al,. 2015; BAAD: a Biomass And Allometry Database for woody plants. Ecology, 96: 1445. doi: 10.1890/14-1889.1
-def retrieve_crown_allometry(filename):
+def retrieve_crown_allometry(filename,conf=0.9):
     datatype = {'names': ('ID', 'Ref', 'Location', 'Lat', 'Long', 'Species', 'Family','Diameter','Height','CrownArea','CrownDepth'), 'formats': ('i8','S32','S256','f16','f16','S32','S32','f16','f16','f16','f16')}
     data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
     
@@ -17,6 +96,12 @@ def retrieve_crown_allometry(filename):
     
     # regression to find power law exponents D = a.H^b
     b, loga, r, p, serr = stats.linregress(logH,logD)
+    logH_i = np.arange(logH.min(),logH.max(),(logH.max()-logH.min())/1000.)
+    PI,PI_upper,PI_lower = calculate_prediction_interval(logH_i,logH,logD,b,loga,conf=conf)
+
+    H_i = np.exp(logH_i)
+    PI_u = np.exp(PI_upper)
+    PI_l = np.exp(PI_lower)
     
     model_logD = b*logH + loga
     error = logD-model_logD
@@ -24,11 +109,20 @@ def retrieve_crown_allometry(filename):
     CF = np.exp(MSE/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
     a = np.exp(loga)
 
-    return a, b, CF, r**2, p, H, D
+    return a, b, CF, r**2, p, H, D, H_i, PI_u, PI_l
+
+def load_BAAD_crown_allometry_data(filename):
+    datatype = {'names': ('ID', 'Ref', 'Location', 'Lat', 'Long', 'Species', 'Family','Diameter','Height','CrownArea','CrownDepth'), 'formats': ('i8','S32','S256','f16','f16','S32','S32','f16','f16','f16','f16')}
+    data = np.genfromtxt(filename, skiprows = 1, delimiter = ',',dtype=datatype)
+    mask = np.all((~np.isnan(data['Diameter']),~np.isnan(data['CrownDepth'])),axis=0)
+    H = data['Height'][mask]
+    D = data['CrownDepth'][mask]
+    DBH = data['Diameter'][mask]
+    return DBH, H, D
 
 # Derive local allometric relationship between DBH and height -> fill gaps in census data
 def load_crown_survey_data(census_file):
-    datatype = {'names': ('plot','subplot','date','observers','tag','DBH','H_DBH','Height','flag','alive','C1','C2','subplotX','subplotY','density','spp','cmap_date','Xfield','Yfield','Zfield','DBH_field','Height_field','CrownArea','C3','dead_flag1','dead_flag2','dead_flag3'), 'formats': ('S16','i8','S10','S32','i8','f8','f8','f8','S8','i8','S132','S132','f8','f8','f8','S64','S10','f8','f8','f8','f8','f8','f8','S132','i8','i8','i8')}
+    datatype = {'names': ('plot','subplot','date','observers','tag','DBH','H_DBH','Height','flag','alive','C1','C2','subplotX','subplotY','density','spp','cmap_date','Xfield','Yfield','Zfield','DBH_field','Height_field','CrownArea','C3','dead_flag1','dead_flag2','dead_flag3','brokenlive_flag'), 'formats': ('S16','i8','S10','S32','i8','f8','f8','f8','S8','i8','S132','S132','f8','f8','f8','S64','S10','f8','f8','f8','f8','f8','f8','S132','i8','i8','i8','i8')}
     data = np.genfromtxt(census_file, skiprows = 1, delimiter = ',',dtype=datatype)
     return data
 
@@ -50,7 +144,7 @@ def calculate_allometric_equations_from_survey(data):
     a_ht = np.exp(loga)
 
     # now do crown areas
-    mask = np.all((~np.isnan(data['CrownArea']),~np.isnan(data['DBH_field'])),axis=0)
+    mask = np.all((~np.isnan(data['CrownArea']),~np.isnan(data['DBH_field']),~np.isnan(data['Height'])),axis=0)
     DBH = data['DBH_field'][mask]
     A = data['CrownArea'][mask]
     logDBH = np.log(DBH)
@@ -81,6 +175,27 @@ def calculate_crown_dimensions(DBH,Ht,Area, a_ht, b_ht, CF_ht, a_area, b_area, C
     # Apply canopy depth model
     Depth = CF_depth*a_depth*Ht**b_depth
 
+    # Remove any existing nodata values (brought forwards from input data
+    mask = np.all((~np.isnan(Depth),~np.isnan(Ht),~np.isnan(Area)),axis=0)
+    Depth = Depth[mask]
+    Ht = Ht[mask]
+    Area = Area[mask]
+    return Ht, Area, Depth
+
+# As above, but randomly sampling from prediction intervals for gapfilling
+def calculate_crown_dimensions_mc(DBH,Ht,Area,ref_DBH,ref_D, a_ht, b_ht, a_area, b_area, a_depth, b_depth):
+    # Gapfill record with local allometry
+    # Heights
+    mask = np.isnan(Ht)
+    Ht[mask] = random_sample_from_powerlaw_prediction_interval(DBH[mask],DBH,Ht,b_ht,a_ht,array=True)
+    #Ht[mask] = CF_ht*a_ht*DBH[mask]**b_ht
+    #Crown areas
+    mask = np.isnan(Area)
+    Area[mask] = random_sample_from_powerlaw_prediction_interval(DBH[mask],DBH,Area,b_area,a_area,array=True)
+
+    # Apply canopy depth model (from regional database)
+    Depth = random_sample_from_powerlaw_prediction_interval(DBH,ref_DBH,ref_D,b_depth,a_depth,array=True)
+    
     # Remove any existing nodata values (brought forwards from input data
     mask = np.all((~np.isnan(Depth),~np.isnan(Ht),~np.isnan(Area)),axis=0)
     Depth = Depth[mask]
@@ -144,15 +259,46 @@ def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, 
         mask = np.all((Ht>=ht_l,Ht-D<=ht_u),axis=0)
         d1 = np.max((Ht-ht_u,zeros),axis=0)
         d2 = np.min((Ht-ht_l,D),axis=0)
-        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta)**2/(2*beta+1) * (d2[mask]**(2*beta+1) - d1[mask]**(2*beta+1)) )
-    
+        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta)**2/(2*beta+1) * (d2[mask]**(2*beta+1) - d1[mask]**(2*beta+1.)) )
+
     # sanity check
-    TestV = np.nansum(pi*D*r_max**2/(2*beta+1))
+    TestV = np.nansum(pi*D*r_max**2/(2*beta+1.))
     precision_requirement = 10**-8
     if CanopyV.sum() <= TestV - precision_requirement:
         print "Issue - sanity check fail: ", CanopyV.sum(),TestV
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
+
+def calculate_LAD_profiles_generic_mc(canopy_layers, Area, D, Ht, beta_min, beta_max, plot_area, leafA_per_unitV=1.):
+    r_max = np.sqrt(Area/np.pi)
+    layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
+    N_layers = canopy_layers.size
+    CanopyV = np.zeros(N_layers)
+    pi=np.pi
+    zeros = np.zeros(Ht.size)
+    D[D>Ht]=Ht[D>Ht]
+    # Formula for volume of revolution of power law function r = alpha*D^beta:
+    #                 V = pi*(r_max/D_max^beta)^2/(2*beta+1) * (D2^(2beta+1) - D1^(2beta+1))
+    #                 where alpha = (r_max/D_max^beta)^2
+    n_trees = Ht.size
+    beta=np.random.rand(n_trees)*(beta_max-beta_min)+beta_min
+    beta[:]=0.6
+    for i in range(0,N_layers):
+        ht_u = canopy_layers[i]
+        ht_l = ht_u-layer_thickness
+        mask = np.all((Ht>=ht_l,Ht-D<=ht_u),axis=0)
+        d1 = np.max((Ht-ht_u,zeros),axis=0)
+        d2 = np.min((Ht-ht_l,D),axis=0)
+        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta[mask])**2/(2*beta[mask]+1) * (d2[mask]**(2*beta[mask]+1) - d1[mask]**(2*beta[mask]+1.)) )
+
+    # sanity check
+    TestV = np.nansum(pi*D*r_max**2/(2*beta+1.))
+    precision_requirement = 10**-8
+    if CanopyV.sum() <= TestV - precision_requirement:
+        print "Issue - sanity check fail: ", CanopyV.sum(),TestV
+    LAD = CanopyV*leafA_per_unitV/plot_area
+    return LAD, CanopyV
+
 
 
 #---------------------------------------
@@ -420,3 +566,46 @@ def calculate_crown_dimensions_for_stem_distributions(DBH,stem_density,a_ht, b_h
     Ht = Ht[mask]
     Area = Area[mask]
     return Ht, Area, Depth, stem_density
+
+
+#=============================================================================================================================
+# 3-dimensional crown models
+# create 3D model of individual crown within a specified environment.
+# Note, assumes periodic boundary conditions, so that crown overlap that exceeds
+# plot extent is added to the opposite side of the plot. Voxels are included if
+# the centre is contained within the crown. This imposes the following constraints:
+#
+# voxel in crown if:
+#                      1) 0 <= z' <= Zmax
+#                      2) r <= Rmax/Zmax^beta * z'^beta;
+#                                 where r = sqrt((x-x0)
+#
+# Input variables:
+# - canopy_matrix (the three dimensional matrix representing the canopy space - dimensions x,y,z)
+# - x,y,z (vectors containing the centre coordinates of each voxel
+# - x0,y0 (horizontal coordinates of stem)
+# - Z0 (the depth from the top of the domain to the tree top
+# - Zmax (the maximum crown depth)
+# - Rmax (the maximum radius of the tree)
+# - beta (the exponent controlling the canopy morphology)
+# Returns:
+# - a 3D matrix containing the calculated crown for this tree, located within the plot domain
+def generate_3D_crown(canopy_matrix,x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
+    # generate masks for tree crown
+    z_ = z-Z0
+    xm,ym,z_ = np.meshgrid(x,y,z_)
+    r = np.sqrt((xm-x0)**2+(ym-y0)**2)
+    con1 = np.all((z<0,z>Zmax),axis=0)
+    con2 = r > (z_**beta) * Rmax/(Zmax**beta)
+
+    crown = np.ones(canopy_matrix.shape)
+    crown[con1] = 0
+    crown[con2] = 0
+    
+    return crown
+
+# - plot_mask (an optional mask that accounts for non-square plot geometries) 
+def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta,plot_mask=np.empty([])):
+    canopy_matrix = np.zeros((x.size,y.size,z.size),dtype='float')
+    if plot_mask.size > 0:
+        canopy_matrix[plot_mask!=1]=np.nan

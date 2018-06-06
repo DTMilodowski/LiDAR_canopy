@@ -25,8 +25,7 @@ def log_log_linear_regression(x,y,conf=0.95):
     a = np.exp(loga)
     return a, b, CF, r**2, p, x_i, PI_u, PI_l
 
-    
-# Calculate prediction intervals
+# Calculate prediction intervals analytically (assumes normal distribution)
 # x_i = x location at which to calculate the prediction interval
 # x_obs = observed x values used to fit model
 # y_obs = corresponding y values
@@ -51,7 +50,59 @@ def calculate_prediction_interval(x_i,x_obs,y_obs,m,c,conf):
     lower = y_exp-abs(dy)
     return dy,upper,lower 
 
+# Calculate prediction intervals through bootstrapping and resampling from residuals.
+# The bootstrap model accounts for parameter uncertainty
+# The residual resampling accounts for uncertainty in the residual - i.e. effects not
+# accounted for by the regression model
+# Inputs:
+# - x_i = x location(s) at which to calculate the prediction interval
+#   This should be either a numpy array, list or single value. nD arrays will be
+#   converted to 1D arrays
+# - x_obs = the observed x values used to fit model
+# - y_obs = corresponding y values
+# - conf = confidence interval, as fraction
+# - niter = number of iterations over which to bootstrap
+# - n_i = number of locations x_i (default is 
+# Returns:
+# - ll and ul (the upper and lower bounds of the confidence interval)
+def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs,conf,niter):
+    
+    n=0
+    if np.isscalar(x_i):
+        n=1
+    else:
+        try:
+            n=x_i.size # deal with numpy arrays
+            if x_i.ndim > 1: # linearize multidimensional arrays
+                x_i=x_i.reshape(n)
+        except:
+            try:
+                n=len(x_i) # deal with lists
+            except TypeError:
+                print "Sorry, not a valid type for this function"
 
+    y_i = np.zeros((n,niter))*np.nan
+    # Bootstrapping
+    for ii in range(0,niter):
+        # resample observations (with replacement) 
+        ix = np.random.choice(x_obs.size, size=x_obs.size,replace=True)
+        x_boot = np.take(x_obs,ix)
+        y_boot = np.take(y_obs,ix)
+
+        # regression model
+        m, c, r, p, serr = stats.linregress(x_boot,y_boot)
+
+        # randomly sample from residuals with replacement
+        res = np.random.choice((y_boot-(m*x_boot + c)),size = n,replace=True)
+
+        # estimate y based on model and randomly sampled residuals
+        y_i[:,ii] = m*x_i + c + res
+
+    ll=np.percentile(y_i,100*(1-conf)/2.,axis=1)
+    ul=np.percentile(y_i,100*(conf+(1-conf)/2.),axis=1)
+        
+    return ll,ul
+    
 # Calculate a prediction based on a linear regression model
 # As above, but this time randomly sampling from prediction interval
 # m = regression slope

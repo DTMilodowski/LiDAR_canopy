@@ -64,9 +64,11 @@ def calculate_prediction_interval(x_i,x_obs,y_obs,m,c,conf):
 # - niter = number of iterations over which to bootstrap
 # - n_i = number of locations x_i (default is 
 # Returns:
-# - ll and ul (the upper and lower bounds of the confidence interval)
+# - y_i = the mean values predicted at x_i
+# - ll and ul = the upper and lower bounds of the confidence interval
 def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs,conf,niter):
-    
+
+    # some fiddles to account for likely possible data types for x_i
     n=0
     if np.isscalar(x_i):
         n=1
@@ -81,11 +83,11 @@ def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs
             except TypeError:
                 print "Sorry, not a valid type for this function"
 
-    y_i = np.zeros((n,niter))*np.nan
+    y = np.zeros((n,niter))*np.nan
     # Bootstrapping
     for ii in range(0,niter):
         # resample observations (with replacement) 
-        ix = np.random.choice(x_obs.size, size=x_obs.size,replace=True)
+        ix = np.random.choice(x_obs.size, size=n,replace=True)
         x_boot = np.take(x_obs,ix)
         y_boot = np.take(y_obs,ix)
 
@@ -96,12 +98,14 @@ def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs
         res = np.random.choice((y_boot-(m*x_boot + c)),size = n,replace=True)
 
         # estimate y based on model and randomly sampled residuals
-        y_i[:,ii] = m*x_i + c + res
+        y[:,ii] = m*x_i + c + res
 
+    # confidence intervals simply derived from the distribution of y
     ll=np.percentile(y_i,100*(1-conf)/2.,axis=1)
     ul=np.percentile(y_i,100*(conf+(1-conf)/2.),axis=1)
-        
-    return ll,ul
+    y_i = np.mean(y,axis=1)
+
+    return y_i,ll,ul
     
 # Calculate a prediction based on a linear regression model
 # As above, but this time randomly sampling from prediction interval

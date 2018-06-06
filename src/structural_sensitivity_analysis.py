@@ -57,7 +57,7 @@ mask = plot_coordinates['plot']==alt_plot
 affine=lstsq.least_squares_affine_matrix(plot_coordinates['x'][mask],plot_coordinates['y'][mask],plot_coordinates['x_prime'][mask],plot_coordinates['y_prime'][mask])
 plot_bbox = np.array(lstsq.apply_affine_transformation(plot_coordinates['x'][mask],plot_coordinates['y'][mask],affine)).transpose()
 
-pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox)
+pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox,filter_by_first_return_location=True)
 n_returns = pts.shape[0]
 shots = np.unique(pts[:,-1]) 
 n_shots=shots.size
@@ -173,7 +173,7 @@ for dd in range(0,target_points.size):
                 centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
                 radius = np.sqrt(sample_res[ss]**2/2.)              
                 ids = trees[0].query_ball_point([centre_x,centre_y], radius)
-                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp])
+                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp],filter_by_first_return_location=True)
                 #------
                 heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
                 PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)

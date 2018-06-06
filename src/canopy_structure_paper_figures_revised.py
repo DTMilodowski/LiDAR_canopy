@@ -264,16 +264,18 @@ for pp in range(0,N_plots):
     n_subplots = subplot_polygons[Plot_name].shape[0]
     # set up array to host inventory profiles
     field_LAD_profiles = np.zeros((n_iter,heights.size))
-    
+
+    # mask out dead and broken trees
+    dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,field_data['dead_flag3']==-1),axis=0)
+    brokenlive_mask = field_data['brokenlive_flag']==-1
+    mask = np.all((field_data['plot']==Plot_name,dead_mask,brokenlive_mask),axis=0)
+
     # ITERATE MONTE-CARLO PROCEDURE
     #------------------------------------------------------------------------------------
     for ii in range(0,n_iter):
         # now get field inventory estimate - remove dead trees and broken live trees with no crown
         # Note that we only deal with the 1ha plot level estimates as errors relating stem based
         # vs. area based are problematic at subplot level
-        dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,field_data['dead_flag3']==-1),axis=0)
-        brokenlive_mask = field_data['brokenlive_flag']==-1
-        mask = np.all((field_data['plot']==Plot_name,dead_mask,brokenlive_mask),axis=0)
         Ht,Area,Depth = field.calculate_crown_dimensions_mc(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], DBH_BAAD, H_BAAD,D_BAAD, a_ht, b_ht, a_A, b_A, a, b)
         
         field_LAD_profiles[ii,:], CanopyV = field.calculate_LAD_profiles_generic_mc(heights, Area, Depth, Ht, beta_min,beta_max, subplot_area*25)
@@ -308,7 +310,9 @@ csp.plot_location_map(figure_name,figure_number)
 
 # Figure 4 - Allometric models; include confidence intervals, and add vertical band
 # illustrating the 10 cm DBH cutoff
-
+figure_name = output_dir + 'Fig4_allometric_relationships.png'
+figure_number = 5
+csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file)
 
 # Figure 5 - Point clouds and profiles across degradation gradient
 figure_name = output_dir + 'Fig5_pointclouds_and_profiles.png'

@@ -183,7 +183,7 @@ def calculate_crown_dimensions(DBH,Ht,Area, a_ht, b_ht, CF_ht, a_area, b_area, C
     return Ht, Area, Depth
 
 # As above, but randomly sampling from prediction intervals for gapfilling
-def calculate_crown_dimensions_mc(DBH,Ht,Area,ref_DBH,ref_D, a_ht, b_ht, a_area, b_area, a_depth, b_depth):
+def calculate_crown_dimensions_mc(DBH,Ht,Area,ref_DBH,ref_Ht,ref_D, a_ht, b_ht, a_area, b_area, a_depth, b_depth):
     # Gapfill record with local allometry
     # Heights
     mask = np.isnan(Ht)
@@ -194,7 +194,8 @@ def calculate_crown_dimensions_mc(DBH,Ht,Area,ref_DBH,ref_D, a_ht, b_ht, a_area,
     Area[mask] = random_sample_from_powerlaw_prediction_interval(DBH[mask],DBH,Area,b_area,a_area,array=True)
 
     # Apply canopy depth model (from regional database)
-    Depth = random_sample_from_powerlaw_prediction_interval(DBH,ref_DBH,ref_D,b_depth,a_depth,array=True)
+    #Depth = random_sample_from_powerlaw_prediction_interval(DBH,ref_DBH,ref_D,b_depth,a_depth,array=True)
+    Depth = random_sample_from_powerlaw_prediction_interval(Ht,ref_Ht,ref_D,b_depth,a_depth,array=True)
     
     # Remove any existing nodata values (brought forwards from input data
     mask = np.all((~np.isnan(Depth),~np.isnan(Ht),~np.isnan(Area)),axis=0)

@@ -263,7 +263,7 @@ for pp in range(0,N_plots):
     Plot_name=Plots[pp]
     n_subplots = subplot_polygons[Plot_name].shape[0]
     # set up array to host inventory profiles
-    field_LAD_profiles = np.zeros((n_iter,heights.size))
+    #field_LAD_profiles = np.zeros((n_iter,heights.size))
 
     # mask out dead and broken trees
     dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,field_data['dead_flag3']==-1),axis=0)
@@ -271,7 +271,7 @@ for pp in range(0,N_plots):
     mask = np.all((field_data['plot']==Plot_name,np.isfinite(field_data['DBH_field']),dead_mask,brokenlive_mask),axis=0)
 
     Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-    field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
+    #field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
 
     # now building the canopy model
     buff = 20

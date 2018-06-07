@@ -106,6 +106,7 @@ def random_sample_from_powerlaw_prediction_interval(x_i,x_obs,y_obs,a,b,array=Fa
 # - ll and ul = the upper and lower bounds of the confidence interval
 def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs,conf,niter):
 
+    from matplotlib import pyplot as plt
     # some fiddles to account for likely possible data types for x_i
     n=0
     if np.isscalar(x_i):
@@ -128,11 +129,11 @@ def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs
 
         # regression model
         m, c, r, p, serr = stats.linregress(x_boot,y_boot)
-
+        
         # randomly sample from residuals with replacement
         res = np.random.choice((y_boot-(m*x_boot + c)),size = n,replace=True)
 
-        # estimate y based on model and randomly sampled residuals
+        # estimate y based on model and randomly sampled residuals
         y_i[:,ii] = m*x_i + c + res
 
     # confidence intervals simply derived from the distribution of y
@@ -141,6 +142,12 @@ def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs
 
     return ll,ul
 
+# equivalent to above but for log-log space prediction
+def calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs,conf=.9,niter=1000):
+    log_ll,log_ul = calculate_prediction_interval_bootstrap_resampling_residuals(np.log(x_i),np.log(x_obs),np.log(y_obs),conf,niter)
+    return np.exp(log_ll),np.exp(log_ul)
+    
+    
 # Calculate a prediction based on a linear regression model
 # As above, but this time randomly sampling from prediction interval
 # calculated using random sampling from residuals.

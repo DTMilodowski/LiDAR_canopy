@@ -688,7 +688,7 @@ def calculate_crown_dimensions_for_stem_distributions(DBH,stem_density,a_ht, b_h
 # - The voxel is in crown if:
 #              1) 0 <= z' <= Zmax
 #              2) r <= Rmax/Zmax^beta * z'^beta;
-#   where r = sqrt((x-x0)
+#   where r = sqrt((x-x0)**2+(y-y0)**2)
 #
 # Note that we do not have data on crowns for trees outwith each plot
 # that overlap into the plot area. To compensate, we include in our
@@ -706,20 +706,18 @@ def calculate_crown_dimensions_for_stem_distributions(DBH,stem_density,a_ht, b_h
 # - Rmax (the maximum radius of the tree)
 # - beta (the exponent controlling the canopy morphology)
 # Returns:
-# - a 3D matrix containing the calculated crown for this tree, located within the plot domain
+# - 0 (the canopy_matrix array is updated with the new crown)
 def generate_3D_crown(canopy_matrix,x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
-    # generate masks for tree crown
-    z_ = z-Z0
-    xm,ym,z_ = np.meshgrid(x,y,z_)
-    r = np.sqrt((xm-x0)**2+(ym-y0)**2)
-    con1 = np.all((z<0,z>Zmax),axis=0)
-    con2 = r > (z_**beta) * Rmax/(Zmax**beta)
+    from matplotlib import pyplot as plt
 
-    crown = np.ones(canopy_matrix.shape)
-    crown[con1] = 0
-    crown[con2] = 0
-    
-    return crown
+    # generate masks for tree crown
+    xm,ym,zm = np.meshgrid(x,y,z)
+    r = np.sqrt((xm-x0)**2+(ym-y0)**2)
+    con = np.all((zm>=Z0,zm<=Zmax+Z0,r <= ((zm-Z0)**beta) * Rmax/(Zmax**beta)),axis=0)
+    #crown = np.zeros(canopy_matrix.shape)
+    canopy_matrix[con] = 1
+    return 0
+    #return crown
 
 # 3-D canopy
 # This function creates 3D crown model by aggregating individual crowns
@@ -736,31 +734,23 @@ def generate_3D_crown(canopy_matrix,x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
 # - plot_mask (an optional mask that accounts for non-square plot geometries)
 # - buffer (an optional argument that by default is zero, but should be
 #   increased so that it is sufficient to account for crown overlap
-def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta,plot_mask=np.empty([]), buffer=0):
-
+def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
+    from matplotlib import pyplot as plt
     # first create buffer
+    n_trees = x0.size
     dx = x[1]-x[0]
     dy = y[1]-y[0]
-    x_buff = np.arange(x[0]-buffer,x[-1]+buffer,dx)
-    y_buff = np.arange(y[0]-buffer,y[-1]+buffer,dy)
 
     # now create buffered canopy matrix
-    canopy_matrix = np.zeros((x_buff.size,y_buff.size,z.size),dtype='float')
-
-    # impose plot mask
-    plot_mask_buff = np.zeros(x_buff.size,y_buff.size)
-    plot_mask_buff[int(buffer/dx):x.size,int(buffer/dy):y.size]=[plot_mask.copy()]
-    if plot_mask.size > 0:
-        canopy_matrix[plot_mask_buff!=1]=np.nan
+    #crowns = np.zeros((n_trees,y.size,x.size,z.size),dtype='float')
+    canopy = np.zeros((y.size,x.size,z.size),dtype='float')
 
     # Now loop through the trees. For each tree, calculate the crown volume,
     # then add to the crown map.
-    n_trees = x0.size
     for tt in range(0,n_trees):
-        canopy_matrix += generate_3D_crown(canopy_matrix,x_buff,y_buff,z,x0[tt],y0[tt],Z0[tt],Zmax[tt],Rmax[tt],beta[tt])
-    
-    # reset PAD in overlapping areas so that PAD = 1. m2 m-3 throughout crowns
-    canopy_matrix[canopy_matrix>1]=1
+        generate_3D_crown(canopy,x,y,z,x0[tt],y0[tt],Z0[tt],Zmax[tt],Rmax[tt],beta[tt])
+        
+    plt.imshow(np.transpose(np.sum(canopy,axis=1)),origin='lower');plt.colorbar();plt.show()
 
-    return canopy_matrix
+    return canopy
     

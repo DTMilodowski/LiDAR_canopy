@@ -268,8 +268,29 @@ for pp in range(0,N_plots):
     # mask out dead and broken trees
     dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,field_data['dead_flag3']==-1),axis=0)
     brokenlive_mask = field_data['brokenlive_flag']==-1
-    mask = np.all((field_data['plot']==Plot_name,dead_mask,brokenlive_mask),axis=0)
+    mask = np.all((field_data['plot']==Plot_name,np.isfinite(field_data['DBH_field']),dead_mask,brokenlive_mask),axis=0)
 
+    Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+    field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
+
+    # now building the canopy model
+    buff = 20
+    xmin = np.min(field_data['Xfield'][mask])
+    xmax = np.max(field_data['Xfield'][mask])
+    ymin = np.min(field_data['Yfield'][mask])
+    ymax = np.max(field_data['Yfield'][mask])
+    x = np.arange(xmin-buff,xmax+buff,1.)+0.5
+    y = np.arange(ymin-buff,ymax+buff,1.)+0.5
+    z = np.arange(0,80.,1.)+0.5
+    z=z[::-1]
+    x0 = field_data['Xfield'][mask]
+    y0 = field_data['Yfield'][mask]
+    Z0 = 80 - Ht
+    Zmax = Depth
+    Rmax = np.sqrt(Area)
+    beta = np.ones(x0.size)*0.6
+    crown_model = field.generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta)
+    
     # ITERATE MONTE-CARLO PROCEDURE
     #------------------------------------------------------------------------------------
     for ii in range(0,n_iter):

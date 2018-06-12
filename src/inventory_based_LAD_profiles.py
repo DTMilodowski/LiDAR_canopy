@@ -590,7 +590,6 @@ def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
 
     return plot_dict
 
-
 #=====================================================================================================================
 # Load in data for Danum detailed census - every subplot censused
 def load_Danum_stem_census(filename, sp_area=20.**2):
@@ -735,7 +734,7 @@ def generate_3D_crown(canopy_matrix,x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
 # - buffer (an optional argument that by default is zero, but should be
 #   increased so that it is sufficient to account for crown overlap
 def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
-    from matplotlib import pyplot as plt
+    #from matplotlib import pyplot as plt
     # first create buffer
     n_trees = x0.size
     dx = x[1]-x[0]
@@ -750,7 +749,7 @@ def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
     for tt in range(0,n_trees):
         generate_3D_crown(canopy,x,y,z,x0[tt],y0[tt],Z0[tt],Zmax[tt],Rmax[tt],beta[tt])
         
-    plt.imshow(np.transpose(np.sum(canopy,axis=1)),origin='lower');plt.colorbar();plt.show()
+    #plt.imshow(np.transpose(np.sum(canopy,axis=1)),origin='lower');plt.colorbar();plt.show()
 
     return canopy
     

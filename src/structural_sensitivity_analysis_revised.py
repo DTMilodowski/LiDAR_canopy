@@ -32,8 +32,8 @@ datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32'
 plot_coordinates = np.genfromtxt(gps_pts_file, skiprows = 0, delimiter = ',',dtype=datatype)
 
 plot = 'Belian'
-plot = 'E'
-plot = 'B North'
+#plot = 'E'
+#plot = 'B North'
 
 max_height = 80.
 layer_thickness = 1.
@@ -41,15 +41,15 @@ heights = np.arange(0.,max_height)+1
 heights_rad = np.arange(0,max_height+1)
 n_layers = heights.size
 plot_width = 100.
-sample_res = np.array([5.,10.,20.,25.,50.,100.])
-keys = ['5m','10m','20m','25m','50m','100m']
+sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
+keys = ['2m','5m','10m','20m','25m','50m','100m']
 kappa = 0.72
 max_k = 2
 n_iter = 250
 
 area = 10.**4
-target_point_density = np.array([2., 5., 10., 15., 20., 25., 30., 40.])
-keys_2 = ['2','5','10','15','20','25','30','40']
+target_point_density = np.array([5., 10., 15., 20., 25., 30., 40.])
+keys_2 = ['5','10','15','20','25','30','40']
 target_points = area*target_point_density
 
 #---------------------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ mask = plot_coordinates['plot']==plot
 affine=lstsq.least_squares_affine_matrix(plot_coordinates['x'][mask],plot_coordinates['y'][mask],plot_coordinates['x_prime'][mask],plot_coordinates['y_prime'][mask])
 plot_bbox = np.array(lstsq.apply_affine_transformation(np.array([0.,100.,100.,0.]),np.array([100.,100.,0.,0.]),affine)).transpose() # simple square bounding box applied for all sensitivity analyses
 
-pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox)
+pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox,filter_by_first_return_location=True)
 n_returns = pts.shape[0]
 shots = np.unique(pts[:,-1]) 
 n_shots=shots.size
@@ -117,7 +117,7 @@ for ss in range(0,sample_res.size):
     # set up dictionaries to hold the profiles
     temp_dic={}
     for dd in range(0,target_points.size):       
-        temp[keys_2[dd]] = PAD.copy() 
+        temp_dic[keys_2[dd]] = PAD.copy() 
 
     # store all profiles in relevant dictionary
     PAD_profiles_MH[keys[ss]] = temp_dic.copy()
@@ -172,7 +172,7 @@ for dd in range(0,target_points.size):
                 centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
                 radius = np.sqrt(sample_res[ss]**2/2.)              
                 ids = trees[0].query_ball_point([centre_x,centre_y], radius)
-                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp])
+                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp],filter_by_first_return_location=True)
                 #------
                 heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
                 PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)

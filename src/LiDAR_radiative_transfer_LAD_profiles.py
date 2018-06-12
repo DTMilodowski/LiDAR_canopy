@@ -514,7 +514,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
     # inclusion are likely to be poor.  In the simplest case, there are not enought returns
     # at k=kmax, irrespective of scan angle. Therefore, we decrease kmax to compensate.
     while np.all((np.sum(pts[:,3]==max_k)<min_returns, max_k>1)):
-        print '\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1
+        #print '\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1
         max_k-=1
 
     #print "Calculating LAD using radiative tranfer model"
@@ -555,7 +555,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
     # if all theta bins fail test, then abandon all theta info
     N_fail = th_fail.size
     if N_fail == S:
-        print '\t\t WARNING: not sufficient returns for any of ', S, 'scan angles to invert independently therefore aggregating all scan angles'
+        #print '\t\t WARNING: not sufficient returns for any of ', S, 'scan angles to invert independently therefore aggregating all scan angles'
         S=1
         th=np.array(np.sum(th*N_per_A)/float(np.sum(N_per_A))).reshape(1)
         A[:] = th
@@ -564,7 +564,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
 
     # Otherwise aggregate th_fail into nearest th until no more scan angles fail test.
     elif N_fail>0:
-        print '\t\t WARNING: not enough returns for ', N_fail ,'/',S,' scan angles.  Aggregating with neighbouring scan angles'
+        #print '\t\t WARNING: not enough returns for ', N_fail ,'/',S,' scan angles.  Aggregating with neighbouring scan angles'
         for tt in range(0,N_fail):
             # find nearest passing bin
             idx = (np.abs(th_pass-th_fail[tt])).argmin()
@@ -625,7 +625,7 @@ def calculate_LAD_DTM_old(pts,zi,max_k,tl,min_returns = 10):
     # inclusion are likely to be poor.  In the simplest case, there are not enought returns
     # at k=kmax, irrespective of scan angle. Therefore, we decrease kmax to compensate.
     while np.all((np.sum(pts[:,3]==max_k)<min_returns, max_k>1)):
-        print '\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1
+        #print '\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1
         max_k-=1
 
     #print "Calculating LAD using radiative tranfer model"
@@ -666,7 +666,7 @@ def calculate_LAD_DTM_old(pts,zi,max_k,tl,min_returns = 10):
     # if all theta bins fail test, then abandon all theta info
     N_fail = th_fail.size
     if N_fail == S:
-        print '\t\t WARNING: not sufficient returns for any of ', S, 'scan angles to invert independently therefore aggregating all scan angles'
+        #print '\t\t WARNING: not sufficient returns for any of ', S, 'scan angles to invert independently therefore aggregating all scan angles'
         S=1
         th=np.array(np.sum(th*N_per_A)/float(np.sum(N_per_A))).reshape(1)
         A[:] = th
@@ -675,7 +675,7 @@ def calculate_LAD_DTM_old(pts,zi,max_k,tl,min_returns = 10):
 
     # Otherwise aggregate th_fail into nearest th until no more scan angles fail test.
     elif N_fail>0:
-        print '\t\t WARNING: not enough returns for ', N_fail ,'/',S,' scan angles.  Aggregating with neighbouring scan angles'
+        #print '\t\t WARNING: not enough returns for ', N_fail ,'/',S,' scan angles.  Aggregating with neighbouring scan angles'
         for tt in range(0,N_fail):
             # find nearest passing bin
             idx = (np.abs(th_pass-th_fail[tt])).argmin()

@@ -210,8 +210,8 @@ for pp in range(0,N_plots):
     # CLEANING AND STORING
     # now we have looped through and created the different profiles, need to account for any NaN's and apply minimum height
     # to the LAD distributions
-    # - set NaN values to zero
     """
+    # - set NaN values to zero
     LAD_rad[np.isnan(LAD_rad)]=0
     LAD_rad_DTM[np.isnan(LAD_rad_DTM)]=0
     LAD_MH[np.isnan(LAD_MH)]=0

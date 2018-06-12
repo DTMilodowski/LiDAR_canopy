@@ -64,7 +64,7 @@ n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 plot_area = 10.**4
 subplot_area = 20.*20.
-beta = 0.6 # morphological parameter in inventory-based canopy model
+beta = 0.35 # morphological parameter in inventory-based canopy model
 beta_min = 0.26 # 95% range reported for US tree species by Purves et al. (2007)
 beta_max = 0.44 # 95% range reported for US tree species by Purves et al. (2007)
 kappa = 0.76
@@ -108,15 +108,15 @@ DBH_BAAD, H_BAAD, D_BAAD = field.load_BAAD_crown_allometry_data(allometry_file)
 
 # load stem data
 #stem_data = field.load_SAFE_small_plot_data(stems_file)
-DC1_stem_data = field.load_Danum_stem_census(D1_stemcensus, sp_area=100.**2, N_subplots = 1) # all subplots
-DC2_stem_data = field.load_Danum_stem_census(D2_stemcensus, sp_area=100.**2, N_subplots = 1) # all subplots
+DC1_stem_data = field.load_Danum_stem_census(D1_stemcensus) # all subplots
+DC2_stem_data = field.load_Danum_stem_census(D2_stemcensus) # all subplots
 SAFE_stem_data = field.load_SAFE_small_stem_census(SAFE_stemcensus) # subset of subplots
 
 #------------------------------------------------------------------------------------
 # MAIN ANALYSIS
 # LiDAR PROFILES LOOP
 # loop through all plots to be analysed
-#plot_lidar_pts= np.load('plot_point_clouds.npz')['arr_0']
+plot_point_cloud= np.load('plot_point_clouds.npz')['arr_0'][()]
 for pp in range(0,N_plots):
     print Plots[pp]
     Plot_name=Plots[pp]
@@ -128,9 +128,9 @@ for pp in range(0,N_plots):
     n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
     coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
     bbox_polygon = aux.get_bounding_box(coord_pairs)
-    plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon,filter_by_first_return_location=True)    
-    plot_point_cloud[Plots[pp]]=plot_lidar_pts.copy()
-    #plot_lidar_pts=plot_point_cloud[Plots[pp]]
+    #plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon,filter_by_first_return_location=True)    
+    #plot_point_cloud[Plots[pp]]=plot_lidar_pts.copy()
+    plot_lidar_pts=plot_point_cloud[Plots[pp]]
     print "canopy height = ", np.percentile(plot_lidar_pts[plot_lidar_pts[:,3]==1,2],99), "m"
     """
     # LOOP THROUGH SUBPLOTS, CALCULATING CANOPY PROFILES
@@ -257,6 +257,60 @@ a_A, b_A, CF_A, r_sq_A, p_A, temp, PI_u_A, PI_l_A = field.log_log_linear_regress
 # 3) DBH-Height allometry
 a_ht, b_ht, CF_ht, r_sq_ht, p_ht, temp, PI_u_ht, PI_l_ht = field.log_log_linear_regression(field_data['DBH_field'],field_data['Height_field'])
 
+# Version one - no montecarlo routine
+for pp in range(0,N_plots):
+    print Plots[pp]
+    Plot_name=Plots[pp]
+    n_subplots = subplot_polygons[Plot_name].shape[0]
+
+    # mask out dead and broken trees
+    dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,field_data['dead_flag3']==-1),axis=0)
+    brokenlive_mask = field_data['brokenlive_flag']==-1
+    mask = np.all((field_data['plot']==Plot_name,np.isfinite(field_data['DBH_field']),np.isfinite(field_data['Xfield']),dead_mask,brokenlive_mask),axis=0)
+
+    Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+    #field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
+
+    # now building the canopy model
+    buff = 20
+    xmin = np.min(field_data['Xfield'][mask])
+    xmax = np.max(field_data['Xfield'][mask])
+    ymin = np.min(field_data['Yfield'][mask])
+    ymax = np.max(field_data['Yfield'][mask])
+    x = np.arange(xmin-buff,xmax+buff,1.)+0.5
+    y = np.arange(ymin-buff,ymax+buff,1.)+0.5
+    z = np.arange(0,80.,1.)+0.5
+    z=z[::-1]
+    x0 = field_data['Xfield'][mask]
+    y0 = field_data['Yfield'][mask]
+    Z0 = 80 - Ht
+    Zmax = Depth
+    Rmax = np.sqrt(Area/np.pi)
+    beta_list = np.ones(x0.size)*beta
+    crown_model = field.generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta_list)
+
+    #condense into vertical profile
+    field_LAD_profile = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
+    smallstem_LAD_profiles = np.zeros(n_subplots,heights.shape)
+    for i in range(0,n_subplots):
+        #print "Subplot: ", subplot_labels[Plot_name][i]
+        subplot_index = subplot_labels[Plot_name][i]-1
+        # add small stem contributions
+        if Plot_name == 'DC1':
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC1_stem_data['dbh'],DC1_stem_data['stem_density'][:,subplot_index],a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+        elif Plot_name == 'DC2':
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC2_stem_data['dbh'],DC2_stem_data['stem_density'][:,subplot_index],a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+        else:
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(SAFE_stem_data[Plot_name]['dbh'],SAFE_stem_data[Plot_name]['stem_density'][:,subplot_index],a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+
+        smallstem_LAD_profiles[i,:] = field.calculate_LAD_profiles_from_stem_size_distributions(heights, Area, Depth, Ht, StemDensity, beta)
+
+    field_LAD_profile+=np.mean(smallstem_LAD_profile,axis=0)
+    
+    inventory_LAD[Plot_name] = field_LAD_profile.copy()
+    #inventory_LAD_std[Plot_name] = np.std(field_LAD_profiles,axis=0)
+    inventory_LAI[Plot_name] = np.sum(field_LAD_profile)
+"""
 n_iter = 1000
 for pp in range(0,N_plots):
     print Plots[pp]
@@ -315,7 +369,7 @@ for pp in range(0,N_plots):
         inventory_LAD[Plot_name] = np.mean(field_LAD_profiles,axis=0)
         inventory_LAD_std[Plot_name] = np.std(field_LAD_profiles,axis=0)
         inventory_LAI[Plot_name] = np.sum(field_LAD_profiles,axis=1)*layer_thickness
-    
+"""    
 #----------------------------------------------------------------------------
 # NOW MAKE PLOTS
 # Figure 1 - Location map, with Hansen data and plot locations
@@ -336,7 +390,7 @@ figure_number = 5
 csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file)
 
 # Figure 5 - Point clouds and profiles across degradation gradient
-figure_name = output_dir + 'Fig5_pointclouds_and_profiles.png'
+figure_name = output_dir + 'Fig5_pointclouds_and_profiles_test.png'
 figure_number = 5
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD)
@@ -368,12 +422,12 @@ csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
 # <see sensitivity analysis script>
 
 # Figure 12 - Comparison against canopy volume estimates
-figure_name = output_dir + 'Fig12_comparing_LiDAR_PAI_and_inventory.png'
+figure_name = output_dir + 'Fig12_comparing_LiDAR_PAI_and_inventory_test.png'
 figure_number = 12
-csp.plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,Inventory_LAD)
+csp.plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD,inventory_LAI)
 
 # Figure 13 - Comparison against canopy volume distributions (analagous to Figure 7)
-figure_name = output_dir + 'Fig7_crossplot_LiDAR_and_inventory_profiles.png'
+figure_name = output_dir + 'Fig7_crossplot_LiDAR_and_inventory_profiles_test.png'
 figure_number = 13
 
 

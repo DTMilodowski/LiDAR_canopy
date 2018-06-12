@@ -228,7 +228,7 @@ def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6,print_ke
     S = polygon[:,1].min()
     N = polygon[:,1].max()
     tile_pts = load_lidar_data_by_bbox(lasfile,N,S,E,W,print_npts=False)
-    pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon,print_keep,filter_by_first_return_location=filter_by_first_return_location)
+    pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon,filter_by_first_return_location)
     # now create KDTrees
     starting_ids, trees = create_KDTree(pts)
 

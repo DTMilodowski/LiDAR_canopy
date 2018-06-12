@@ -25,7 +25,7 @@ axis_size = rcParams['font.size']+2
 
 #---------------------------------------------------------------------------------------------------------------
 # Some filenames & params
-las_file = '../../src/Carbon_plot_point_cloud_buffer.las'
+las_file = 'Carbon_plot_point_cloud_buffer.las'
 
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting_sensitivity_analysis_version.csv'
 datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32','f16','f16','f16','f16')}
@@ -48,8 +48,8 @@ max_k = 2
 n_iter = 250
 
 area = 10.**4
-target_point_density = np.array([5., 10., 15., 20., 25., 30., 40.])
-keys_2 = ['5','10','15','20','25','30','40']
+target_point_density = np.array([2., 5., 10., 15., 20., 25., 30., 40.])
+keys_2 = ['2','5','10','15','20','25','30','40']
 target_points = area*target_point_density
 
 #---------------------------------------------------------------------------------------------------------------
@@ -69,6 +69,7 @@ subplots = {}
 PAD_profiles_MH = {}
 PAD_profiles_rad1 = {}
 PAD_profiles_rad2 = {}
+penetration_limit = {}
 
 # Loop through all the spatial scales of interest
 for ss in range(0,sample_res.size):
@@ -112,23 +113,20 @@ for ss in range(0,sample_res.size):
     subplots[keys[ss]] = subplot
 
     n_subplots=len(subplot)
-    PAD = np.zeros((n_iter,n_subplots,n_layers))
+    PAD = np.zeros((n_iter,n_subplots,n_layers),dtype='float')
     # set up dictionaries to hold the profiles
-    pt_dens_MH={}
-    pt_dens_rad1={}
-    pt_dens_rad2={}
+    temp_dic={}
     for dd in range(0,target_points.size):       
-        pt_dens_MH[keys_2[dd]] = PAD.copy() 
-        pt_dens_rad1[keys_2[dd]] = PAD.copy()
-        pt_dens_rad2[keys_2[dd]] = PAD.copy()
+        temp[keys_2[dd]] = PAD.copy() 
 
     # store all profiles in relevant dictionary
-    PAD_profiles_MH[keys[ss]] = pt_dens_MH.copy()
-    PAD_profiles_rad1[keys[ss]] = pt_dens_rad1.copy()
-    PAD_profiles_rad2[keys[ss]] = pt_dens_rad2.copy()
-    
+    PAD_profiles_MH[keys[ss]] = temp_dic.copy()
+    PAD_profiles_rad1[keys[ss]] = temp_dic.copy()
+    PAD_profiles_rad2[keys[ss]] = temp_dic.copy()
+    penetration_limit[keys[ss]] = temp_dic.copy()
 
 PAD = None
+temp_dic = None
 
 #-----------------------------------------------------
 # now do the sensitivity analysis 
@@ -169,7 +167,7 @@ for dd in range(0,target_points.size):
             # for each of the subplots, clip point cloud and model PAD and get the metrics
             for pp in range(0,n_subplots):
                 # query the tree to locate points of interest
-                # note that we will only have one tree for number of points in sensitivity analysis  
+                # note that we will only have one tree for the number of points in sensitivity analysis  
                 centre_x = np.mean(subplots[keys[ss]][pp][0:4,0])
                 centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
                 radius = np.sqrt(sample_res[ss]**2/2.)              
@@ -178,6 +176,7 @@ for dd in range(0,target_points.size):
                 #------
                 heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
                 PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+                penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = np.cumsum(first_return_profile)==0
                 #------
                 u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
                 PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
@@ -191,3 +190,4 @@ for dd in range(0,target_points.size):
 np.save("MH_sensitivity_%s.npy" % plot, PAD_profiles_MH)
 np.save("rad1_sensitivity_%s.npy" % plot, PAD_profiles_rad1)
 np.save("rad2_sensitivity_%s.npy" % plot, PAD_profiles_rad2)
+np.save("penetration_limit_%s.npy" % plot, penetration_limit)

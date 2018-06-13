@@ -174,7 +174,7 @@ for dd in range(0,target_points.size):
                 ids = trees[0].query_ball_point([centre_x,centre_y], radius)
                 sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp],filter_by_first_return_location=True)
                 #------
-                if pts.size>0:
+                if np.sum(sp_pts[:,3]==1)>0:
                     heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
                     PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
                     penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = np.cumsum(first_return_profile)==0

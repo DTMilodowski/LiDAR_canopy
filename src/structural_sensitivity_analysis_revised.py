@@ -32,8 +32,8 @@ datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32'
 plot_coordinates = np.genfromtxt(gps_pts_file, skiprows = 0, delimiter = ',',dtype=datatype)
 
 plot = 'Belian'
-#plot = 'E'
-#plot = 'B North'
+plot = 'E'
+plot = 'B North'
 
 max_height = 80.
 layer_thickness = 1.
@@ -174,15 +174,22 @@ for dd in range(0,target_points.size):
                 ids = trees[0].query_ball_point([centre_x,centre_y], radius)
                 sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp],filter_by_first_return_location=True)
                 #------
-                heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
-                PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-                penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = np.cumsum(first_return_profile)==0
-                #------
-                u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
-                PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
-                #------
-                u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
-                PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
+                if pts.size>0:
+                    heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
+                    PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+                    penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = np.cumsum(first_return_profile)==0
+                    #------
+                    u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
+                    PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
+                    #------
+                    u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
+                    PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
+                else:
+                    PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = np.nan
+                    PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=np.nan
+                    PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=np.nan
+                    penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = 1.
+                    
         end_time = time.time()
         print '\t loop time = ', end_time - start_time
 

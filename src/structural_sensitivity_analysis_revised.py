@@ -32,8 +32,8 @@ datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32'
 plot_coordinates = np.genfromtxt(gps_pts_file, skiprows = 0, delimiter = ',',dtype=datatype)
 
 plot = 'Belian'
-plot = 'E'
-plot = 'B North'
+#plot = 'E'
+#plot = 'B North'
 
 max_height = 80.
 layer_thickness = 1.
@@ -59,6 +59,10 @@ affine=lstsq.least_squares_affine_matrix(plot_coordinates['x'][mask],plot_coordi
 plot_bbox = np.array(lstsq.apply_affine_transformation(np.array([0.,100.,100.,0.]),np.array([100.,100.,0.,0.]),affine)).transpose() # simple square bounding box applied for all sensitivity analyses
 
 pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox,filter_by_first_return_location=True)
+ 
+print pts.shape
+pts[pts[:,2]<0,2]=0
+print pts.shape
 n_returns = pts.shape[0]
 shots = np.unique(pts[:,-1]) 
 n_shots=shots.size

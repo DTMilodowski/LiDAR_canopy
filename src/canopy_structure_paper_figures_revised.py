@@ -305,8 +305,7 @@ for pp in range(0,N_plots):
 
         smallstem_LAD_profiles[i,:] = field.calculate_LAD_profiles_from_stem_size_distributions(heights, Area, Depth, Ht, StemDensity, beta)
 
-    field_LAD_profile+=np.mean(smallstem_LAD_profile,axis=0)
-    
+    field_LAD_profile+=np.mean(smallstem_LAD_profiles,axis=0)
     inventory_LAD[Plot_name] = field_LAD_profile.copy()
     #inventory_LAD_std[Plot_name] = np.std(field_LAD_profiles,axis=0)
     inventory_LAI[Plot_name] = np.sum(field_LAD_profile)

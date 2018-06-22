@@ -291,7 +291,7 @@ for pp in range(0,N_plots):
 
     #condense into vertical profile
     field_LAD_profile = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
-    smallstem_LAD_profiles = np.zeros(n_subplots,heights.shape)
+    smallstem_LAD_profiles = np.zeros((n_subplots,heights.size))
     for i in range(0,n_subplots):
         #print "Subplot: ", subplot_labels[Plot_name][i]
         subplot_index = subplot_labels[Plot_name][i]-1
@@ -310,6 +310,9 @@ for pp in range(0,N_plots):
     inventory_LAD[Plot_name] = field_LAD_profile.copy()
     #inventory_LAD_std[Plot_name] = np.std(field_LAD_profiles,axis=0)
     inventory_LAI[Plot_name] = np.sum(field_LAD_profile)
+
+
+np.savez('canopy_profiles.npz',(inventory_LAD,MacArthurHorn_LAD,radiative_LAD,radiative_DTM_LAD))
 """
 n_iter = 1000
 for pp in range(0,N_plots):

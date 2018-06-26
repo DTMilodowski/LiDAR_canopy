@@ -312,6 +312,10 @@ for pp in range(0,N_plots):
 
 
 np.savez('canopy_profiles.npz',(inventory_LAD,MacArthurHorn_LAD,radiative_LAD,radiative_DTM_LAD))
+inventory_LAD=np.load('canopy_profiles.npz')['arr_0'][()][0]
+MacArthurHorn_LAD=np.load('canopy_profiles.npz')['arr_0'][()][1]
+radiative_LAD=np.load('canopy_profiles.npz')['arr_0'][()][2]
+radiative_DTM_LAD=np.load('canopy_profiles.npz')['arr_0'][()][3]
 """
 n_iter = 1000
 for pp in range(0,N_plots):
@@ -392,7 +396,7 @@ figure_number = 5
 csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file)
 
 # Figure 5 - Point clouds and profiles across degradation gradient
-figure_name = output_dir + 'Fig5_pointclouds_and_profiles_test.png'
+figure_name = output_dir + 'Fig5_pointclouds_and_profiles.png'
 figure_number = 5
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD)

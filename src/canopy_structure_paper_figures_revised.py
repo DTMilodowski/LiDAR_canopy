@@ -433,10 +433,69 @@ figure_number = 12
 csp.plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD,inventory_LAI)
 
 # Figure 13 - Comparison against canopy volume distributions (analagous to Figure 7)
-figure_name = output_dir + 'Fig7_crossplot_LiDAR_and_inventory_profiles_test.png'
+figure_name = output_dir + 'Fig13_crossplot_LiDAR_and_inventory_profiles_test.png'
 figure_number = 13
 
+# Fiure 14 - Comparison against basal area
+figure_name = output_dir + 'Fig14_PAI_vs_basal_area.png'
+figure_number = 14
 
+census_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_TreeCensus.csv'
+census = cen.collate_plot_level_census_data(census_file)
+
+BA = {}
+Plots_SAFE = ['Belian', 'Seraya', 'LF', 'E','B North', 'B South']
+Plots_Danum = ['DC1', 'DC2']
+plot_colour = {}
+plot_colour['Belian']=colour[0]
+plot_colour['Seraya']=colour[0]
+plot_colour['DC1']=colour[0]
+plot_colour['DC2']=colour[0]
+plot_colour['LF']=colour[1]
+plot_colour['E']=colour[1]
+plot_colour['B North']=colour[2]
+plot_colour['B South']=colour[2]
+
+plot_marker = {}
+plot_marker['Belian']='o'
+plot_marker['Seraya']='v'
+plot_marker['DC1']='^'
+plot_marker['DC2']='s'
+plot_marker['LF']='o'
+plot_marker['E']='v'
+plot_marker['B North']='o'
+plot_marker['B South']='v'
+plot_label = {}
+plot_label['Belian']='MLA01'
+plot_label['Seraya']='MLA02'
+plot_label['DC1']='DAN04'
+plot_label['DC2']='DAN05'
+plot_label['LF']='SAF04'
+plot_label['E']='SAF03'
+plot_label['B North']='SAF02'
+plot_label['B South']='SAF01'
+
+for pp in range(0,len(Plots_SAFE)):
+    temp_BA = np.zeros(n_subplots)
+    for ss in range(0,n_subplots):
+        # check basal area
+        temp_BA[ss] = census[Plots_SAFE[pp]]['BasalArea'][ss,0]*25/100**2
+    temp_BA[np.isnan(temp_BA)]=0
+    BA[Plots_SAFE[pp]]=temp_BA.copy()
+
+for pp in range(0,len(Plots_Danum)):
+    temp_BA = np.zeros(n_subplots)
+    for ss in range(0,n_subplots):
+        indices = np.all((field_data['plot']==Plots_Danum[pp],field_data['subplot']==ss+1,np.isfinite(field_data['DBH'])),axis=0)
+        temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*25./100**2
+    BA[Plots_Danum[pp]]=temp_BA.copy()
+
+csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,BA,plot_marker,plot_label)
+
+
+
+
+#================================
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 import plot_LAD_profiles as pprof
 pprof.plot_subplot_LAD_profiles(radiative_DTM_LAD['Seraya'][:,:,-1],heights_rad[::-1],'g','test','test')

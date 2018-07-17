@@ -3,6 +3,26 @@
 import numpy as np
 from scipy import stats
 
+# linear regression with confidence intervals and prediction intervals
+def linear_regression(x_,y_,conf=0.95):
+    mask = np.all((np.isfinite(x_),np.isfinite(y_)),axis=0)
+    x = x_[mask]
+    y = y_[mask]
+
+    # regression to find power law exponents D = a.H^b
+    m, c, r, p, serr = stats.linregress(x,y)
+    x_i = np.arange(x.min(),x.max(),(x.max()-x.min())/1000.)
+    y_i = m*x_i + c
+    PI,PI_u,PI_l = calculate_prediction_interval(x_i,x,y,m,c,conf)
+    CI,CI_u,CI_l = calculate_confidence_interval(x_i,x,y,m,c,conf)
+    
+    model_y = m*x + c
+    error = y-model_y
+    MSE = np.mean(error**2)
+    
+    return m, c, r**2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l
+
+
 # log-log regression with confidence intervals
 def log_log_linear_regression(x,y,conf=0.95):
     mask = np.all((np.isfinite(x),np.isfinite(y)),axis=0)
@@ -27,7 +47,33 @@ def log_log_linear_regression(x,y,conf=0.95):
 
 
 #=================================
-# ANALYTICAL PREDICTION INTERVALS
+# ANALYTICAL CONFIDENCE AND PREDICTION INTERVALS
+
+# Calculate confidence intervals analytically (assumes normal distribution)
+# x_i = x location at which to calculate the confidence interval
+# x_obs = observed x values used to fit model
+# y_obs = corresponding y values
+# m = gradient
+# c = constant
+# conf = confidence interval
+# returns dy - the confidence interval
+def calculate_confidence_interval(x_i,x_obs,y_obs,m,c,conf):
+    
+    alpha = 1.-conf
+    
+    n = x_obs.size
+    y_mod = m*x_obs+c
+    se =  np.sqrt(np.sum((y_mod-y_obs)**2/(n-2)))
+    x_mean = x_obs.mean()
+    
+    # Quantile of Student's t distribution for p=1-alpha/2
+    q=stats.t.ppf(1.-alpha/2.,n-2)
+    dy = q*se*np.sqrt(1/float(n)+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
+    y_exp=m*x_i+c
+    upper = y_exp+abs(dy)
+    lower = y_exp-abs(dy)
+    return dy,upper,lower 
+
 
 # Calculate prediction intervals analytically (assumes normal distribution)
 # x_i = x location at which to calculate the prediction interval
@@ -36,7 +82,7 @@ def log_log_linear_regression(x,y,conf=0.95):
 # m = gradient
 # c = constant
 # conf = confidence interval
-# returns dy - the confidence interval
+# returns dy - the prediction interval
 def calculate_prediction_interval(x_i,x_obs,y_obs,m,c,conf):
     
     alpha = 1.-conf
@@ -48,7 +94,7 @@ def calculate_prediction_interval(x_i,x_obs,y_obs,m,c,conf):
     
     # Quantile of Student's t distribution for p=1-alpha/2
     q=stats.t.ppf(1.-alpha/2.,n-2)
-    dy = q*se*np.sqrt(1+1/n+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
+    dy = q*se*np.sqrt(1+1/float(n)+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
     y_exp=m*x_i+c
     upper = y_exp+abs(dy)
     lower = y_exp-abs(dy)
@@ -69,7 +115,7 @@ def random_sample_from_regression_model_prediction_interval(x_i,x_obs,y_obs,m,c,
         q = np.random.standard_t(n-2,size=x_i.size)
     else:
         q = np.random.standard_t(n-2) 
-    dy = q*se*np.sqrt(1+1/n+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
+    dy = q*se*np.sqrt(1+1/float(n)+((x_i-x_mean)**2)/np.sum((x_obs-x_mean)**2))
     y_i = y_exp+dy
 
     return y_i
@@ -217,7 +263,7 @@ def retrieve_crown_allometry(filename,conf=0.9):
     model_logD = b*logH + loga
     error = logD-model_logD
     MSE = np.mean(error**2)
-    CF = np.exp(MSE/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
+    CF = np.exp(MSE/2.) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
     a = np.exp(loga)
 
     return a, b, CF, r**2, p, H, D, H_i, PI_u, PI_l

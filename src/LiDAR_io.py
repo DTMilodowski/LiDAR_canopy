@@ -14,7 +14,7 @@ import time
 
 # get bounding box from las file
 def get_lasfile_bbox(las_file):
-    lasFile = las.file.File(las_file,mode='r')
+    lasFile = las.file.File(las_file,mode='r-')
     max_xyz = lasFile.header.max
     min_xyz = lasFile.header.min
     UR = np.asarray([max_xyz[0],max_xyz[1]])

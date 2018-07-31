@@ -34,24 +34,28 @@ def bin_returns(pts_in, max_height, layer_thickness):
     return heights,profile,n_ground_returns
 
 # Use MacArthur-Horn method to estimate LAD profile from the lidar return profile.  See methods described by Stark et al., Ecology Letters, 2012
-def estimate_LAD_MacArthurHorn(lidar_profile,n_ground_returns,layer_thickness,k):
+def estimate_LAD_MacArthurHorn(lidar_profile,n_ground_returns,layer_thickness,k,zero_nodata=True):
     n_layers = lidar_profile.size    
     S = np.zeros(n_layers+1)
     S[1:]=np.cumsum(lidar_profile)
     S+=n_ground_returns
-    S[S==0]=1 # This step is required to stop the base of the profile (final return) kicking out errors if there are no ground returns
+    if zero_nodata:
+        S[S==0]=1 # This step is required to stop the base of the profile (final return)
+                  # kicking out errors if there are no ground returns. This might be advisable
+                  # if you were constructing a simple PAI map, but note that it will be
+                  # affected by saturation in cases where the understory is not sampled
+        
     S_in = S[1:]
     S_out= S[:-1]
     LAD_profile = np.log(S_in/S_out)/(k*layer_thickness)
-    
+
+    """
     # Shouldn't have any divide by zeros, but just in case...
     if np.sum(np.isfinite(LAD_profile)==False)>0:
         print np.sum(np.isfinite(LAD_profile)==False)
     LAD_profile[np.isfinite(LAD_profile)==False]==0
-
+    """    
     return LAD_profile
-
-
 
 # Do some crunching to brute force the best fitting k for MacArther-Horn method.
 def minimise_misfit_for_k(kmin,kmax,k_interval,subplot_LAIs,subplot_lidar_profiles,n_ground_returns,layer_thickness,minimum_height=0):

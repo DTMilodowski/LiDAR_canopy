@@ -25,7 +25,7 @@ def get_lasfile_bbox(las_file):
     return UR, LR, UL, LL
 
 # get bounding box from many las files or laz files
-def get_bbox_of_multiple_tiles(file_list,laz_files=False):
+def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
     las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
     n_files = las_files.size
     
@@ -38,6 +38,8 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False):
         ymin = min_xyz[1]
         xmax = max_xyz[0]
         ymax = max_xyz[1]
+        zmin = min_xyz[2]
+        zmax = max_xyz[2]
         lasFile.close()
         os.system("rm temp.las")
 
@@ -51,6 +53,8 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False):
             ymin = min(ymin,min_xyz[1])
             xmax = max(xmax,max_xyz[0])
             ymax = max(ymax,max_xyz[1])
+            zmin = min(zmin,max_xyz[2])
+            zmax = max(zmax,max_xyz[2])
             lasFile.close()
             os.system("rm temp.las")
 
@@ -63,6 +67,8 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False):
         ymin = min_xyz[1]
         xmax = max_xyz[0]
         ymax = max_xyz[1]
+        zmin = min_xyz[2]
+        zmax = max_xyz[2]
         lasFile.close()
         
         for i in range(1,n_files):
@@ -73,14 +79,20 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False):
             ymin = min(ymin,min_xyz[1])
             xmax = max(xmax,max_xyz[0])
             ymax = max(ymax,max_xyz[1])
+            zmin = min(zmin,min_xyz[2])
+            zmax = max(zmax,max_xyz[2])
             lasFile.close()
 
     UR = np.asarray([xmax,ymax])
     LR = np.asarray([xmax,ymin])
     UL = np.asarray([xmin,ymax])
     LL = np.asarray([xmin,ymin])
-
-    return UR, LR, UL, LL
+    Zlim = np.asarray([zmin,zmax])
+    if return_zlim:
+        return UR, LR, UL, LL, Zlim
+    else:
+        return UR, LR, UL, LL
+        
 
 # Load lidar data => x,y,z,return,class, scan angle, gps_time
 # Returns: - a numpy array containing the points

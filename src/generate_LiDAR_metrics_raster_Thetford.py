@@ -44,15 +44,14 @@ site = 'Thetford2015_patchN'
 
 
 # Some parameters
-min_PAD = 0.1
-radius = np.sqrt(200)
-max_height = 46.   
-min_height = 2.     
-layer_thickness = 1
+radius = np.sqrt(200) # for buffer
+max_height = 46.   # max tree height
+min_height = 2.     # minimum height for inclusion in PAI and Shannon Index calculation
+layer_thickness = 1 # thickness of vertical strata
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 layers = heights.size
-kappa = 1.
-raster_res = 10
+kappa = 1. # correction factor (clumping and leaf angles)
+raster_res = 10 # resolution of output rasters
 
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
@@ -89,6 +88,7 @@ PAI = np.zeros((rows,cols))*np.nan
 PAD = np.zeros((rows,cols,layers))*np.nan
 Shannon = np.zeros((rows,cols))*np.nan
 pt_dens = np.zeros((rows,cols))
+n_ground = np.zeros((rows,cols))
 
 # Phase three - loop through las tiles and gradually fill the array
 laz_files = io.find_las_files_by_polygon(laz_list,bbox)
@@ -169,12 +169,14 @@ for i in range(0,n_files):
                     # other metrics
                     pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(np.pi*radius**2.)
                     Shannon[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter[np.isnan(PAD_iter)])
+                    n_ground[row_ii,col_jj]= n_ground_returns
+                    
             sample_pts=None
     lidar_pts = None
     trees = None
     starting_ids_for_trees = None
 
-np.savez('%s_metrics_10m' % site,point_density=pt_dens,pai=PAI,shannon=Shannon, pad=PAD)
+np.savez('%s_metrics_10m' % site,point_density=pt_dens,pai=PAI,shannon=Shannon, pad=PAD, n_ground=n_ground)
 
 metrics = np.load('%s_metrics_10m.npz' % site)
 

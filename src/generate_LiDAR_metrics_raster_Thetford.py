@@ -42,6 +42,8 @@ laz_files = False ## CHANGE AS REQUIRED - note that if laszip is installed, this
 # Site ID
 site = 'Thetford2015_patchN'
 
+# load in a raster to get coordinate system info for later
+temp,temp_geoT,coord_sys = raster.load_GeoTIFF_band_and_georeferencing('/home/dmilodow/DataStore_DTM/BALI/Thetford_CHM_5m_2017.tif')
 
 # Some parameters
 radius = np.sqrt(200) # for buffer
@@ -155,10 +157,10 @@ for i in range(0,n_files):
                 if np.sum(sample_pts[:,3]==1) > 0:
                     # calculate PAD profile
                     heights,first_return_profile,n_ground_returns = pad.bin_returns(sample_pts, max_height, layer_thickness)
-                    PADprof = pad.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa,zero_nodata=True)
+                    PADprof = pad.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa,zero_nodata=False)
                     
                     # vertically distributed PAI
-                    PAD[:,row_ii,col_jj] = PADprof.copy()
+                    PAD[row_ii,col_jj,:] = PADprof.copy()
                     
                     # remove lowermost portion of profile
                     PAD_iter = PADprof.copy()
@@ -188,7 +190,7 @@ geoTransform = [ XMinimum, raster_res, 0, YMaximum, 0, -raster_res ]
 for kk in range(0,len(metrics.keys())):
     var = metrics.keys()[kk]
     print "\t\t\t Saving rasters: %s" % var
-    raster.write_raster_to_GeoTiff(metrics[var], geoTransform, ('%s_pointcloud_metrics_10m_%s' % (site,var)), EPSG_CODE='27700')
+    raster.write_raster_to_GeoTiff_with_coordinate_system(metrics[var], geoTransform, coord_sys,'%s_pointcloud_metrics_10m_%s' % (site,var))
 
 """
 import sys

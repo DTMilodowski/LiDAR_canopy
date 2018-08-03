@@ -86,8 +86,13 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
     srs.SetWellKnownGeogCS( 'EPSG:'+EPSG_CODE )
     dataset.SetProjection( srs.ExportToWkt() )
     # write array
-    dataset.GetRasterBand(1).SetNoDataValue( -9999 )
-    dataset.GetRasterBand(1).WriteArray( array )
+    if NBands==1:
+        dataset.GetRasterBand(1).SetNoDataValue( -9999 )
+        dataset.GetRasterBand(1).WriteArray( array )
+    else:
+        for bb in range(0,NBands):
+            dataset.GetRasterBand(bb+1).SetNoDataValue( -9999 )
+            dataset.GetRasterBand(bb+1).WriteArray( array[:,:,bb] )
     dataset = None
     return 0
     #-----------------------------------
@@ -218,3 +223,88 @@ def load_GeoTIFF_band_and_georeferencing(File,band_number=1):
         array=np.flipud(array)
     
     return array, geoTrans, coord_sys
+
+
+
+# Function to write an array to a geoTIFF
+def write_array_to_GeoTiff_with_coordinate_system(array,geoTrans,coord_sys,OUTFILE,north_up=True):
+    NBands = 1
+    NRows = 0
+    NCols = 0
+
+    if north_up:
+        # for north_up array, need the n-s resolution (element 5) to be negative
+        if geoTrans[5]>0:
+            geoTrans[5]*=-1
+            geoTrans[3] = geoTrans[3]-(array.shape[0]+1.)*geoTrans[5]
+        # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
+        if len(array.shape) < 2: 
+            print 'array has less than two dimensions! Unable to write to raster'
+            sys.exit(1)  
+        elif len(array.shape) == 2:
+            (NRows,NCols) = array.shape
+            array = np.flipud(array)
+        elif len(array.shape) == 3:
+            (NRows,NCols,NBands) = array.shape
+            for i in range(0,NBands):
+                array[:,:,i] = np.flipud(array[:,:,i])
+        else:
+            print 'array has too many dimensions! Unable to write to raster'
+            sys.exit(1)  
+
+    else:
+        # for north_up array, need the n-s resolution (element 5) to be positive
+        if geoTrans[5]<0:
+            geoTrans[5]*=-1
+            geoTrans[3] = geoTrans[3]-(array.shape[0]+1.)*geoTrans[5]
+        # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
+        if len(array.shape) < 2: 
+            print 'array has less than two dimensions! Unable to write to raster'
+            sys.exit(1)  
+        elif len(array.shape) == 2:
+            (NRows,NCols) = array.shape
+            array = np.flipud(array)
+        elif len(array.shape) == 3:
+            (NRows,NCols,NBands) = array.shape
+            for i in range(0,NBands):
+                array[:,:,i] = np.flipud(array[:,:,i])
+        else:
+            print 'array has too many dimensions! Unable to write to raster'
+            sys.exit(1)  
+    
+    # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
+    if len(array.shape) < 2: 
+        print 'array has less than two dimensions! Unable to write to raster'
+        sys.exit(1)  
+    elif len(array.shape) == 2:
+        (NRows,NCols) = array.shape
+        array = np.flipud(array)
+    elif len(array.shape) == 3:
+        (NRows,NCols,NBands) = array.shape
+        for i in range(0,NBands):
+            array[:,:,i] = np.flipud(array[:,:,i])
+    else:
+        print 'array has too many dimensions! Unable to write to raster'
+        sys.exit(1)  
+    
+    # Write GeoTiff
+    driver = gdal.GetDriverByName('GTiff')
+    driver.Register()
+
+    # set all the relevant geospatial information
+    dataset = driver.Create( OUTFILE, NCols, NRows, NBands, gdal.GDT_Float32 )
+    print "Generating raster %s with %i bands" % ((OUTFILE),NBands)
+    dataset.SetGeoTransform( geoTrans )
+    srs = osr.SpatialReference(wkt=coord_sys)
+    dataset.SetProjection( srs.ExportToWkt() )
+    # write array
+    if len(array.shape) == 2:
+        dataset.GetRasterBand(1).SetNoDataValue( -9999 )
+        dataset.GetRasterBand(1).WriteArray( array )
+    elif len(array.shape) == 3:
+        for bb in range(0,NBands):
+            dataset.GetRasterBand(bb+1).SetNoDataValue( -9999 )
+            dataset.GetRasterBand(bb+1).WriteArray( array[:,:,i] )
+    dataset = None
+    return 0
+

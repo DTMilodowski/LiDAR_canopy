@@ -89,7 +89,7 @@ cols_jj = np.arange(x_coords.size)
 PAI = np.zeros((rows,cols))*np.nan
 PAD = np.zeros((rows,cols,layers))*np.nan
 Shannon = np.zeros((rows,cols))*np.nan
-pt_dens = np.zeros((rows,cols))
+pulse_dens = np.zeros((rows,cols))
 n_ground = np.zeros((rows,cols))
 
 # Phase three - loop through las tiles and gradually fill the array
@@ -169,8 +169,8 @@ for i in range(0,n_files):
 
 
                     # other metrics
-                    pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(np.pi*radius**2.)
-                    Shannon[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter[np.isnan(PAD_iter)])
+                    pulse_dens[row_ii,col_jj] =np.sum(sample_pts[:,3]==1) /(raster_res**2.)
+                    Shannon[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter)#[np.isnan(PAD_iter)])
                     n_ground[row_ii,col_jj]= n_ground_returns
                     
             sample_pts=None
@@ -178,7 +178,7 @@ for i in range(0,n_files):
     trees = None
     starting_ids_for_trees = None
 
-np.savez('%s_metrics_10m' % site,point_density=pt_dens,pai=PAI,shannon=Shannon, pad=PAD, n_ground=n_ground)
+np.savez('%s_metrics_10m' % site,pulse_density=pulse_dens,pai=PAI,shannon=Shannon, pad=PAD, n_ground=n_ground)
 
 metrics = np.load('%s_metrics_10m.npz' % site)
 
@@ -190,7 +190,8 @@ geoTransform = [ XMinimum, raster_res, 0, YMaximum, 0, -raster_res ]
 for kk in range(0,len(metrics.keys())):
     var = metrics.keys()[kk]
     print "\t\t\t Saving rasters: %s" % var
-    raster.write_raster_to_GeoTiff_with_coordinate_system(metrics[var], geoTransform, coord_sys,'%s_pointcloud_metrics_10m_%s' % (site,var))
+    metrics[var][np.isnan(metrics[var])]=-9999
+    raster.write_array_to_GeoTiff_with_coordinate_system(metrics[var], geoTransform, coord_sys,'%s_pointcloud_metrics_10m_%s.tif' % (site,var),north_up=False)
 
 """
 import sys

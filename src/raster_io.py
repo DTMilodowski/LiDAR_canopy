@@ -304,7 +304,7 @@ def write_array_to_GeoTiff_with_coordinate_system(array,geoTrans,coord_sys,OUTFI
     elif len(array.shape) == 3:
         for bb in range(0,NBands):
             dataset.GetRasterBand(bb+1).SetNoDataValue( -9999 )
-            dataset.GetRasterBand(bb+1).WriteArray( array[:,:,i] )
+            dataset.GetRasterBand(bb+1).WriteArray( array[:,:,bb] )
     dataset = None
     return 0
 

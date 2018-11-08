@@ -1,11 +1,11 @@
 import numpy as np
 
 # This library contains code to calculate Leaf Area Density (LAD) profiles from LiDAR-
-# derived 3D point cloud data using a model based on radiative tranfer theory.  The 
-# method was developed by Detto et al. and is described in full in their publication: 
+# derived 3D point cloud data using a model based on radiative tranfer theory.  The
+# method was developed by Detto et al. and is described in full in their publication:
 # Detto, M., G. Asner, Sonnentag, O. and H. C. Muller-Landau. 2015. Using stochastic
 # radiative transfer models to estimate leaf area density from multireturn LiDAR in
-# complex tropical forests. Journal of Geophysical Research. 
+# complex tropical forests. Journal of Geophysical Research.
 
 #----------------------------------------------------------------------------------------
 # This function calculates the LAD profile based on the radiative transfer model
@@ -19,7 +19,7 @@ import numpy as np
 #                                    xK(number of points per return number)
 #        Note that this is an optional input arguement, but saves reformulating n if
 #        already calculated once (i.e. for testing different leaf inclination models).
-#        In the first instance - feed it an empty array, i.e. n=np.array([]).  This is 
+#        In the first instance - feed it an empty array, i.e. n=np.array([]).  This is
 #        the default setting.
 # Outputs
 # u   :: a 1D vector of LAD at heights zi
@@ -98,12 +98,12 @@ def calculate_LAD_Detto_original(pts,zi,max_k,tl,n=np.array([])):
     use = alpha_indices[np.isfinite(alpha)]
     alpha = np.interp(alpha_indices,use,alpha[use])
     alpha[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
-    
+
     #beta[:jj+1]=U0[:jj+1]
     beta[:jj]=U0[:jj]
     beta_indices = np.arange(beta.size)
     use = beta_indices[np.isfinite(beta)]
-    beta = np.interp(beta_indices,use,beta[use]) 
+    beta = np.interp(beta_indices,use,beta[use])
     beta[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
 
     # numerical solution
@@ -134,7 +134,7 @@ def calculate_LAD_old(pts,zi,max_k,tl,n=np.array([])):
     th = np.unique(A)
     S  = th.size
     K  = int(R.max())
-    
+
     # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
     # and return number
     if n.size == 0:
@@ -148,7 +148,7 @@ def calculate_LAD_old(pts,zi,max_k,tl,n=np.array([])):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
     # find all scan angles for which there are no returns, and remove these scan angles from the inversion
-    # This happens very rarely -i.e. cases where there are very few returns at all at this scan angle.  
+    # This happens very rarely -i.e. cases where there are very few returns at all at this scan angle.
     # Future efforts could go further here by removing scan angles for which the number of 1st returns
     # falls below a threshold, rather than 0.
     n0_test = np.sum(n[:,:,0],axis=0)
@@ -164,7 +164,7 @@ def calculate_LAD_old(pts,zi,max_k,tl,n=np.array([])):
             for j in range(0,S):
                 use2 = A[use1]==th[j]
                 for k in range(0,K):
-                    n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok        
+                    n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
     ##### New test -> let's add 1 to all 1st return bins for which there are also other returns
     n_orig = n.copy()
@@ -222,11 +222,11 @@ def calculate_LAD_old(pts,zi,max_k,tl,n=np.array([])):
             alpha[i]= 1.-np.inner(I[i,use,0],w)
             # Eq 8b
             beta[i] = np.inner((U[i,use,0]*G[i,use]/np.abs(np.cos(np.conj(th[use])/180*np.pi))),w)
-    
-    #### In Detto's original code, interpolation is used to traverse nodata gaps.  I am not sure why this 
-    ### approach was used as nodata gaps arise when the number of returns within a given canopy layer is 
-    ### zero.  The simplest explanation for this scenario is that there is very low leaf area density and 
-    ### hence no interception of the LiDAR pulses.  The interpolation function used by Detto seems likely 
+
+    #### In Detto's original code, interpolation is used to traverse nodata gaps.  I am not sure why this
+    ### approach was used as nodata gaps arise when the number of returns within a given canopy layer is
+    ### zero.  The simplest explanation for this scenario is that there is very low leaf area density and
+    ### hence no interception of the LiDAR pulses.  The interpolation function used by Detto seems likely
     ### to overestimate leaf area - perhaps by a large amount where there are distinct layers in the
     ### canopy.  In contrast, I set ui  = 0 for these layers.  This is simpler, and matches the modelled
     ### scenario more closely.
@@ -244,7 +244,7 @@ def calculate_LAD_old(pts,zi,max_k,tl,n=np.array([])):
     """
     beta_indices = np.arange(beta.size)
     use = beta_indices[np.isfinite(beta)]
-    beta = np.interp(beta_indices,use,beta[use]) 
+    beta = np.interp(beta_indices,use,beta[use])
     beta[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
     """
     beta[~np.isfinite(beta)]=0
@@ -280,7 +280,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     th = np.unique(A)
     S  = th.size
     K  = int(R.max())
-    
+
     # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
     # and return number
     if n.size == 0:
@@ -294,7 +294,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
                     n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
 
     # find all scan angles for which there are no returns, and remove these scan angles from the inversion
-    # This happens very rarely -i.e. cases where there are very few returns at all at this scan angle.  
+    # This happens very rarely -i.e. cases where there are very few returns at all at this scan angle.
     # Future efforts could go further here by removing scan angles for which the number of 1st returns
     # falls below a threshold, rather than 0.
     n0_test = np.sum(n[:,:,0],axis=0)
@@ -371,10 +371,10 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
 
     status = np.zeros(M) # 0 = ok, 1 = CASE 1 (across all scan angles), 2 = CASE 2
     penetration_limit = np.zeros(M) # 0 = ok, 1 = no more first returns left
-    
+
     nall_total = np.sum(nall,axis=0) # sum up 1st return distributions for weighting
     n1_total = np.sum(n1,axis=0) # sum up 1st return distributions for weighting
-    
+
     for mm in range(0,M):
         use = case1_flag[mm,:]==False # np.all((case1_flag[mm,:]==False,case2_flag[mm,:]==False),axis=0) # control[i,:]>0
         if use.sum() == 0:
@@ -384,17 +384,17 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         if np.sum(n1[mm:,:]) == 0:
             penetration_limit[mm] = 1
         U0[mm] = np.inner((G[mm,:]/np.abs(np.cos(np.conj(th)/180*np.pi))),(nall_total/np.sum(nall_total)))
-        
+
         if use.sum() > 0:#w.size >0:
             w=n1_total[use]/np.sum(n1_total[use]) # w weights the averaging across the ensemble of scan angles
                                                   # angles based on the proportion of first returns
-               
+
             # Eq 8a from Detto et al., 2015
             alpha[mm]= 1.-np.inner(I[mm,use,0],w)
             # Eq 8b
             beta[mm] = np.inner((U[mm,use,0]*G[mm,use]/np.abs(np.cos(np.conj(th[use])/180*np.pi))),w)
             #print alpha[mm]
- 
+
     ### In Detto's original code, interpolation is used to traverse nodata gaps in alpha and beta.
     ### We have modified this slightly.
     ###
@@ -412,9 +412,9 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     ###
     ### In practice, as the leaf area density is calculated based on alpha and beta, we avoid
     ### interpolating across nodata gaps until after the leaf area density calculation - i.e. we
-    ### interpolate across gaps in the foliage profile, not in alpha or beta, rather than propagate 
+    ### interpolate across gaps in the foliage profile, not in alpha or beta, rather than propagate
     ### potential interpolation artefacts.
-    
+
     alpha[:jj]=0 # no plant area above the top of canopy, so nothing absorbed so far
     """
     alpha_indices=np.arange(alpha.size)
@@ -427,7 +427,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     """
     beta_indices = np.arange(beta.size)
     use = beta_indices[np.isfinite(beta)]
-    beta = np.interp(beta_indices,use,beta[use]) 
+    beta = np.interp(beta_indices,use,beta[use])
     beta[use[-1]+1:]=np.nan # python's interpolation function extends to end of given x range. I convert extrapolated values to np.nan
     """
     #beta[~np.isfinite(beta)]=0
@@ -445,7 +445,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
         # deal with case of no returns, but above penetration limit, so assume no leaf area density (CASE 1)
         if status[mm]==1 and penetration_limit[mm] == 0 :
             u[mm]=0
-        
+
     #u[~np.isfinite(u)]=np.nan
 
     # Now do the interpolation across nodata gaps (CASE 2). Note that it isn't possible to interpolate if below
@@ -457,7 +457,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     u[:jj]=0
     indices = np.arange(u.size)
     use = indices[np.isfinite(u)]
-    u = np.interp(indices,use,u[use]) 
+    u = np.interp(indices,use,u[use])
     u[use[-1]+1:]=np.nan # python's interpolation function by default extends to end of given x range, which is not desired.
     """
     for mm in range(0,M):
@@ -468,7 +468,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     plt.plot(penetration_limit,'+b')
     plt.plot(status,'.g')
     plt.ylim(ymax=3,ymin=-0.1)
-    
+
     plt.show()
     """
     return u,n,I,U
@@ -487,7 +487,7 @@ def Gfunction(LAD,ze,zi):
     use = np.abs(J)<=1
     phi = np.arccos(J[use])
     A[use] = np.cos(th[use])*np.cos(ze)*(1+(2/np.pi)*(np.tan(phi)-phi))
-    
+
 
     if LAD == 'planophile':
         f=2/np.pi*(1+np.cos(2*th))
@@ -500,7 +500,7 @@ def Gfunction(LAD,ze,zi):
     # options here to include more leaf angle distributions (see paper by Detto et al., 2015)
     return G
 
-    
+
 #----------------------------------------------------------------------------------
 # This function is an adapted version of Detto et al. (2015)'s radiative transfer
 # model.  In this version, however, I account for the variable attenuation of lidar
@@ -514,9 +514,8 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
     # inclusion are likely to be poor.  In the simplest case, there are not enought returns
     # at k=kmax, irrespective of scan angle. Therefore, we decrease kmax to compensate.
     while np.all((np.sum(pts[:,3]==max_k)<min_returns, max_k>1)):
-        #print '\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1
+        print '\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1
         max_k-=1
-
     #print "Calculating LAD using radiative tranfer model"
     # first unpack pts
     keep = pts[:,3]<=max_k
@@ -532,7 +531,6 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
     S  = th.size
     K  = int(R.max())
     pts_z  = pts[keep,2]
-
     # calculate n(z,s,k), a matrix containing the number of points per depth, scan angle
     # and return number
     #print "\tCalculating return matrix"
@@ -544,7 +542,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
             for k in range(0,K):
                 n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
     #print n.sum(axis=0)
-    # Second check! 
+    # Second check!
     # Now loop through the scan angles and aggregate scan angles where there are not sufficient returns
     # to reliably invert profile - this is usually determined by the number of returns for k=kmax
     N_k_per_A = np.sum(n,axis=0)
@@ -573,12 +571,12 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
             idx_Afail = A==th_fail[tt]
             n_Apass = (A==th_pass[idx]).sum()
             idx_Apass = A==th_pass[idx]
-            
-            # weighted average for th_pass           
+
+            # weighted average for th_pass
             th_pass[idx] = (th_pass[idx]*n_Apass + th_fail[tt]*n_Afail)/float(n_Apass + n_Afail)
             A[np.any((idx_Afail,idx_Apass),axis=0)] = th_pass[idx]
 
-        #Rebuild n    
+        #Rebuild n
         pts[keep,5]=A.copy()
         th = np.unique(A)
         S  = th.size
@@ -616,7 +614,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
             n[:,s,k]*=np.product(CF[s,:this_k])
     #print n.sum(axis=0)
     u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n)
-    
+
     return u,n,I,U
 
 def calculate_LAD_DTM_old(pts,zi,max_k,tl,min_returns = 10):
@@ -655,7 +653,7 @@ def calculate_LAD_DTM_old(pts,zi,max_k,tl,min_returns = 10):
             for k in range(0,K):
                 n[i,j,k]=np.sum(R[use1][use2]==k+1) # check conditional indexing - should be ok
     #print n.sum(axis=0)
-    # Second check! 
+    # Second check!
     # Now loop through the scan angles and aggregate scan angles where there are not sufficient returns
     # to reliably invert profile - this is usually determined by the number of returns for k=kmax
     N_k_per_A = np.sum(n,axis=0)
@@ -684,12 +682,12 @@ def calculate_LAD_DTM_old(pts,zi,max_k,tl,min_returns = 10):
             idx_Afail = A==th_fail[tt]
             n_Apass = (A==th_pass[idx]).sum()
             idx_Apass = A==th_pass[idx]
-            
-            # weighted average for th_pass           
+
+            # weighted average for th_pass
             th_pass[idx] = (th_pass[idx]*n_Apass + th_fail[tt]*n_Afail)/float(n_Apass + n_Afail)
             A[np.any((idx_Afail,idx_Apass),axis=0)] = th_pass[idx]
 
-        #Rebuild n    
+        #Rebuild n
         pts[keep,5]=A.copy()
         th = np.unique(A)
         S  = th.size
@@ -727,7 +725,7 @@ def calculate_LAD_DTM_old(pts,zi,max_k,tl,min_returns = 10):
             n[:,s,k]*=np.product(CF[s,:this_k])
     #print n.sum(axis=0)
     u,n,I,U = calculate_LAD_old(pts,zi,max_k,tl,n)
-    
+
     return u,n,I,U
 
 

@@ -4,7 +4,7 @@
 ## allow v. efficient spatial searches to be done.  Moreover, the when dealing
 ## with >10^6 points (build time on our linux server ~0.5 s), we split the data
 ## into multiple trees due to the non-linear increase in build time with the
-## number of points. 
+## number of points.
 import numpy as np
 import laspy as las
 import os
@@ -28,7 +28,7 @@ def get_lasfile_bbox(las_file):
 def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
     las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
     n_files = las_files.size
-    
+
     if laz_files:
         os.system("las2las %s temp.las" % las_files[0])
         lasFile = las.file.File('temp.las',mode='r-')
@@ -70,7 +70,7 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
         zmin = min_xyz[2]
         zmax = max_xyz[2]
         lasFile.close()
-        
+
         for i in range(1,n_files):
             lasFile = las.file.File(las_files[i],mode='r-')
             max_xyz = lasFile.header.max
@@ -92,7 +92,7 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
         return UR, LR, UL, LL, Zlim
     else:
         return UR, LR, UL, LL
-        
+
 
 # Load lidar data => x,y,z,return,class, scan angle, gps_time
 # Returns: - a numpy array containing the points
@@ -101,7 +101,7 @@ def load_lidar_data(las_file,print_npts=True):
     pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank, lasFile.gps_time)).transpose()
     pts = pts[pts[:,2]>=0,:]
     if print_npts:
-        print "loaded ", pts[:,0].size, " points"
+        print("loaded ", pts[:,0].size, " points")
     lasFile.close()
     return pts
 
@@ -117,7 +117,7 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
 
     pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii], lasFile.gps_time[ii])).transpose()
     if print_npts:
-        print "loaded ", pts[:,0].size, " points"
+        print("loaded ", pts[:,0].size, " points")
     lasFile.close()
     return pts
 
@@ -126,7 +126,7 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
 # Creates kd-trees to host data.
 # RETURNS  - a second  array containing the starting indices of the points
 #            associated with a given tree for cross checking against the
-#            point cloud 
+#            point cloud
 #          - a list of trees
 def create_KDTree(pts,max_pts_per_tree = 10**6):
     npts = pts.shape[0]
@@ -134,7 +134,7 @@ def create_KDTree(pts,max_pts_per_tree = 10**6):
     #print npts,ntrees, int(ntrees)
     trees = []
     starting_ids = []
-    
+
     for tt in range(0,ntrees):
         i0=tt*max_pts_per_tree
         i1 = (tt+1)*max_pts_per_tree
@@ -172,14 +172,14 @@ def find_las_files_by_polygon(file_list,polygon,print_keep=False):
             if inside.sum()>0:
                 keep.append(las_files[i])
     if print_keep:
-        print 'las tiles to load in:', len(keep)
+        print('las tiles to load in:', len(keep))
         for ll in range(0,len(keep)):
             print keep[ll]
     return keep
 
 # load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.
 # polygon is a 2D array with N_pts*rows and two cols (x,y).
-# I've added a fudge to deal with laz files, which uses las2las from lastools to create a temporary .las file before reading with laspy. Undoubtedly not the most elegant solution, but it works :-) 
+# I've added a fudge to deal with laz files, which uses las2las from lastools to create a temporary .las file before reading with laspy. Undoubtedly not the most elegant solution, but it works :-)
 def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_files=False,print_keep=False):
     W = polygon[:,0].min()
     E = polygon[:,0].max()
@@ -195,12 +195,12 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
     starting_ids = np.asarray([])
 
     # first case scenario that no points in ROI
-    print '\t\tloading %.0f tiles...' % n_files
+    print('\t\tloading %.0f tiles...' % n_files)
     start=time.time()
     if n_files == 0:
-        print 'WARNING: No files within specified polygon - try again'
+        print('WARNING: No files within specified polygon - try again')
         pts = np.array([])
-                              
+
     # otherwise, we have work to do!
     else:
         if laz_files:
@@ -208,34 +208,34 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
             tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
             os.system("rm temp.las")
         else:
-            tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False) 
- 
+            tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False)
+
         pts = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
-                
+
         # now repeat for subsequent tiles
-        for i in range(1,n_files):    
+        for i in range(1,n_files):
             if laz_files:
                 os.system("las2las %s temp.las" % keep_files[i])
                 tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
                 os.system("rm temp.las")
-            else:                
+            else:
                 tile_pts = load_lidar_data_by_bbox(keep_files[i],N,S,E,W,print_npts=False)
 
             pts_ = lidar.filter_lidar_data_by_polygon(tile_pts,polygon)
             pts = np.concatenate((pts,pts_),axis=0)
 
     end=time.time()
-    print '\t\t\t...%.3f s' % (end-start)
+    print('\t\t\t...%.3f s' % (end-start))
     # now create KDTrees
-    print '\t\tbuilding KD-trees...'
+    print('\t\tbuilding KD-trees...')
     start=time.time()
     starting_ids, trees = create_KDTree(pts)
     end=time.time()
-    print  '\t\t\t...%.3f s' % (end-start)
+    print('\t\t\t...%.3f s' % (end-start))
 
-    print "loaded ", pts.shape[0], " points into ", len(trees), " KDTrees"
+    print("loaded ", pts.shape[0], " points into ", len(trees), " KDTrees")
     return pts, starting_ids, trees
-    
+
 # equivalent file but for a single las file
 def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6,print_keep=False,filter_by_first_return_location=False):
     W = polygon[:,0].min()
@@ -247,7 +247,7 @@ def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6,print_ke
     # now create KDTrees
     starting_ids, trees = create_KDTree(pts)
 
-    print "loaded ", pts.shape[0], " points"
+    print("loaded ", pts.shape[0], " points")
     return pts, starting_ids, trees
 
 # equivalent scripts for laz files - calls las2las to transform to .las files
@@ -265,11 +265,11 @@ def find_laz_files_by_polygon(file_list,polygon,print_keep=False):
             keep.append(laz_files[i])
         os.system("rm temp.las")
     if print_keep:
-        print 'las tiles to load in:', len(keep)
+        print('las tiles to load in:', len(keep))
         for ll in range(0,len(keep)):
-            print keep[ll]
+            print(keep[ll])
     return keep
-    
+
 #----------------------------------------------------------------------------
 # Next here are scripts that use a point and circular neighbourhood instead
 #----------------------------------------------------------------------------
@@ -286,7 +286,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**
     starting_ids = np.asarray([])
 
     if n_files == 0:
-        print 'WARNING: No files within specified neighbourhood - try again'
+        print('WARNING: No files within specified neighbourhood - try again')
         pts = np.array([])
 
     else:
@@ -302,7 +302,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**
     # now create KDTrees
     starting_ids, trees = create_KDTree(pts)
 
-    print "loaded ", pts[:,0].size, " points"
+    print("loaded ", pts[:,0].size, " points")
     return pts,starting_ids, trees
 
 
@@ -311,7 +311,7 @@ def load_lidar_data_by_neighbourhood(file_list,xy,radius,max_pts_per_tree = 10**
 ## Functions to write point cloud files
 ##------------------------------------------------------------------------------
 
-# This function writes a set of lidar returns into a csv file, so that the same 
+# This function writes a set of lidar returns into a csv file, so that the same
 # point cloud samples can be loaded into different software packages
 def points_to_csv(pts,outfile):
     n_pts,temp = pts.shape

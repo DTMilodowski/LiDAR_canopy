@@ -59,8 +59,8 @@ site = 'SAFE'
 # Some parameters
 min_PAD = 0.1
 radius = np.sqrt(200)
-max_height = 80.   
-min_height = 2.     
+max_height = 80.
+min_height = 2.
 layer_thickness = 1
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
@@ -100,6 +100,8 @@ PAI_30_45 = np.zeros((rows,cols))*np.nan
 PAI_45_up = np.zeros((rows,cols))*np.nan
 Shannon = np.zeros((rows,cols))*np.nan
 pt_dens = np.zeros((rows,cols))
+Shape = np.zeros((rows,cols))*np.nan
+layers = np.zeros((rows,cols))*np.nan
 
 # Phase three - loop through las tiles and gradually fill the array
 las_files = np.genfromtxt(las_list,delimiter=',',dtype='S256')
@@ -151,8 +153,8 @@ for i in range(0,n_files):
             pixel_bbox = np.array([[x_iter-raster_res/2., y_iter-raster_res/2.], [x_iter-raster_res/2., y_iter+raster_res/2.],
                                    [x_iter+raster_res/2., y_iter+raster_res/2.], [x_iter+raster_res/2., y_iter-raster_res/2.],
                                    [x_iter-raster_res/2., y_iter-raster_res/2.]])
-            
-            # retrieve point clouds samples        
+
+            # retrieve point clouds samples
             sample_pts = np.array([])
             for tt in range(0,N_trees):
                 ids = trees[tt].query_ball_point([x_iter,y_iter], radius)
@@ -164,7 +166,7 @@ for i in range(0,n_files):
                         sample_iter = lidar.filter_lidar_data_by_polygon(lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]],pixel_bbox)
                         sample_pts = np.concatenate((sample_pts,sample_iter),axis=0)
                         sample_iter = None
-                        
+
             # If we have the returns, then calculate metric of interest - in
             # this case the PAI
             if sample_pts.size > 0:
@@ -172,11 +174,11 @@ for i in range(0,n_files):
                     # calculate PAD profile
                     heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
                     PAD_prof = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-                    
+
                     # remove lowermost portion of profile
                     PAD_iter = PAD_prof.copy()
                     PAD_iter[heights<min_height]=0
-                
+
                     PAI[row_ii,col_jj] = np.sum(PAD_iter)
 
                     # vertically distributed PAI
@@ -186,11 +188,13 @@ for i in range(0,n_files):
                     PAI_15_30[row_ii,col_jj] = np.sum(PAD_prof[np.all((heights>15,heights<=30),axis=0)])
                     PAI_30_45[row_ii,col_jj] = np.sum(PAD_prof[np.all((heights>30,heights<=45),axis=0)])
                     PAI_45_up[row_ii,col_jj] = np.sum(PAD_prof[heights>45])
-                    
+
                     # other metrics
                     pt_dens[row_ii,col_jj] = sample_pts.shape[0]/(raster_res**2.)
                     Shannon[row_ii,col_jj] = struct.calculate_Shannon_index(PAD_iter)
-                    
+                    Htemp, Ptemp, Shape[row_ii,col_jj] = struct.calculate_canopy_shape(heights,PAD_iter)
+                    layers[row_ii,col_jj] = struct.calculate_number_of_contiguous_layers(heights,PAD_iter,min_PAD)
+
             sample_pts=None
     lidar_pts = None
     trees = None
@@ -199,7 +203,7 @@ for i in range(0,n_files):
 PAImax = PAD.calculate_analytical_limit(pt_dens,raster_res**2.,kappa,0.)
 PAImax[np.isnan(PAI)]=np.nan
 
-np.savez('%s_canopy_level_metrics_10m' % site,point_density=pt_dens,pai=PAI,shannon=Shannon,pai_00_02m=PAI_00_02,pai_02_05m=PAI_02_05,pai_05_15m=PAI_05_15,pai_15_30m=PAI_15_30,pai_30_45m=PAI_30_45,pai_45_up=PAI_45_up,PAImax=PAImax)
+np.savez('%s_canopy_level_metrics_10m' % site,point_density=pt_dens,pai=PAI,shannon=Shannon,shape=Shape,n_layers=layers,pai_00_02m=PAI_00_02,pai_02_05m=PAI_02_05,pai_05_15m=PAI_05_15,pai_15_30m=PAI_15_30,pai_30_45m=PAI_30_45,pai_45_up=PAI_45_up,PAImax=PAImax)
 
 metrics = np.load('%s_canopy_level_metrics_10m.npz' % site)
 

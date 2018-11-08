@@ -33,67 +33,117 @@ penetration_lim_BNorth = np.load('penetration_limit_BNorth.npy')[()]
 penetration_lim_E = np.load('penetration_limit_E.npy')[()]
 
 # Figure 1 - sensitivity of 1 ha profiles to point density
+## Belian
 plt.figure(1, facecolor='White',figsize=[9,9])
 ax1a = plt.subplot2grid((3,6),(0,0))
-ax1a.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax1a.set_ylabel('height / m',fontsize=axis_size)
 ax1a.annotate('a - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax1b = plt.subplot2grid((3,6),(0,1),sharex=ax1a,sharey=ax1a)
-ax1b.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax1b.annotate('b - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax1c = plt.subplot2grid((3,6),(0,2),sharex=ax1a,sharey=ax1a)
-ax1c.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax1c.annotate('c - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax1d = plt.subplot2grid((3,6),(0,3),sharex=ax1a,sharey=ax1a)
-ax1d.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax1d.annotate('d - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax1e = plt.subplot2grid((3,6),(0,4),sharex=ax1a,sharey=ax1a)
-ax1e.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax1e.annotate('e - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax1f = plt.subplot2grid((3,6),(0,5),sharex=ax1a,sharey=ax1a)
-ax1f.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax1f.annotate('f - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
+## E
+ax1g = plt.subplot2grid((3,6),(1,0),sharex=ax1a,sharey=ax1a)
+ax1g.set_ylabel('height / m',fontsize=axis_size)
+ax1g.annotate('g - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1h = plt.subplot2grid((3,6),(1,1),sharex=ax1a,sharey=ax1a)
+ax1h.annotate('h - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1i = plt.subplot2grid((3,6),(1,2),sharex=ax1a,sharey=ax1a)
+ax1i.annotate('i - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1j = plt.subplot2grid((3,6),(1,3),sharex=ax1a,sharey=ax1a)
+ax1j.annotate('j - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1k = plt.subplot2grid((3,6),(1,4),sharex=ax1a,sharey=ax1a)
+ax1k.annotate('k - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1l = plt.subplot2grid((3,6),(1,5),sharex=ax1a,sharey=ax1a)
+ax1l.annotate('l - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+## B North
+ax1m = plt.subplot2grid((3,6),(2,0),sharex=ax1a,sharey=ax1a)
+ax1m.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1m.set_ylabel('height / m',fontsize=axis_size)
+ax1m.annotate('m - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1n = plt.subplot2grid((3,6),(2,1),sharex=ax1a,sharey=ax1a)
+ax1n.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1n.annotate('n - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1o = plt.subplot2grid((3,6),(2,2),sharex=ax1a,sharey=ax1a)
+ax1o.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1o.annotate('o - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1p = plt.subplot2grid((3,6),(2,3),sharex=ax1a,sharey=ax1a)
+ax1p.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1p.annotate('p - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1q = plt.subplot2grid((3,6),(2,4),sharex=ax1a,sharey=ax1a)
+ax1q.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1q.annotate('q - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+ax1r = plt.subplot2grid((3,6),(2,5),sharex=ax1a,sharey=ax1a)
+ax1r.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
+ax1r.annotate('r - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
 # loop through the subplots
-sp = [ax1a,ax1b,ax1c,ax1d,ax1e,ax1f]
+sp = [ax1a,ax1b,ax1c,ax1d,ax1e,ax1f,ax1g,ax1h,ax1i,ax1j,ax1k,ax1l,ax1m,ax1n,ax1o,ax1p,ax1q,ax1r]
 pkeys = ['2m','5m','10m','20m','50m','100m']
+kk =0
 for pp in range(0,len(sp)):
 
-  rad1_sp = np.nanmean(PAD_profiles_rad1_Belian[pkeys[pp]]['40'],axis=1)
-  rad1 = np.nanmedian(rad1_sp,axis=0)
-  rad1perc = np.nanpercentile(rad1_sp,[2.5,25,75,95.5],axis=0)
-  sp[pp].fill_betweenx(heights[2:],rad1perc[0][2:],rad1perc[3][2:],color=colour[1],alpha=0.3)
-  sp[pp].fill_betweenx(heights[2:],rad1perc[1][2:],rad1perc[2][2:],color=colour[1],alpha=0.3)
+    rad1_sp = np.nanmean(PAD_profiles_rad1_Belian[pkeys[kk]]['40'],axis=1)
+    rad1 = np.nanmedian(rad1_sp,axis=0)
+    rad1perc = np.nanpercentile(rad1_sp,[2.5,25,75,95.5],axis=0)
+    sp[pp].fill_betweenx(heights[2:],rad1perc[0][2:],rad1perc[3][2:],color=colour[1],alpha=0.3)
+    sp[pp].fill_betweenx(heights[2:],rad1perc[1][2:],rad1perc[2][2:],color=colour[1],alpha=0.3)
 
-  rad2_sp = np.nanmean(PAD_profiles_rad2_Belian[pkeys[pp]]['40'],axis=1)
-  rad2 = np.nanmedian(rad2_sp,axis=0)
-  rad2perc = np.nanpercentile(rad2_sp,[2.5,25,75,95.5],axis=0)
-  sp[pp].fill_betweenx(heights[2:],rad2perc[0][2:],rad2perc[3][2:],color=colour[2],alpha=0.3)
-  sp[pp].fill_betweenx(heights[2:],rad2perc[1][2:],rad2perc[2][2:],color=colour[2],alpha=0.3)
-  """
-  MH_sp = np.nanmean(PAD_profiles_MH_Belian[pkeys[pp]]['40'],axis=1)
-  MH = np.nanmedian(MH_sp,axis=0)
-  MHperc = np.nanpercentile(MH_sp,[2.5,25,75,95.5],axis=0)
-  sp[pp].fill_betweenx(heights[2:],MHperc[0][2:],MHperc[3][2:],color=colour[0],alpha=0.3)
-  sp[pp].fill_betweenx(heights[2:],MHperc[1][2:],MHperc[2][2:],color=colour[0],alpha=0.3)
-  """
-  if pp==2:
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5, label = 'rad trans (Detto)')
-    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5, label = 'rad trans (modified)')
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
-    sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=3)
-  else:
-    sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
-    sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
-    sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5)
+    rad2_sp = np.nanmean(PAD_profiles_rad2_Belian[pkeys[kk]]['40'],axis=1)
+    rad2 = np.nanmedian(rad2_sp,axis=0)
+    rad2perc = np.nanpercentile(rad2_sp,[2.5,25,75,95.5],axis=0)
+    sp[pp].fill_betweenx(heights[2:],rad2perc[0][2:],rad2perc[3][2:],color=colour[2],alpha=0.3)
+    sp[pp].fill_betweenx(heights[2:],rad2perc[1][2:],rad2perc[2][2:],color=colour[2],alpha=0.3)
 
+    MH_sp = np.nanmean(PAD_profiles_MH_Belian[pkeys[kk]]['40'],axis=1)
+    MH = np.nanmedian(MH_sp,axis=0)
+    MHperc = np.nanpercentile(MH_sp,[2.5,25,75,95.5],axis=0)
+    sp[pp].fill_betweenx(heights[2:],MHperc[0][2:],MHperc[3][2:],color=colour[0],alpha=0.3)
+    sp[pp].fill_betweenx(heights[2:],MHperc[1][2:],MHperc[2][2:],color=colour[0],alpha=0.3)
+
+    if pp==2:
+        sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
+        sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5, label = 'rad trans (Detto)')
+        sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5, label = 'rad trans (modified)')
+        sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
+        sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+        sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=3)
+    else:
+        sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+        sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
+        sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5)
+
+    kk+=1
+    if kk==length(pkeys):
+        k=0
+
+
+
+
+"""
 # 1b) the widths of the 50% (solid) and 95% (dashed) confidence intervals of each vertical layer
 # this gives an indication of the reliability of the profile at a given canopy depth
 ax1f = plt.subplot2grid((2,5),(1,0),sharey=ax1a)
@@ -186,7 +236,7 @@ plt.setp(yticklabels,visible=False)
 plt.subplots_adjust(hspace=0.4, wspace = 0.1, bottom = 0.2)
 plt.savefig('PAD_resolution_sensitivity.png')
 plt.show()
-
+"""
 
 #==============================================================================================
 # 2) Equivalent plots but this time using different point densities at target resolution

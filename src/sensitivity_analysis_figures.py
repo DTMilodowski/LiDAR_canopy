@@ -36,6 +36,7 @@ penetration_lim_E = np.load('penetration_limit_E.npy')[()]
 ## Belian
 plt.figure(1, facecolor='White',figsize=[8,9])
 ax1a = plt.subplot2grid((3,6),(0,0))
+ax1a.set_title('MLA01 - old growth', fontsize=10)
 ax1a.set_ylabel('height / m',fontsize=axis_size)
 ax1a.annotate('a - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
@@ -56,6 +57,7 @@ ax1f.annotate('f - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundco
 
 ## E
 ax1g = plt.subplot2grid((3,6),(1,0),sharex=ax1a,sharey=ax1a)
+ax1g.set_title('SAF03 - moderately logged', fontsize=10)
 ax1g.set_ylabel('height / m',fontsize=axis_size)
 ax1g.annotate('g - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
@@ -76,6 +78,7 @@ ax1l.annotate('l - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundco
 
 ## B North
 ax1m = plt.subplot2grid((3,6),(2,0),sharex=ax1a,sharey=ax1a)
+ax1m.set_title('SAF02 - heavily logged', fontsize=10)
 ax1m.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax1m.set_ylabel('height / m',fontsize=axis_size)
 ax1m.annotate('m - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -135,14 +138,14 @@ for pp in range(0,len(sp)):
         sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
         sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5, label = 'rad trans (Detto)')
         sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5, label = 'rad trans (modified)')
-        sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=3)
+        sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.3), ncol=3)
     else:
         sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
         sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
         sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5)
 
 ax1a.set_ylim(0,80)
-ax1a.set_xlim(0,0.5)
+ax1a.set_xlim(0,0.59)
 
 ax1a.locator_params(axis='x',nbins=5)
 ax1b.locator_params(axis='x',nbins=5)
@@ -169,8 +172,8 @@ yticklabels = ax1b.get_yticklabels() + ax1c.get_yticklabels() + ax1d.get_ytickla
 xticklabels = ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xticklabels() + ax1d.get_xticklabels() + ax1e.get_xticklabels() + ax1f.get_xticklabels() + \
               ax1g.get_xticklabels() + ax1h.get_xticklabels() + ax1i.get_xticklabels() + ax1j.get_xticklabels() + ax1k.get_xticklabels() + ax1l.get_xticklabels()
 plt.setp(yticklabels,visible=False)
-plt.setp(xticklabels,visible=False)
-plt.subplots_adjust(hspace=0.4, wspace = 0.1, bottom = 0.2)
+#plt.setp(xticklabels,visible=False)
+plt.subplots_adjust(hspace=0.2, wspace = 0.2, bottom = 0.2)
 plt.savefig('PAD_resolution_sensitivity_1ha_average.png')
 plt.show()
 
@@ -183,6 +186,7 @@ plt.show()
 pkeys=['5','10','15','20','25','30','40']
 plt.figure(2, facecolor='White',figsize=[7,9])
 ax2a = plt.subplot2grid((3,5),(0,0))
+ax2a.set_title('MLA01 - old growth', fontsize=10)
 ax2a.set_ylabel('height / m',fontsize=axis_size)
 ax2a.annotate('a - 5 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
@@ -199,6 +203,7 @@ ax2e = plt.subplot2grid((3,5),(0,4),sharex=ax2a,sharey=ax2a)
 ax2e.annotate('e - 40 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax2f = plt.subplot2grid((3,5),(1,0),sharex=ax2a,sharey=ax2a)
+ax2f.set_title('SAF03 - moderately logged', fontsize=10)
 ax2f.set_ylabel('height / m',fontsize=axis_size)
 ax2f.annotate('f - 5 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
@@ -215,6 +220,7 @@ ax2j = plt.subplot2grid((3,5),(1,4),sharex=ax2a,sharey=ax2a)
 ax2j.annotate('j - 40 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax2k = plt.subplot2grid((3,5),(2,0),sharex=ax2a,sharey=ax2a)
+ax2k.set_title('SAF02 - heavily logged', fontsize=10)
 ax2k.set_xlabel('PAD / m$^2$m$^{-3}$',fontsize=axis_size)
 ax2k.set_ylabel('height / m',fontsize=axis_size)
 ax2k.annotate('k - 5 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -268,14 +274,14 @@ for pp in range(0,len(sp)):
         sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
         sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5, label = 'rad trans (Detto)')
         sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5, label = 'rad trans (modified)')
-        sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=3)#(loc='upper right')
+        sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.3), ncol=3)#(loc='upper right')
     else:
         sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
         sp[pp].plot(rad1[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
         sp[pp].plot(rad2[2:],heights[2:],'-',c=colour[2],linewidth=1.5)
 
 ax2a.set_ylim(0,80)
-ax2a.set_xlim(0,0.7)
+ax2a.set_xlim(0,0.59)
 ax2a.locator_params(axis='x',nbins=5)
 ax2b.locator_params(axis='x',nbins=5)
 ax2c.locator_params(axis='x',nbins=5)
@@ -299,7 +305,7 @@ xticklabels = ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xtickla
               ax1f.get_xticklabels() + ax1g.get_xticklabels() + ax1h.get_xticklabels() + ax1i.get_xticklabels() + ax1j.get_xticklabels()
 plt.setp(yticklabels,visible=False)
 plt.setp(xticklabels,visible=False)
-plt.subplots_adjust(hspace=0.4, wspace = 0.1, bottom = 0.2)
+plt.subplots_adjust(hspace=0.2, wspace = 0.2, bottom = 0.2)
 plt.savefig('PAD_point_density_sensitivity_1ha_averages.png')
 plt.show()
 
@@ -379,7 +385,7 @@ for pp in range(0,len(sp)):
         sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1)
         sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1)
 
-ax3a.set_ylim(0,80)
+ax3a.set_ylim(0,89)
 ax3a.set_xlim(0,520)
 ax3a.locator_params(axis='x',nbins=5)
 ax3b.locator_params(axis='x',nbins=5)
@@ -390,8 +396,6 @@ ax3f.locator_params(axis='x',nbins=5)
 
 yticklabels = ax3b.get_yticklabels() + ax3c.get_yticklabels() + ax3d.get_yticklabels() + ax3e.get_yticklabels() + ax3f.get_yticklabels()
 plt.setp(yticklabels,visible=False)
-plt.subplots_adjust(hspace=0.4, wspace = 0.1, bottom = 0.2)
-plt.setp(yticklabels,visible=False)
 plt.savefig('PAD_resolution_sensitivity_individual_CIs.png')
 plt.show()
 
@@ -399,7 +403,7 @@ plt.show()
 #===============================================================================
 # As above, but now looking at point density
 ## Belian
-plt.figure(4, facecolor='White',figsize=[7,4])
+plt.figure(4, facecolor='White',figsize=[7,3])
 ax4a = plt.subplot2grid((1,5),(0,0))
 ax4a.set_ylabel('height / m',fontsize=axis_size)
 ax4a.annotate('a - 5 pts m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -468,7 +472,7 @@ for pp in range(0,len(sp)):
         sp[pp].plot(rad2_95CI[2:],heights[2:],':',c=colour[2],linewidth=1)
         sp[pp].plot(rad2_50CI[2:],heights[2:],'-',c=colour[2],linewidth=1)
 
-ax4a.set_ylim(0,80)
+ax4a.set_ylim(0,89)
 ax4a.set_xlim(0,520)
 ax4a.locator_params(axis='x',nbins=5)
 ax4b.locator_params(axis='x',nbins=5)
@@ -477,8 +481,6 @@ ax4d.locator_params(axis='x',nbins=5)
 ax4e.locator_params(axis='x',nbins=5)
 
 yticklabels = ax4b.get_yticklabels() + ax4c.get_yticklabels() + ax4d.get_yticklabels() + ax4e.get_yticklabels()
-plt.setp(yticklabels,visible=False)
-plt.subplots_adjust(hspace=0.4, wspace = 0.1, bottom = 0.2)
 plt.setp(yticklabels,visible=False)
 plt.savefig('PAD_point_density_sensitivity_individual_CIs.png')
 plt.show()
@@ -493,6 +495,7 @@ plt.show()
 plt.figure(5, facecolor='White',figsize=[8,9])
 ax1a = plt.subplot2grid((3,6),(0,0))
 ax1a.set_ylabel('height / m',fontsize=axis_size)
+ax1a.set_title('MLA01', fontsize=10)
 ax1a.annotate('a - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax1b = plt.subplot2grid((3,6),(0,1),sharex=ax1a,sharey=ax1a)
@@ -513,6 +516,7 @@ ax1f.annotate('f - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundco
 ## E
 ax1g = plt.subplot2grid((3,6),(1,0),sharex=ax1a,sharey=ax1a)
 ax1g.set_ylabel('height / m',fontsize=axis_size)
+ax1g.set_title('SAF03', fontsize=10)
 ax1g.annotate('g - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 
 ax1h = plt.subplot2grid((3,6),(1,1),sharex=ax1a,sharey=ax1a)
@@ -532,6 +536,7 @@ ax1l.annotate('l - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundco
 
 ## B North
 ax1m = plt.subplot2grid((3,6),(2,0),sharex=ax1a,sharey=ax1a)
+ax1m.set_title('SAF02', fontsize=10)
 ax1m.set_xlabel('fraction occluded (%)',fontsize=axis_size)
 ax1m.set_ylabel('height / m',fontsize=axis_size)
 ax1m.annotate('m - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
@@ -575,7 +580,7 @@ for pp in range(0,len(sp)):
     sp[pp].plot(lim[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
 
 ax1a.set_ylim(0,80)
-ax1a.set_xlim(0,100)
+ax1a.set_xlim(0,110)
 
 ax1a.locator_params(axis='x',nbins=2)
 ax1b.locator_params(axis='x',nbins=2)
@@ -603,7 +608,7 @@ xticklabels = ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xtickla
               ax1g.get_xticklabels() + ax1h.get_xticklabels() + ax1i.get_xticklabels() + ax1j.get_xticklabels() + ax1k.get_xticklabels() + ax1l.get_xticklabels()
 plt.setp(yticklabels,visible=False)
 plt.setp(xticklabels,visible=False)
-plt.subplots_adjust(hspace=0.4, wspace = 0.1, bottom = 0.2)
+plt.subplots_adjust(hspace=0.2, wspace = 0.)
 plt.savefig('penetration_limits_sensitivity_1ha_average.png')
 plt.show()
 
@@ -623,7 +628,7 @@ PAI_MH = np.arange(0)
 PAI_rad1 = np.arange(0)
 PAI_rad2 = np.arange(0)
 plot = []
-plot_name = ['MAO01','SAF03','SAF02']
+plot_name = ['MLA01','SAF03','SAF02']
 for rr in range(0,N_res):
     for dd in range(0,N_dens):
         for pp in range(0,len(plot_name)):
@@ -665,59 +670,72 @@ ax6a = plt.subplot2grid((3,3),(0,0))
 ax6a.set_ylabel('PAI',fontsize=axis_size)
 ax6a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[0])
+ax6a.set_ylabel('')
+ax6a.set_xlabel('')
 
 ax6b = plt.subplot2grid((3,3),(0,1),sharex=ax6a,sharey=ax6a)
 ax6b.set_title('Point density = 5 pts m$^{-2}$', fontsize=10)
 ax6b.annotate('b - rad. trans. (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_rad1',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[1])
+ax6b.set_ylabel('')
+ax6b.set_xlabel('')
+ax6e.set_ylabel('PAI',fontsize=axis_size)
 
 ax6c = plt.subplot2grid((3,3),(0,2),sharex=ax6a,sharey=ax6a)
 ax6c.annotate('c - rad. trans (modified)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_rad2',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[2])
-
+ax6c.set_ylabel('')
+ax6c.set_xlabel('')
 
 # row two of matrix - point density is 20 pts m-2
 mask = np.all(((df['plot']==plot_name[pp]),(df['point density']=='20')),axis=0)
 
 ax6d = plt.subplot2grid((3,3),(1,0),sharex=ax6a,sharey=ax6a)
-ax6d.set_ylabel('PAI',fontsize=axis_size)
-ax6d.annotate('d - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax6d.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[0])
+ax6d.set_ylabel('')
+ax6d.set_xlabel('')
+ax6d.set_ylabel('PAI',fontsize=axis_size)
 
 ax6e = plt.subplot2grid((3,3),(1,1),sharex=ax6a,sharey=ax6a)
 ax6e.set_title('Point density = 20 pts m$^{-2}$', fontsize=10)
-ax6e.annotate('e - rad. trans. (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax6e.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_rad1',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[1])
+ax6e.set_ylabel('')
+ax6e.set_xlabel('')
 
 ax6f = plt.subplot2grid((3,3),(1,2),sharex=ax6a,sharey=ax6a)
-ax6f.annotate('f - rad. trans (modified)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax6f.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_rad2',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[2])
+ax6f.set_ylabel('')
+ax6f.set_xlabel('')
 
 
 # row three of matrix - point density is 40 pts m-2
 mask = np.all(((df['plot']==plot_name[pp]),(df['point density']=='40')),axis=0)
 
 ax6g = plt.subplot2grid((3,3),(2,0),sharex=ax6a,sharey=ax6a)
-ax6g.set_ylabel('PAI',fontsize=axis_size)
-ax6g.annotate('g - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax6g.annotate('g', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[0])
+ax6g.set_ylabel('')
+ax6g.set_xlabel('')
+ax6g.set_ylabel('PAI',fontsize=axis_size)
 
 ax6h = plt.subplot2grid((3,3),(2,1),sharex=ax6a,sharey=ax6a)
 ax6h.set_title('Point density = 40 pts m$^{-2}$', fontsize=10)
-ax6h.annotate('h - rad. trans. (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax6h.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_rad1',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[1])
+ax6h.set_ylabel('')
+ax6h.set_xlabel('')
 
 ax6i = plt.subplot2grid((3,3),(2,2),sharex=ax6a,sharey=ax6a)
-ax6i.annotate('i - rad. trans (modified)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+ax6i.annotate('i', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
 sns.violinplot(x='resolution',y='PAI_rad2',data=df[mask],inner=None,linewidth=0.5,scale='width',color=colour[2])
+ax6i.set_ylabel('')
+ax6i.set_xlabel('')
 
-xticklabels = ax6a.get_xticklabels() + ax6b.get_xticklabels() + ax6c.get_xticklabels() + ax6d.get_xticklabels() + ax6e.get_xticklabels() + ax6f.get_xticklabels()
-
-yticklabels = ax6h.get_yticklabels() + ax6b.get_yticklabels() + ax6c.get_yticklabels() + ax6i.get_yticklabels() + ax6e.get_yticklabels() + ax6f.get_yticklabels()
-
-#plt.setp(xticklabels,visible=False)
-plt.setp(yticklabels,visible=False)
-plt.subplots_adjust(wspace = 0.4,hspace=0.2)
+ax6a.set_xlim(xmax=14)
+plt.subplots_adjust(wspace = 0.2,hspace=0.4)
 plt.savefig('PAI_sensitivity_revised.png')
 
 plt.show()

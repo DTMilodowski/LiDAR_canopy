@@ -75,10 +75,10 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     colour = ['#46E900','#1A2BCE','#E0007F']
     rgb = [[70,233,0],[26,43,206],[224,0,127]]
     labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
-    
+
     # first up, going to need to find affine transformation to rotate the point cloud for
     # easy plotting
-    
+
     # The GPS coordinates for the plot locations can be used to find this transformation matrix
     datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32','f16','f16','f16','f16')}
     plot_coords = np.genfromtxt(gps_pts_file, delimiter = ',',dtype=datatype)
@@ -89,14 +89,14 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     plot_coords['plot'][plot_coords['plot']=='B_north'] = 'B North'
     plot_coords['plot'][plot_coords['plot']=='B_south'] = 'B South'
     plot_coords['plot'][plot_coords['plot']=='LFE'] = 'LF'
-    
+
     affine = {}
     fig1_plots = ['Belian', 'Seraya','LF','E', 'B North', 'B South']
     Plots =      ['Belian', 'Seraya','LF','E', 'B North', 'B South']
     N_plots = len(fig1_plots)
 
     plot_point_cloud_display = {}
-    
+
     for pp in range(0, N_plots):
         # first get points for a given plot and build matrices - note that I've reversed xy and xy_prime in this case to reverse the rotation-translation
         mask = plot_coords['plot']==fig1_plots[pp]
@@ -105,10 +105,10 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
         x_prime = plot_coords['x'][mask]
         y_prime = plot_coords['y'][mask]
         affine[Plots[pp]]=lstsq.least_squares_affine_matrix(x,y,x_prime,y_prime)
-        
+
         Xi = np.asarray([plot_point_cloud[Plots[pp]][:,0],plot_point_cloud[Plots[pp]][:,1],np.ones(plot_point_cloud[Plots[pp]].shape[0])])
         Xi_prime = np.dot(affine[Plots[pp]],Xi)
-        
+
         plot_point_cloud_display[Plots[pp]] = plot_point_cloud[Plots[pp]].copy()
         plot_point_cloud_display[Plots[pp]][:,0]=Xi_prime[0]
         plot_point_cloud_display[Plots[pp]][:,1]=Xi_prime[1]
@@ -120,54 +120,54 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
-    
+
     # Seraya
     ax1b = plt.subplot2grid((6,7),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1b.annotate('b - Old growth, MLA02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1b.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
-    
+
     # LF
     ax1c = plt.subplot2grid((6,7),(2,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1c.annotate('c - Moderately logged, SAF04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1c.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
-    
+
     # E
     ax1d = plt.subplot2grid((6,7),(3,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1d.annotate('d - Moderately logged, SAF05', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1d.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
-    
+
     # B North
     ax1e = plt.subplot2grid((6,7),(4,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1e.annotate('e - Heavily logged, SAF02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1e.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
-    
+
     # B South
     ax1f = plt.subplot2grid((6,7),(5,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1f.annotate('f - Heavily logged, SAF01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1f.set_ylabel('Height / m',fontsize=axis_size)
     ax1f.set_xlabel('Horizontal distance / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
-    
+
     axes = [ax1a, ax1b, ax1c, ax1d, ax1e, ax1f]
     for pp in range(0,6):
         plot_lidar_pts = plot_point_cloud_display[fig1_plots[pp]]
         for k in range(0,max_return):
-            
+
             mask = np.all((plot_lidar_pts[:,0]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,1]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,3]==k+1),axis=0)
             points_x = 100-plot_lidar_pts[mask][:,0]
             points_z = plot_lidar_pts[mask][:,2]
             points_y = plot_lidar_pts[mask][:,1]
-            
+
             alpha_max = 0.1
             colours = np.zeros((points_x.size,4))
             colours[:,0]=rgb[k][0]/255.
             colours[:,1]=rgb[k][1]/255.
             colours[:,2]=rgb[k][2]/255.
-            
+
             colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
             axes[pp].scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=1)
             axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=1,label=labels[k])
@@ -236,24 +236,24 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     ax6f = plt.subplot2grid((6,7),(5,6),sharey=ax1a,sharex=ax3a)
     ax6f.set_xlabel('Crown Volume\n(m$^3$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
 
-    axes1 = [ax2a,  ax2b, ax2c, ax2d, ax2e, ax2f] 
-    axes2 = [ax3a,  ax3b, ax3c, ax3d, ax3e, ax3f] 
-    axes3 =  [ax4a,  ax4b, ax4c, ax4d, ax4e, ax4f] 
-    axes4 = [ax5a,  ax5b, ax5c, ax5d, ax5e, ax5f] 
+    axes1 = [ax2a,  ax2b, ax2c, ax2d, ax2e, ax2f]
+    axes2 = [ax3a,  ax3b, ax3c, ax3d, ax3e, ax3f]
+    axes3 =  [ax4a,  ax4b, ax4c, ax4d, ax4e, ax4f]
+    axes4 = [ax5a,  ax5b, ax5c, ax5d, ax5e, ax5f]
     axes5 = [ax6a,  ax6b, ax6c, ax6d, ax6e, ax6f]
 
     yticklabels=[]
     xticklabels=[]
     xticklabels.append(ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xticklabels() + ax1d.get_xticklabels() + ax1e.get_xticklabels())
-    
+
     for pp in range(0,6):
         Plot_name = fig1_plots[pp]
-        
+
         # plot lidar profile
         return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
         for k in range(0,max_return):
             axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1)
-            
+
             # plot macarthur horn profile
             for i in range(0,n_subplots):
                 axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
@@ -262,7 +262,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
             for i in range(0,n_subplots):
                 axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
             axes3[pp].plot(radiative_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
-                    
+
             # plot corrective radiative transfer profile
             for i in range(0,n_subplots):
                 axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
@@ -279,7 +279,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
         yticklabels.append(axes3[pp].get_yticklabels())
         yticklabels.append(axes4[pp].get_yticklabels())
         yticklabels.append(axes5[pp].get_yticklabels())
-            
+
         if pp < 5:
             xticklabels.append(axes1[pp].get_xticklabels())
             xticklabels.append(axes2[pp].get_xticklabels())
@@ -306,7 +306,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     plt.savefig(figure_name)
     plt.show()
     return 0
-    
+
 #=======================================================================================
 # Compare LiDAR approaches
 def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1):
@@ -334,15 +334,15 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_
         rad3_DTM_20m[pp,:]=np.nansum(radiative_DTM_LAD[Plots[pp]][:,:,2],axis=1)*layer_thickness
         print rad2_DTM_20m[pp].astype('int')
         print mh_20m[pp]
-        
+
         mh_1ha[pp] = np.nansum(MacArthurHorn_LAD_mean[Plots[pp]])*layer_thickness
         rad2_1ha[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,1])*layer_thickness
         rad3_1ha[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,2])*layer_thickness
         rad2_DTM_1ha[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,1])*layer_thickness
         rad3_DTM_1ha[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,2])*layer_thickness
-        print rad2_DTM_1ha[pp]  
-        print mh_1ha[pp]      
-        
+        print rad2_DTM_1ha[pp]
+        print mh_1ha[pp]
+
     # annotate with stats
     r_sq_a = [aux.get_rsquared_annotation(mh_1ha,rad2_1ha), aux.get_rsquared_annotation(mh_1ha,rad3_1ha)]
     r_sq_b = [aux.get_rsquared_annotation(mh_1ha,rad2_DTM_1ha), aux.get_rsquared_annotation(mh_1ha,rad3_DTM_1ha)]
@@ -353,7 +353,7 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_
     ax1.set_ylabel('PAI$_{rad}$',fontsize=axis_size)
     ax1.annotate('a - radiative transfer (Detto)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1.annotate('$k_{max}=2$; ' + r_sq_a[0] + '\n$k_{max}=3$; ' + r_sq_a[1], xy=(0.95,0.90), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=10)
-    
+
     ax1.plot([0,20],[0,20],'--',color='black',alpha=0.3)
     ax1.plot(mh_20m,rad2_20m,'.',color=colour[1],alpha=0.5)
     ax1.plot(mh_20m,rad3_20m,'.',color=colour[2],alpha=0.5)
@@ -363,7 +363,7 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_
     ax1.errorbar(mh_1ha,rad2_1ha,xerr=x_err,yerr=y_err,marker='o',linestyle='None',color=colour[1])
     y_err=np.std(rad3_20m,axis=1)/np.sqrt(n_subplots)
     ax1.errorbar(mh_1ha,rad3_1ha,xerr=x_err,yerr=y_err,marker='o',linestyle='None',color=colour[2])
-    
+
     ax2 = plt.subplot2grid((1,2),(0,1), sharex = ax1, sharey = ax1)
     ax2.set_xlabel('PAI$_{MacArthur-Horn}$',fontsize=axis_size)
     ax2.set_ylabel('PAI$_{rad}$',fontsize=axis_size)
@@ -414,7 +414,7 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
         rad3[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,2])*layer_thickness
         radDTM2[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,1])*layer_thickness
         radDTM3[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,2])*layer_thickness
-    
+
     # annotate with stats
     r_sq_a =   aux.get_rsquared_annotation(vol,mh)
     r_sq_b = [aux.get_rsquared_annotation(vol,rad2),aux.get_rsquared_annotation(vol,rad3)]
@@ -450,17 +450,17 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
         for i in range(0,N_plots):
             ax2.plot(inventory_LAI[Plots[i]],radiative_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
     """
-    
+
     m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = linear_regression(vol,rad2,conf=0.95)
     ax2.fill_between(x_i,CI_l,CI_u,color='0.75')
     ax2.plot(x_i,y_i,'-',color='black')
-    
+
     for k in range(1,3):
         for i in range(0,N_plots):
             x_err=np.nan#np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
             y_err=np.nan#np.std(radiative_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
             if i==0:
-                leg_label = '$k_{max}=$' + str(k+1) 
+                leg_label = '$k_{max}=$' + str(k+1)
                 #ax2.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
                 ax2.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_LAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
             else:
@@ -477,23 +477,23 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
         for i in range(0,N_plots):
             ax3.plot(inventory_LAI[Plots[i]],radiative_DTM_LAI[Plots[i]][:,k],'.',color=colour[k],alpha=0.5)
     """
-    
+
     m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = linear_regression(vol,radDTM2,conf=0.95)
     ax3.fill_between(x_i,CI_l,CI_u,color='0.75')
     ax3.plot(x_i,y_i,'-',color='black')
-    
+
     for k in range(1,3):
         for i in range(0,N_plots):
             x_err=np.nan#np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
             y_err=np.nan#np.std(radiative_DTM_LAI[Plots[i]][:,k])/np.sqrt(n_subplots)
             if i==0:
-                leg_label = '$k_{max}=$' + str(k+1) 
+                leg_label = '$k_{max}=$' + str(k+1)
                 #ax3.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
                 ax3.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_DTM_LAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
             else:
                 #ax3.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
                 ax3.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_DTM_LAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k])
-                
+
     ax3.legend(loc=4)
 
     #ax1.set_ylim((0,20))
@@ -526,7 +526,7 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
         rad3[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,2])*layer_thickness
         radDTM2[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,1])*layer_thickness
         radDTM3[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,2])*layer_thickness
-    
+
     # annotate with stats
     r_sq_a =   aux.get_rsquared_annotation(BA,mh)
     r_sq_b = aux.get_rsquared_annotation(BA,radDTM3)
@@ -550,10 +550,10 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
     ax3.annotate(r_sq_b, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=axis_size)
     ax3.set_ylabel('PAI',fontsize=axis_size)
     ax3.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
-    
+
     m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = linear_regression(BA,radDTM3,conf=0.95)
     ax3.fill_between(x_i,CI_l,CI_u,color='0.75')
-    ax3.plot(x_i,y_i,'-',color='black')                                                          
+    ax3.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
         ax3.plot(BA[i],radDTM3[i],marker=plot_marker[Plots[i]],markerfacecolor=plot_colour[Plots[i]],linestyle='None')
 
@@ -568,14 +568,14 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
 
 # Location map
 def plot_location_map(figure_name,figure_number):
-    
+
     # create simple colourmap
     cmap_colours = [(1.0,  1.0, 1.0),(170./256.,229./256.,156./256.)]
     cbins= 100
     cmap_name = 'w_gn'
     white_green = LinearSegmentedColormap.from_list(cmap_name, cmap_colours,N=cbins)
 
-    #loc_cb = plticker.MultipleLocator(base=0.2) 
+    #loc_cb = plticker.MultipleLocator(base=0.2)
     """
     GFW_file = '/disk/scratch/local.2/dmilodow/GFW/Hansen_GFC2015_treecover2000_10N_110E_resampled.tif'
     mask_file = '/disk/scratch/local.2/dmilodow/GFW/Hansen_GFC2015_datamask_10N_110E_resampled.tif'
@@ -643,7 +643,7 @@ def plot_location_map(figure_name,figure_number):
         else:
             col=colour[1]
         m.ax.plot(point[0], point[1], marker='o', color=col, markersize=15)
-    
+
     # colorbar bits and bobs
     divider = make_axes_locatable(ax1)
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -662,7 +662,7 @@ def plot_location_map(figure_name,figure_number):
     plt.tight_layout()
     plt.savefig(figure_name)
     #plt.show()
-        
+
     return 0
 
 
@@ -670,7 +670,7 @@ def plot_location_map(figure_name,figure_number):
 def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
 
     # Process the profiles
-    
+
     # 2 columns (plotting MacHorn on x axis, multi return on y axis)
     # 3 rows (old growth, moderately logged, heavily logged)
     fig = plt.figure(figure_number, facecolor='White',figsize=[6,9])
@@ -681,7 +681,7 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
     y1=np.cumsum(radiative_LAD_mean[Plot_name][:-3,1])
     y2=np.cumsum(radiative_DTM_LAD_mean[Plot_name][:-3,1])
     t=heights[2:][::-1]
-    ax1 = plt.subplot2grid((3,2),(0,0))    
+    ax1 = plt.subplot2grid((3,2),(0,0))
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
         ax1.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
@@ -701,11 +701,11 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
     ax3 = plt.subplot2grid((3,2),(1,0),sharex=ax1,sharey=ax1)
     ax3.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax3.set_ylabel('cumulative PAD$_{rad trans (Detto)}$ (m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
-    
+
     for i in range(0,n_subplots):
         ax3.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
     plot_colourline(ax3,x,y1,t,linewidth=5,cmap='plasma')
-    
+
     ax4 = plt.subplot2grid((3,2),(1,1),sharex=ax1,sharey=ax1)
     ax4.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax4.set_ylabel('cumulative PAD$_{rad trans (new)}$ (m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
@@ -715,7 +715,7 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
 
     for i in range(0,n_subplots):
         ax4.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_DTM_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
-    
+
     plot_colourline(ax4,x,y2,t,linewidth=5,cmap='plasma')
 
     # Finally heavily logged forest
@@ -723,19 +723,19 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
     x=np.cumsum(MacArthurHorn_LAD_mean[Plot_name][2:][::-1])
     y1=np.cumsum(radiative_LAD_mean[Plot_name][:-3,1])
     y2=np.cumsum(radiative_DTM_LAD_mean[Plot_name][:-3,1])
-    ax5 = plt.subplot2grid((3,2),(2,0),sharex=ax1,sharey=ax1)    
+    ax5 = plt.subplot2grid((3,2),(2,0),sharex=ax1,sharey=ax1)
     ax5.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
-    
+
     for i in range(0,n_subplots):
         ax5.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
     plot_colourline(ax5,x,y1,t,linewidth=5,cmap='plasma')
-    
+
     ax6 = plt.subplot2grid((3,2),(2,1),sharex=ax1,sharey=ax1)
     ax6.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
 
     for i in range(0,n_subplots):
         ax6.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_DTM_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
-        
+
     plot_colourline(ax6,x,y2,t,linewidth=5,cmap='plasma')
 
     # tidy up tick labels
@@ -758,20 +758,20 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
     # plot colorbar in ax1
     cmap = cmaps.plasma
     norm = colors.Normalize(vmin=0., vmax=80.)
-    cbaxes = inset_axes(ax1, width="5%", height="50%", loc=6) 
+    cbaxes = inset_axes(ax1, width="5%", height="50%", loc=6)
     cbar= colorbar.ColorbarBase(cbaxes, cmap=cmap,norm=norm, ticks=[0.,40.,80.], orientation='vertical')
     cbar.set_label('Height (m)')
     plt.tight_layout()
     plt.show()
-    
-    
+
+
     return 0
 
 
 # Plot canopy residuals
 
 def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,max_return=2):
-    
+
     # 2 columns (plotting MacHorn on x axis, multi return on y axis)
     # 3 rows (old growth, moderately logged, heavily logged)
     fig = plt.figure(figure_number, facecolor='White',figsize=[6,9])
@@ -785,7 +785,7 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     x1=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     x2=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
 
-    ax1 = plt.subplot2grid((3,2),(0,0))    
+    ax1 = plt.subplot2grid((3,2),(0,0))
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
         ax1.plot((radiative_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
@@ -810,11 +810,11 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     ax3 = plt.subplot2grid((3,2),(1,0),sharex=ax1,sharey=ax1)
     ax3.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax3.set_ylabel('height (m)',fontsize=axis_size)
-    
+
     for i in range(0,n_subplots):
         ax3.plot((radiative_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax3.plot(x1-x,y,linewidth=2,color='k')
-    
+
     ax4 = plt.subplot2grid((3,2),(1,1),sharex=ax1,sharey=ax1)
     ax4.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax4.set_ylabel('height (m))',fontsize=axis_size)
@@ -834,20 +834,20 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
     x1=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     x2=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
-    ax5 = plt.subplot2grid((3,2),(2,0),sharex=ax1,sharey=ax1)    
+    ax5 = plt.subplot2grid((3,2),(2,0),sharex=ax1,sharey=ax1)
     ax5.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax5.set_xlabel('PAD$_{rad trans-Detto}$-PAD$_{MacArthur-Horn}$\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
-    
+
     for i in range(0,n_subplots):
         ax5.plot((radiative_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax5.plot(x1-x,y,linewidth=2,color='k')
-    
+
     ax6 = plt.subplot2grid((3,2),(2,1),sharex=ax1,sharey=ax1)
     ax6.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax6.set_xlabel('PAD$_{rad trans-new}$-PAD$_{MacArthur-Horn}$\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
     ax6.yaxis.tick_right()
     ax6.yaxis.set_ticks_position('both')
-    
+
     for i in range(0,n_subplots):
         ax6.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax6.plot(x2-x,y,linewidth=2,color='k')
@@ -858,8 +858,8 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
 
     plt.tight_layout()
     plt.show()
-    
-    
+
+
 # plot PAD-volume ratios
 def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD,max_return=2):
     fig = plt.figure(figure_number, facecolor='White',figsize=[8,9])
@@ -874,7 +874,7 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
     x2=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     x3=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
 
-    ax1 = plt.subplot2grid((3,3),(0,0))    
+    ax1 = plt.subplot2grid((3,3),(0,0))
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax1.plot(np.log10(x1/x),y,linewidth=2,color='k')
 
@@ -887,7 +887,7 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
     ax3.yaxis.tick_right()
     ax3.yaxis.set_ticks_position('both')
     ax3.plot(np.log10(x2/x),y,linewidth=2,color='k')
-    
+
     # Next up - Moderately logged forest
     Plot_name='E'
     ids = np.arange(heights.size)
@@ -902,7 +902,7 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
     ax4.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax4.set_ylabel('height (m)',fontsize=axis_size)
     ax4.plot(np.log10(x1/x),y,linewidth=2,color='k')
-    
+
     ax5 = plt.subplot2grid((3,3),(1,1),sharex=ax1,sharey=ax1)
     ax5.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax5.plot(np.log10(x2/x),y,linewidth=2,color='k')
@@ -925,16 +925,16 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
     x2=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     x3=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
 
-    ax7 = plt.subplot2grid((3,3),(2,0),sharex=ax1,sharey=ax1)    
+    ax7 = plt.subplot2grid((3,3),(2,0),sharex=ax1,sharey=ax1)
     ax7.annotate('g', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax7.set_xlabel('PAD$_{rad trans-Detto}$-PAD$_{MacArthur-Horn}$\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
     ax7.plot(np.log10(x1/x),y,linewidth=2,color='k')
-    
+
     ax8 = plt.subplot2grid((3,3),(2,1),sharex=ax1,sharey=ax1)
     ax8.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax8.set_xlabel('PAD$_{rad trans-new}$-PAD$_{MacArthur-Horn}$\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
     ax8.plot(np.log10(x2/x),y,linewidth=2,color='k')
-    
+
     ax9 = plt.subplot2grid((3,3),(2,2),sharex=ax1,sharey=ax1)
     ax9.annotate('i', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax9.set_xlabel('PAD$_{rad trans-new}$-PAD$_{MacArthur-Horn}$\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
@@ -948,77 +948,86 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
 
     plt.tight_layout()
     plt.show()
-    
+
 # Plot allometric relationships
 # Plot three subplots defining the relationships used to construct the canopy profiles
-def plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file):
+def plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file,niter=10000):
 
-    DBH_BAAD, H_BAAD, D_BAAD = field.load_BAAD_crown_allometry_data(allometry_file)
+    #DBH_BAAD, H_BAAD, D_BAAD = field.load_BAAD_crown_allometry_data(allometry_file)
+    BAAD = field.load_BAAD_allometry_data(allometry_file,filter_dbh=True,filter_status='None')
+    H_BAAD = BAAD['ht']
+    D_BAAD = BAAD['cd']
     a, b, CF, r_sq, p, H_, PI_u, PI_l = field.log_log_linear_regression(H_BAAD,D_BAAD,conf=0.90)
-    
+
     field_data = field.load_crown_survey_data(field_file)
     a_Ht, b_Ht, CF_Ht, r_sq_Ht, p_Ht, DBH_Ht, PI_u_Ht, PI_l_Ht = field.log_log_linear_regression(field_data['DBH_field'],field_data['Height_field'],conf=0.90)
-    
+
     a_A, b_A, CF_A, r_sq_A, p_A, DBH_A, PI_u_A, PI_l_A = field.log_log_linear_regression(field_data['DBH_field'],field_data['CrownArea'],conf=0.90)
 
-    PI_25_D,PI_75_D = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(H_,H_BAAD,D_BAAD,conf=0.5,niter=10000)
-    PI_05_D,PI_95_D = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(H_,H_BAAD,D_BAAD,conf=0.9,niter=10000)
+    PI_25_D,PI_75_D = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(H_,H_BAAD,D_BAAD,conf=0.5,niter=niter)
+    PI_05_D,PI_95_D = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(H_,H_BAAD,D_BAAD,conf=0.9,niter=niter)
 
     mask = np.all((np.isfinite(field_data['DBH_field']),np.isfinite(field_data['CrownArea'])),axis=0)
-    PI_25_A,PI_75_A = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(DBH_A,field_data['DBH_field'][mask],field_data['CrownArea'][mask],conf=0.5,niter=10000)
-    PI_05_A,PI_95_A = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(DBH_A,field_data['DBH_field'][mask],field_data['CrownArea'][mask],conf=0.9,niter=10000)
-    
+    PI_25_A,PI_75_A = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(DBH_A,field_data['DBH_field'][mask],field_data['CrownArea'][mask],conf=0.5,niter=niter)
+    PI_05_A,PI_95_A = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(DBH_A,field_data['DBH_field'][mask],field_data['CrownArea'][mask],conf=0.9,niter=niter)
+
     mask = np.all((np.isfinite(field_data['DBH_field']),np.isfinite(field_data['Height_field'])),axis=0)
-    PI_25_H,PI_75_H = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(DBH_Ht,field_data['DBH_field'][mask],field_data['Height_field'][mask],conf=0.5,niter=10000)
-    PI_05_H,PI_95_H = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(DBH_Ht,field_data['DBH_field'][mask],field_data['Height_field'][mask],conf=0.9,niter=10000)
-    
+    PI_25_H,PI_75_H = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(DBH_Ht,field_data['DBH_field'][mask],field_data['Height_field'][mask],conf=0.5,niter=niter)
+    PI_05_H,PI_95_H = field.calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(DBH_Ht,field_data['DBH_field'][mask],field_data['Height_field'][mask],conf=0.9,niter=niter)
+
     D_ = CF*a*H_**b
     CA_ = CF_A*a_A*DBH_A**b_A
     Ht_ = CF_Ht*a_Ht*DBH_Ht**b_Ht
-    
+
     plt.figure(figure_number,facecolor='White',figsize=[9,3])
     ax1 = plt.subplot2grid((1,3),(0,0))
     ax1.set_ylabel('Crown Depth / m')
-    ax1.set_xlabel('Height / cm')
+    ax1.set_xlabel('Height / m')
     ax1.annotate('a - Height-Crown Depth', xy=(0.08,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    
+
     ax1.fill_between(H_,PI_05_D,PI_95_D,color='0.95')
     ax1.fill_between(H_,PI_25_D,PI_75_D,color='0.85')
     ax1.plot(H_BAAD,D_BAAD,'.',color='#1A2BCE',alpha=0.2)
     ax1.plot(H_,D_,'-',color='black')
-    
+
     eq = '$D=%.2fH^{%.2f}$\n$r^2=%.2f$' % (CF*a, b,r_sq)
     ax1.annotate(eq, xy=(0.08,0.85), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    
+
     ax2 = plt.subplot2grid((1,3),(0,1))
     ax2.annotate('b - DBH-Crown Area', xy=(0.08,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax2.set_xlabel('DBH / cm')
     ax2.set_ylabel('Crown Area / m$^2$')
 
     ax2.fill_between(DBH_A,PI_05_A,PI_95_A,color='0.95')
-    ax2.fill_between(DBH_A,PI_25_A,PI_75_A,color='0.85')    
+    ax2.fill_between(DBH_A,PI_25_A,PI_75_A,color='0.85')
     ax2.plot(field_data['DBH_field'],field_data['CrownArea'],'.',color='#1A2BCE',alpha=0.2)
     ax2.plot(DBH_A,CA_,'-',color='black')
-    
+
     eq = '$A=%.2fDBH^{%.2f}$\n$r^2=%.2f$' % (CF_A*a_A, b_A,r_sq_A)
     ax2.annotate(eq, xy=(0.08,0.85), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax2.axvspan(0,10,color='0.8')
-    
+
     ax3 = plt.subplot2grid((1,3),(0,2))#,sharex=ax3b)
     ax3.annotate('c - DBH-Height', xy=(0.08,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax3.set_xlabel('DBH / cm')
     ax3.set_ylabel('Height / m')
 
     ax3.fill_between(DBH_Ht,PI_05_H,PI_95_H,color='0.95')
-    ax3.fill_between(DBH_Ht,PI_25_H,PI_75_H,color='0.85')    
+    ax3.fill_between(DBH_Ht,PI_25_H,PI_75_H,color='0.85')
     ax3.plot(field_data['DBH_field'],field_data['Height_field'],'.',color='#1A2BCE',alpha=0.2)
     ax3.plot(DBH_Ht,Ht_,'-',color='black')
-    
+
     eq = '$H=%.2fDBH^{%.2f}$\n$r^2=%.2f$' % (CF_Ht*a_Ht, b_Ht,r_sq_Ht)
     ax3.annotate(eq, xy=(0.08,0.85), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax3.axvspan(0,10,color='0.8')
 
-
+    ax1.set_xlim(xmin=0)
+    ax2.set_xlim(xmin=0)
+    ax3.set_xlim(xmin=0)
+    ax1.set_ylim(ymin=0)
+    ax2.set_ylim(ymin=0)
+    ax3.set_ylim(ymin=0)
     plt.tight_layout()
+    plt.savefig(figure_name)
     plt.show()
     return 0

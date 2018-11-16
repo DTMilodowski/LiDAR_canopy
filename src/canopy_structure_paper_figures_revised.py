@@ -2,7 +2,7 @@
 # This driver function analyses both LiDAR data and field inventory data to produce independent estimates of
 # canopy structure.  These are compared against each other and their integrated LAD is compared against LAI
 # estimates from hemispherical photographs.
-############################################################################################################### 
+###############################################################################################################
 import numpy as np
 import sys
 from matplotlib import pyplot as plt
@@ -128,7 +128,7 @@ for pp in range(0,N_plots):
     n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
     coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
     bbox_polygon = aux.get_bounding_box(coord_pairs)
-    #plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon,filter_by_first_return_location=True)    
+    #plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon,filter_by_first_return_location=True)
     #plot_point_cloud[Plots[pp]]=plot_lidar_pts.copy()
     plot_lidar_pts=plot_point_cloud[Plots[pp]]
     print "canopy height = ", np.percentile(plot_lidar_pts[plot_lidar_pts[:,3]==1,2],99), "m"
@@ -159,7 +159,7 @@ for pp in range(0,N_plots):
     # set up some arrays to host the MacArthur-Horn profiles
     #heights = np.arange(0,max_height)+1
     LAD_MH = np.zeros((n_subplots, heights.size))
-    
+
     # set up array to host the lidar return profiles
     lidar_return_profiles = np.zeros((n_subplots, heights_rad.size, max_return))
     lidar_return_profiles_adj = np.zeros((n_subplots, heights_rad.size, max_return))
@@ -206,7 +206,7 @@ for pp in range(0,N_plots):
     LAD_MH_mean = np.nansum(LAD_MH,axis=0)/(np.sum(np.isfinite(LAD_MH),axis=0)).astype('float')
     LAD_rad_mean = np.nansum(LAD_rad,axis=0)/(np.sum(np.isfinite(LAD_rad),axis=0)).astype('float')
     LAD_rad_DTM_mean = np.nansum(LAD_rad_DTM,axis=0)/(np.sum(np.isfinite(LAD_rad_DTM),axis=0)).astype('float')
-    
+
     # CLEANING AND STORING
     # now we have looped through and created the different profiles, need to account for any NaN's and apply minimum height
     # to the LAD distributions
@@ -228,7 +228,7 @@ for pp in range(0,N_plots):
     lidar_profiles[Plot_name] = lidar_return_profiles.copy()
     lidar_profiles_adjusted[Plot_name] = lidar_return_profiles_adj.copy()
     penetration_limit[Plot_name] = penetration_lim.copy()
-    
+
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
     radiative_LAD[Plot_name] = LAD_rad.copy()
     radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
@@ -287,7 +287,7 @@ for pp in range(0,N_plots):
     Zmax = Depth
     Rmax = np.sqrt(Area/np.pi)
     beta_list = np.ones(x0.size)*beta
-    crown_model = field.generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta_list)
+    #crown_model = field.generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta_list)
 
     #condense into vertical profile
     field_LAD_profile = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
@@ -321,17 +321,20 @@ n_iter = 1000
 for pp in range(0,N_plots):
     print Plots[pp]
     Plot_name=Plots[pp]
-    n_subplots = subplot_polygons[Plot_name].shape[0]
+    #n_subplots = subplot_polygons[Plot_name].shape[0]
     # set up array to host inventory profiles
-    #field_LAD_profiles = np.zeros((n_iter,heights.size))
+    field_LAD_profiles = np.zeros((n_iter,heights.size))
 
     # mask out dead and broken trees
     dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,field_data['dead_flag3']==-1),axis=0)
     brokenlive_mask = field_data['brokenlive_flag']==-1
     mask = np.all((field_data['plot']==Plot_name,np.isfinite(field_data['DBH_field']),dead_mask,brokenlive_mask),axis=0)
 
-    Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-    #field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
+    Ht = field_data['Height_field'][mask]
+    DBH = field_data['DBH_field'][mask]
+    Area = field_data['CrownArea'][mask]
+    x0 = field_data['Xfield'][mask]
+    y0 = field_data['Yfield'][mask]
 
     # now building the canopy model
     buff = 20
@@ -343,39 +346,47 @@ for pp in range(0,N_plots):
     y = np.arange(ymin-buff,ymax+buff,1.)+0.5
     z = np.arange(0,80.,1.)+0.5
     z=z[::-1]
-    x0 = field_data['Xfield'][mask]
-    y0 = field_data['Yfield'][mask]
-    Z0 = 80 - Ht
-    Zmax = Depth
-    Rmax = np.sqrt(Area)
-    beta = np.ones(x0.size)*0.6
-    crown_model = field.generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta)
-    
+
+
+
     # ITERATE MONTE-CARLO PROCEDURE
     #------------------------------------------------------------------------------------
     for ii in range(0,n_iter):
-        # now get field inventory estimate - remove dead trees and broken live trees with no crown
+        print ii
+        # now get field inventory estimate
         # Note that we only deal with the 1ha plot level estimates as errors relating stem based
         # vs. area based are problematic at subplot level
-        Ht,Area,Depth = field.calculate_crown_dimensions_mc(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], DBH_BAAD, H_BAAD,D_BAAD, a_ht, b_ht, a_A, b_A, a, b)
-        
-        field_LAD_profiles[ii,:], CanopyV = field.calculate_LAD_profiles_generic_mc(heights, Area, Depth, Ht, beta_min,beta_max, subplot_area*25)
+        Ht[np.isnan(Ht)] = field.random_sample_from_powerlaw_prediction_interval(DBH[np.isnan(Ht)],field_data['DBH_field'],field_data['Height_field'],a_ht,b_ht,array=True)
+        Area[np.isnan(Area)] = field.random_sample_from_powerlaw_prediction_interval(DBH[np.isnan(Area)],field_data['DBH_field'],field_data['CrownArea'],a_A,b_A,array=True)
+        Depth= field.random_sample_from_powerlaw_prediction_interval(DBH,DBH_BAAD,D_BAAD,a,b,array=True)
+        #Ht,Area,Depth = field.calculate_crown_dimensions_mc(field_data['DBH_field'],field_data['Height_field'],field_data['CrownArea'], mask, DBH_BAAD, H_BAAD,D_BAAD, a_ht, b_ht, a_A, b_A, a, b)
+
+        #Z0 = 80 - Ht
+        #Zmax = Depth
+        Rmax = np.sqrt(Area/np.pi)
+        #beta_list = np.random.random(x0.size)*(beta_max-beta_min)+beta_min
+        #crown_model = field.generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta_list)
+        crown_model = field.generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
+
+        field_LAD_profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
+
+        #field_LAD_profiles[ii,:], CanopyV = field.calculate_LAD_profiles_generic_mc(heights, Area, Depth, Ht, beta_min,beta_max, subplot_area*25)
 
         # add small stem contributions
         if Plot_name == 'DC1':
-            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions_mc(DC1_stem_data['dbh'].ravel(),DC1_stem_data['stem_density'].ravel(),a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC1_stem_data['dbh'].ravel(),DC1_stem_data['stem_density'].ravel(),a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
         elif Plot_name == 'DC2':
-            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions_mc(DC2_stem_data['dbh'].ravel(),DC2_stem_data['stem_density'].ravel(),a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC2_stem_data['dbh'].ravel(),DC2_stem_data['stem_density'].ravel(),a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
         else:
-            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions_mc(SAFE_stem_data[Plot_name]['dbh'].ravel(),SAFE_stem_data[Plot_name]['stem_density'].ravel(),a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(SAFE_stem_data[Plot_name]['dbh'].ravel(),SAFE_stem_data[Plot_name]['stem_density'].ravel(),a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
 
         smallstem_LAD_profile = field.calculate_LAD_profiles_from_stem_size_distributions(heights, Area, Depth, Ht, StemDensity, beta)
         field_LAD_profiles[ii,:]+=smallstem_LAD_profile
-    
+
         inventory_LAD[Plot_name] = np.mean(field_LAD_profiles,axis=0)
         inventory_LAD_std[Plot_name] = np.std(field_LAD_profiles,axis=0)
         inventory_LAI[Plot_name] = np.sum(field_LAD_profiles,axis=1)*layer_thickness
-"""    
+"""
 #----------------------------------------------------------------------------
 # NOW MAKE PLOTS
 # Figure 1 - Location map, with Hansen data and plot locations

@@ -10,16 +10,16 @@ from scipy import stats
 # Load spreadsheet of LAI derived from hemispherical photographs (courtesy of Terhi Riutta at Oxford).  LAI estimated using Hemisfer.
 def load_field_LAI(LAI_file):
     datatype = {'names': ('ForestType','Plot', 'Subplot', 'LAI'), 'formats': ('S32','S32','i8','f16')}
-    hemisfer_LAI = np.genfromtxt(LAI_file, skiprows = 1, delimiter = ',',dtype=datatype)
+    hemisfer_LAI = np.genfromtxt(LAI_file, skip_header = 1, delimiter = ',',dtype=datatype)
 
     return hemisfer_LAI
 
 # This function loads the subplot coordinates from a csv file.  File columns should be as follows:
 # Plot Subplot 'X0', 'Y0', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3'
 def load_boundaries(coordinate_list):
-    
+
     datatype = {'names': ('Plot', 'Subplot', 'X0', 'Y0', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3'), 'formats': ('S32','i8','f16','f16','f16','f16','f16','f16','f16','f16')}
-    coords = np.genfromtxt(coordinate_list, skiprows = 1, delimiter = ',',dtype=datatype)
+    coords = np.genfromtxt(coordinate_list, skip_header = 1, delimiter = ',',dtype=datatype)
     plot_name=np.unique(coords['Plot'])
     coordinate_dict = {}
     subplot_dict = {}
@@ -45,11 +45,11 @@ def load_boundaries(coordinate_list):
 
 # This function is similar to above but now will read an arbitrary number of vertices so that generic polygons can be used
 def load_generic_boundaries(coordinate_list):
-    
+
     f = open(coordinate_list,'r')
     lines=f.readlines()[0:]
     N = len(lines)
-    
+
     coordinate_dict = {}
     for i in range(1,N):
         line = lines[i].strip().split(",")
@@ -105,7 +105,7 @@ def get_bounding_box_with_buffer(coordinate_list,buffer_width):
 
 # write R-squared and p-value
 def get_rsquared_annotation(x,y):
-    
+
     m, c, r, p, err = stats.linregress(x,y)
     p_str = ''
     if  p <= 0.001:
@@ -116,7 +116,7 @@ def get_rsquared_annotation(x,y):
         p_str='*'
     elif p <= 0.1:
         p_str='$^.$'
-    
+
     annotation = '$R^2$ = %.3f' % r**2
     annotation = annotation + p_str
     return annotation

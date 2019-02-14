@@ -10,7 +10,7 @@ def oneD_least_squares_polynomial(x,y,order=1):
     Y = y[mask]
     ones = np.ones(Y.size)
     A=np.array([])
-    
+
     if order == 1:
         # coefficients returned should be in order a-b for:
         # z = ax + b
@@ -43,7 +43,7 @@ def twoD_least_squares_polynomial(x,y,z,order=1):
     Z = z[mask]
     ones = np.ones(Z.size)
     A=np.array([])
-    
+
     if order == 1:
         # coefficients returned should be in order a-f for:
         # z = ax + by + c
@@ -63,17 +63,17 @@ def twoD_least_squares_polynomial(x,y,z,order=1):
 # perform a least squares affine transformation to map a set of coordinates x,y to a transformed coordinate set x',y'.
 # input arguments:
 #   x -       the original x coordinate
-#   y -       the original y coordinate 
+#   y -       the original y coordinate
 #   x_prime - the target x coordinate
 #   y_prime - the target y coordinate
-#   shear   - a flag to determine whether points can be sheared in addition 
+#   shear   - a flag to determine whether points can be sheared in addition
 #             to rotation and translation (default is False)
 def least_squares_affine_matrix(x,y,x_prime,y_prime,shear=False):
     # first get points for a given plot and build matrices
     n_points = x.size
     A=np.zeros((2*n_points,6))
     b=np.zeros(2*n_points)
-    
+
     for ii in range(0,n_points):
         A[ii,0]=x[ii]
         A[ii,1]=y[ii]
@@ -88,9 +88,6 @@ def least_squares_affine_matrix(x,y,x_prime,y_prime,shear=False):
 
     # now perform least squares inversion to find parameters of the optimal 2D rotation-translation affine transformation
     h, res, rank, s = np.linalg.lstsq(A,b)
-    #print  '%.3f' % h[0], '\t%.3f' % h[1], '\t%.3f' % h[2]
-    #print  '%.3f' % h[3], '\t%.3f' % h[4], '\t%.3f' % h[5]
-    #print '0\t0\t1'
     # now construct the affine transformation matrix
     affine = np.zeros((3,3))
     affine[0,0]=h[0]
@@ -102,14 +99,14 @@ def least_squares_affine_matrix(x,y,x_prime,y_prime,shear=False):
     affine[2,0]=0
     affine[2,1]=0
     affine[2,2]=1
-        
+
     return affine
 
 
 # Apply affine transformation
 def apply_affine_transformation(x,y,affine):
-    
+
     X = np.asarray([x,y,np.ones(x.size)])
     X_prime = np.dot(affine,X)
-    
+
     return X_prime[0], X_prime[1]

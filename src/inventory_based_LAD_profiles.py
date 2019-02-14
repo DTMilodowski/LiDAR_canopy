@@ -965,16 +965,16 @@ def calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
     return field_LAD_profile,field_LAD_profile_std
 
 # second version adds measurement error. Errors are two part lists or arrays
-# indicating bias and random error (expressed as an estimated percentage)
+# indicating bias and random error (expressed as an estimated fraction)
 def calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,x0,y0,Ht_,DBH_,Area_,
                                         a_ht,b_ht,a_A,b_A,a_D,b_D,
                                         error,field_data,BAAD_data,n_iter=10):
     field_LAD_profiles = np.zeros((n_iter,z.size))
     for ii in range(0,n_iter):
         # combine random and systematic errors to the observations as fractions
-        err_Ht = (np.random.normal(scale = error['Ht'][1],size = Ht.size)+error['Ht'][0])/100.
-        err_DBH = (np.random.normal(scale = error['DBH'][1],size = DBH.size)+error['DBH'][0])/100.
-        err_Area = (np.random.normal(scale = error['Area'][1],size = Area.size)+error['Area'][0])/100.
+        err_Ht = (np.random.normal(scale = error['Ht'][1],size = Ht.size)+error['Ht'][0])
+        err_DBH = (np.random.normal(scale = error['DBH'][1],size = DBH.size)+error['DBH'][0])
+        err_Area = (np.random.normal(scale = error['Area'][1],size = Area.size)+error['Area'][0])
 
         # apply errors
         DBH = DBH_*(1+err_DBH)

@@ -131,7 +131,6 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
 def create_KDTree(pts,max_pts_per_tree = 10**6):
     npts = pts.shape[0]
     ntrees = int(np.ceil(npts/float(max_pts_per_tree)))
-    #print npts,ntrees, int(ntrees)
     trees = []
     starting_ids = []
 
@@ -174,7 +173,7 @@ def find_las_files_by_polygon(file_list,polygon,print_keep=False):
     if print_keep:
         print('las tiles to load in:', len(keep))
         for ll in range(0,len(keep)):
-            print keep[ll]
+            print(keep[ll])
     return keep
 
 # load all lidar points from multiple las files witin specified polygon.  The file list needs to have either the full or relative path to the files included.

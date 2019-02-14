@@ -33,8 +33,8 @@ datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32'
 plot_coordinates = np.genfromtxt(gps_pts_file, skip_header = 0, delimiter = ',',dtype=datatype)
 
 plot = 'Belian'
-plot = 'E'
-plot = 'B North'
+#plot = 'E'
+#plot = 'B North'
 
 max_height = 80.
 layer_thickness = 1.
@@ -134,11 +134,11 @@ temp_dic = None
 # now do the sensitivity analysis
 # Loop through all the target point densities
 for dd in range(0,target_points.size):
-    print 'target point density = ', target_point_density[dd]
+    print('target point density = ', target_point_density[dd])
     # iterate through all iterations, so that we sample point cloud minimum number of times
     for ii in range(0,n_iter):
         start_time = time.time()
-        print 'iteration ', ii+1,'/',n_iter, ' for point density ', dd+1,' of ', target_points.size
+        print('iteration ', ii+1,'/',n_iter, ' for point density ', dd+1,' of ', target_points.size)
         # subsample the point cloud - this is tricky because we are sampling with replacement, but for
         # every sample there could be up to kmax returns!  All these returns need to be pulled out so
         # that we are resampling by pulse, not point
@@ -159,12 +159,10 @@ for dd in range(0,target_points.size):
             vals, idx_start= np.unique(temp_shots, return_index=True)
             temp_shots = np.delete(temp_shots,idx_start)
         #-------------------
-
-        #print '\t\t', target_point_density[dd],'-' , pts_iter.shape[0]/100.**2 , count
         starting_ids, trees = io.create_KDTree(pts_iter)
         # loop through each sampling resolution
         for ss in range(0,sample_res.size):
-            print '\t - sample res = ', keys[ss]
+            print('\t - sample res = ', keys[ss])
             n_subplots = len(subplots[keys[ss]])
             # for each of the subplots, clip point cloud and model PAD and get the metrics
             for pp in range(0,n_subplots):
@@ -174,7 +172,7 @@ for dd in range(0,target_points.size):
                 centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
                 radius = np.sqrt(sample_res[ss]**2/2.)
                 ids = trees[0].query_ball_point([centre_x,centre_y], radius)
-                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp],filter_by_first_return_location=True)
+                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp],filter_by_first_return_location=False)
                 #------
                 if np.sum(sp_pts[:,3]==1)>0:
                     heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
@@ -193,9 +191,9 @@ for dd in range(0,target_points.size):
                     penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = 1.
 
         end_time = time.time()
-        print '\t loop time = ', end_time - start_time
+        print('\t loop time = ', end_time - start_time)
 
-np.save("MH_sensitivity_%s.npy" % plot, PAD_profiles_MH)
-np.save("rad1_sensitivity_%s.npy" % plot, PAD_profiles_rad1)
-np.save("rad2_sensitivity_%s.npy" % plot, PAD_profiles_rad2)
-np.save("penetration_limit_%s.npy" % plot, penetration_limit)
+np.save("MH_sensitivity_%s_test.npy" % plot, PAD_profiles_MH)
+np.save("rad1_sensitivity_%s_test.npy" % plot, PAD_profiles_rad1)
+np.save("rad2_sensitivity_%s_test.npy" % plot, PAD_profiles_rad2)
+np.save("penetration_limit_%s_test.npy" % plot, penetration_limit)

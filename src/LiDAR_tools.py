@@ -44,7 +44,7 @@ def points_in_poly(x,y,poly):
         p1x,p1y = p2x,p2y
 
     return x[inside],y[inside], inside
-        
+
 # This retrieves all points within circular neighbourhood,  Terget point is the location around which the neighbourhood search is conducted, for a specified search radius.  x and y are vectors with the x and y coordinates of the test points
 def points_in_radius(x,y,target_x, target_y,radius):
     inside=np.zeros(x.size,dtype=bool)
@@ -74,7 +74,7 @@ def filter_lidar_data_by_polygon(in_pts,polygon,filter_by_first_return_location 
             x,y,inside = points_in_poly(in_pts[:,0],in_pts[:,1],polygon)
         pts = in_pts[inside,:]
     else:
-        print "\t\t\t no points in polygon"
+        print("\t\t\t no points in polygon")
     return pts
 
 # filter lidar by circular neighbourhood
@@ -84,6 +84,5 @@ def filter_lidar_data_by_neighbourhood(in_pts,target_xy,radius):
         x,y,inside =  points_in_radius(in_pts[:,0],in_pts[:,1],target_xy[0],target_xy[1],radius)
         pts = in_pts[inside,:]
     else:
-        print "\t\t\t no points in neighbourhood"
+        print( "\t\t\t no points in neighbourhood")
     return pts
-

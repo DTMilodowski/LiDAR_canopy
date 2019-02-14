@@ -166,7 +166,7 @@ def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs
             if x_i.ndim > 1: # linearize multidimensional arrays
                 x_i=x_i.reshape(n)
         except TypeError:
-            print "Sorry, not a valid type for this function"
+            print("Sorry, not a valid type for this function")
 
     y_i = np.zeros((n,niter))*np.nan
     # Bootstrapping
@@ -215,7 +215,7 @@ def random_sample_from_bootstrap_linear_regression_prediction_interval(x_i,x_obs
             if x_i.ndim > 1: # linearize multidimensional arrays
                 x_i=x_i.reshape(n)
         except TypeError:
-            print "Sorry, not a valid type for this function"
+            print("Sorry, not a valid type for this function")
 
     # resample observations (with replacement) i.e. one iteration of bootstrap procedure
     ix = np.random.choice(x_obs.size, size=n,replace=True)
@@ -378,7 +378,6 @@ def calculate_crown_dimensions_mc(DBH,Ht,Area,ref1_DBH,ref1_Ht,ref1_Area,ref2_DB
     #Depth = random_sample_from_powerlaw_prediction_interval(DBH,ref_DBH,ref_D,b_depth,a_depth,array=True)
     Depth = random_sample_from_powerlaw_prediction_interval(Ht,ref2_Ht,ref2_D,b_depth,a_depth,array=True)
 
-    #print Ht, Area,Depth
     # Remove any existing nodata values (brought forwards from input data
     mask = np.all((np.isfinite(Depth),np.isfinite(Ht),np.isfinite(Area)),axis=0)
     Depth = Depth[mask]
@@ -421,7 +420,7 @@ def calculate_LAD_profiles_ellipsoid(canopy_layers, a, b, c, z0, plot_area, leaf
 
     # sanity check
     TestV = np.nansum(4*pi*a*b*c/3)
-    print CanopyV.sum(),TestV
+    print(CanopyV.sum(),TestV)
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
 
@@ -449,7 +448,7 @@ def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, 
     TestV = np.nansum(pi*D*r_max**2/(2*beta+1.))
     precision_requirement = 10**-8
     if CanopyV.sum() <= TestV - precision_requirement:
-        print "Issue - sanity check fail: ", CanopyV.sum(),TestV
+        print("Issue - sanity check fail: ", CanopyV.sum(),TestV)
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
 
@@ -479,7 +478,7 @@ def calculate_LAD_profiles_generic_mc(canopy_layers, Area, D, Ht, beta_min, beta
     TestV = np.nansum(pi*D*r_max**2/(2*beta+1.))
     precision_requirement = 10**-8
     if CanopyV.sum() <= TestV - precision_requirement:
-        print "Issue - sanity check fail: ", CanopyV.sum(),TestV
+        print("Issue - sanity check fail: ", CanopyV.sum(),TestV)
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
 
@@ -596,8 +595,12 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
 # Load in data for SAFE detailed subplot census - all trees >2 cm  - only interested in a subset of the fields
 def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
 
-    datatype = {'names': ('Plot', 'Subplot', 'Date', 'Obs','tag', 'DBH_ns', 'DBH_ew', 'H_POM','Height', 'Flag', 'Notes'), 'formats': ('S8','i8','S10','S64','int_','f','f','f','f','S4','S32')}
-    data = np.genfromtxt(filename, skip_header = 1, usecols=np.arange(0,11), delimiter = ',',dtype=datatype)
+    datatype = {'names': ('Plot', 'Subplot', 'Date', 'Obs','tag', 'DBH_ns',
+                         'DBH_ew', 'H_POM', 'Height', 'Flag', 'Notes'),
+                'formats': ('S8','i8','S10','S64','int_','f',
+                        'f','f','f','S4','S32')}
+    data = np.genfromtxt(filename, skip_header = 1, usecols=np.arange(0,11),
+                        delimiter = ',',dtype=datatype)
 
     data['DBH_ns']/=10. # convert from mm to cm
     data['DBH_ew']/=10. # convert from mm to cm
@@ -607,9 +610,9 @@ def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
 
     mask = np.ones(N,dtype='bool')
     for i in range(0,N):
-        if 'liana' in data['Notes'][i]:
+        if(b'liana' in data['Notes'][i]):
             mask[i] = False
-        elif 'Liana' in data['Notes'][i]:
+        elif(b'Liana' in data['Notes'][i]):
             mask[i] = False
 
     # Remove lianas and dead trees
@@ -811,10 +814,10 @@ def generate_3D_crown(canopy_matrix,x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
 # Returns:
 # - 0 (the canopy_matrix array is updated with the new crown)
 
-def generate_3D_ellipsoid_crown(canopy_matrix,x,y,z,x0,y0,H,D,R):
+def generate_3D_ellipsoid_crown(canopy_matrix,xm,ym,zm,x0,y0,H,D,R):
     z0 = H-D/2.
     # generate masks for tree crown
-    xm,ym,zm = np.meshgrid(x,y,z)
+    #xm,ym,zm = np.meshgrid(x,y,z)
     con = (((xm-x0)/R)**2+((ym-y0)/R)**2+((zm-z0)/(D/2.))**2) <= 1
     canopy_matrix[con]=1
 #
@@ -844,11 +847,11 @@ def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
     # now create buffered canopy matrix
     #crowns = np.zeros((n_trees,y.size,x.size,z.size),dtype='float')
     canopy = np.zeros((y.size,x.size,z.size),dtype='float')
-
+    xm,ym,zm = np.meshgrid(x,y,z)
     # Now loop through the trees. For each tree, calculate the crown volume,
     # then add to the crown map.
     for tt in range(0,n_trees):
-        generate_3D_crown(canopy,x,y,z,x0[tt],y0[tt],Z0[tt],Zmax[tt],Rmax[tt],beta[tt])
+        generate_3D_crown(canopy,xm,ym,zm,x0[tt],y0[tt],Z0[tt],Zmax[tt],Rmax[tt],beta[tt])
 
     #plt.imshow(np.transpose(np.sum(canopy,axis=1)),origin='lower');plt.colorbar();plt.show()
 

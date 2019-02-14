@@ -17,7 +17,7 @@ import fiona
 from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 import matplotlib.ticker as plticker
-from mpl_toolkits.basemap import Basemap
+#from mpl_toolkits.basemap import Basemap
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib import colorbar
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -326,22 +326,22 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_
     rad3_DTM_20m = np.zeros((N_plots,N_subplots))
 
     for pp in range(0,N_plots):
-        print Plots[pp]
+        print(Plots[pp])
         mh_20m[pp,:]=np.nansum(MacArthurHorn_LAD[Plots[pp]],axis=1)*layer_thickness
         rad2_20m[pp,:]=np.nansum(radiative_LAD[Plots[pp]][:,:,1],axis=1)*layer_thickness
         rad3_20m[pp,:]=np.nansum(radiative_LAD[Plots[pp]][:,:,2],axis=1)*layer_thickness
         rad2_DTM_20m[pp,:]=np.nansum(radiative_DTM_LAD[Plots[pp]][:,:,1],axis=1)*layer_thickness
         rad3_DTM_20m[pp,:]=np.nansum(radiative_DTM_LAD[Plots[pp]][:,:,2],axis=1)*layer_thickness
-        print rad2_DTM_20m[pp].astype('int')
-        print mh_20m[pp]
+        print(rad2_DTM_20m[pp].astype('int'))
+        print(mh_20m[pp])
 
         mh_1ha[pp] = np.nansum(MacArthurHorn_LAD_mean[Plots[pp]])*layer_thickness
         rad2_1ha[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,1])*layer_thickness
         rad3_1ha[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,2])*layer_thickness
         rad2_DTM_1ha[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,1])*layer_thickness
         rad3_DTM_1ha[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,2])*layer_thickness
-        print rad2_DTM_1ha[pp]
-        print mh_1ha[pp]
+        print(rad2_DTM_1ha[pp])
+        print(mh_1ha[pp])
 
     # annotate with stats
     r_sq_a = [aux.get_rsquared_annotation(mh_1ha,rad2_1ha), aux.get_rsquared_annotation(mh_1ha,rad3_1ha)]
@@ -405,7 +405,7 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
     radDTM3 = np.zeros(N_plots)
 
     for pp in range(0,N_plots):
-        print Plots[pp]
+        print(Plots[pp])
         # for 1 ha averages, want to avoid nodata
         # these should be identifiable based on penetration limit
         vol[pp] = np.sum(Inventory_LAD[Plots[pp]])
@@ -517,7 +517,7 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
     radDTM3 = np.zeros(N_plots)
 
     for pp in range(0,N_plots):
-        print Plots[pp]
+        print(Plots[pp])
         # for 1 ha averages, want to avoid nodata
         # these should be identifiable based on penetration limit
         BA[pp] = np.mean(BasalArea[Plots[pp]]).copy()
@@ -565,7 +565,7 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
     return 0
 
 
-
+"""
 # Location map
 def plot_location_map(figure_name,figure_number):
 
@@ -576,12 +576,7 @@ def plot_location_map(figure_name,figure_number):
     white_green = LinearSegmentedColormap.from_list(cmap_name, cmap_colours,N=cbins)
 
     #loc_cb = plticker.MultipleLocator(base=0.2)
-    """
-    GFW_file = '/disk/scratch/local.2/dmilodow/GFW/Hansen_GFC2015_treecover2000_10N_110E_resampled.tif'
-    mask_file = '/disk/scratch/local.2/dmilodow/GFW/Hansen_GFC2015_datamask_10N_110E_resampled.tif'
-    mask = gdal.Open(mask_file).ReadAsArray()
-    ds = gdal.Open(GFW_file)
-    """
+
     AGB_file = '/home/dmilodow/DataStore_GCEL/AGB/avitabile/Avitabile_AGB_Map/Avitabile_AGB_Map.tif'
     ds = gdal.Open(AGB_file)
     geoTrans = ds.GetGeoTransform()
@@ -664,7 +659,7 @@ def plot_location_map(figure_name,figure_number):
     #plt.show()
 
     return 0
-
+"""
 
 # Cross-plot canopy layers (new)
 def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):

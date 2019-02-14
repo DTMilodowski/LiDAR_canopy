@@ -514,7 +514,7 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
     # inclusion are likely to be poor.  In the simplest case, there are not enought returns
     # at k=kmax, irrespective of scan angle. Therefore, we decrease kmax to compensate.
     while np.all((np.sum(pts[:,3]==max_k)<min_returns, max_k>1)):
-        print '\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1
+        print('\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1)
         max_k-=1
     #print "Calculating LAD using radiative tranfer model"
     # first unpack pts
@@ -752,6 +752,6 @@ def calculate_LAD_rad_DTM_test_ensemble(sample_pts,max_height,layer_thickness,mi
     mask = heights <= minimum_height
     LAD_rad[mask]=0
     PAIs=LAD_rad.sum()
-    print "--------"
-    print PAIs
+    print("--------")
+    print(PAIs)
     return 0#heights, LAD_rad

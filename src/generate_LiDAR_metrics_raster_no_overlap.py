@@ -59,8 +59,8 @@ site = 'gola_nomo_area_04'
 # Some parameters
 min_PAD = 0.1
 radius = np.sqrt(200)
-max_height = 80.   
-min_height = 2.     
+max_height = 80.
+min_height = 2.
 layer_thickness = 1
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
@@ -115,7 +115,7 @@ kurt = np.zeros((rows,cols))*np.nan
 las_files = np.genfromtxt(las_list,delimiter=',',dtype='S256')
 n_files = las_files.size
 for i in range(0,n_files):
-    print "Processing tile %i of %i" % (i+1,n_files)
+    print("Processing tile %i of %i" % (i+1,n_files))
     # get bbox of specific tile
     if laz_files:
         os.system("las2las %s temp.las" % las_files[i])
@@ -161,8 +161,8 @@ for i in range(0,n_files):
             pixel_bbox = np.array([[x_iter-raster_res/2., y_iter-raster_res/2.], [x_iter-raster_res/2., y_iter+raster_res/2.],
                                    [x_iter+raster_res/2., y_iter+raster_res/2.], [x_iter+raster_res/2., y_iter-raster_res/2.],
                                    [x_iter-raster_res/2., y_iter-raster_res/2.]])
-            
-            # retrieve point clouds samples        
+
+            # retrieve point clouds samples
             sample_pts = np.array([])
             for tt in range(0,N_trees):
                 ids = trees[tt].query_ball_point([x_iter,y_iter], radius)
@@ -174,7 +174,7 @@ for i in range(0,n_files):
                         sample_iter = lidar.filter_lidar_data_by_polygon(lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]],pixel_bbox)
                         sample_pts = np.concatenate((sample_pts,sample_iter),axis=0)
                         sample_iter = None
-                        
+
             # If we have the returns, then calculate metric of interest - in
             # this case the PAI
             if sample_pts.size > 0:
@@ -182,11 +182,11 @@ for i in range(0,n_files):
                     # calculate PAD profile
                     heights,first_return_profile,n_ground_returns = PAD.bin_returns(sample_pts, max_height, layer_thickness)
                     PADprof = PAD.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-                    
+
                     # remove lowermost portion of profile
                     PAD_iter = PADprof.copy()
                     PAD_iter[heights<min_height]=0
-                
+
                     PAI[row_ii,col_jj] = np.sum(PAD_iter)
 
                     # vertically distributed PAI
@@ -224,7 +224,7 @@ geoTransform = [ XMinimum, raster_res, 0, YMaximum, 0, -raster_res ]
 
 for kk in range(0,len(metrics.keys())):
     var = metrics.keys()[kk]
-    print "\t\t\t Saving rasters: %s" % var
+    print("\t\t\t Saving rasters: %s" % var)
     raster.write_raster_to_GeoTiff_UTM(metrics[var], geoTransform, ('%s_pointcloud_metrics_20m_%s' % (site,var)), utm)
 
 """

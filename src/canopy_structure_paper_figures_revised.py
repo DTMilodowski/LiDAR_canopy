@@ -331,6 +331,10 @@ BAAD_data={}
 BAAD_data['D']=D_BAAD
 BAAD_data['Ht']=Ht_BAAD
 BAAD_data['DBH']=DBH_BAAD
+error = {}
+error['Ht']=[.1,.1]
+error['DBH']=[0.,.02]
+error['Area']=[0.,.05]
 
 n_iter = 10
 for pp in range(0,N_plots):
@@ -366,6 +370,9 @@ for pp in range(0,N_plots):
     field_profile, field_profile_std = calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
                                         a_ht,b_ht,a_A,b_A,a_D,b_D,
                                         field_data,BAAD_data,n_iter=n_iter):
+    #field_profile, field_profile_std = calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,
+    #                                    x0,y0,Ht,DBH,Area,a_ht,b_ht,a_A,b_A,a_D,b_D,error,
+    #                                    field_data,BAAD_data,n_iter=n_iter):
 
     # add small stem contributions
     smallstem_profiles = np.zeros((n_subplots,heights.size))

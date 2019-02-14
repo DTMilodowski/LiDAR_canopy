@@ -16,7 +16,7 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
     #-----------------------------------
 
     #-----------------------------------
-    # Check orientation of array before writing to raster to ensure 
+    # Check orientation of array before writing to raster to ensure
     # compatibility with GIS platforms.
     if north_up:
         # for north_up array, need the n-s resolution (element 5) to be negative
@@ -24,9 +24,9 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
             geoTrans[5]*=-1
             geoTrans[3] = geoTrans[3]-(array.shape[0]+1.)*geoTrans[5]
         # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-        if len(array.shape) < 2: 
-            print 'array has less than two dimensions! Unable to write to raster'
-            sys.exit(1)  
+        if len(array.shape) < 2:
+            print('array has less than two dimensions! Unable to write to raster')
+            sys.exit(1)
         elif len(array.shape) == 2:
             (NRows,NCols) = array.shape
             array = np.flipud(array)
@@ -35,8 +35,8 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
             for i in range(0,NBands):
                 array[:,:,i] = np.flipud(array[:,:,i])
         else:
-            print 'array has too many dimensions! Unable to write to raster'
-            sys.exit(1)  
+            print('array has too many dimensions! Unable to write to raster')
+            sys.exit(1)
 
     else:
         # for north_up array, need the n-s resolution (element 5) to be positive
@@ -44,9 +44,9 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
             geoTrans[5]*=-1
             geoTrans[3] = geoTrans[3]-(array.shape[0]+1.)*geoTrans[5]
         # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-        if len(array.shape) < 2: 
-            print 'array has less than two dimensions! Unable to write to raster'
-            sys.exit(1)  
+        if len(array.shape) < 2:
+            print('array has less than two dimensions! Unable to write to raster')
+            sys.exit(1)
         elif len(array.shape) == 2:
             (NRows,NCols) = array.shape
             array = np.flipud(array)
@@ -55,13 +55,13 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
             for i in range(0,NBands):
                 array[:,:,i] = np.flipud(array[:,:,i])
         else:
-            print 'array has too many dimensions! Unable to write to raster'
-            sys.exit(1)  
-    
+            print('array has too many dimensions! Unable to write to raster')
+            sys.exit(1)
+
     # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-    if len(array.shape) < 2: 
-        print 'array has less than two dimensions! Unable to write to raster'
-        sys.exit(1)  
+    if len(array.shape) < 2:
+        print('array has less than two dimensions! Unable to write to raster')
+        sys.exit(1)
     elif len(array.shape) == 2:
         (NRows,NCols) = array.shape
         array = np.flipud(array)
@@ -70,8 +70,8 @@ def write_raster_to_GeoTiff(array,geoTrans, OUTFILE_prefix, EPSG_CODE='4326', no
         for i in range(0,NBands):
             array[:,:,i] = np.flipud(array[:,:,i])
     else:
-        print 'array has too many dimensions! Unable to write to raster'
-        sys.exit(1)  
+        print('array has too many dimensions! Unable to write to raster')
+        sys.exit(1)
     #-----------------------------------
 
     #-----------------------------------
@@ -107,9 +107,9 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
     else:
         hem = "southern"
         bnorth = 0
-        
+
     prjCS = "UTM %i (%s) in %s hemisphere." % (utm_zone, datum, hem)
-    
+
     #-----------------------------------
     # some dummy variables to be updated
     NBands = 1
@@ -118,7 +118,7 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
     #-----------------------------------
 
     #-----------------------------------
-    # Check orientation of array before writing to raster to ensure 
+    # Check orientation of array before writing to raster to ensure
     # compatibility with GIS platforms.
     if north_up:
         # for north_up array, need the n-s resolution (element 5) to be negative
@@ -126,9 +126,9 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
             geoTrans[5]*=-1
             geoTrans[3] = geoTrans[3]-(array.shape[0]+1.)*geoTrans[5]
         # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-        if len(array.shape) < 2: 
-            print 'array has less than two dimensions! Unable to write to raster'
-            sys.exit(1)  
+        if len(array.shape) < 2:
+            print('array has less than two dimensions! Unable to write to raster')
+            sys.exit(1)
         elif len(array.shape) == 2:
             (NRows,NCols) = array.shape
             #array = np.flipud(array)
@@ -137,8 +137,8 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
             #for i in range(0,NBands):
             #    array[:,:,i] = np.flipud(array[:,:,i])
         else:
-            print 'array has too many dimensions! Unable to write to raster'
-            sys.exit(1)  
+            print('array has too many dimensions! Unable to write to raster')
+            sys.exit(1)
 
     else:
         # for north_up array, need the n-s resolution (element 5) to be positive
@@ -146,9 +146,9 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
             geoTrans[5]*=-1
             geoTrans[3] = geoTrans[3]-(array.shape[0]+1.)*geoTrans[5]
         # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-        if len(array.shape) < 2: 
-            print 'array has less than two dimensions! Unable to write to raster'
-            sys.exit(1)  
+        if len(array.shape) < 2:
+            print('array has less than two dimensions! Unable to write to raster')
+            sys.exit(1)
         elif len(array.shape) == 2:
             (NRows,NCols) = array.shape
             array = np.flipud(array)
@@ -157,13 +157,13 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
             for i in range(0,NBands):
                 array[:,:,i] = np.flipud(array[:,:,i])
         else:
-            print 'array has too many dimensions! Unable to write to raster'
-            sys.exit(1)  
-    
+            print('array has too many dimensions! Unable to write to raster')
+            sys.exit(1)
+
     # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-    if len(array.shape) < 2: 
-        print 'array has less than two dimensions! Unable to write to raster'
-        sys.exit(1)  
+    if len(array.shape) < 2:
+        print('array has less than two dimensions! Unable to write to raster')
+        sys.exit(1)
     elif len(array.shape) == 2:
         (NRows,NCols) = array.shape
         array = np.flipud(array)
@@ -172,8 +172,8 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
         for i in range(0,NBands):
             array[:,:,i] = np.flipud(array[:,:,i])
     else:
-        print 'array has too many dimensions! Unable to write to raster'
-        sys.exit(1)  
+        print('array has too many dimensions! Unable to write to raster')
+        sys.exit(1)
     #-----------------------------------
 
     #-----------------------------------
@@ -197,23 +197,23 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
     return 0
     #-----------------------------------
 
-# Simple script to load GeoTIFF 
+# Simple script to load GeoTIFF
 def load_GeoTIFF_band_and_georeferencing(File,band_number=1):
-    
+
     driver = gdal.GetDriverByName('GTiff')
     driver.Register()
 
     try:
         ds = gdal.Open(File)
     except RuntimeError, e:
-        print 'unable to open ' + File
-        print e
+        print('unable to open ' + File)
+        print(e)
         sys.exit(1)
-        
+
     source_band = ds.GetRasterBand(band_number)
     if source_band is None:
-        print "BAND MISSING"
-        sys.exit(1)  
+        print("BAND MISSING")
+        sys.exit(1)
 
     array = np.array(ds.GetRasterBand(band_number).ReadAsArray(),dtype=np.float64)
     geoTrans = ds.GetGeoTransform()
@@ -221,7 +221,7 @@ def load_GeoTIFF_band_and_georeferencing(File,band_number=1):
 
     if geoTrans[-1] < 0:
         array=np.flipud(array)
-    
+
     return array, geoTrans, coord_sys
 
 
@@ -238,9 +238,9 @@ def write_array_to_GeoTiff_with_coordinate_system(array,geoTrans,coord_sys,OUTFI
             geoTrans[5]*=-1
             geoTrans[3] = geoTrans[3]-(array.shape[0]+1.)*geoTrans[5]
         # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-        if len(array.shape) < 2: 
-            print 'array has less than two dimensions! Unable to write to raster'
-            sys.exit(1)  
+        if len(array.shape) < 2:
+            print('array has less than two dimensions! Unable to write to raster')
+            sys.exit(1)
         elif len(array.shape) == 2:
             (NRows,NCols) = array.shape
             array = np.flipud(array)
@@ -249,8 +249,8 @@ def write_array_to_GeoTiff_with_coordinate_system(array,geoTrans,coord_sys,OUTFI
             for i in range(0,NBands):
                 array[:,:,i] = np.flipud(array[:,:,i])
         else:
-            print 'array has too many dimensions! Unable to write to raster'
-            sys.exit(1)  
+            print('array has too many dimensions! Unable to write to raster')
+            sys.exit(1)
 
     else:
         # for north_up array, need the n-s resolution (element 5) to be positive
@@ -258,9 +258,9 @@ def write_array_to_GeoTiff_with_coordinate_system(array,geoTrans,coord_sys,OUTFI
             geoTrans[5]*=-1
             geoTrans[3] = geoTrans[3]-(array.shape[0]+1.)*geoTrans[5]
         # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-        if len(array.shape) < 2: 
-            print 'array has less than two dimensions! Unable to write to raster'
-            sys.exit(1)  
+        if len(array.shape) < 2:
+            print('array has less than two dimensions! Unable to write to raster')
+            sys.exit(1)
         elif len(array.shape) == 2:
             (NRows,NCols) = array.shape
             array = np.flipud(array)
@@ -269,13 +269,13 @@ def write_array_to_GeoTiff_with_coordinate_system(array,geoTrans,coord_sys,OUTFI
             for i in range(0,NBands):
                 array[:,:,i] = np.flipud(array[:,:,i])
         else:
-            print 'array has too many dimensions! Unable to write to raster'
-            sys.exit(1)  
-    
+            print('array has too many dimensions! Unable to write to raster')
+            sys.exit(1)
+
     # Get array dimensions and flip so that it plots in the correct orientation on GIS platforms
-    if len(array.shape) < 2: 
-        print 'array has less than two dimensions! Unable to write to raster'
-        sys.exit(1)  
+    if len(array.shape) < 2:
+        print('array has less than two dimensions! Unable to write to raster')
+        sys.exit(1)
     elif len(array.shape) == 2:
         (NRows,NCols) = array.shape
         array = np.flipud(array)
@@ -284,16 +284,16 @@ def write_array_to_GeoTiff_with_coordinate_system(array,geoTrans,coord_sys,OUTFI
         for i in range(0,NBands):
             array[:,:,i] = np.flipud(array[:,:,i])
     else:
-        print 'array has too many dimensions! Unable to write to raster'
-        sys.exit(1)  
-    
+        print('array has too many dimensions! Unable to write to raster')
+        sys.exit(1)
+
     # Write GeoTiff
     driver = gdal.GetDriverByName('GTiff')
     driver.Register()
 
     # set all the relevant geospatial information
     dataset = driver.Create( OUTFILE, NCols, NRows, NBands, gdal.GDT_Float32 )
-    print "Generating raster %s with %i bands" % ((OUTFILE),NBands)
+    print("Generating raster %s with %i bands" % ((OUTFILE),NBands))
     dataset.SetGeoTransform( geoTrans )
     srs = osr.SpatialReference(wkt=coord_sys)
     dataset.SetProjection( srs.ExportToWkt() )
@@ -307,4 +307,3 @@ def write_array_to_GeoTiff_with_coordinate_system(array,geoTrans,coord_sys,OUTFI
             dataset.GetRasterBand(bb+1).WriteArray( array[:,:,bb] )
     dataset = None
     return 0
-

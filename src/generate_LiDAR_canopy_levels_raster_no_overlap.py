@@ -107,7 +107,7 @@ layers = np.zeros((rows,cols))*np.nan
 las_files = np.genfromtxt(las_list,delimiter=',',dtype='S256')
 n_files = las_files.size
 for i in range(0,n_files):
-    print "Processing tile %i of %i" % (i+1,n_files)
+    print("Processing tile %i of %i" % (i+1,n_files))
     # get bbox of specific tile
     if laz_files:
         os.system("las2las %s temp.las" % las_files[i])
@@ -214,7 +214,7 @@ geoTransform = [ XMinimum, raster_res, 0, YMaximum, 0, -raster_res ]
 
 for kk in range(0,len(metrics.keys())):
     var = metrics.keys()[kk]
-    print "\t\t\t Saving rasters: %s" % var
+    print("\t\t\t Saving rasters: %s" % var)
     raster.write_raster_to_GeoTiff_UTM(metrics[var], geoTransform, ('%s_pointcloud_canpoy_level_metrics_20m_%s' % (site,var)), utm)
 
 """

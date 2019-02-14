@@ -34,7 +34,7 @@ rcParams['font.size'] = 16
 rcParams['legend.numpoints'] = 1
 axis_size = rcParams['font.size']+2
 
-# code to get trio of nice colourblind friendly colours 
+# code to get trio of nice colourblind friendly colours
 cmap = cm.get_cmap('plasma')
 scale = np.arange(0.,3.)
 scale /=2.5
@@ -139,7 +139,7 @@ vjr_file = 'VJR_prj.shp'
 ea_file = 'EA_prj.shp'
 
 land_cover = fiona.open(shapefile_dir+land_cover_file)
-vjr = fiona.open(shapefile_dir+vjr_file)             
+vjr = fiona.open(shapefile_dir+vjr_file)
 ea = fiona.open(shapefile_dir+ea_file)
 
 patches = []
@@ -152,10 +152,10 @@ for poly in land_cover:
     for nn in range(0,Npoly):
       polygon = Polygon(poly['geometry']['coordinates'][1][nn], True,ec='None',fc=color_iter)
       patches.append(polygon)
-  else:  
+  else:
     polygon = Polygon(poly['geometry']['coordinates'][0], True,ec='None',fc=color_iter)
     patches.append(polygon)
-    
+
 
 VJR_poly = vjr[0]
 polygon = Polygon(VJR_poly['geometry']['coordinates'][0], True,ec='#1A2CCE',fc='None')
@@ -168,20 +168,20 @@ patches.append(polygon)
 
 coords_trans = coords-np.array([W,S])/float(geo[1])+np.array([W,S])
 
-fig = plt.figure(2, facecolor='White',figsize=[12,12]) 
-loc_x = plticker.MultipleLocator(base=10**4) 
-loc_y = plticker.MultipleLocator(base=10**4) 
-loc_cb = plticker.MultipleLocator(base=10) 
-loc_cc = plticker.MultipleLocator(base=4) 
-loc_cd = plticker.MultipleLocator(base=0.05) 
+fig = plt.figure(2, facecolor='White',figsize=[12,12])
+loc_x = plticker.MultipleLocator(base=10**4)
+loc_y = plticker.MultipleLocator(base=10**4)
+loc_cb = plticker.MultipleLocator(base=10)
+loc_cc = plticker.MultipleLocator(base=4)
+loc_cd = plticker.MultipleLocator(base=0.05)
 
 ax2a= plt.subplot2grid((2,2),(0,0))
 ax2a.yaxis.set_major_locator(loc_y)
 ax2a.xaxis.set_major_locator(loc_x)
 p2a = PatchCollection(patches, match_original=True)
 ax2a.annotate('a - Land cover', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-ax2a.add_collection(p2a) 
-ax2a.set_aspect('equal', adjustable='box-forced')     
+ax2a.add_collection(p2a)
+ax2a.set_aspect('equal', adjustable='box-forced')
 ax2a.set_xlim(xmin=W,xmax=E)
 ax2a.set_ylim(ymin=S,ymax=N)
 divider = make_axes_locatable(ax2a)
@@ -190,27 +190,27 @@ ax2a.annotate('VJR', xy=(560437,516426), xycoords='data',backgroundcolor='none',
 ax2a.annotate('SAFE', xy=(564805,520225), xycoords='data',backgroundcolor='none',horizontalalignment='center', verticalalignment='center')
 for tick in ax2a.get_yticklabels():
     tick.set_rotation(90)
-#ax2a.set_xticklabels([])       
+#ax2a.set_xticklabels([])
 
 for pp in range(0,3):
   ax2a.plot(coords[pp,0],coords[pp,1],'o',c='white')
   ax2a.annotate(labels[pp], xy=coords[pp]+250, xycoords='data',color='black')
 
-    
+
 ax2b= plt.subplot2grid((2,2),(0,1))
 ax2b.yaxis.set_major_locator(loc_y)
 ax2b.xaxis.set_major_locator(loc_x)
 ax2b.annotate('b - Point density', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
 ax2b.set_xlim(xmin=W,xmax=E)
 ax2b.set_ylim(ymin=S,ymax=N)
-im2b=ax2b.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,S,N])   
+im2b=ax2b.imshow(dens,vmin=0,vmax=30,cmap='plasma',origin='lower',extent=[W,E,S,N])
 #densm = np.ma.masked_where(np.isnan(dens),dens)
-#im2b = ax2b.pcolormesh(X,Y,densm,vmin=0,vmax=30,cmap='plasma')                     
-ax2b.axis('image')    
+#im2b = ax2b.pcolormesh(X,Y,densm,vmin=0,vmax=30,cmap='plasma')
+ax2b.axis('image')
 #ax2b.set_xticklabels([])
-#ax2b.set_yticklabels([])           
+#ax2b.set_yticklabels([])
 ax2b.yaxis.set_major_locator(loc_y)
-ax2b.xaxis.set_major_locator(loc_x)                
+ax2b.xaxis.set_major_locator(loc_x)
 for tick in ax2b.get_yticklabels():
     tick.set_rotation(90)
 
@@ -218,7 +218,7 @@ divider2b = make_axes_locatable(ax2b)
 cax2b = divider2b.append_axes("right", size="5%", pad=0.05)
 cbar2b=plt.colorbar(im2b, cax=cax2b)
 cbar2b.ax.set_ylabel('point density / pts m$^{-2}$',fontsize = axis_size)
-cbar2b.solids.set_edgecolor("face")             
+cbar2b.solids.set_edgecolor("face")
 cbar2b.locator = loc_cb
 cbar2b.update_ticks()
 """
@@ -233,7 +233,7 @@ ax2c.annotate('c - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolo
 im2c = ax2c.imshow(PAI,cmap='viridis',origin='lower',extent=[W,E,S,N])
 #PAIm = np.ma.masked_where(np.isnan(PAI),PAI)
 #im2c = ax2c.pcolormesh(X,Y,PAIm,cmap='viridis')
-ax2c.axis('image')                                 
+ax2c.axis('image')
 for tick in ax2c.get_yticklabels():
     tick.set_rotation(90)
 
@@ -241,7 +241,7 @@ divider2c = make_axes_locatable(ax2c)
 cax2c = divider2c.append_axes("right", size="5%", pad=0.05)
 cbar2c=plt.colorbar(im2c, cax=cax2c)
 cbar2c.ax.set_ylabel('PAI',fontsize = axis_size)
-cbar2c.solids.set_edgecolor("face")             
+cbar2c.solids.set_edgecolor("face")
 cbar2c.locator = loc_cc
 cbar2c.update_ticks()
 """
@@ -258,18 +258,18 @@ im2d = ax2d.imshow(PAI/PAImax,vmin = 0.85, vmax=1, cmap='plasma',origin='lower',
 #proximity = np.ma.masked_where(np.isnan(PAI),PAI/PAImax)
 #im2d = ax2d.pcolormesh(X,Y,proximity,vmin=0.85,vmax=1,cmap='plasma')
 ax2d.axis('image')
-#ax2d.set_yticklabels([])  
+#ax2d.set_yticklabels([])
 
 divider2d = make_axes_locatable(ax2d)
 cax2d = divider2d.append_axes("right", size="5%", pad=0.05)
 cbar2d=plt.colorbar(im2d, cax=cax2d)
 cbar2d.ax.set_ylabel('PAI/PAI$_{max}$',fontsize = axis_size)
-cbar2d.solids.set_edgecolor("face")           
+cbar2d.solids.set_edgecolor("face")
 cbar2d.locator = loc_cd
-cbar2d.update_ticks()                
+cbar2d.update_ticks()
 for tick in ax2d.get_yticklabels():
     tick.set_rotation(90)
-    
+
 plt.tight_layout()
 plt.savefig('Fig1_SAFE_point_density_PAI_maps.png')
 plt.savefig('Fig1_SAFE_point_density_PAI_maps.pdf')
@@ -284,8 +284,8 @@ laz_files = False
 min_PAD = 0.1
 radius = 10.
 area = np.pi*radius**2
-max_height = 80.   
-min_height = 2.     
+max_height = 80.
+min_height = 2.
 layer_thickness = 1
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 kappa = 0.7
@@ -299,7 +299,7 @@ PAI_iter = np.zeros((3,n_dens,n_iterations))
 sample_pts_collated = []
 
 for pp in range(0,3):
-    print "point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1])
+    print("point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1]))
     # define a bounding box around target points to load in point cloud around area of interest
     E = coords[pp,0]+500
     N = coords[pp,1]+500
@@ -309,7 +309,7 @@ for pp in range(0,3):
     polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
     lidar_pts, starting_ids_for_trees, trees = lidar_io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=laz_files)
     N_trees = len(trees)
-    # retrieve point clouds samples        
+    # retrieve point clouds samples
     sample_pts = np.array([])
     for tt in range(0,N_trees):
       ids = trees[tt].query_ball_point(coords[pp], radius)
@@ -321,7 +321,7 @@ for pp in range(0,3):
 
     sample_pts_collated.append(sample_pts.copy())
     sample_pts = None
-          
+
 # Now loop through the points again pulling out the metrics
 for pp in range(0,3):
     # If we have the returns, then calculate metric of interest - in
@@ -338,17 +338,17 @@ for pp in range(0,3):
             # calculate PAD profile
             heights,first_return_profile,n_ground_returns = MH.bin_returns(sample_pts_iter, max_height, layer_thickness)
             PADprof = MH.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-            
+
             # remove lowermost portion of profile
             PAD_iter = PADprof.copy()
             PAD_iter[heights<min_height]=0
-            
+
             PAI_iter[pp,dd,ii] = np.sum(PAD_iter)
-              
+
       else:
-        print "no first returns in neighbourhood"
+        print("no first returns in neighbourhood")
     else:
-      print "no returns in neighbourhood"
+      print("no returns in neighbourhood")
 
 # Now plot up the results
 PAI_A = np.mean(PAI_iter[0,:,:],axis=1)
@@ -405,9 +405,9 @@ for pp in range(0,3):
   for ss in range(0,n_grids):
     x = np.arange(coords_00[pp,0],coords_00[pp,0]+ha+1,res[ss])
     y = np.arange(coords_00[pp,1],coords_00[pp,1]+ha+1,res[ss])
-    
+
     xv,yv=np.asarray(np.meshgrid(x,y))
-    
+
     rr,cc = xv.shape
     rr-=1
     cc-=1
@@ -419,7 +419,7 @@ for pp in range(0,3):
             subplot.append( np.asarray(bbox).transpose() )
 
     subplots[pp][keys[ss]] = subplot
-    
+
     n_subplots=len(subplot)
     PAI_res[keys[ss]] = np.zeros((3,n_subplots))
 
@@ -428,7 +428,7 @@ sample_pts_collated = []
 starting_ids_collated = []
 trees_collated = []
 for pp in range(0,3):
-    print "point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1])
+    print("point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1]))
     # define a bounding box around target points to load in point cloud around area of interest
     E = coords[pp,0]+500
     N = coords[pp,1]+500
@@ -444,24 +444,24 @@ for pp in range(0,3):
 
 # Now loop through the subplots and sample the point cloud
 for pp in range(0,3):
-    print "point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1])
+    print("point %i, x = %.0f, y = %.0f" % (pp+1, coords[pp,0], coords[pp,1]))
     # loop through each sampling resolution
     lidar_pts = sample_pts_collated[pp].copy()
     starting_ids_for_trees = starting_ids_collated[pp].copy()
     N_trees = trees_collated[pp].size
-    
+
     for ss in range(0,res.size):
-      print '\t - sample res = ', keys[ss]
+      print('\t - sample res = ', keys[ss])
       n_subplots = len(subplots[pp][keys[ss]])
-      rad_ss = np.sqrt(res[ss]**2/2.)              
+      rad_ss = np.sqrt(res[ss]**2/2.)
       # for each of the subplots, clip point cloud and model PAD and get the metrics
       for sp in range(0,n_subplots):
         # query the tree to locate points of interest
-        # note that we will only have one tree for number of points in sensitivity analysis  
+        # note that we will only have one tree for number of points in sensitivity analysis
         centre_x = np.mean(subplots[pp][keys[ss]][sp][0:4,0])
         centre_y = np.mean(subplots[pp][keys[ss]][sp][0:4,1])
         radius = np.sqrt(res[ss]**2/2.)
-        # retrieve point clouds samples        
+        # retrieve point clouds samples
         sample_pts = np.array([])
         for tt in range(0,N_trees):
           ids = trees_collated[pp][tt].query_ball_point(np.array([centre_x,centre_y]), radius)
@@ -470,7 +470,7 @@ for pp in range(0,3):
               sample_pts = lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]
             else:
               sample_pts = np.concatenate((sample_pts,lidar_pts[np.asarray(ids)+starting_ids_for_trees[tt]]),axis=0)
-              
+
         # keep only first returns
         sample_pts=sample_pts[sample_pts[:,3]==1,:]
         sp_pts = lidar.filter_lidar_data_by_polygon(sample_pts,subplots[pp][keys[ss]][sp])
@@ -481,7 +481,7 @@ for pp in range(0,3):
         PADprof[heights<min_height]=0
         PAI_res[keys[ss]][pp,sp] = PADprof.sum()
       PAI_mean[pp,ss] = np.mean(PAI_res[keys[ss]][pp,:])
-      PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:]) 
+      PAI_sd[pp,ss] = np.std(PAI_res[keys[ss]][pp,:])
 
 PAI_serr = np.zeros(PAI_sd.shape)
 for pp in range(0,3):
@@ -518,18 +518,18 @@ for tt in range(0,len(test_res)):
     #PAI_std_scaling[pp,tt] = np.mean(temp_host)
     bias[pp,tt] = np.mean(temp_host)
     e[pp,tt]=np.mean(temp_host2)
-    print pp,tt,bias[pp,tt], e[pp,tt]
-                                      
+    print(pp,tt,bias[pp,tt], e[pp,tt])
+
 # now use linear interpolation to estimate bias at each of the resolutions used
-# in this analysis  
-bias_interpolated = np.zeros((3,res.size))    
+# in this analysis
+bias_interpolated = np.zeros((3,res.size))
 for pp in range(0,3):
   for rr in range(0,res.size):
     res1 = test_res[test_res*10<=res[rr]][-1]
     res2 = test_res[test_res*10>=res[rr]][0]
     bias1 = bias[pp,test_res==res1][0]
     bias2 = bias[pp,test_res==res2][0]
-    print res[rr],res1,res2
+    print(res[rr],res1,res2)
     if res1!=res2:
       bias_interpolated[pp,rr] = bias1+(bias2-bias1)*(res[rr]/10-res1)/(res2-res1)
     else:

@@ -590,6 +590,57 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
     LAD = CanopyV*leafA_per_unitV
     return LAD
 
+# as above for ellipsoidal geometry
+def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, Ht, stem_density, leafA_per_unitV=1.):
+
+    pi=np.pi
+    r_max = np.sqrt(Area/pi)
+    layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
+    N_layers = canopy_layers.size
+    CanopyV = np.zeros(N_layers)
+    zeros = np.zeros(Ht.size)
+
+    for i in range(0,N_layers):
+        ht_u = canopy_layers[i]
+        ht_l = ht_u-layer_thickness
+        mask = np.all((Ht>=ht_l,Ht-D<=ht_u),axis=0)
+        d1 = np.max((Ht-ht_u,zeros),axis=0)
+        d2 = np.min((Ht-ht_l,D),axis=0)
+        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta)**2/(2*beta+1) * (d2[mask]**(2*beta+1) - d1[mask]**(2*beta+1))*stem_density[mask] )
+
+    LAD = CanopyV*leafA_per_unitV
+    return LAD
+
+def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers, Area, D, Ht, stem_density, plot_area, leafA_per_unitV=1.):
+
+    pi=np.pi
+    # ellipsoid dims
+    a = np.sqrt(Area/pi)
+    b=a.copy()
+    c = D/2.
+
+    layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
+    N_layers = canopy_layers.size
+    CanopyV = np.zeros(N_layers)
+    zeros = np.zeros(a.size)
+    # Formula for volume of ellipsoidal cap: V = 1/3*pi*a*b*x**2*(3c-x)/c**2 where x
+    # is the vertical distance from the top of the ellipsoid along axis c.
+    for i in range(0,N_layers):
+        ht_u = canopy_layers[i]
+        ht_l = ht_u-layer_thickness
+        mask = np.all((z0+c>=ht_l,z0-c<=ht_u),axis=0)
+        x1 = np.max((z0+c-ht_u,zeros),axis=0)
+        x2 = np.min((z0+c-ht_l,2*c),axis=0)
+        CanopyV[i]+= np.sum(pi/3.*a[mask]*b[mask]/c[mask]**2 *
+                            (x2[mask]**2.*(3.*c[mask]-x2[mask])-
+                            x1[mask]**2.*(3.*c[mask]-x1[mask])))
+
+    # sanity check
+    # Formula for volume of ellipsoid: V = 4/3*pi*a*b*c
+    TestV = np.nansum(4*pi*a*b*c/3)
+    print(CanopyV.sum(),TestV)
+    LAD = CanopyV*leafA_per_unitV/plot_area
+    return LAD, CanopyV
 
 #=====================================================================================================================
 # Load in data for SAFE detailed subplot census - all trees >2 cm  - only interested in a subset of the fields
@@ -847,7 +898,6 @@ def generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta):
     # now create buffered canopy matrix
     #crowns = np.zeros((n_trees,y.size,x.size,z.size),dtype='float')
     canopy = np.zeros((y.size,x.size,z.size),dtype='float')
-    xm,ym,zm = np.meshgrid(x,y,z)
     # Now loop through the trees. For each tree, calculate the crown volume,
     # then add to the crown map.
     for tt in range(0,n_trees):
@@ -874,9 +924,79 @@ def generate_3D_ellipsoid_canopy(x,y,z,x0,y0,H,D,R):
     dx = x[1]-x[0]
     dy = y[1]-y[0]
     canopy = np.zeros((y.size,x.size,z.size),dtype='float')
+    xm,ym,zm = np.meshgrid(x,y,z)
 
     # Now loop through the trees. For each tree, calculate the crown volume,
     # then add to the crown map.
     for tt in range(0,n_trees):
-        generate_3D_ellipsoid_crown(canopy,x,y,z,x0[tt],y0[tt],H[tt],D[tt],R[tt])
+        print(tt,n_trees)
+        generate_3D_ellipsoid_crown(canopy,xm,ym,zm,x0[tt],y0[tt],H[tt],D[tt],R[tt])
     return canopy
+
+
+#===============================================================================
+# MONTE CARLO ROUTINES FOR CROWN CONTSTRUCTION
+# First version samples from the error distribution simulated from the
+# allometric rlationships underpinning the modelled crown geometry (ellipsoid)
+def calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
+                                        a_ht,b_ht,a_A,b_A,a_D,b_D,
+                                        field_data,BAAD_data,n_iter=10):
+    for ii in range(0,n_iter):
+        print(ii)
+        # now get field inventory estimate
+        # Note that we only deal with the 1ha plot level estimates as errors relating stem based
+        # vs. area based are problematic at subplot level
+        Ht[np.isnan(Ht)] = random_sample_from_powerlaw_prediction_interval(DBH[np.isnan(Ht)],
+                                                field_data['DBH_field'],field_data['Height_field'],
+                                                a_ht,b_ht,array=True)
+        Area[np.isnan(Area)] = random_sample_from_powerlaw_prediction_interval(DBH[np.isnan(Area)],
+                                                field_data['DBH_field'],field_data['CrownArea'],
+                                                a_A,b_A,array=True)
+        Depth = random_sample_from_powerlaw_prediction_interval(Ht,BAAD_data['Ht'],BAAD_data['D'],
+                                                a,b,array=True)
+        Rmax = np.sqrt(Area/np.pi)
+        crown_model = field.generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
+
+        field_LAD_profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
+    # average and SD
+    field_LAD_profile = np.mean(field_LAD_profiles,axis=0)
+    field_LAD_profile_std = np.std(field_LAD_profiles,axis=0)
+
+    return field_LAD_profile,field_LAD_profile_std
+
+# second version adds measurement error. Errors are two part lists or arrays
+# indicating bias and random error (expressed as an estimated percentage)
+def calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,x0,y0,Ht_,DBH_,Area_,
+                                        a_ht,b_ht,a_A,b_A,a_D,b_D,
+                                        error_Ht,error_DBH,error_Area,
+                                        field_data,BAAD_data,n_iter=10):
+    field_LAD_profiles = np.zeros((n_iter,z.size))
+    for ii in range(0,n_iter):
+        # combine random and systematic errors to the observations as fractions
+        err_Ht = (np.random.normal(scale = error_Ht[1],size = Ht.size)+error_Ht[0])/100.
+        err_DBH = (np.random.normal(scale = error_DBH[1],size = DBH.size)+error_DBH[0])/100.
+        err_Area = (np.random.normal(scale = error_Area[1],size = Area.size)+error_Area[0])/100.
+
+        # apply errors
+        DBH = DBH_*(1+err_DBH)
+        Ht = Ht_*(1+err_Ht_)
+        DBH = Area_*(1+err_Area)
+
+        # Randomly sample allometrics from simulated error distribution
+        Ht[np.isnan(Ht)] = random_sample_from_powerlaw_prediction_interval(DBH[np.isnan(Ht)],
+                                                field_data['DBH_field'],field_data['Height_field'],
+                                                a_ht,b_ht,array=True)
+        Area[np.isnan(Area)] = random_sample_from_powerlaw_prediction_interval(DBH[np.isnan(Area)],
+                                                field_data['DBH_field'],field_data['CrownArea'],
+                                                a_A,b_A,array=True)
+        Depth = random_sample_from_powerlaw_prediction_interval(Ht,BAAD_data['Ht'],BAAD_data['D'],
+                                                a,b,array=True)
+        Rmax = np.sqrt(Area/np.pi)
+        crown_model = field.generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
+
+        field_LAD_profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
+    # average and SD
+    field_LAD_profile = np.mean(field_LAD_profiles,axis=0)
+    field_LAD_profile_std = np.std(field_LAD_profiles,axis=0)
+
+    return field_LAD_profile,field_LAD_profile_std

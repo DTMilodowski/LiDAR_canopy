@@ -1,5 +1,6 @@
-# This contains code to estimate LAD profiles based on field measurements of tree height and crown dimensions, in addition to crown depth based on a regional allometric equation.
-
+# This contains code to estimate LAD profiles based on field measurements of
+# tree height and crown dimensions, in addition to crown depth based on a
+# regional allometric equation.
 import numpy as np
 from scipy import stats
 
@@ -22,7 +23,6 @@ def linear_regression(x_,y_,conf=0.95):
 
     return m, c, r**2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l
 
-
 # log-log regression with confidence intervals
 def log_log_linear_regression(x,y,conf=0.95):
     mask = np.all((np.isfinite(x),np.isfinite(y)),axis=0)
@@ -44,7 +44,6 @@ def log_log_linear_regression(x,y,conf=0.95):
     CF = np.exp(MSE/2) # Correction factor due to fitting regression in log-space (Baskerville, 1972)
     a = np.exp(loga)
     return a, b, CF, r**2, p, x_i, PI_u, PI_l
-
 
 #=================================
 # ANALYTICAL CONFIDENCE AND PREDICTION INTERVALS
@@ -73,7 +72,6 @@ def calculate_confidence_interval(x_i,x_obs,y_obs,m,c,conf):
     upper = y_exp+abs(dy)
     lower = y_exp-abs(dy)
     return dy,upper,lower
-
 
 # Calculate prediction intervals analytically (assumes normal distribution)
 # x_i = x location at which to calculate the prediction interval
@@ -192,7 +190,8 @@ def calculate_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs
     return ll,ul
 
 # equivalent to above but for log-log space prediction
-def calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs,conf=.9,niter=1000):
+def calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(x_i,x_obs,y_obs,
+                                                                    conf=.9,niter=1000):
     log_ll,log_ul = calculate_prediction_interval_bootstrap_resampling_residuals(np.log(x_i),np.log(x_obs),np.log(y_obs),conf,niter)
     return np.exp(log_ll),np.exp(log_ul)
 
@@ -590,7 +589,8 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
     return LAD
 
 # as above for ellipsoidal geometry
-def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers, Area, D, Ht, stem_density, plot_area, leafA_per_unitV=1.):
+def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers,
+                                    Area, D, Ht, stem_density, leafA_per_unitV=1.):
 
     pi=np.pi
     # ellipsoid dims
@@ -618,7 +618,7 @@ def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers,
     # sanity check
     # Formula for volume of ellipsoid: V = 4/3*pi*a*b*c
     #TestV = np.nansum(4*pi*a*b*c/3)
-    LAD = CanopyV*leafA_per_unitV/plot_area
+    LAD = CanopyV*leafA_per_unitV
     return LAD
 
 #=====================================================================================================================
@@ -762,7 +762,8 @@ def load_Danum_stem_census(filename, sp_area=20.**2):
 
 
 # calculate crown geometries based on stem distributions only
-def calculate_crown_dimensions_for_stem_distributions(DBH,stem_density,a_ht, b_ht, CF_ht, a_area, b_area, CF_area, a_depth, b_depth, CF_depth):
+def calculate_crown_dimensions_for_stem_distributions(DBH,stem_density,a_ht, b_ht, CF_ht,
+                                    a_area, b_area, CF_area, a_depth, b_depth, CF_depth):
 
     # Get rid of bins with no trees
     DBH = DBH[stem_density>0]

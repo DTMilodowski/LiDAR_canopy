@@ -384,8 +384,6 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
     plt.show()
     return 0
 
-# plot point clouds with canopy profiles
-# six rows for six plots (2x old growth, 2x moderately logged, 2x heavily logged)
 def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad,
                                 lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
                                 radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
@@ -401,21 +399,20 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     # The GPS coordinates for the plot locations can be used to find this transformation matrix
     datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32','f16','f16','f16','f16')}
     plot_coords = np.genfromtxt(gps_pts_file, delimiter = ',',dtype=datatype)
-    plot_coords['plot'][plot_coords['plot']=='danum_1'] = 'DC1'
-    plot_coords['plot'][plot_coords['plot']=='danum_2'] = 'DC2'
-    plot_coords['plot'][plot_coords['plot']=='maliau_belian'] = 'Belian'
-    plot_coords['plot'][plot_coords['plot']=='maliau_seraya'] = 'Seraya'
-    plot_coords['plot'][plot_coords['plot']=='B_north'] = 'B North'
-    plot_coords['plot'][plot_coords['plot']=='B_south'] = 'B South'
-    plot_coords['plot'][plot_coords['plot']=='LFE'] = 'LF'
+    plot_coords['plot'][plot_coords['plot']==b'danum_1'] = 'DC1'
+    plot_coords['plot'][plot_coords['plot']==b'danum_2'] = 'DC2'
+    plot_coords['plot'][plot_coords['plot']==b'maliau_belian'] = 'Belian'
+    plot_coords['plot'][plot_coords['plot']==b'maliau_seraya'] = 'Seraya'
+    plot_coords['plot'][plot_coords['plot']==b'B_north'] = 'B North'
+    plot_coords['plot'][plot_coords['plot']==b'B_south'] = 'B South'
+    plot_coords['plot'][plot_coords['plot']==b'LFE'] = 'LF'
 
     affine = {}
-    fig1_plots = ['Belian', 'Seraya','LF','E', 'B North', 'B South']
-    Plots =      ['Belian', 'Seraya','LF','E', 'B North', 'B South']
+    fig1_plots = [b'Belian', b'Seraya',b'LF',b'E', b'B North', b'B South']
+    Plots =      [b'Belian', b'Seraya',b'LF',b'E', b'B North', b'B South']
     N_plots = len(fig1_plots)
 
     plot_point_cloud_display = {}
-
     for pp in range(0, N_plots):
         # first get points for a given plot and build matrices - note that I've reversed xy and xy_prime in this case to reverse the rotation-translation
         mask = plot_coords['plot']==fig1_plots[pp]
@@ -608,7 +605,9 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 
 
 #=======================================================================================
+"""
 # Compare LiDAR approaches
+"""
 def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
                         radiative_LAD,radiative_LAD_mean,
                         radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1):
@@ -693,8 +692,12 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_
 
 
 #===============================================================================
+"""
 # LAI vs. canopy volume
-def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,Inventory_LAD,Inventory_LAI,layer_thickness=1):
+"""
+def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                            radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,
+                            radiative_DTM_LAD_mean,Inventory_LAD,Inventory_LAI,layer_thickness=1):
     Plots = MacArthurHorn_LAD.keys()
     N_plots = len(Plots)
     N_subplots = np.shape(MacArthurHorn_LAD[Plots[0]])[0]
@@ -803,8 +806,12 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
     plt.show()
     return 0
 
+"""
 # LAI vs. basal area
-def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,BasalArea,layer_thickness=1):
+"""
+def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                            radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,
+                            radiative_DTM_LAD_mean,BasalArea,layer_thickness=1):
 
 
     Plots = MacArthurHorn_LAD.keys()
@@ -1393,6 +1400,33 @@ def plot_allometric_relationships(figure_name,figure_number,field_file,allometry
     ax1.set_ylim(ymin=0)
     ax2.set_ylim(ymin=0)
     ax3.set_ylim(ymin=0)
+    plt.tight_layout()
+    plt.savefig(figure_name)
+    plt.show()
+    return 0
+
+
+"""
+# Plot transmittance ratio - the ratio of observed vs expected number of subsequent
+# LiDAR returns for a single pulse
+"""
+def plot_transmittance_ratio(figure_number,figure_name,pts):
+    # A figure illustrating transmittance ratio between successive returns
+    plt.figure(figure_number, facecolor='White',figsize=[3,3])
+    ax = plt.subplot2grid((1,1),(0,0))
+    ax.set_xlabel('return number, k')
+    ax.set_ylabel('$N_{observed}$ / $N_{expected}$')
+    for i in range(0,4):
+        if i==0:
+            ax.plot(1,1,'o',color='#1A2BCE')
+        else:
+            N_veg = float(np.all((pts[:,3]==i,pts[:,4]==1),axis=0).sum())
+            N_i = float((pts[:,3]==i+1).sum())
+            ax.plot(i+1,N_i/N_veg,'o',color='#1A2BCE')
+
+    ax.set_ylim(0,1.1)
+    ax.set_xlim(0.2,4.8)
+    plt.xticks(np.arange(4)+1)
     plt.tight_layout()
     plt.savefig(figure_name)
     plt.show()

@@ -910,7 +910,7 @@ def generate_3D_ellipsoid_canopy(x,y,z,x0,y0,H,D,R):
     # then add to the crown map.
     for tt in range(0,n_trees):
         if(tt%50==0):
-            print('\processing tree %i from %i' % (tt,n_trees))
+            print('\tprocessing tree %i from %i' % (tt,n_trees))
         generate_3D_ellipsoid_crown(canopy,xm,ym,zm,x0[tt],y0[tt],H[tt],D[tt],R[tt])
     canopy[canopy>1]=1
     return canopy

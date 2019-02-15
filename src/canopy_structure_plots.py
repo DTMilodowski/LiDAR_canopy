@@ -66,9 +66,17 @@ def plot_colourline(ax,x,y,t,linewidth=10,cmap='plasma'):
     ax.add_collection(lc)
     return 0
 
+"""
+# Plot point cloud example for introduction
+"""
+
+"""
 # plot point clouds with canopy profiles
 # six rows for six plots (2x old growth, 2x moderately logged, 2x heavily logged)
-def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
+# In old version, plot the Detto model without correction factor as well as the
+# other two
+"""
+def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
 
     max_return=3
     n_subplots = 25
@@ -116,7 +124,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     plt.figure(figure_number, facecolor='White',figsize=[9,12])
 
     # Belian
-    ax1a = plt.subplot2grid((6,7),(0,0),colspan=2)
+    ax1a = plt.subplot2grid((6,6),(0,0),colspan=2)
     ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
@@ -306,6 +314,228 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     plt.savefig(figure_name)
     plt.show()
     return 0
+
+# plot point clouds with canopy profiles
+# six rows for six plots (2x old growth, 2x moderately logged, 2x heavily logged)
+def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
+
+    max_return=3
+    n_subplots = 25
+    colour = ['#46E900','#1A2BCE','#E0007F']
+    rgb = [[70,233,0],[26,43,206],[224,0,127]]
+    labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
+
+    # first up, going to need to find affine transformation to rotate the point cloud for
+    # easy plotting
+
+    # The GPS coordinates for the plot locations can be used to find this transformation matrix
+    datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32','f16','f16','f16','f16')}
+    plot_coords = np.genfromtxt(gps_pts_file, delimiter = ',',dtype=datatype)
+    plot_coords['plot'][plot_coords['plot']=='danum_1'] = 'DC1'
+    plot_coords['plot'][plot_coords['plot']=='danum_2'] = 'DC2'
+    plot_coords['plot'][plot_coords['plot']=='maliau_belian'] = 'Belian'
+    plot_coords['plot'][plot_coords['plot']=='maliau_seraya'] = 'Seraya'
+    plot_coords['plot'][plot_coords['plot']=='B_north'] = 'B North'
+    plot_coords['plot'][plot_coords['plot']=='B_south'] = 'B South'
+    plot_coords['plot'][plot_coords['plot']=='LFE'] = 'LF'
+
+    affine = {}
+    fig1_plots = ['Belian', 'Seraya','LF','E', 'B North', 'B South']
+    Plots =      ['Belian', 'Seraya','LF','E', 'B North', 'B South']
+    N_plots = len(fig1_plots)
+
+    plot_point_cloud_display = {}
+
+    for pp in range(0, N_plots):
+        # first get points for a given plot and build matrices - note that I've reversed xy and xy_prime in this case to reverse the rotation-translation
+        mask = plot_coords['plot']==fig1_plots[pp]
+        x = plot_coords['x_prime'][mask]
+        y = plot_coords['y_prime'][mask]
+        x_prime = plot_coords['x'][mask]
+        y_prime = plot_coords['y'][mask]
+        affine[Plots[pp]]=lstsq.least_squares_affine_matrix(x,y,x_prime,y_prime)
+
+        Xi = np.asarray([plot_point_cloud[Plots[pp]][:,0],plot_point_cloud[Plots[pp]][:,1],np.ones(plot_point_cloud[Plots[pp]].shape[0])])
+        Xi_prime = np.dot(affine[Plots[pp]],Xi)
+
+        plot_point_cloud_display[Plots[pp]] = plot_point_cloud[Plots[pp]].copy()
+        plot_point_cloud_display[Plots[pp]][:,0]=Xi_prime[0]
+        plot_point_cloud_display[Plots[pp]][:,1]=Xi_prime[1]
+
+    plt.figure(figure_number, facecolor='White',figsize=[9,12])
+
+    # Belian
+    ax1a = plt.subplot2grid((6,6),(0,0),colspan=2)
+    ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1a.set_ylabel('Height / m',fontsize=axis_size)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+
+    # Seraya
+    ax1b = plt.subplot2grid((6,6),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1b.annotate('b - Old growth, MLA02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1b.set_ylabel('Height / m',fontsize=axis_size)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+
+    # LF
+    ax1c = plt.subplot2grid((6,6),(2,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1c.annotate('c - Moderately logged, SAF04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1c.set_ylabel('Height / m',fontsize=axis_size)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+
+    # E
+    ax1d = plt.subplot2grid((6,6),(3,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1d.annotate('d - Moderately logged, SAF05', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1d.set_ylabel('Height / m',fontsize=axis_size)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+
+    # B North
+    ax1e = plt.subplot2grid((6,6),(4,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1e.annotate('e - Heavily logged, SAF02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1e.set_ylabel('Height / m',fontsize=axis_size)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+
+    # B South
+    ax1f = plt.subplot2grid((6,6),(5,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1f.annotate('f - Heavily logged, SAF01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1f.set_ylabel('Height / m',fontsize=axis_size)
+    ax1f.set_xlabel('Horizontal distance / m',fontsize=axis_size)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+
+    axes = [ax1a, ax1b, ax1c, ax1d, ax1e, ax1f]
+    for pp in range(0,6):
+        plot_lidar_pts = plot_point_cloud_display[fig1_plots[pp]]
+        for k in range(0,max_return):
+
+            mask = np.all((plot_lidar_pts[:,0]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,1]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,3]==k+1),axis=0)
+            points_x = 100-plot_lidar_pts[mask][:,0]
+            points_z = plot_lidar_pts[mask][:,2]
+            points_y = plot_lidar_pts[mask][:,1]
+
+            alpha_max = 0.1
+            colours = np.zeros((points_x.size,4))
+            colours[:,0]=rgb[k][0]/255.
+            colours[:,1]=rgb[k][1]/255.
+            colours[:,2]=rgb[k][2]/255.
+
+            colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
+            axes[pp].scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=1)
+            axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=1,label=labels[k])
+
+    #---------------------------------------------------------
+    # NOW PLOT PROFILES
+    # Belian
+    ax2a = plt.subplot2grid((6,6),(0,2),sharey=ax1a)
+    ax2a.annotate('LiDAR returns', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    # - MacHorn
+    ax3a = plt.subplot2grid((6,6),(0,3),sharey=ax1a)
+    ax3a.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    # - Detto
+    ax4a = plt.subplot2grid((6,6),(0,4),sharey=ax1a,sharex=ax3a)
+    ax4a.annotate('multi. return \nrad. trans.', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    # - Corrected rad trans
+    ax5a = plt.subplot2grid((6,6),(0,5),sharey=ax1a,sharex=ax3a)
+    ax5a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+
+    # Seraya
+    ax2b = plt.subplot2grid((6,6),(1,2),sharey=ax1a,sharex=ax2a)
+    ax3b = plt.subplot2grid((6,6),(1,3),sharey=ax1a,sharex=ax3a)
+    ax4b = plt.subplot2grid((6,6),(1,4),sharey=ax1a,sharex=ax3a)
+    ax5b = plt.subplot2grid((6,6),(1,5),sharey=ax1a,sharex=ax3a)
+
+    # LF
+    ax2c = plt.subplot2grid((6,6),(2,2),sharey=ax1a,sharex=ax2a)
+    ax3c = plt.subplot2grid((6,6),(2,3),sharey=ax1a,sharex=ax3a)
+    ax4c = plt.subplot2grid((6,6),(2,4),sharey=ax1a,sharex=ax3a)
+    ax5c = plt.subplot2grid((6,6),(2,5),sharey=ax1a,sharex=ax3a)
+
+    # E
+    ax2d = plt.subplot2grid((6,6),(3,2),sharey=ax1a,sharex=ax2a)
+    ax3d = plt.subplot2grid((6,6),(3,3),sharey=ax1a,sharex=ax3a)
+    ax4d = plt.subplot2grid((6,6),(3,4),sharey=ax1a,sharex=ax3a)
+    ax5d = plt.subplot2grid((6,6),(3,5),sharey=ax1a,sharex=ax3a)
+
+    # B North
+    ax2e = plt.subplot2grid((6,6),(4,2),sharey=ax1a,sharex=ax2a)
+    ax3e = plt.subplot2grid((6,6),(4,3),sharey=ax1a,sharex=ax3a)
+    ax4e = plt.subplot2grid((6,6),(4,4),sharey=ax1a,sharex=ax3a)
+    ax5e = plt.subplot2grid((6,6),(4,5),sharey=ax1a,sharex=ax3a)
+
+    # B South
+    ax2f = plt.subplot2grid((6,6),(5,2), sharex = ax1a, sharey = ax2a)
+    ax2f.set_xlabel('Number of returns\n(x1000)',fontsize=axis_size,horizontalalignment='center')
+    # - MacHorn
+    ax3f = plt.subplot2grid((6,6),(5,3),sharey=ax1a, sharex=ax3a)
+    ax3f.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    # - Corrected rad trans
+    ax4f = plt.subplot2grid((6,6),(5,4),sharey=ax1a,sharex=ax3a)
+    ax4f.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    # - Inventory
+    ax5f = plt.subplot2grid((6,6),(5,5),sharey=ax1a,sharex=ax3a)
+    ax5f.set_xlabel('Crown Volume\n(m$^3$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+
+    axes1 = [ax2a,  ax2b, ax2c, ax2d, ax2e, ax2f]
+    axes2 = [ax3a,  ax3b, ax3c, ax3d, ax3e, ax3f]
+    axes3 =  [ax4a,  ax4b, ax4c, ax4d, ax4e, ax4f]
+    axes4 = [ax5a,  ax5b, ax5c, ax5d, ax5e, ax5f]
+
+    yticklabels=[]
+    xticklabels=[]
+    xticklabels.append(ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xticklabels() + ax1d.get_xticklabels() + ax1e.get_xticklabels())
+
+    for pp in range(0,6):
+        Plot_name = fig1_plots[pp]
+
+        # plot lidar profile
+        return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
+        for k in range(0,max_return):
+            axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1)
+
+            # plot macarthur horn profile
+            for i in range(0,n_subplots):
+                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
+            axes2[pp].plot(MacArthurHorn_LAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+
+            # plot corrective radiative transfer profile
+            for i in range(0,n_subplots):
+                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+            axes3[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+
+            # field inventory
+            #for i in range(0,n_subplots):
+                #axes5[pp].fill_betweenx(heights[2:],0,inventory_LAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
+            #axes5[pp].plot(np.mean(inventory_LAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
+            axes4[pp].plot(inventory_LAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+
+        yticklabels.append(axes1[pp].get_yticklabels())
+        yticklabels.append(axes2[pp].get_yticklabels())
+        yticklabels.append(axes3[pp].get_yticklabels())
+        yticklabels.append(axes4[pp].get_yticklabels())
+
+        if pp < 5:
+            xticklabels.append(axes1[pp].get_xticklabels())
+            xticklabels.append(axes2[pp].get_xticklabels())
+            xticklabels.append(axes3[pp].get_xticklabels())
+            xticklabels.append(axes4[pp].get_xticklabels())
+
+    ax1a.set_xlim(0,100)
+    ax1a.set_ylim(0,80)
+    ax2a.set_xlim(0,29)
+    ax3a.set_xlim(xmin=0,xmax=0.7)
+
+    ax2f.locator_params(axis='x',nbins=5)
+    ax3f.locator_params(axis='x',nbins=5)
+    ax4f.locator_params(axis='x',nbins=5)
+    ax5f.locator_params(axis='x',nbins=5)
+
+    plt.setp(yticklabels,visible=False)
+    plt.setp(xticklabels,visible=False)
+    plt.subplots_adjust(hspace=0.2, wspace = 0.1)
+
+    plt.tight_layout()
+    plt.savefig(figure_name)
+    plt.show()
+    return 0
+
 
 #=======================================================================================
 # Compare LiDAR approaches

@@ -101,7 +101,7 @@ max_height_field={}
 # LOADING DATA
 # load coordinates and lidar points for target areas
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
-all_lidar_pts = io.load_lidar_data(las_file)
+#all_lidar_pts = io.load_lidar_data(las_file)
 
 # load field data and retrieve allometric relationships
 field_data = field.load_crown_survey_data(field_file)
@@ -405,67 +405,45 @@ for pp in range(0,N_plots):
 
 #----------------------------------------------------------------------------
 # NOW MAKE PLOTS
+
+#-------------------------------
+# INTRODUCTION & METHODS
+#-------------------------------
 # Figure 1 - Location map, with Hansen data and plot locations
 figure_name = output_dir+'Fig1_Location_map.png'
 figure_number = 1
 csp.plot_location_map(figure_name,figure_number)
 
-# Figure 2 - Transmission ratio figure; adapted to illustrate the variance in
-# transmission ratios across the landscape
+# Figure 2 sample point cloud - coloured by return number
 
-# Figure 3 - Sketch illustrating canopy model
-# <Manual figure>
+# Figure 3 sketch explaining field-based crown model construction
+# <manual figure>
 
 # Figure 4 - Allometric models; include confidence intervals, and add vertical band
 # illustrating the 10 cm DBH cutoff
 figure_name = output_dir + 'Fig4_allometric_relationships.png'
-figure_number = 5
+figure_number = 4
 csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file)
 
+#-------------------------------
+# RESULTS - STRUCTURAL CHANGES
+#           ACROSS GRADIENT
+#-------------------------------
 # Figure 5 - Point clouds and profiles across degradation gradient
 figure_name = output_dir + 'Fig5_pointclouds_and_profiles.png'
 figure_number = 5
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD)
 
-# Figure 6 - PAI comparison between methods
-# Add R-sq for both 20 m x 20 m and 1 ha estimates (to do)
-figure_name = output_dir + 'Fig6_comparing_LiDAR_PAI_estimates.png'
+# Figure 6 - Cross-plot canopy layers (new)
+figure_name = output_dir + 'Fig6_crossplot_LiDAR_PAD_residual_profiles.png'
 figure_number = 6
-csp.compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1)
-
-# Figure 7 - Cross-plot canopy layers (new)
-figure_name = output_dir + 'Fig7_crossplot_LiDAR_PAD_residual_profiles.png'
-figure_number = 7
 csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean)
 
-
-# Figure 8 - Summary plots from sensitivity analysis for old growth plot and logged plot
-# Switch to split violin plots
-# <see sensitivity analysis script>
-
-# Figure 9 - Sensitivity analysis of vertical profiles to point density
-# Comparison of OG vs Moderately Logged vs. Heavily Logged
-# <see sensitivity analysis script>
-
-# Figure 10 - Sensitivity analysis of vertical profiles to spatial resolution
-# <see sensitivity analysis script>
-
-# Figure 11 - Sensitivity analysis of unsampled voxels
-# <see sensitivity analysis script>
-
-# Figure 12 - Comparison against canopy volume estimates
-figure_name = output_dir + 'Fig12_comparing_LiDAR_PAI_and_inventory_test.png'
-figure_number = 12
-csp.plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD,inventory_LAI)
-
-# Figure 13 - Comparison against canopy volume distributions (analagous to Figure 7)
-figure_name = output_dir + 'Fig13_crossplot_LiDAR_and_inventory_profiles_test.png'
-figure_number = 13
-
+# Figure 7 - PAI plotted against basal area
 # Fiure 14 - Comparison against basal area
-figure_name = output_dir + 'Fig14_PAI_vs_basal_area.png'
-figure_number = 14
+figure_name = output_dir + 'Fig7_PAI_vs_basal_area.png'
+figure_number = 7
 
 census_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_TreeCensus.csv'
 census = cen.collate_plot_level_census_data(census_file)
@@ -519,6 +497,63 @@ for pp in range(0,len(Plots_Danum)):
 
 csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,BA,plot_marker,plot_label)
 
+#-------------------------------
+# RESULTS - SENSITIVITY ANALYSIS
+# see sensitivity analysis plots
+#-------------------------------
+# Figure 8 - Sensitivity analysis of vertical profiles to spatial resolution
+# Comparison of OG vs Moderately Logged vs. Heavily Logged
+# <see sensitivity analysis script>
+
+# Figure 9 - Sensitivity analysis of unsampled voxels
+# <see sensitivity analysis script>
+
+# Figure 10 - Sensitivity analysis of vertical profiles to point density
+# <see sensitivity analysis script>
+
+# Figure 11 - Summary plots from sensitivity analysis for PAI vs. resolution
+# and point density
+# <see sensitivity analysis script>
+
+#-------------------------------
+# SUPPLEMENT
+# METHODS
+#-------------------------------
+# Figure S1 - comparison of Detto vs. modified algorithm
+
+# Figure S2 - "transmission ratio"
+
+# Figure S3 - example crown model
+
+#-------------------------------
+# SUPPLEMENT
+# RESULTS
+#-------------------------------
+# Figure S4 - sensitivity analysis, confidence interval sensitivity to resolution
+
+# Figure S5 - sensitivity analysis, confidence interval sensitivity to density
+
+
+
+
+
+"""
+# Figure 6 - PAI comparison between methods
+# Add R-sq for both 20 m x 20 m and 1 ha estimates (to do)
+figure_name = output_dir + 'Fig6_comparing_LiDAR_PAI_estimates.png'
+figure_number = 6
+csp.compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1)
+
+
+# Figure 12 - Comparison against canopy volume estimates
+figure_name = output_dir + 'Fig12_comparing_LiDAR_PAI_and_inventory_test.png'
+figure_number = 12
+csp.plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD,inventory_LAI)
+
+# Figure 13 - Comparison against canopy volume distributions (analagous to Figure 7)
+figure_name = output_dir + 'Fig13_crossplot_LiDAR_and_inventory_profiles_test.png'
+figure_number = 13
+
 
 
 
@@ -526,3 +561,8 @@ csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 import plot_LAD_profiles as pprof
 pprof.plot_subplot_LAD_profiles(radiative_DTM_LAD['Seraya'][:,:,-1],heights_rad[::-1],'g','test','test')
+
+
+"""
+# Figure 2 - Transmission ratio figure; adapted to illustrate the variance in
+# transmission ratios across the landscape

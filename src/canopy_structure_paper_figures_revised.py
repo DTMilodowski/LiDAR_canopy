@@ -357,10 +357,10 @@ for pp in range(0,N_plots):
 
     # now building the canopy model
     buff = 20
-    xmin = np.min(field_data['Xfield'][mask])
-    xmax = np.max(field_data['Xfield'][mask])
-    ymin = np.min(field_data['Yfield'][mask])
-    ymax = np.max(field_data['Yfield'][mask])
+    xmin = np.nanmin(field_data['Xfield'][mask])
+    xmax = np.nanmax(field_data['Xfield'][mask])
+    ymin = np.nanmin(field_data['Yfield'][mask])
+    ymax = np.nanmax(field_data['Yfield'][mask])
     x = np.arange(xmin-buff,xmax+buff,1.)+0.5
     y = np.arange(ymin-buff,ymax+buff,1.)+0.5
     z = np.arange(0,80.,1.)+0.5
@@ -456,7 +456,8 @@ csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
 """
 figure_name = output_dir + 'Fig6_crossplot_LiDAR_PAD_residual_profiles.png'
 figure_number = 6
-csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean)
+csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,
+                MacArthurHorn_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean)
 
 """
 # Figure 7 - PAI plotted against basal area
@@ -471,33 +472,16 @@ BA = {}
 Plots_SAFE = ['Belian', 'Seraya', 'LF', 'E','B North', 'B South']
 Plots_Danum = ['DC1', 'DC2']
 plot_colour = {}
-plot_colour['Belian']=colour[0]
-plot_colour['Seraya']=colour[0]
-plot_colour['DC1']=colour[0]
-plot_colour['DC2']=colour[0]
-plot_colour['LF']=colour[1]
-plot_colour['E']=colour[1]
-plot_colour['B North']=colour[2]
-plot_colour['B South']=colour[2]
+plot_colour['Belian']=colour[0];plot_colour['Seraya']=colour[0];plot_colour['DC1']=colour[0]
+plot_colour['DC2']=colour[0];plot_colour['LF']=colour[1];plot_colour['E']=colour[1]
+plot_colour['B North']=colour[2];plot_colour['B South']=colour[2]
 
 plot_marker = {}
-plot_marker['Belian']='o'
-plot_marker['Seraya']='v'
-plot_marker['DC1']='^'
-plot_marker['DC2']='s'
-plot_marker['LF']='o'
-plot_marker['E']='v'
-plot_marker['B North']='o'
-plot_marker['B South']='v'
+plot_marker['Belian']='o';plot_marker['Seraya']='v';plot_marker['DC1']='^';plot_marker['DC2']='s'
+plot_marker['LF']='o';plot_marker['E']='v';plot_marker['B North']='o';plot_marker['B South']='v'
 plot_label = {}
-plot_label['Belian']='MLA01'
-plot_label['Seraya']='MLA02'
-plot_label['DC1']='DAN04'
-plot_label['DC2']='DAN05'
-plot_label['LF']='SAF04'
-plot_label['E']='SAF03'
-plot_label['B North']='SAF02'
-plot_label['B South']='SAF01'
+plot_label['Belian']='MLA01';plot_label['Seraya']='MLA02';plot_label['DC1']='DAN04';plot_label['DC2']='DAN05'
+plot_label['LF']='SAF04';plot_label['E']='SAF03';plot_label['B North']='SAF02';plot_label['B South']='SAF01'
 
 for pp in range(0,len(Plots_SAFE)):
     temp_BA = np.zeros(n_subplots)
@@ -510,11 +494,14 @@ for pp in range(0,len(Plots_SAFE)):
 for pp in range(0,len(Plots_Danum)):
     temp_BA = np.zeros(n_subplots)
     for ss in range(0,n_subplots):
-        indices = np.all((field_data['plot']==Plots_Danum[pp],field_data['subplot']==ss+1,np.isfinite(field_data['DBH'])),axis=0)
-        temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*25./100**2
+        indices = np.all((field_data['plot']==Plots_Danum[pp],field_data['subplot']==ss+1,
+                                np.isfinite(field_data['DBH'])),axis=0)
+        temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*25./100.**2
     BA[Plots_Danum[pp]]=temp_BA.copy()
 
-csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,BA,plot_marker,plot_label)
+csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                            radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,
+                            BA,plot_marker,plot_label)
 
 #-------------------------------
 # RESULTS - SENSITIVITY ANALYSIS

@@ -393,8 +393,7 @@ for pp in range(0,N_plots):
                                                 a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
 
         smallstem_profiles[ss,:] = field.calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(heights,
-                                            Area, Depth, Ht, StemDensity,
-                                            subplot_area, leafA_per_unitV=1.)
+                                            Area, Depth, Ht, StemDensity)
 
     field_profiles[:]+=np.mean(smallstem_profiles,axis=0)
 
@@ -452,7 +451,7 @@ csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
                         radiative_DTM_LAD_mean,inventory_LAD)
 
 """
-# Figure 6 - Cross-plot canopy layers (new)
+# Figure 6 - Cross-plot canopy layers
 """
 figure_name = output_dir + 'Fig6_crossplot_LiDAR_PAD_residual_profiles.png'
 figure_number = 6
@@ -528,6 +527,8 @@ csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
 # Figure S1 - comparison of Detto vs. modified algorithm
 
 # Figure S2 - "transmission ratio"
+figure_number = 112
+figure_name = output_dir+'figS2_transmittance_ratios.png'
 
 # Figure S3 - example crown model
 
@@ -570,5 +571,3 @@ pprof.plot_subplot_LAD_profiles(radiative_DTM_LAD['Seraya'][:,:,-1],heights_rad[
 
 
 """
-# Figure 2 - Transmission ratio figure; adapted to illustrate the variance in
-# transmission ratios across the landscape

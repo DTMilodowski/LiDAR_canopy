@@ -69,6 +69,72 @@ def plot_colourline(ax,x,y,t,linewidth=10,cmap='plasma'):
 """
 # Plot point cloud example for introduction
 """
+# plot point clouds with canopy profiles
+def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
+
+    max_return=3
+    colour = ['#46E900','#1A2BCE','#E0007F']
+    rgb = [[70,233,0],[26,43,206],[224,0,127]]
+    labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
+
+    # first up, going to need to find affine transformation to rotate the point cloud for
+    # easy plotting
+
+    # The GPS coordinates for the plot locations can be used to find this transformation matrix
+    datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32','f16','f16','f16','f16')}
+    plot_coords = np.genfromtxt(gps_pts_file, delimiter = ',',dtype=datatype)
+    plot_coords['plot'][plot_coords['plot']=='maliau_belian'] = 'Belian'
+    Plot = 'Belian'
+
+    # first get points for a given plot and build matrices - note that I've reversed xy and xy_prime in this case to reverse the rotation-translation
+    mask = plot_coords['plot']==Plot
+    x = plot_coords['x_prime'][mask]
+    y = plot_coords['y_prime'][mask]
+    x_prime = plot_coords['x'][mask]
+    y_prime = plot_coords['y'][mask]
+    affine=lstsq.least_squares_affine_matrix(x,y,x_prime,y_prime)
+
+    Xi = np.asarray([plot_point_cloud[Plot][:,0],plot_point_cloud[Plot][:,1],
+                            np.ones(plot_point_cloud[Plot].shape[0])])
+    Xi_prime = np.dot(affine[Plot],Xi)
+
+    plot_point_cloud_display = plot_point_cloud[Plot].copy()
+    plot_point_cloud_display[:,0]=Xi_prime[0]
+    plot_point_cloud_display[:,1]=Xi_prime[1]
+
+    plt.figure(figure_number, facecolor='White',figsize=[5,4])
+
+    # Belian
+    ax = plt.subplot2grid((1,1),(0,0))
+    ax.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax.set_ylabel('Height / m',fontsize=axis_size)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+
+    plot_lidar_pts = plot_point_cloud_display
+    for k in range(0,max_return):
+
+        mask = np.all((plot_lidar_pts[:,0]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,1]>=0,plot_lidar_pts[:,0]<=100,plot_lidar_pts[:,3]==k+1),axis=0)
+        points_x = 100-plot_lidar_pts[mask][:,0]
+        points_z = plot_lidar_pts[mask][:,2]
+        points_y = plot_lidar_pts[mask][:,1]
+
+        alpha_max = 0.1
+        colours = np.zeros((points_x.size,4))
+        colours[:,0]=rgb[k][0]/255.
+        colours[:,1]=rgb[k][1]/255.
+        colours[:,2]=rgb[k][2]/255.
+
+        colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
+        ax.scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=1)
+        ax.scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=1,
+                        label=labels[k])
+
+    ax.set_xlim(0,100)
+    ax.set_ylim(0,80)
+    plt.tight_layout()
+    plt.savefig(figure_name)
+    plt.show()
+    return 0
 
 """
 # plot point clouds with canopy profiles

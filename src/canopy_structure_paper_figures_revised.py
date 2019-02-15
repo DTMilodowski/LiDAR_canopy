@@ -409,18 +409,29 @@ for pp in range(0,N_plots):
 #-------------------------------
 # INTRODUCTION & METHODS
 #-------------------------------
+"""
 # Figure 1 - Location map, with Hansen data and plot locations
+"""
 figure_name = output_dir+'Fig1_Location_map.png'
 figure_number = 1
 csp.plot_location_map(figure_name,figure_number)
 
+"""
 # Figure 2 sample point cloud - coloured by return number
+"""
+figure_name = output_dir+'Fig1_sample_point_cloud.png'
+figure_number = 2
+csp.plot_point_cloud(figure_name,figure_number,gps_pts_file,plot_point_cloud)
 
+"""
 # Figure 3 sketch explaining field-based crown model construction
 # <manual figure>
+"""
 
+"""
 # Figure 4 - Allometric models; include confidence intervals, and add vertical band
 # illustrating the 10 cm DBH cutoff
+"""
 figure_name = output_dir + 'Fig4_allometric_relationships.png'
 figure_number = 4
 csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file)
@@ -429,19 +440,27 @@ csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry
 # RESULTS - STRUCTURAL CHANGES
 #           ACROSS GRADIENT
 #-------------------------------
+"""
 # Figure 5 - Point clouds and profiles across degradation gradient
+"""
 figure_name = output_dir + 'Fig5_pointclouds_and_profiles.png'
 figure_number = 5
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
-csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD)
+csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
+                        plot_point_cloud,heights,heights_rad, lidar_profiles,
+                        MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_DTM_LAD,
+                        radiative_DTM_LAD_mean,inventory_LAD)
 
+"""
 # Figure 6 - Cross-plot canopy layers (new)
+"""
 figure_name = output_dir + 'Fig6_crossplot_LiDAR_PAD_residual_profiles.png'
 figure_number = 6
 csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean)
 
+"""
 # Figure 7 - PAI plotted against basal area
-# Fiure 14 - Comparison against basal area
+"""
 figure_name = output_dir + 'Fig7_PAI_vs_basal_area.png'
 figure_number = 7
 

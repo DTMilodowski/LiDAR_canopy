@@ -526,9 +526,12 @@ csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
 #-------------------------------
 # Figure S1 - comparison of Detto vs. modified algorithm
 
+"""
 # Figure S2 - "transmission ratio"
+"""
 figure_number = 112
 figure_name = output_dir+'figS2_transmittance_ratios.png'
+csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
 
 # Figure S3 - example crown model
 

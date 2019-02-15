@@ -612,7 +612,6 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
                         radiative_LAD,radiative_LAD_mean,
                         radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1):
-
     Plots = MacArthurHorn_LAD.keys()
     N_plots = len(Plots)
     N_subplots = np.shape(MacArthurHorn_LAD[Plots[0]])[0]
@@ -1061,13 +1060,14 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
     plt.tight_layout()
     plt.show()
 
-
     return 0
 
-
-# Plot canopy residuals
-
-def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,max_return=2):
+"""
+# Plot canopy residuals for comparison between the Mac-Horn and multi-return
+# radiative transfer approachself.
+# Old version also includes the uncorrected Detto model
+"""
+def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,max_return=2):
 
     # 2 columns (plotting MacHorn on x axis, multi return on y axis)
     # 3 rows (old growth, moderately logged, heavily logged)
@@ -1156,8 +1156,75 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     plt.tight_layout()
     plt.show()
 
+def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                                radiative_DTM_LAD,radiative_DTM_LAD_mean,max_return=2):
 
+    # 3 columns (old growth, moderately logged, heavily logged)
+    fig = plt.figure(figure_number, facecolor='White',figsize=[3,8])
+
+    # First up - old-growth forest
+    Plot_name='Belian'
+    ids = np.arange(heights.size)
+    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    y=heights[2:idmax]
+    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
+    x1=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+
+    ax1 = plt.subplot2grid((1,3),(0,0))
+    ax1.annotate('a - MLA-01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
+                    horizontalalignment='left', verticalalignment='top', fontsize=12)
+    for i in range(0,n_subplots):
+        ax1.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),
+                    y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+    ax1.plot(x1-x,y,linewidth=2,color='k')
+
+    # Next up - Moderately logged forest
+    Plot_name='E - SAF-03'
+    ids = np.arange(heights.size)
+    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    y=heights[2:idmax]
+    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
+    x1=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    ax2 = plt.subplot2grid((1,3),(0,1),sharex=ax1,sharey=ax1)
+    ax2.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
+                    horizontalalignment='left', verticalalignment='top', fontsize=12)
+    for i in range(0,n_subplots):
+        ax2.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),
+                    y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+    ax2.plot(x1-x,y,linewidth=2,color='k')
+    ax2.set_xlabel('PAD$_{rad trans}$-PAD$_{MacArthur-Horn}$\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
+
+
+    # Finally heavily logged forest
+    Plot_name = 'B South'
+    ids = np.arange(heights.size)
+    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    y=heights[2:idmax]
+    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
+    x1=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    ax3 = plt.subplot2grid((1,3),(0,2),sharex=ax1,sharey=ax1)
+    ax3.annotate('c - SAF-01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
+                horizontalalignment='left', verticalalignment='top', fontsize=12)
+    for i in range(0,n_subplots):
+        ax3.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),
+                y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+    a3.plot(x1-x,y,linewidth=2,color='k')
+    # tidy up tick labels
+    ax3.set_ylabel('height (m))',fontsize=axis_size)
+    ax3.yaxis.set_label_position("right")
+    ax3.yaxis.tick_right()
+    ax3.yaxis.set_ticks_position('both')
+    yticklabels=[ax2.get_yticklabels()]
+    plt.setp(yticklabels,visible=False)
+
+    plt.tight_layout()
+    plt.show()
+
+    return 0
+
+"""
 # plot PAD-volume ratios
+"""
 def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD,max_return=2):
     fig = plt.figure(figure_number, facecolor='White',figsize=[8,9])
 
@@ -1246,8 +1313,10 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
     plt.tight_layout()
     plt.show()
 
+"""
 # Plot allometric relationships
 # Plot three subplots defining the relationships used to construct the canopy profiles
+"""
 def plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file,niter=10000):
 
     #DBH_BAAD, H_BAAD, D_BAAD = field.load_BAAD_crown_allometry_data(allometry_file)

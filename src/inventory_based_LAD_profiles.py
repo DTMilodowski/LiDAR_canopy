@@ -483,7 +483,6 @@ def calculate_LAD_profiles_generic_mc(canopy_layers, Area, D, Ht, beta_min, beta
     return LAD, CanopyV
 
 
-
 #---------------------------------------
 # SMALL SAFE PLOTS DATA
 # some code to load in the survey data on small stems from the small SAFE plots.
@@ -591,26 +590,6 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
     return LAD
 
 # as above for ellipsoidal geometry
-def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, Ht, stem_density, leafA_per_unitV=1.):
-
-    pi=np.pi
-    r_max = np.sqrt(Area/pi)
-    layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
-    N_layers = canopy_layers.size
-    CanopyV = np.zeros(N_layers)
-    zeros = np.zeros(Ht.size)
-
-    for i in range(0,N_layers):
-        ht_u = canopy_layers[i]
-        ht_l = ht_u-layer_thickness
-        mask = np.all((Ht>=ht_l,Ht-D<=ht_u),axis=0)
-        d1 = np.max((Ht-ht_u,zeros),axis=0)
-        d2 = np.min((Ht-ht_l,D),axis=0)
-        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta)**2/(2*beta+1) * (d2[mask]**(2*beta+1) - d1[mask]**(2*beta+1))*stem_density[mask] )
-
-    LAD = CanopyV*leafA_per_unitV
-    return LAD
-
 def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers, Area, D, Ht, stem_density, plot_area, leafA_per_unitV=1.):
 
     pi=np.pi
@@ -618,6 +597,7 @@ def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers,
     a = np.sqrt(Area/pi)
     b=a.copy()
     c = D/2.
+    z0 = Ht-c
 
     layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
     N_layers = canopy_layers.size

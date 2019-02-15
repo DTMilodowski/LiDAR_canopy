@@ -869,8 +869,9 @@ def generate_3D_ellipsoid_crown(canopy_matrix,xm,ym,zm,x0,y0,H,D,R):
     z0 = H-D/2.
     # generate masks for tree crown
     #xm,ym,zm = np.meshgrid(x,y,z)
-    con = (((xm-x0)/R)**2+((ym-y0)/R)**2+((zm-z0)/(D/2.))**2) <= 1
-    canopy_matrix[con]=1
+    #con = (((xm-x0)/R)**2+((ym-y0)/R)**2+((zm-z0)/(D/2.))**2) <= 1
+    #canopy_matrix[con]=1
+    canopy_matrix += ((((xm-x0)/R)**2+((ym-y0)/R)**2+((zm-z0)/(D/2.))**2) <= 1)
 #
 
 # 3-D canopy
@@ -931,6 +932,7 @@ def generate_3D_ellipsoid_canopy(x,y,z,x0,y0,H,D,R):
     for tt in range(0,n_trees):
         print(tt,n_trees)
         generate_3D_ellipsoid_crown(canopy,xm,ym,zm,x0[tt],y0[tt],H[tt],D[tt],R[tt])
+    canopy[canopy>1]=1
     return canopy
 
 

@@ -943,6 +943,7 @@ def generate_3D_ellipsoid_canopy(x,y,z,x0,y0,H,D,R):
 def calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
                                         a_ht,b_ht,a_A,b_A,a_D,b_D,
                                         field_data,BAAD_data,n_iter=10):
+    profiles = np.zeros((n_iter,z.size))
     for ii in range(0,n_iter):
         print(ii)
         # now get field inventory estimate
@@ -955,23 +956,24 @@ def calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
                                                 field_data['DBH_field'],field_data['CrownArea'],
                                                 a_A,b_A,array=True)
         Depth = random_sample_from_powerlaw_prediction_interval(Ht,BAAD_data['Ht'],BAAD_data['D'],
-                                                a,b,array=True)
+                                                a_D,b_D,array=True)
         Rmax = np.sqrt(Area/np.pi)
-        crown_model = field.generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
 
-        field_LAD_profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
+        crown_model = generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
+
+        profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
     # average and SD
-    field_LAD_profile = np.mean(field_LAD_profiles,axis=0)
-    field_LAD_profile_std = np.std(field_LAD_profiles,axis=0)
+    profile = np.mean(profiles,axis=0)
+    profile_std = np.std(profiles,axis=0)
 
-    return field_LAD_profile,field_LAD_profile_std
+    return profile,profile_std
 
 # second version adds measurement error. Errors are two part lists or arrays
 # indicating bias and random error (expressed as an estimated fraction)
 def calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,x0,y0,Ht_,DBH_,Area_,
                                         a_ht,b_ht,a_A,b_A,a_D,b_D,
                                         error,field_data,BAAD_data,n_iter=10):
-    field_LAD_profiles = np.zeros((n_iter,z.size))
+    profiles = np.zeros((n_iter,z.size))
     for ii in range(0,n_iter):
         # combine random and systematic errors to the observations as fractions
         err_Ht = (np.random.normal(scale = error['Ht'][1],size = Ht.size)+error['Ht'][0])
@@ -995,9 +997,9 @@ def calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,x0,y0,Ht_,DB
         Rmax = np.sqrt(Area/np.pi)
         crown_model = field.generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
 
-        field_LAD_profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
+        profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
     # average and SD
-    field_LAD_profile = np.mean(field_LAD_profiles,axis=0)
-    field_LAD_profile_std = np.std(field_LAD_profiles,axis=0)
+    profile = np.mean(profiles,axis=0)
+    profile_std = np.std(profiles,axis=0)
 
-    return field_LAD_profile,field_LAD_profile_std
+    return profile,profile_std

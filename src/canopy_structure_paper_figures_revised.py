@@ -117,7 +117,7 @@ SAFE_stem_data = field.load_SAFE_small_stem_census(SAFE_stemcensus) # subset of 
 # MAIN ANALYSIS
 # LiDAR PROFILES LOOP
 # loop through all plots to be analysed
-#plot_point_cloud= np.load('plot_point_clouds.npz')['arr_0'][()]
+plot_point_cloud= np.load('plot_point_clouds.npz')['arr_0'][()]
 for pp in range(0,N_plots):
     print(Plots[pp])
     Plot_name=Plots[pp]
@@ -129,8 +129,8 @@ for pp in range(0,N_plots):
     n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
     coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
     bbox_polygon = aux.get_bounding_box(coord_pairs)
-    plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon,filter_by_first_return_location=True)
-    plot_point_cloud[Plots[pp]]=plot_lidar_pts.copy()
+    #plot_lidar_pts = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon,filter_by_first_return_location=True)
+    #plot_point_cloud[Plots[pp]]=plot_lidar_pts.copy()
     plot_lidar_pts=plot_point_cloud[Plots[pp]]
     print("canopy height = ", np.percentile(plot_lidar_pts[plot_lidar_pts[:,3]==1,2],99), "m")
 
@@ -367,12 +367,12 @@ for pp in range(0,N_plots):
 
     # ITERATE MONTE-CARLO PROCEDURE
     #------------------------------------------------------------------------------------
-    field_profile, field_profile_std = calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
-                                        a_ht,b_ht,a_A,b_A,a_D,b_D,
-                                        field_data,BAAD_data,n_iter=n_iter):
+    field_profile, field_profile_std = field.calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
+                                        a_ht,b_ht,a_A,b_A,a,b,
+                                        field_data,BAAD_data,n_iter=n_iter)
     #field_profile, field_profile_std = calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,
     #                                    x0,y0,Ht,DBH,Area,a_ht,b_ht,a_A,b_A,a_D,b_D,error,
-    #                                    field_data,BAAD_data,n_iter=n_iter):
+    #                                    field_data,BAAD_data,n_iter=n_iter)
 
     # add small stem contributions
     smallstem_profiles = np.zeros((n_subplots,heights.size))
@@ -393,7 +393,8 @@ for pp in range(0,N_plots):
                                                 a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
 
         smallstem_profiles[ss,:] = field.calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(heights,
-                                            Area, Depth, Ht, StemDensity, subplot_area, leafA_per_unitV=1.):
+                                            Area, Depth, Ht, StemDensity,
+                                            subplot_area, leafA_per_unitV=1.)
 
     field_profile+=np.mean(smallstem_profiles,axis=0)
 

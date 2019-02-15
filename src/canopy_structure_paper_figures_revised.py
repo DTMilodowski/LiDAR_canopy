@@ -329,7 +329,7 @@ radiative_DTM_LAD=np.load('canopy_profiles.npz')['arr_0'][()][3]
 
 BAAD_data={}
 BAAD_data['D']=D_BAAD
-BAAD_data['Ht']=Ht_BAAD
+BAAD_data['Ht']=H_BAAD
 BAAD_data['DBH']=DBH_BAAD
 error = {}
 error['Ht']=[.1,.1]
@@ -367,10 +367,10 @@ for pp in range(0,N_plots):
 
     # ITERATE MONTE-CARLO PROCEDURE
     #------------------------------------------------------------------------------------
-    field_profile, field_profile_std = field.calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
+    field_profiles = field.calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
                                         a_ht,b_ht,a_A,b_A,a,b,
                                         field_data,BAAD_data,n_iter=n_iter)
-    #field_profile, field_profile_std = calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,
+    #field_profiles = calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,
     #                                    x0,y0,Ht,DBH,Area,a_ht,b_ht,a_A,b_A,a_D,b_D,error,
     #                                    field_data,BAAD_data,n_iter=n_iter)
 
@@ -396,11 +396,11 @@ for pp in range(0,N_plots):
                                             Area, Depth, Ht, StemDensity,
                                             subplot_area, leafA_per_unitV=1.)
 
-    field_profile+=np.mean(smallstem_profiles,axis=0)
+    field_profiles[:]+=np.mean(smallstem_profiles,axis=0)
 
-    inventory_LAD[Plot_name] = np.mean(field_LAD_profiles,axis=0)
-    inventory_LAD_std[Plot_name] = np.std(field_LAD_profiles,axis=0)
-    inventory_LAI[Plot_name] = np.sum(field_LAD_profiles,axis=1)*layer_thickness
+    inventory_LAD[Plot_name] = np.mean(field_profiles,axis=0)
+    inventory_LAD_std[Plot_name] = np.std(field_profiles,axis=0)
+    inventory_LAI[Plot_name] = np.sum(field_profiles)*layer_thickness
 
 
 #----------------------------------------------------------------------------

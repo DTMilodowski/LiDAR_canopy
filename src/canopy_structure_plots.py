@@ -142,7 +142,10 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
 # In old version, plot the Detto model without correction factor as well as the
 # other two
 """
-def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
+def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
+                            plot_point_cloud,heights,heights_rad, lidar_profiles,
+                            MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,
+                            radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
 
     max_return=3
     n_subplots = 25
@@ -383,8 +386,9 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,p
 
 # plot point clouds with canopy profiles
 # six rows for six plots (2x old growth, 2x moderately logged, 2x heavily logged)
-def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad, lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
-
+def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad,
+                                lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                                radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
@@ -605,7 +609,9 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 
 #=======================================================================================
 # Compare LiDAR approaches
-def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1):
+def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                        radiative_LAD,radiative_LAD_mean,
+                        radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1):
 
     Plots = MacArthurHorn_LAD.keys()
     N_plots = len(Plots)

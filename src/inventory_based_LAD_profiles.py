@@ -617,10 +617,9 @@ def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers,
 
     # sanity check
     # Formula for volume of ellipsoid: V = 4/3*pi*a*b*c
-    TestV = np.nansum(4*pi*a*b*c/3)
-    print(CanopyV.sum(),TestV)
+    #TestV = np.nansum(4*pi*a*b*c/3)
     LAD = CanopyV*leafA_per_unitV/plot_area
-    return LAD, CanopyV
+    return LAD
 
 #=====================================================================================================================
 # Load in data for SAFE detailed subplot census - all trees >2 cm  - only interested in a subset of the fields
@@ -910,7 +909,8 @@ def generate_3D_ellipsoid_canopy(x,y,z,x0,y0,H,D,R):
     # Now loop through the trees. For each tree, calculate the crown volume,
     # then add to the crown map.
     for tt in range(0,n_trees):
-        print(tt,n_trees)
+        if(tt%50==0):
+            print('\processing tree %i from %i' % (tt,n_trees))
         generate_3D_ellipsoid_crown(canopy,xm,ym,zm,x0[tt],y0[tt],H[tt],D[tt],R[tt])
     canopy[canopy>1]=1
     return canopy
@@ -925,7 +925,7 @@ def calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
                                         field_data,BAAD_data,n_iter=10):
     profiles = np.zeros((n_iter,z.size))
     for ii in range(0,n_iter):
-        print(ii)
+        print('iteration %i out of %i' % (ii,n_iter))
         # now get field inventory estimate
         # Note that we only deal with the 1ha plot level estimates as errors relating stem based
         # vs. area based are problematic at subplot level
@@ -942,11 +942,8 @@ def calculate_crown_volume_profiles_mc(x,y,z,x0,y0,Ht,DBH,Area,
         crown_model = generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
 
         profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
-    # average and SD
-    profile = np.mean(profiles,axis=0)
-    profile_std = np.std(profiles,axis=0)
 
-    return profile,profile_std
+    return profiles
 
 # second version adds measurement error. Errors are two part lists or arrays
 # indicating bias and random error (expressed as an estimated fraction)
@@ -978,8 +975,5 @@ def calculate_crown_volume_profiles_mc_with_measurement_error(x,y,z,x0,y0,Ht_,DB
         crown_model = field.generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
 
         profiles[ii,:] = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
-    # average and SD
-    profile = np.mean(profiles,axis=0)
-    profile_std = np.std(profiles,axis=0)
 
-    return profile,profile_std
+    return profiles

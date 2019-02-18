@@ -13,6 +13,10 @@ import numpy.ma as ma
 from matplotlib import rcParams
 from datetime import datetime
 
+import cartopy
+from cartopy import config
+import cartopy.crs as ccrs
+
 import fiona
 from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
@@ -875,6 +879,7 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
 
 """
 # Location map
+"""
 def plot_location_map(figure_name,figure_number):
 
     # create simple colourmap
@@ -888,7 +893,7 @@ def plot_location_map(figure_name,figure_number):
     AGB_file = '/home/dmilodow/DataStore_GCEL/AGB/avitabile/Avitabile_AGB_Map/Avitabile_AGB_Map.tif'
     ds = gdal.Open(AGB_file)
     geoTrans = ds.GetGeoTransform()
-    W = 114
+    W = 114.
     E = 120
     N = 9
     S = 3
@@ -902,72 +907,110 @@ def plot_location_map(figure_name,figure_number):
     x0 = geoT[0]
     y0 = geoT[3]
     rows,cols = array.shape
-    lon = np.arange(x0,x0+xres*cols,xres)+ xres * 0.5
-    lat = np.arange(y0,y0+yres*rows,yres)+ yres * 0.5
-    lons,lats = np.meshgrid(lon, lat)
-    plt.figure(figure_number, facecolor='White',figsize=[10,7])
+    lons = np.arange(x0,x0+xres*cols,xres)+ xres * 0.5
+    lats = np.arange(y0,y0+yres*rows,yres)+ yres * 0.5
+
+    from cartopy.io.shapereader import Reader
+    from cartopy.feature import ShapelyFeature
+    from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
+    import matplotlib.ticker as mticker
+    fig = plt.figure(figure_number, facecolor='White',figsize=[10,7])
     # Region
-    ax1 = plt.subplot2grid((1,1),(0,0))
+    ax = plt.axes(projection=ccrs.PlateCarree())
+    ax.background_patch.set_facecolor('0.8')
+    im = plt.pcolormesh(lons,lats, array, cmap='Greens')
 
-    m = Basemap(projection='aea', lat_0=5.5, lon_0=116.8, llcrnrlat=3.9, urcrnrlat=7.5,llcrnrlon=115.2, urcrnrlon=119.5, resolution='i')
-    m.ax = ax1
+    #country_shp = '/home/dmilodow/DataStore_DTM/EOlaboratory/Areas/NaturalEarth/10m_cultural/ne_10m_admin_0_countries.shp'
+    country_shp = '/home/dmilodow/DataStore_DTM/EOlaboratory/Areas/NaturalEarth/10m_cultural/ne_10m_admin_0_boundary_lines_land.shp'
+    shp = Reader(country_shp)
+    Boundaries_left = [i for i in shp.records()
+                    if i.attributes['adm0_left']=='Malaysia']
+    Boundaries_right = [i for i in shp.records()
+                    if i.attributes['adm0_right']=='Malaysia']
+    for b1 in Boundaries_right:
+        if b1.attributes['adm0_left'] != 'Singapore':
+            sp = ShapelyFeature(b1.geometry, crs,  facecolor = 'none', edgecolor='black')
+            ax.add_feature(sp)
+    for b2 in Boundaries_left:
+        sp = ShapelyFeature(b2.geometry, crs,  facecolor = 'none', edgecolor='black')
+        ax.add_feature(sp)
 
-    # plot some lines
-    parallels = np.arange(0.,12.,2.)
-    # labels = [left,right,top,bottom]
-    m.drawparallels(parallels,labels=[True,False,False,False],fontsize=8)
-    meridians = np.arange(110.,122.,2.)
-    m.drawmeridians(meridians,labels=[False,False,False,True],fontsize=8)
+    states_shp = '/home/dmilodow/DataStore_DTM/EOlaboratory/Areas/NaturalEarth/10m_cultural/ne_10m_admin_1_states_provinces_lines_shp.shp'
+    shp = Reader(states_shp)
+    Boundaries = [i for i in shp.records()
+                    if i.attributes['adm0_name']=='Malaysia']
+    for b in Boundaries:
+        print(b.attributes['name'])
+        if b.attributes['name'] != 'Malaysia_15':
+            sp = ShapelyFeature(b.geometry, crs,  facecolor = 'none', edgecolor='black')
+            ax.add_feature(sp)
 
-    #im = m.pcolormesh(xx,yy, array, cmap=white_green, vmin=0.3, vmax=1)
-    im = m.pcolormesh(lons,lats, array, cmap='viridis', latlon=True)
-
-    country_shp = '/home/dmilodow/DataStore_DTM/EOlaboratory/Areas/NaturalEarth/10m_cultural/ne_10m_admin_0_countries'
-    shp = m.readshapefile(country_shp, 'countries', drawbounds=False)
-    for info, shape in zip(m.countries_info, m.countries):
-        if info['name'] == 'Indonesia':
-            poly = Polygon(shape, facecolor='0.2',edgecolor='0.2',alpha = 0.8)
-            m.ax.add_patch(poly)
-        #elif info['name'] == 'Malaysia':
-        #    poly = Polygon(shape, facecolor='None',edgecolor='0.5')
-        #    m.ax.add_patch(poly)
-        elif info['name'] == 'Brunei':
-            poly = Polygon(shape, facecolor='0.2',edgecolor='0.2',alpha = 0.8)
-            m.ax.add_patch(poly)
 
     # Plot locations
-    plot_shp = 'plot_locations_for_location_map_WGS84'
-    pshp = m.readshapefile(plot_shp, 'plot', drawbounds=False)
-    for info, point in zip(m.plot_info, m.plot):
-        if info['ForestType'] == 'OG':
+    plot_shp = 'plot_locations_for_location_map_WGS84.shp'
+    pshp = Reader(plot_shp)
+    for pp in pshp.records():
+        col=colour[1]
+        if pp.attributes['ForestType'] == 'OG':
             col = colour[0]
-        elif info['ForestType'] == 'ML':
-            col = colour[2]
-        else:
-            col=colour[1]
-        m.ax.plot(point[0], point[1], marker='o', color=col, markersize=15)
+        elif pp.attributes['ForestType'] == 'ML':
+            col=colour[2]
+        ax.plot(pp.geometry.coords.xy[0],pp.geometry.coords.xy[1], marker='o', color=col, markersize=5)
+
+    ax.set_xlim(left=W,right=E)
+    ax.set_ylim(top=N,bottom=S)
+
+    parallels = np.arange(0.,12.,2.)
+    meridians = np.arange(110.,122.,2.)
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=1, color='gray', linestyle='--')
+    gl.xlabels_bottom = False
+    gl.ylabels_left = False
+    gl.xlocator = mticker.FixedLocator(meridians)
+    gl.ylocator = mticker.FixedLocator(parallels)
+    gl.xformatter = LONGITUDE_FORMATTER
+    gl.yformatter = LATITUDE_FORMATTER
+    gl.xlabel_style = {'color': '0.5'}
+    gl.ylabel_style = {'color': '0.5'}
 
     # colorbar bits and bobs
-    divider = make_axes_locatable(ax1)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
+    divider = make_axes_locatable(ax)
+    #cax = divider.append_axes("right", size="5%", pad=0.05)
+    cax = divider.new_horizontal(size="5%", pad=0.8, axes_class=plt.Axes)
+    fig.add_axes(cax)
     cbar=plt.colorbar(im, cax=cax)#,extend = 'min')
-    #cbar.ax.set_ylabel('fraction tree cover in 2000',fontsize = axis_size)
     cbar.ax.set_ylabel('AGB / Mg ha$^{-1}$',fontsize = 15)
     cbar.solids.set_edgecolor("face")
-    #cbar.locator = loc_cb
-    #cbar.update_ticks()
 
-    ax1.annotate('Sabah\nMalaysia', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=20, fontweight='bold')
+    ax.annotate('SABAH\nMALAYSIA', xy=(0.05,0.95), xycoords='axes fraction',
+            backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
+            fontsize=15, style='italic')
+    ax.annotate('SAFE', xy=(117.7,4.6), xycoords='data',backgroundcolor='none',
+            horizontalalignment='left', verticalalignment='top', fontsize=12,
+            color='black', fontweight='bold')
+    ax.annotate('Maliau\nBasin', xy=(116.9,4.8), xycoords='data',
+        backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom',
+        fontsize=12,color='black', fontweight='bold')
+    ax.annotate('Danum Valley', xy=(117.8,5.), xycoords='data',
+        backgroundcolor='none',horizontalalignment='left', verticalalignment='bottom',
+        fontsize=12,color='black', fontweight='bold')
+    #plt.tight_layout()
+    #plt.savefig(figure_name)
+    plt.show()
 
-    ax1.annotate('SAFE', xy=(277058,89946), xycoords='data',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=20,color='white', fontweight='bold')
-    ax1.annotate('Maliau\nBasin', xy=(186070,100167), xycoords='data',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=20,color='white', fontweight='bold')
-    ax1.annotate('Danum Valley', xy=(290346,122654), xycoords='data',backgroundcolor='none',horizontalalignment='left', verticalalignment='bottom', fontsize=20,color='white', fontweight='bold')
-    plt.tight_layout()
-    plt.savefig(figure_name)
+    """
+    Indonesia = [i for i in shp.records()
+        if i.attributes['name'] == 'Indonesia']
+    for i in Indonesia:
+        sp = ShapelyFeature(i.geometry, crs,  facecolor='0.2',edgecolor='0.2',alpha = 0.8)
+        ax.add_feature(sp)
+    """
+
+
     #plt.show()
 
     return 0
-"""
+
 
 # Cross-plot canopy layers (new)
 def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):

@@ -101,7 +101,7 @@ max_height_field={}
 # LOADING DATA
 # load coordinates and lidar points for target areas
 subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
-#all_lidar_pts = io.load_lidar_data(las_file)
+all_lidar_pts = io.load_lidar_data(las_file)
 
 # load field data and retrieve allometric relationships
 field_data = field.load_crown_survey_data(field_file)
@@ -260,72 +260,6 @@ for pp in range(0,N_plots):
         mask = np.all((field_data['subplot']==ss-1,field_data['plot']==Plots[pp],np.isfinite(field_data['DBH_field']),np.isfinite(field_data['Xfield']),dead_mask,brokenlive_mask),axis=0)
         if mask.sum()>0:
             max_height_field[Plots[pp]][ss]=np.nanmax(field_data[mask]['Height_field'])
-"""
-# Version one - no montecarlo routine
-for pp in range(0,N_plots):
-    print(Plots[pp])
-    Plot_name=Plots[pp]
-    n_subplots = subplot_polygons[Plot_name].shape[0]
-
-    # mask out dead and broken trees
-    dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,field_data['dead_flag3']==-1),axis=0)
-    brokenlive_mask = field_data['brokenlive_flag']==-1
-    mask = np.all((field_data['plot']==Plot_name,np.isfinite(field_data['DBH_field']),np.isfinite(field_data['Xfield']),dead_mask,brokenlive_mask),axis=0)
-
-    Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],field_data['Height_field'][mask],field_data['CrownArea'][mask], a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-    #field_LAD_profiles[subplot_index,:], CanopyV = field.calculate_LAD_profiles_generic(heights, Area, Depth, Ht, beta, subplot_area)
-
-    # now building the canopy model
-    buff = 20
-    xmin = np.min(field_data['Xfield'][mask])
-    xmax = np.max(field_data['Xfield'][mask])
-    ymin = np.min(field_data['Yfield'][mask])
-    ymax = np.max(field_data['Yfield'][mask])
-    x = np.arange(xmin-buff,xmax+buff,1.)+0.5
-    y = np.arange(ymin-buff,ymax+buff,1.)+0.5
-    z = np.arange(0,80.,1.)+0.5
-    z=z[::-1]
-    x0 = field_data['Xfield'][mask]
-    y0 = field_data['Yfield'][mask]
-    Z0 = 80 - Ht
-    Zmax = Depth
-    Rmax = np.sqrt(Area/np.pi)
-    beta_list = np.ones(x0.size)*beta
-    #crown_model = field.generate_3D_canopy(x,y,z,x0,y0,Z0,Zmax,Rmax,beta_list)
-
-    #condense into vertical profile
-    field_LAD_profile = np.sum(np.sum(crown_model,axis=1),axis=0)/10.**4
-    smallstem_LAD_profiles = np.zeros((n_subplots,heights.size))
-    for i in range(0,n_subplots):
-        #print "Subplot: ", subplot_labels[Plot_name][i]
-        subplot_index = int(subplot_labels[Plot_name][i]-1)
-        # add small stem contributions
-        if Plot_name == 'DC1':
-            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC1_stem_data['dbh'],DC1_stem_data['stem_density'][:,subplot_index],
-                                                            a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-        elif Plot_name == 'DC2':
-            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC2_stem_data['dbh'],DC2_stem_data['stem_density'][:,subplot_index],
-                                                            a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-        else:
-            Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(SAFE_stem_data[Plot_name]['dbh'],SAFE_stem_data[Plot_name]['stem_density'][:,subplot_index],
-                                                            a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-
-        smallstem_LAD_profiles[i,:] = field.calculate_LAD_profiles_from_stem_size_distributions(heights,
-                                                            Area, Depth, Ht, StemDensity, beta)
-
-    field_LAD_profile+=np.mean(smallstem_LAD_profiles,axis=0)
-    inventory_LAD[Plot_name] = field_LAD_profile.copy()
-    #inventory_LAD_std[Plot_name] = np.std(field_LAD_profiles,axis=0)
-    inventory_LAI[Plot_name] = np.sum(field_LAD_profile)
-
-
-np.savez('canopy_profiles.npz',(inventory_LAD,MacArthurHorn_LAD,radiative_LAD,radiative_DTM_LAD))
-inventory_LAD=np.load('canopy_profiles.npz')['arr_0'][()][0]
-MacArthurHorn_LAD=np.load('canopy_profiles.npz')['arr_0'][()][1]
-radiative_LAD=np.load('canopy_profiles.npz')['arr_0'][()][2]
-radiative_DTM_LAD=np.load('canopy_profiles.npz')['arr_0'][()][3]
-"""
-
 
 BAAD_data={}
 BAAD_data['D']=D_BAAD
@@ -401,6 +335,14 @@ for pp in range(0,N_plots):
     inventory_LAD_std[Plot_name] = np.std(field_profiles,axis=0)
     inventory_LAI[Plot_name] = np.sum(field_profiles)*layer_thickness
 
+
+np.savez('canopy_profiles.npz',(inventory_LAD,inventory_LAD_std,MacArthurHorn_LAD,radiative_LAD,
+        radiative_DTM_LAD))
+inventory_LAD=np.load('canopy_profiles.npz')['arr_0'][()][0]
+inventory_LAD_std=np.load('canopy_profiles.npz')['arr_0'][()][1]
+MacArthurHorn_LAD=np.load('canopy_profiles.npz')['arr_0'][()][2]
+radiative_LAD=np.load('canopy_profiles.npz')['arr_0'][()][3]
+radiative_DTM_LAD=np.load('canopy_profiles.npz')['arr_0'][()][4]
 
 #----------------------------------------------------------------------------
 # NOW MAKE PLOTS
@@ -524,16 +466,30 @@ csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
 # SUPPLEMENT
 # METHODS
 #-------------------------------
-# Figure S1 - comparison of Detto vs. modified algorithm
-
 """
-# Figure S2 - "transmission ratio"
+# Figure S1 - "transmission ratio"
 """
-figure_number = 112
-figure_name = output_dir+'figS2_transmittance_ratios.png'
+figure_number = 111
+figure_name = output_dir+'figS1_transmittance_ratios.png'
 csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
 
+"""
+# Figure S2 - comparison of Detto vs. modified algorithm
+"""
+figure_number = 112
+figure_name = output_dir+'figS2_LiDAR_profiles_comparison.png'
+csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
+                        lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                        radiative_LAD,radiative_LAD_mean,
+                        radiative_DTM_LAD,radiative_DTM_LAD_mean)
+
+"""
 # Figure S3 - example crown model
+"""
+figure_number = 113
+figure_name = output_dir+'figS3_crown_model_example'
+plot_ = 'Belian'
+def plot_crown_model(figure_number,figure_name,):
 
 #-------------------------------
 # SUPPLEMENT

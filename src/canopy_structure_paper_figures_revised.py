@@ -488,8 +488,10 @@ csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 """
 figure_number = 113
 figure_name = output_dir+'figS3_crown_model_example'
-plot_ = 'Belian'
-def plot_crown_model(figure_number,figure_name,):
+Plot_name = b'Belian'
+
+csp.plot_canopy_model(figure_number,figure_name,Plot_name,field_data,
+                    a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
 
 #-------------------------------
 # SUPPLEMENT

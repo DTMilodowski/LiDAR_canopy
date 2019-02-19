@@ -1,5 +1,4 @@
-import numpy as np
-from matplotlib import pyplot as plt
+
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
@@ -7,38 +6,28 @@ import LiDAR_MacHorn_LAD_profiles as LAD1
 import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import inventory_based_LAD_profiles as field
 import least_squares_fitting as lstsq
+import geospatial_utility_tools as geo
+
+import sys
+import numpy as np
 from scipy import stats
 from osgeo import gdal
 import numpy.ma as ma
-from matplotlib import rcParams
-from datetime import datetime
 
 import cartopy
 from cartopy import config
 import cartopy.crs as ccrs
+from cartopy.io.shapereader import Reader
+from cartopy.feature import ShapelyFeature
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
-import fiona
-from matplotlib.patches import Polygon
-from matplotlib.collections import PatchCollection
+from matplotlib import pyplot as plt
+from matplotlib import rcParams
+import matplotlib.ticker as mticker
 import matplotlib.ticker as plticker
-#from mpl_toolkits.basemap import Basemap
-from matplotlib.colors import LinearSegmentedColormap
 from matplotlib import colorbar
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-from matplotlib.collections import LineCollection
-
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-
-import sys
-
-# Get perceptually uniform colourmaps
-sys.path.append('/home/dmilodow/DataStore_DTM/FOREST2020/EOdata/EO_data_processing/src/')
-import geospatial_utility_tools as geo
-sys.path.append('/home/dmilodow/DataStore_DTM/FOREST2020/EOdata/EO_data_processing/src/plot_EO_data/colormap/')
-import colormaps as cmaps
-plt.register_cmap(name='plasma', cmap=cmaps.plasma)
-plt.register_cmap(name='viridis', cmap=cmaps.viridis)
 
 # Set up some basiic parameters for the plots
 rcParams['font.family'] = 'sans-serif'
@@ -909,18 +898,14 @@ def plot_location_map(figure_name,figure_number):
     rows,cols = array.shape
     lons = np.arange(x0,x0+xres*cols,xres)+ xres * 0.5
     lats = np.arange(y0,y0+yres*rows,yres)+ yres * 0.5
+    crs = ccrs.PlateCarree()
 
-    from cartopy.io.shapereader import Reader
-    from cartopy.feature import ShapelyFeature
-    from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-    import matplotlib.ticker as mticker
     fig = plt.figure(figure_number, facecolor='White',figsize=[10,7])
     # Region
-    ax = plt.axes(projection=ccrs.PlateCarree())
+    ax = plt.axes(projection=crs)
     ax.background_patch.set_facecolor('0.8')
     im = plt.pcolormesh(lons,lats, array, cmap='Greens')
 
-    #country_shp = '/home/dmilodow/DataStore_DTM/EOlaboratory/Areas/NaturalEarth/10m_cultural/ne_10m_admin_0_countries.shp'
     country_shp = '/home/dmilodow/DataStore_DTM/EOlaboratory/Areas/NaturalEarth/10m_cultural/ne_10m_admin_0_boundary_lines_land.shp'
     shp = Reader(country_shp)
     Boundaries_left = [i for i in shp.records()
@@ -940,11 +925,7 @@ def plot_location_map(figure_name,figure_number):
     Boundaries = [i for i in shp.records()
                     if i.attributes['adm0_name']=='Malaysia']
     for b in Boundaries:
-        print(b.attributes['name'])
-        if b.attributes['name'] != 'Malaysia_15':
-            sp = ShapelyFeature(b.geometry, crs,  facecolor = 'none', edgecolor='black')
-            ax.add_feature(sp)
-
+        ax.plot(b.geometry.coords.xy[0],b.geometry.coords.xy[1], ":", color='0.1',lw=1)
 
     # Plot locations
     plot_shp = 'plot_locations_for_location_map_WGS84.shp'
@@ -957,34 +938,39 @@ def plot_location_map(figure_name,figure_number):
             col=colour[2]
         ax.plot(pp.geometry.coords.xy[0],pp.geometry.coords.xy[1], marker='o', color=col, markersize=5)
 
-    ax.set_xlim(left=W,right=E)
-    ax.set_ylim(top=N,bottom=S)
+    ax.set_xlim(left=W,right=E);ax.set_ylim(top=N,bottom=S)
 
-    parallels = np.arange(0.,12.,2.)
-    meridians = np.arange(110.,122.,2.)
+    # Grid lines
+    parallels = np.arange(0.,12.,2.); meridians = np.arange(110.,122.,2.)
+
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', linestyle='--')
-    gl.xlabels_bottom = False
-    gl.ylabels_left = False
-    gl.xlocator = mticker.FixedLocator(meridians)
-    gl.ylocator = mticker.FixedLocator(parallels)
-    gl.xformatter = LONGITUDE_FORMATTER
-    gl.yformatter = LATITUDE_FORMATTER
-    gl.xlabel_style = {'color': '0.5'}
-    gl.ylabel_style = {'color': '0.5'}
+    gl.xlabels_bottom = False; gl.ylabels_left = False
+    gl.xlocator = mticker.FixedLocator(meridians); gl.ylocator = mticker.FixedLocator(parallels)
+    gl.xformatter = LONGITUDE_FORMATTER; gl.yformatter = LATITUDE_FORMATTER
+    gl.xlabel_style = {'color': '0.5'}; gl.ylabel_style = {'color': '0.5'}
 
     # colorbar bits and bobs
     divider = make_axes_locatable(ax)
-    #cax = divider.append_axes("right", size="5%", pad=0.05)
     cax = divider.new_horizontal(size="5%", pad=0.8, axes_class=plt.Axes)
     fig.add_axes(cax)
     cbar=plt.colorbar(im, cax=cax)#,extend = 'min')
     cbar.ax.set_ylabel('AGB / Mg ha$^{-1}$',fontsize = 15)
     cbar.solids.set_edgecolor("face")
 
-    ax.annotate('SABAH\nMALAYSIA', xy=(0.05,0.95), xycoords='axes fraction',
-            backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
-            fontsize=15, style='italic')
+    # Labels
+    ax.annotate('SABAH', xy=(117,5.7), xycoords='data',
+            backgroundcolor='none',horizontalalignment='center', verticalalignment='center',
+            fontsize=12, style='italic')
+    ax.annotate('SARAWAK', xy=(114.7,3.56), xycoords='data',
+            backgroundcolor='none',horizontalalignment='center', verticalalignment='center',
+            fontsize=12, style='italic')
+    ax.annotate('BRUNEI', xy=(114.4,4.74), xycoords='data',
+            backgroundcolor='none',horizontalalignment='center', verticalalignment='center',
+            fontsize=12, style='italic')
+    ax.annotate('N. KALIMANTAN', xy=(116.9,3.67), xycoords='data',
+            backgroundcolor='none',horizontalalignment='center', verticalalignment='center',
+            fontsize=12, style='italic')
     ax.annotate('SAFE', xy=(117.7,4.6), xycoords='data',backgroundcolor='none',
             horizontalalignment='left', verticalalignment='top', fontsize=12,
             color='black', fontweight='bold')
@@ -994,21 +980,9 @@ def plot_location_map(figure_name,figure_number):
     ax.annotate('Danum Valley', xy=(117.8,5.), xycoords='data',
         backgroundcolor='none',horizontalalignment='left', verticalalignment='bottom',
         fontsize=12,color='black', fontweight='bold')
-    #plt.tight_layout()
-    #plt.savefig(figure_name)
+
+    plt.savefig(figure_name)
     plt.show()
-
-    """
-    Indonesia = [i for i in shp.records()
-        if i.attributes['name'] == 'Indonesia']
-    for i in Indonesia:
-        sp = ShapelyFeature(i.geometry, crs,  facecolor='0.2',edgecolor='0.2',alpha = 0.8)
-        ax.add_feature(sp)
-    """
-
-
-    #plt.show()
-
     return 0
 
 

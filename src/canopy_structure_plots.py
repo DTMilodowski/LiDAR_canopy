@@ -1554,3 +1554,90 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
     plt.show()
 
     return 0
+
+"""
+# Plot example crown model
+"""
+def plot_canopy_model(figure_number,figure_name,Plot_name,angle,field_data,
+                    a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a_D, b_D, CF_D,
+                    clip=True,buff=10):
+    # set up crown model etc
+    dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,
+                                            field_data['dead_flag3']==-1),axis=0)
+    brokenlive_mask = (field_data['brokenlive_flag']==-1)
+    mask = np.all((field_data['plot']==Plot_name,np.isfinite(field_data['DBH_field']),
+                                                dead_mask,brokenlive_mask),axis=0)
+
+    Ht = field_data['Height_field'][mask]
+    DBH = field_data['DBH_field'][mask]
+    Area = field_data['CrownArea'][mask]
+    x0 = field_data['Xfield'][mask]
+    y0 = field_data['Yfield'][mask]
+
+    # now building the canopy model
+    buff = 20
+    xmin = np.nanmin(field_data['Xfield'][mask])
+    xmax = np.nanmax(field_data['Xfield'][mask])
+    ymin = np.nanmin(field_data['Yfield'][mask])
+    ymax = np.nanmax(field_data['Yfield'][mask])
+    x = np.arange(xmin-buff,xmax+buff,1.)+0.5
+    y = np.arange(ymin-buff,ymax+buff,1.)+0.5
+    z = np.arange(0,80.,1.)+0.5
+
+    Ht,Area,Depth = field.calculate_crown_dimensions(field_data['DBH_field'][mask],
+                    field_data['Height_field'][mask],field_data['CrownArea'][mask],
+                    a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a_D, b_D, CF_D)
+
+    Rmax = np.sqrt(Area/np.pi)
+
+    canopy = field.generate_3D_ellipsoid_canopy(x,y,z,x0,y0,Ht,Depth,Rmax)
+
+    from scipy.ndimage import rotate as rot
+    canopy_ = rot(canopy,angle)
+    if clip:
+        row_test = np.sum(np.sum(canopy_,axis=2),axis=1)
+        col_test = np.sum(np.sum(canopy_,axis=2),axis=0)
+        print(col_test.shape,row_test.shape)
+        row_min = np.argwhere(row_test>0.001)[0][0]
+        row_max = np.argwhere(row_test>0.001)[-1][0]
+        col_min = np.argwhere(col_test>0.001)[0][0]
+        col_max = np.argwhere(col_test>0.001)[-1][0]
+        print(row_min,row_max,col_min,col_max)
+        canopy_ = canopy_[row_min:row_max,col_min:col_max]
+    # Now plot up the crown model
+    fig = plt.figure(figure_number, facecolor='White',figsize=[8,8])
+
+    ax1 = plt.subplot2grid((2,1),(0,0))
+    ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
+                horizontalalignment='left', verticalalignment='top', fontsize=10)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+    ax2 = plt.subplot2grid((2,1),(1,0))
+    ax2.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
+                horizontalalignment='left', verticalalignment='top',fontsize=10)
+    plt.gca().set_aspect('equal', adjustable='box-forced')
+
+    ax1.set_ylabel('Horizontal distance / m',fontsize=axis_size)
+    ax1.set_xlabel('Horizontal distance / m',fontsize=axis_size)
+    ax2.set_ylabel('Height / m',fontsize=axis_size)
+    ax2.set_xlabel('Horizontal distance / m',fontsize=axis_size)
+
+    im1 = ax1.imshow(np.sum(canopy_,axis=2), cmap = 'viridis',vmin=0,origin = 'lower')
+    im2 = ax2.imshow(np.sum(canopy_,axis=0).transpose()/100., cmap = 'viridis',vmin=0,origin = 'lower')
+
+    # colorbar bits and bobs
+    divider = make_axes_locatable(ax1)
+    cax1 = divider.new_horizontal(size="5%", pad=0.8, axes_class=plt.Axes)
+    fig.add_axes(cax1)
+    cbar1=plt.colorbar(im1, cax=cax1)
+    cbar1.ax.set_ylabel('Crown volume / m$^3$m$^{-2}$m$^{-1}$',fontsize = 12)
+    cbar1.solids.set_edgecolor("face")
+    divider = make_axes_locatable(ax1)
+
+    divider = make_axes_locatable(ax2)
+    cax2 = divider.new_horizontal(size="5%", pad=0.8, axes_class=plt.Axes)
+    fig.add_axes(cax2)
+    cbar2=plt.colorbar(im2, cax=cax2)
+    cbar2.ax.set_ylabel('Crown volume density / m$^3$m$^{-2}$m$^{-1}$',fontsize = 12)
+    cbar2.solids.set_edgecolor("face")
+    plt.show()
+    return 0

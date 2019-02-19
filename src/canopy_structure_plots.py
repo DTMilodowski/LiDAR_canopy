@@ -596,7 +596,6 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     plt.show()
     return 0
 
-
 #=======================================================================================
 """
 # Compare LiDAR approaches
@@ -682,7 +681,6 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_
     plt.savefig(figure_name)
     plt.show()
     return 0
-
 
 #===============================================================================
 """
@@ -865,36 +863,19 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
     plt.show()
     return 0
 
-
 """
 # Location map
 """
 def plot_location_map(figure_name,figure_number):
 
-    # create simple colourmap
-    cmap_colours = [(1.0,  1.0, 1.0),(170./256.,229./256.,156./256.)]
-    cbins= 100
-    cmap_name = 'w_gn'
-    white_green = LinearSegmentedColormap.from_list(cmap_name, cmap_colours,N=cbins)
-
-    #loc_cb = plticker.MultipleLocator(base=0.2)
-
     AGB_file = '/home/dmilodow/DataStore_GCEL/AGB/avitabile/Avitabile_AGB_Map/Avitabile_AGB_Map.tif'
     ds = gdal.Open(AGB_file)
     geoTrans = ds.GetGeoTransform()
-    W = 114.
-    E = 120
-    N = 9
-    S = 3
+    W = 114.; E = 120; N = 9; S = 3
     agb,geoT=geo.clip_array_to_bbox(np.asarray(ds.ReadAsArray(),dtype='float'),geoTrans,N,S,W,E)
-    agb[agb<0]=np.nan
-    array = ma.masked_invalid(agb)
-    #array = np.asarray(ds.ReadAsArray(),dtype='float')/100.
-    #array[mask!=1]=np.nan
-    xres = geoT[1]
-    yres = geoT[5]
-    x0 = geoT[0]
-    y0 = geoT[3]
+    agb[agb<0]=np.nan; array = ma.masked_invalid(agb)
+
+    xres = geoT[1]; yres = geoT[5]; x0 = geoT[0]; y0 = geoT[3]
     rows,cols = array.shape
     lons = np.arange(x0,x0+xres*cols,xres)+ xres * 0.5
     lats = np.arange(y0,y0+yres*rows,yres)+ yres * 0.5

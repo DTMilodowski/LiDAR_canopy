@@ -917,7 +917,7 @@ def plot_location_map(figure_name,figure_number):
             col = colour[0]
         elif pp.attributes['ForestType'] == 'ML':
             col=colour[2]
-        ax.plot(pp.geometry.coords.xy[0],pp.geometry.coords.xy[1], marker='o', color=col, markersize=5)
+        ax.plot(pp.geometry.coords.xy[0],pp.geometry.coords.xy[1], marker='o', mfc=col,mec='white', mew=0.5, markersize=6)
 
     ax.set_xlim(left=W,right=E);ax.set_ylim(top=N,bottom=S)
 
@@ -949,7 +949,7 @@ def plot_location_map(figure_name,figure_number):
     ax.annotate('BRUNEI', xy=(114.4,4.74), xycoords='data',
             backgroundcolor='none',horizontalalignment='center', verticalalignment='center',
             fontsize=12, style='italic')
-    ax.annotate('N. KALIMANTAN', xy=(116.9,3.67), xycoords='data',
+    ax.annotate('N. KALIMANTAN', xy=(116.5,3.67), xycoords='data',
             backgroundcolor='none',horizontalalignment='center', verticalalignment='center',
             fontsize=12, style='italic')
     ax.annotate('SAFE', xy=(117.7,4.6), xycoords='data',backgroundcolor='none',
@@ -1428,4 +1428,129 @@ def plot_transmittance_ratio(figure_number,figure_name,pts):
     plt.tight_layout()
     plt.savefig(figure_name)
     plt.show()
+    return 0
+
+"""
+# Plot comparison of LiDAR derived profiles: Mac-Horn, Detto, Detto-corrected
+"""
+def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
+                        lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                        radiative_LAD,radiative_LAD_mean,
+                        radiative_DTM_LAD,radiative_DTM_LAD_mean):
+    max_return=3
+    n_subplots = 25
+    colour = ['#46E900','#1A2BCE','#E0007F']
+    fig_plots = [b'Belian',b'E',b'B South']
+
+    plt.figure(figure_number, facecolor='White',figsize=[8,8])
+
+    # Belian
+    ax1a = plt.subplot2grid((3,4),(0,0))
+    ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
+                fontsize=10)
+    ax2a.annotate('Return profile', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right',
+                verticalalignment='top', fontsize=9)
+    ax2a = plt.subplot2grid((3,4),(0,1),sharey=ax1a)
+    ax2a.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right',
+                verticalalignment='top', fontsize=9)
+    ax3a = plt.subplot2grid((3,4),(0,2),sharey=ax1a,sharex=ax3a)
+    ax3a.annotate('multi. return \nrad. trans.\npre-correction', xy=(0.95,0.95),
+                xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right',
+                verticalalignment='top', fontsize=9)
+    ax4a = plt.subplot2grid((3,4),(0,3),sharey=ax1a,sharex=ax3a)
+    ax4a.annotate('multi. return \nrad. trans.\npost-correction', xy=(0.95,0.95),
+                xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right',
+                verticalalignment='top', fontsize=9)
+
+    # E
+    ax1b = plt.subplot2grid((3,4),(1,0),sharey=ax1a,sharex=ax1a)
+    ax1b.annotate('b - Moderately logged, SAF05', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
+                fontsize=10)
+    ax2b = plt.subplot2grid((3,4),(1,1),sharey=ax1a,sharex=ax2a)
+    ax3b = plt.subplot2grid((3,4),(1,2),sharey=ax1a,sharex=ax3a)
+    ax4b = plt.subplot2grid((3,4),(1,3),sharey=ax1a,sharex=ax3a)
+
+    # B South
+    ax1c = plt.subplot2grid((3,4),(2,0),sharey=ax1a,sharex=ax1a)
+    ax1c.annotate('c - Heavily logged, SAF01', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
+                fontsize=10)
+    ax2c = plt.subplot2grid((3,4),(2,1),sharey=ax1a,sharex=ax2a)
+    ax3c = plt.subplot2grid((3,4),(2,2),sharey=ax1a,sharex=ax3a)
+    ax4c = plt.subplot2grid((3,4),(2,3),sharey=ax1a,sharex=ax3a)
+
+    ax1a.set_ylabel('Height / m',fontsize=axis_size)
+    ax1b.set_ylabel('Height / m',fontsize=axis_size)
+    ax1c.set_ylabel('Height / m',fontsize=axis_size)
+    ax1c.set_xlabel('Number of returns\n(x1000)',fontsize=axis_size,horizontalalignment='center')
+    ax2c.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    ax3c.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    ax4c.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    #---------------------------------------------------------
+
+    axes1 = [ax1a,  ax1b, ax1c]
+    axes2 = [ax3a,  ax3b, ax3c]
+    axes3 =  [ax4a,  ax4b, ax4c]
+    axes4 = [ax5a,  ax5b, ax5c]
+
+    yticklabels=[]
+    xticklabels=[]
+    xticklabels.append(ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xticklabels())
+
+    for pp in range(0,3):
+        Plot_name = fig1_plots[pp]
+
+        # plot lidar profile
+        return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
+        for k in range(0,max_return):
+            axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],
+            linewidth=1)
+
+        # plot macarthur horn profile
+        for i in range(0,n_subplots):
+            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],
+                        alpha=0.01)
+        axes2[pp].plot(MacArthurHorn_LAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+
+        # plot original Detto radiative transfer profile
+        for i in range(0,n_subplots):
+            axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+        axes3[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+
+        # plot corrective radiative transfer profile
+        for i in range(0,n_subplots):
+            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+        axes4[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+
+
+        yticklabels.append(axes2[pp].get_yticklabels())
+        yticklabels.append(axes3[pp].get_yticklabels())
+        yticklabels.append(axes4[pp].get_yticklabels())
+
+        if pp < 2:
+            xticklabels.append(axes1[pp].get_xticklabels())
+            xticklabels.append(axes2[pp].get_xticklabels())
+            xticklabels.append(axes3[pp].get_xticklabels())
+            xticklabels.append(axes4[pp].get_xticklabels())
+
+    ax1a.set_ylim(0,80)
+    ax1a.set_xlim(0,29)
+    ax2a.set_xlim(xmin=0,xmax=0.7)
+
+    ax2c.locator_params(axis='x',nbins=5)
+    ax3c.locator_params(axis='x',nbins=5)
+    ax4c.locator_params(axis='x',nbins=5)
+
+    plt.setp(yticklabels,visible=False)
+    plt.setp(xticklabels,visible=False)
+    plt.subplots_adjust(hspace=0.2, wspace = 0.1)
+
+    plt.tight_layout()
+    plt.savefig(figure_name)
+    plt.show()
+
     return 0

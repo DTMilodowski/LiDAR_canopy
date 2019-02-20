@@ -1605,21 +1605,16 @@ def plot_canopy_model(figure_number,figure_name,Plot_name,angle,field_data,
         print(row_min,row_max,col_min,col_max)
         canopy_ = canopy_[row_min:row_max,col_min:col_max]
 
+    dim_y = canopy_.shape[0]
+    dim_z = canopy_.shape[2]
 
     # Now plot up the crown model
     fig, (ax1, ax2) = plt.subplots(2,1, gridspec_kw = {'height_ratios':[dim_y,dim_z]},figsize=(8,8),num=figure_number)
 
-
-    #ax1 = plt.subplot2grid((dim_z+dim_y+20,1),(0,0),rowspan=dim_y)
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
                 horizontalalignment='left', verticalalignment='top', fontsize=10,color='white')
-    #ax1.set_aspect('equal', adjustable='datalim')
-    #ax2 = plt.subplot2grid((dim_z+dim_y+20,1),(dim_y+20,0),rowspan=dim_z)
     ax2.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
                 horizontalalignment='left', verticalalignment='top',fontsize=10,color='white')
-    #ax2.set_aspect('equal', adjustable='box-forced')
-    #plt.gca().set_aspect('equal', adjustable='box-forced')
-
     ax1.set_ylabel('Horizontal distance / m',fontsize=axis_size)
     ax1.set_xlabel('Horizontal distance / m',fontsize=axis_size)
     ax2.set_ylabel('Height / m',fontsize=axis_size)
@@ -1627,8 +1622,6 @@ def plot_canopy_model(figure_number,figure_name,Plot_name,angle,field_data,
 
     im1 = ax1.imshow(np.sum(canopy_,axis=2), cmap = 'viridis',vmin=0,origin = 'lower')
     im2 = ax2.imshow(np.sum(canopy_,axis=0).transpose()/100., cmap = 'viridis',vmin=0,origin = 'lower')
-
-    #ax2.autoscale()
 
     # colorbar bits and bobs
     divider = make_axes_locatable(ax1)

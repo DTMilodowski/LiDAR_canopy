@@ -76,8 +76,8 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
     # The GPS coordinates for the plot locations can be used to find this transformation matrix
     datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32','f16','f16','f16','f16')}
     plot_coords = np.genfromtxt(gps_pts_file, delimiter = ',',dtype=datatype)
-    plot_coords['plot'][plot_coords['plot']=='maliau_belian'] = 'Belian'
-    Plot = 'Belian'
+    plot_coords['plot'][plot_coords['plot']==b'maliau_belian'] = b'Belian'
+    Plot = b'Belian'
 
     # first get points for a given plot and build matrices - note that I've reversed xy and xy_prime in this case to reverse the rotation-translation
     mask = plot_coords['plot']==Plot
@@ -89,7 +89,7 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
 
     Xi = np.asarray([plot_point_cloud[Plot][:,0],plot_point_cloud[Plot][:,1],
                             np.ones(plot_point_cloud[Plot].shape[0])])
-    Xi_prime = np.dot(affine[Plot],Xi)
+    Xi_prime = np.dot(affine,Xi)
 
     plot_point_cloud_display = plot_point_cloud[Plot].copy()
     plot_point_cloud_display[:,0]=Xi_prime[0]
@@ -99,7 +99,7 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
 
     # Belian
     ax = plt.subplot2grid((1,1),(0,0))
-    ax.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax.annotate('Old growth forest, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
@@ -118,8 +118,8 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
         colours[:,2]=rgb[k][2]/255.
 
         colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
-        ax.scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=1)
-        ax.scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=1,
+        ax.scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=2)
+        ax.scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=2,
                         label=labels[k])
 
     ax.set_xlim(0,100)

@@ -32,7 +32,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 # Set up some basiic parameters for the plots
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['arial']
-rcParams['font.size'] = 12
+rcParams['font.size'] = 8
 rcParams['legend.numpoints'] = 1
 axis_size = rcParams['font.size']+2
 colour = ['#46E900','#1A2BCE','#E0007F']
@@ -1604,17 +1604,21 @@ def plot_canopy_model(figure_number,figure_name,Plot_name,angle,field_data,
         col_max = np.argwhere(col_test>0.001)[-1][0]
         print(row_min,row_max,col_min,col_max)
         canopy_ = canopy_[row_min:row_max,col_min:col_max]
-    # Now plot up the crown model
-    fig = plt.figure(figure_number, facecolor='White',figsize=[8,8])
 
-    ax1 = plt.subplot2grid((2,1),(0,0))
+
+    # Now plot up the crown model
+    fig, (ax1, ax2) = plt.subplots(2,1, gridspec_kw = {'height_ratios':[dim_y,dim_z]},figsize=(8,8),num=figure_number)
+
+
+    #ax1 = plt.subplot2grid((dim_z+dim_y+20,1),(0,0),rowspan=dim_y)
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
-                horizontalalignment='left', verticalalignment='top', fontsize=10)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
-    ax2 = plt.subplot2grid((2,1),(1,0))
+                horizontalalignment='left', verticalalignment='top', fontsize=10,color='white')
+    #ax1.set_aspect('equal', adjustable='datalim')
+    #ax2 = plt.subplot2grid((dim_z+dim_y+20,1),(dim_y+20,0),rowspan=dim_z)
     ax2.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
-                horizontalalignment='left', verticalalignment='top',fontsize=10)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+                horizontalalignment='left', verticalalignment='top',fontsize=10,color='white')
+    #ax2.set_aspect('equal', adjustable='box-forced')
+    #plt.gca().set_aspect('equal', adjustable='box-forced')
 
     ax1.set_ylabel('Horizontal distance / m',fontsize=axis_size)
     ax1.set_xlabel('Horizontal distance / m',fontsize=axis_size)
@@ -1624,20 +1628,22 @@ def plot_canopy_model(figure_number,figure_name,Plot_name,angle,field_data,
     im1 = ax1.imshow(np.sum(canopy_,axis=2), cmap = 'viridis',vmin=0,origin = 'lower')
     im2 = ax2.imshow(np.sum(canopy_,axis=0).transpose()/100., cmap = 'viridis',vmin=0,origin = 'lower')
 
+    #ax2.autoscale()
+
     # colorbar bits and bobs
     divider = make_axes_locatable(ax1)
     cax1 = divider.new_horizontal(size="5%", pad=0.8, axes_class=plt.Axes)
     fig.add_axes(cax1)
     cbar1=plt.colorbar(im1, cax=cax1)
-    cbar1.ax.set_ylabel('Crown volume / m$^3$m$^{-2}$m$^{-1}$',fontsize = 12)
+    cbar1.ax.set_ylabel('Crown volume / m$^3$m$^{-2}$m$^{-1}$',fontsize = 10)
     cbar1.solids.set_edgecolor("face")
-    divider = make_axes_locatable(ax1)
 
     divider = make_axes_locatable(ax2)
     cax2 = divider.new_horizontal(size="5%", pad=0.8, axes_class=plt.Axes)
     fig.add_axes(cax2)
     cbar2=plt.colorbar(im2, cax=cax2)
-    cbar2.ax.set_ylabel('Crown volume density / m$^3$m$^{-2}$m$^{-1}$',fontsize = 12)
+    cbar2.ax.set_ylabel('Crown volume density / m$^3$m$^{-2}$m$^{-1}$',fontsize = 10)
     cbar2.solids.set_edgecolor("face")
+    plt.savefig(figure_name)
     plt.show()
     return 0

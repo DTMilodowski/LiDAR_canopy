@@ -46,6 +46,8 @@ D1_stemcensus = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Danum/carbon_plot_
 D2_stemcensus = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Danum/carbon_plot_data_Danum_05042017_DTMformatting_DAN05.csv'
 SAFE_stemcensus = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_plots/SAFE_SmallTreeCensus_year1only.csv'
 
+gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
+
 # also define output directory (for saving figures)
 output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/FiguresRevised/'
 
@@ -270,7 +272,7 @@ error['Ht']=[.1,.1]
 error['DBH']=[0.,.02]
 error['Area']=[0.,.05]
 
-n_iter = 10
+n_iter = 100
 for pp in range(0,N_plots):
     print(Plots[pp])
     Plot_name=Plots[pp]
@@ -360,7 +362,7 @@ csp.plot_location_map(figure_name,figure_number)
 """
 # Figure 2 sample point cloud - coloured by return number
 """
-figure_name = output_dir+'Fig1_sample_point_cloud.png'
+figure_name = output_dir+'Fig2_sample_point_cloud.png'
 figure_number = 2
 csp.plot_point_cloud(figure_name,figure_number,gps_pts_file,plot_point_cloud)
 
@@ -488,7 +490,7 @@ csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 """
 figure_number = 113
 figure_name = output_dir+'figS3_crown_model_example'
-Plot_name = b'Seraya'
+Plot_name = b'Belian'
 angle = 45.
 csp.plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
                     a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)

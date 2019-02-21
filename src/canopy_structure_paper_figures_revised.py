@@ -332,8 +332,6 @@ for pp in range(0,N_plots):
 
     field_profiles[:]+=np.mean(smallstem_profiles,axis=0)
 
-
-
     inventory_LAD[Plot_name] = np.mean(field_profiles,axis=0)
     inventory_LAD_std[Plot_name] = np.std(field_profiles,axis=0)
     inventory_LAI[Plot_name] = np.sum(field_profiles)*layer_thickness
@@ -431,21 +429,22 @@ for pp in range(0,len(Plots_SAFE)):
     temp_BA = np.zeros(n_subplots)
     for ss in range(0,n_subplots):
         # check basal area
-        temp_BA[ss] = census[Plots_SAFE[pp]]['BasalArea'][ss,0]*25/100**2
+        temp_BA[ss] = census[Plots_SAFE[pp]]['BasalArea'][ss,0]*n_subplots/100**2
     temp_BA[np.isnan(temp_BA)]=0
     BA[Plots_SAFE[pp]]=temp_BA.copy()
 
 for pp in range(0,len(Plots_Danum)):
     temp_BA = np.zeros(n_subplots)
     for ss in range(0,n_subplots):
-        indices = np.all((field_data['plot']==Plots_Danum[pp],field_data['subplot']==ss+1,
+        indices = np.all((field_data['plot']==str.encode(Plots_Danum[pp]),
+                                field_data['subplot']==ss+1,
                                 np.isfinite(field_data['DBH'])),axis=0)
-        temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*25./100.**2
+        temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*n_subplots/100.**2
     BA[Plots_Danum[pp]]=temp_BA.copy()
 
 csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                            radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,
-                            BA,plot_marker,plot_label)
+                            radiative_DTM_LAD,radiative_DTM_LAD_mean,BA,plot_marker,plot_label,
+                            plot_colour)
 
 #-------------------------------
 # RESULTS - SENSITIVITY ANALYSIS

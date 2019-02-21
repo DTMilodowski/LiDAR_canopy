@@ -1,4 +1,3 @@
-
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
@@ -1322,12 +1321,13 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
 # Plot allometric relationships
 # Plot three subplots defining the relationships used to construct the canopy profiles
 """
-def plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file,niter=10000):
+def plot_allometric_relationships(figure_name,figure_number,field_file,
+                                    allometry_file,niter=10000):
 
-    #DBH_BAAD, H_BAAD, D_BAAD = field.load_BAAD_crown_allometry_data(allometry_file)
-    BAAD = field.load_BAAD_allometry_data(allometry_file,filter_dbh=True,filter_status='None')
-    H_BAAD = BAAD['ht']
-    D_BAAD = BAAD['cd']
+    DBH_BAAD, H_BAAD, D_BAAD = field.load_BAAD_crown_allometry_data(allometry_file)
+    #BAAD = field.load_BAAD_allometry_data(allometry_file,filter_dbh=True,filter_status='None')
+    #H_BAAD = BAAD['ht']
+    #D_BAAD = BAAD['cd']
     a, b, CF, r_sq, p, H_, PI_u, PI_l = field.log_log_linear_regression(H_BAAD,D_BAAD,conf=0.90)
 
     field_data = field.load_crown_survey_data(field_file)

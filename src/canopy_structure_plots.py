@@ -800,11 +800,11 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
 # LAI vs. basal area
 """
 def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                            radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,
-                            radiative_DTM_LAD_mean,BasalArea,layer_thickness=1):
+                            radiative_DTM_LAD,radiative_DTM_LAD_mean,BasalArea,
+                            plot_marker,plot_label,plot_colour,layer_thickness=1):
 
 
-    Plots = MacArthurHorn_LAD.keys()
+    Plots = list(MacArthurHorn_LAD.keys())
     N_plots = len(Plots)
     N_subplots = np.shape(MacArthurHorn_LAD[Plots[0]])[0]
     BA = np.zeros(N_plots)
@@ -816,12 +816,11 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
 
     for pp in range(0,N_plots):
         print(Plots[pp])
+        Plots_str = str(Plots[pp], 'utf-8')
         # for 1 ha averages, want to avoid nodata
         # these should be identifiable based on penetration limit
-        BA[pp] = np.mean(BasalArea[Plots[pp]]).copy()
+        BA[pp] = np.mean(BasalArea[Plots_str]).copy()
         mh[pp] = np.nansum(MacArthurHorn_LAD_mean[Plots[pp]])*layer_thickness
-        rad2[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,1])*layer_thickness
-        rad3[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,2])*layer_thickness
         radDTM2[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,1])*layer_thickness
         radDTM3[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,2])*layer_thickness
 
@@ -837,23 +836,28 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
     ax1.annotate(r_sq_a, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=axis_size)
 
     # plot linear regression
-    m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = linear_regression(BA,mh,conf=0.95)
+    m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = field.linear_regression(BA,mh,conf=0.95)
     ax1.fill_between(x_i,CI_l,CI_u,color='0.75')
     ax1.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
-        ax1.plot(BA[i],mh[i],marker=plot_marker[Plots[i]],markerfacecolor=plot_colour[Plots[i]],linestyle='None')
+        Plot_str = str(Plots[i], 'utf-8')
+        ax1.plot(BA[i],mh[i],marker=plot_marker[Plot_str],
+                    color=plot_colour[Plot_str],linestyle='None')
 
     ax3 = plt.subplot2grid((1,2),(0,1), sharex=ax1)#, sharey=ax1)
-    ax3.annotate('b - radiative transfer (modified)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-    ax3.annotate(r_sq_b, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='bottom', fontsize=axis_size)
+    ax3.annotate('b - multi. return\nradiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
+    ax3.annotate(r_sq_b, xy=(0.5,0.05), xycoords='axes fraction',backgroundcolor='none',
+            horizontalalignment='center', verticalalignment='bottom', fontsize=axis_size)
     ax3.set_ylabel('PAI',fontsize=axis_size)
     ax3.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
 
-    m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = linear_regression(BA,radDTM3,conf=0.95)
+    m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = field.linear_regression(BA,radDTM3,conf=0.95)
     ax3.fill_between(x_i,CI_l,CI_u,color='0.75')
     ax3.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
-        ax3.plot(BA[i],radDTM3[i],marker=plot_marker[Plots[i]],markerfacecolor=plot_colour[Plots[i]],linestyle='None')
+        Plot_str = str(Plots[i], 'utf-8')
+        ax3.plot(BA[i],radDTM3[i],marker=plot_marker[Plot_str],
+                    color=plot_colour[Plot_str],linestyle='None',label=plot_label[Plot_str])
 
     ax3.legend(loc=4)
 
@@ -1439,7 +1443,6 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
                         radiative_DTM_LAD,radiative_DTM_LAD_mean):
     max_return=3
     n_subplots = 25
-    colour = ['#46E900','#1A2BCE','#E0007F']
     fig_plots = [b'Belian',b'E',b'B South']
 
     plt.figure(figure_number, facecolor='White',figsize=[8,8])
@@ -1449,18 +1452,18 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
     ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
                 fontsize=10)
-    ax2a.annotate('Return profile', xy=(0.95,0.95), xycoords='axes fraction',
+    ax1a.annotate('Return profile', xy=(0.95,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
     ax2a = plt.subplot2grid((3,4),(0,1),sharey=ax1a)
     ax2a.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
-    ax3a = plt.subplot2grid((3,4),(0,2),sharey=ax1a,sharex=ax3a)
+    ax3a = plt.subplot2grid((3,4),(0,2),sharey=ax1a,sharex=ax2a)
     ax3a.annotate('multi. return \nrad. trans.\npre-correction', xy=(0.95,0.95),
                 xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
-    ax4a = plt.subplot2grid((3,4),(0,3),sharey=ax1a,sharex=ax3a)
+    ax4a = plt.subplot2grid((3,4),(0,3),sharey=ax1a,sharex=ax2a)
     ax4a.annotate('multi. return \nrad. trans.\npost-correction', xy=(0.95,0.95),
                 xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
@@ -1493,38 +1496,42 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
     #---------------------------------------------------------
 
     axes1 = [ax1a,  ax1b, ax1c]
-    axes2 = [ax3a,  ax3b, ax3c]
-    axes3 =  [ax4a,  ax4b, ax4c]
-    axes4 = [ax5a,  ax5b, ax5c]
+    axes2 = [ax2a,  ax2b, ax2c]
+    axes3 =  [ax3a,  ax3b, ax3c]
+    axes4 = [ax4a,  ax4b, ax4c]
 
     yticklabels=[]
     xticklabels=[]
     xticklabels.append(ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xticklabels())
 
     for pp in range(0,3):
-        Plot_name = fig1_plots[pp]
+        Plot_name = fig_plots[pp]
 
         # plot lidar profile
         return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
         for k in range(0,max_return):
-            axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],
-            linewidth=1)
+            axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,
+            '-',c=colour[k], linewidth=1)
 
         # plot macarthur horn profile
         for i in range(0,n_subplots):
-            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],
-                        alpha=0.01)
+            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],
+                                    color=colour[0],alpha=0.02)
         axes2[pp].plot(MacArthurHorn_LAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
 
         # plot original Detto radiative transfer profile
         for i in range(0,n_subplots):
-            axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
-        axes3[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+            axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_LAD[Plot_name][i,:-3,-1][::-1],
+                                    color=colour[1],alpha=0.02)
+        axes3[pp].plot(radiative_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
+                                    '-',c=colour[1],linewidth=2)
 
         # plot corrective radiative transfer profile
         for i in range(0,n_subplots):
-            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
-        axes4[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],
+                                    color=colour[1],alpha=0.02)
+        axes4[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
+                                    '-',c=colour[1],linewidth=2)
 
 
         yticklabels.append(axes2[pp].get_yticklabels())
@@ -1558,7 +1565,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 """
 # Plot example crown model
 """
-def plot_canopy_model(figure_number,figure_name,Plot_name,angle,field_data,
+def plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
                     a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a_D, b_D, CF_D,
                     clip=True,buff=10):
     # set up crown model etc

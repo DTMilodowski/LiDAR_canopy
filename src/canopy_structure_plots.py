@@ -1168,10 +1168,10 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
                                 radiative_DTM_LAD,radiative_DTM_LAD_mean,max_return=2):
 
     # 3 columns (old growth, moderately logged, heavily logged)
-    fig = plt.figure(figure_number, facecolor='White',figsize=[3,8])
+    fig = plt.figure(figure_number, facecolor='White',figsize=[8,4])
 
     # First up - old-growth forest
-    Plot_name='Belian'
+    Plot_name=b'Belian'
     ids = np.arange(heights.size)
     idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
@@ -1187,24 +1187,24 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     ax1.plot(x1-x,y,linewidth=2,color='k')
 
     # Next up - Moderately logged forest
-    Plot_name='E - SAF-03'
+    Plot_name=b'E'
     ids = np.arange(heights.size)
     idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
     x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
     x1=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     ax2 = plt.subplot2grid((1,3),(0,1),sharex=ax1,sharey=ax1)
-    ax2.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
+    ax2.annotate('b - SAF-03', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
                     horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
         ax2.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),
                     y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax2.plot(x1-x,y,linewidth=2,color='k')
-    ax2.set_xlabel('PAD$_{rad trans}$-PAD$_{MacArthur-Horn}$\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
+    ax2.set_xlabel('PAD$_{rad trans}$ - PAD$_{MacArthur-Horn}$ / (m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
 
 
     # Finally heavily logged forest
-    Plot_name = 'B South'
+    Plot_name = b'B South'
     ids = np.arange(heights.size)
     idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
@@ -1216,7 +1216,7 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     for i in range(0,n_subplots):
         ax3.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),
                 y,'-',color='0.5',linewidth=0.5,alpha=0.5)
-    a3.plot(x1-x,y,linewidth=2,color='k')
+    ax3.plot(x1-x,y,linewidth=2,color='k')
     # tidy up tick labels
     ax3.set_ylabel('height (m))',fontsize=axis_size)
     ax3.yaxis.set_label_position("right")
@@ -1224,8 +1224,12 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     ax3.yaxis.set_ticks_position('both')
     yticklabels=[ax2.get_yticklabels()]
     plt.setp(yticklabels,visible=False)
+    ax1.yaxis.set_ticks_position('both')
+    ax2.yaxis.set_ticks_position('both')
+    ax1.set_xlim(-2,2)
 
     plt.tight_layout()
+    plt.savefig(figure_name)
     plt.show()
 
     return 0

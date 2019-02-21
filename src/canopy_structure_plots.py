@@ -1635,7 +1635,7 @@ def plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
     cax1 = divider.new_horizontal(size="5%", pad=0.8, axes_class=plt.Axes)
     fig.add_axes(cax1)
     cbar1=plt.colorbar(im1, cax=cax1)
-    cbar1.ax.set_ylabel('Crown volume / m$^3$m$^{-2}$m$^{-1}$',fontsize = 10)
+    cbar1.ax.set_ylabel('Crown volume / m$^3$m$^{-2}$',fontsize = 10)
     cbar1.solids.set_edgecolor("face")
 
     divider = make_axes_locatable(ax2)

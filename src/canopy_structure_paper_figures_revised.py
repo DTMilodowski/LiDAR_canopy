@@ -71,6 +71,7 @@ beta_max = 0.44 # 95% range reported for US tree species by Purves et al. (2007)
 kappa = 0.70
 
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
+heights_rad = np.arange(0,max_height+layer_thickness,layer_thickness)
 
 #------------------------------------------------------------------------------------
 # DECLARATIONS
@@ -148,7 +149,6 @@ for pp in range(0,N_plots):
         max_height_LiDAR[Plot_name][ss]=np.max(sp_pts[:,2])
 
     # set up some arrays to host the radiative transfer based profiles
-    heights_rad = np.arange(0,max_height+layer_thickness,layer_thickness)
     LAD_rad = np.zeros((n_subplots,heights_rad.size,max_return))
     LAD_rad_DTM = np.zeros((n_subplots,heights_rad.size,max_return))
     LAD_rad_DTM_old = np.zeros((n_subplots,heights_rad.size,max_return))
@@ -314,7 +314,6 @@ for pp in range(0,N_plots):
     smallstem_profiles = np.zeros((n_subplots,heights.size))
     for ss in range(0,n_subplots):
         subplot_index = int(subplot_labels[Plot_name][ss]-1)
-
         if Plot_name == b'DC1':
             Ht,Area,Depth,StemDensity = field.calculate_crown_dimensions_for_stem_distributions(DC1_stem_data['dbh'],
                                                 DC1_stem_data['stem_density'][:,subplot_index],
@@ -328,10 +327,12 @@ for pp in range(0,N_plots):
                                                 SAFE_stem_data[Plot_name]['stem_density'][:,subplot_index],
                                                 a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
 
-        smallstem_profiles[ss,:] = field.calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(heights,
+        smallstem_profiles[subplot_index,:] = field.calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(heights,
                                             Area, Depth, Ht, StemDensity)
 
     field_profiles[:]+=np.mean(smallstem_profiles,axis=0)
+
+
 
     inventory_LAD[Plot_name] = np.mean(field_profiles,axis=0)
     inventory_LAD_std[Plot_name] = np.std(field_profiles,axis=0)

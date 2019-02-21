@@ -4,6 +4,8 @@
 import numpy as np
 from scipy import stats
 
+pi=np.pi
+
 # linear regression with confidence intervals and prediction intervals
 def linear_regression(x_,y_,conf=0.95):
     mask = np.all((np.isfinite(x_),np.isfinite(y_)),axis=0)
@@ -271,7 +273,9 @@ def retrieve_crown_allometry(filename,conf=0.9):
     return a, b, CF, r**2, p, H, D, H_i, PI_u, PI_l
 
 def load_BAAD_crown_allometry_data(filename):
-    datatype = {'names': ('ID', 'Ref', 'Location', 'Lat', 'Long', 'Species', 'Family','Diameter','Height','CrownArea','CrownDepth'), 'formats': ('int_','S32','S256','f','f','S32','S32','f','f','f','f')}
+    datatype = {'names': ('ID', 'Ref', 'Location', 'Lat', 'Long', 'Species', 'Family',
+                'Diameter','Height','CrownArea','CrownDepth'),
+                'formats': ('int_','S32','S256','f','f','S32','S32','f','f','f','f')}
     data = np.genfromtxt(filename, skip_header = 1, delimiter = ',',dtype=datatype)
     mask = np.all((~np.isnan(data['Diameter']),~np.isnan(data['CrownDepth'])),axis=0)
     H = data['Height'][mask]
@@ -279,8 +283,12 @@ def load_BAAD_crown_allometry_data(filename):
     DBH = data['Diameter'][mask]
     return DBH, H, D
 
-def load_BAAD_allometry_data(filename, filter_TropRF = True, filter_nodata = True, filter_dbh = True,filter_status='None'):
-    datatype = ['S10','S100','f','f','S6','f','f', 'S200','f','S100','S100','S100','S4','S4','S4','S100','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f']
+def load_BAAD_allometry_data(filename, filter_TropRF = True, filter_nodata = True,
+                            filter_dbh = True,filter_status='None'):
+    datatype = ['S10','S100','f','f','S6','f','f', 'S200','f','S100','S100','S100',
+                'S4','S4','S4','S100','f','f','f','f','f','f','f','f','f','f','f',
+                'f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f',
+                'f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f','f']
     data = np.genfromtxt(filename, names=True, delimiter = ',',dtype=datatype)
     if filter_TropRF:
         mask = data['vegetation']=='TropRF'
@@ -415,8 +423,6 @@ def calculate_LAD_profiles_ellipsoid(canopy_layers, a, b, c, z0, plot_area, leaf
         x2 = np.min((z0+c-ht_l,2*c),axis=0)
         CanopyV[i]+= np.sum(pi/3.*a[mask]*b[mask]/c[mask]**2 *(x2[mask]**2.*(3.*c[mask]-x2[mask]) - x1[mask]**2.*(3.*c[mask]-x1[mask])))
 
-    #CanopyV = CanopyV1+CanopyV2+CanopyV3+CanopyV4
-
     # sanity check
     TestV = np.nansum(4*pi*a*b*c/3)
     print(CanopyV.sum(),TestV)
@@ -451,7 +457,8 @@ def calculate_LAD_profiles_generic(canopy_layers, Area, D, Ht, beta, plot_area, 
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
 
-def calculate_LAD_profiles_generic_mc(canopy_layers, Area, D, Ht, beta_min, beta_max, plot_area, leafA_per_unitV=1.):
+def calculate_LAD_profiles_generic_mc(canopy_layers, Area, D, Ht, beta_min, beta_max,
+                                        plot_area, leafA_per_unitV=1.):
     r_max = np.sqrt(Area/np.pi)
     layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
     N_layers = canopy_layers.size
@@ -481,12 +488,12 @@ def calculate_LAD_profiles_generic_mc(canopy_layers, Area, D, Ht, beta_min, beta
     LAD = CanopyV*leafA_per_unitV/plot_area
     return LAD, CanopyV
 
-
 #---------------------------------------
 # SMALL SAFE PLOTS DATA
 # some code to load in the survey data on small stems from the small SAFE plots.
 # Numbers of stems are given as a  per-metre density
-def load_SAFE_small_plot_data(filename, plot_area=25.*25.):
+# SAFE small plots are 25 m x 25 m
+def load_SAFE_small_plot_data(filename, plot_area=625.):
     datatype = {'names': ('Block', 'Plot', 'TreeID', 'DBH', 'Height', 'CrownRadius'), 'formats': ('S3','i8','S8','f16','f16','f16')}
     data = np.genfromtxt(filename, skip_header = 1, delimiter = ',',dtype=datatype)
 
@@ -522,27 +529,23 @@ def load_SAFE_small_plot_data(filename, plot_area=25.*25.):
                     if np.isfinite(ht):
                         sum_height[ii,pp]+=ht
                         n_height[ii,pp]+=1
-                    #rad = data['CrownRadius'][mask2][tt]
-                    #if np.isfinite(rad):
-                    #    sum_area[ii,pp]+=np.pi*rad**2
-                    #    n_area[ii,pp]+=1.
 
         # get plot means
         mean_height = sum_height/n_height
-        #mean_area = sum_area/n_area
 
         # plot
         crown_geometry = {}
         crown_geometry['dbh'] = DBH[1:]
         crown_geometry['stem_density'] = np.mean(n_stems,axis=1)[1:]/plot_area
         crown_geometry['height'] = np.mean(mean_height,axis=1)[1:]
-        #crown_geometry['area'] = np.mean(mean_area,axis=1)[1:]
         block_dict[blocks[bb]]= crown_geometry
 
     return block_dict
 
 # some code to get crown dimensions for stem size distributions
-def calculate_crown_dimensions_small_plots(DBH,Ht,stem_density,a_ht, b_ht, CF_ht, a_area, b_area, CF_area, a_depth, b_depth, CF_depth):
+def calculate_crown_dimensions_small_plots(DBH,Ht,stem_density,a_ht, b_ht, CF_ht,
+                                            a_area, b_area, CF_area,
+                                            a_depth, b_depth, CF_depth):
 
     # Get rid of bins with no trees
     Ht = Ht[stem_density>0]
@@ -566,13 +569,12 @@ def calculate_crown_dimensions_small_plots(DBH,Ht,stem_density,a_ht, b_ht, CF_ht
     return Ht, Area, Depth, stem_density
 
 # calculate the crown profiles from the stem size distributions
-def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, Ht, stem_density, beta, leafA_per_unitV=1.):
-
-    r_max = np.sqrt(Area/np.pi)
+def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, Ht,
+                                        stem_density, beta, leafA_per_unitV=1.):
+    r_max = np.sqrt(Area/pi)
     layer_thickness = np.abs(canopy_layers[1]-canopy_layers[0])
     N_layers = canopy_layers.size
     CanopyV = np.zeros(N_layers)
-    pi=np.pi
     zeros = np.zeros(Ht.size)
     # Formula for volume of revolution of power law function r = alpha*D^beta:
     #                 V = pi*(r_max/D_max^beta)^2/(2*beta+1) * (D2^(2beta+1) - D1^(2beta+1))
@@ -583,7 +585,8 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
         mask = np.all((Ht>=ht_l,Ht-D<=ht_u),axis=0)
         d1 = np.max((Ht-ht_u,zeros),axis=0)
         d2 = np.min((Ht-ht_l,D),axis=0)
-        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta)**2/(2*beta+1) * (d2[mask]**(2*beta+1) - d1[mask]**(2*beta+1))*stem_density[mask] )
+        CanopyV[i]+= np.sum( pi*(r_max[mask]/D[mask]**beta)**2/(2*beta+1) *
+                            (d2[mask]**(2*beta+1) - d1[mask]**(2*beta+1))*stem_density[mask] )
 
     LAD = CanopyV*leafA_per_unitV
     return LAD
@@ -591,8 +594,6 @@ def calculate_LAD_profiles_from_stem_size_distributions(canopy_layers, Area, D, 
 # as above for ellipsoidal geometry
 def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers,
                                     Area, D, Ht, stem_density, leafA_per_unitV=1.):
-
-    pi=np.pi
     # ellipsoid dims
     a = np.sqrt(Area/pi)
     b=a.copy()
@@ -603,26 +604,27 @@ def calculate_LAD_profiles_ellipsoid_from_stem_size_distributions(canopy_layers,
     N_layers = canopy_layers.size
     CanopyV = np.zeros(N_layers)
     zeros = np.zeros(a.size)
-    # Formula for volume of ellipsoidal cap: V = 1/3*pi*a*b*x**2*(3c-x)/c**2 where x
-    # is the vertical distance from the top of the ellipsoid along axis c.
+    # Formula for volume of ellipsoidal cap:
+    #       V = 1/3*pi*a*b*x**2*(3c-x)/c**2
+    # where x is the vertical distance from the top of the ellipsoid along axis c.
+    # Therefore ellipsoidal slice between x1 and x2:
+    #       V = (1/3*pi*a*b*/c**2)*(x2**2*(3c-x2)-x2**2*(3c-x2))
     for i in range(0,N_layers):
         ht_u = canopy_layers[i]
         ht_l = ht_u-layer_thickness
         mask = np.all((z0+c>=ht_l,z0-c<=ht_u),axis=0)
         x1 = np.max((z0+c-ht_u,zeros),axis=0)
         x2 = np.min((z0+c-ht_l,2*c),axis=0)
-        CanopyV[i]+= np.sum(pi/3.*a[mask]*b[mask]/c[mask]**2 *
+        CanopyV[i]+= np.sum( pi/3.*a[mask]*b[mask]/c[mask]**2 *
                             (x2[mask]**2.*(3.*c[mask]-x2[mask])-
-                            x1[mask]**2.*(3.*c[mask]-x1[mask])))
+                            x1[mask]**2.*(3.*c[mask]-x1[mask]))*stem_density[mask] )
 
-    # sanity check
-    # Formula for volume of ellipsoid: V = 4/3*pi*a*b*c
-    #TestV = np.nansum(4*pi*a*b*c/3)
     LAD = CanopyV*leafA_per_unitV
     return LAD
 
 #=====================================================================================================================
-# Load in data for SAFE detailed subplot census - all trees >2 cm  - only interested in a subset of the fields
+# Load in data for SAFE detailed subplot census - all trees >2 cm  -
+# only interested in a subset of the fields
 def load_SAFE_small_stem_census(filename, sp_area=20.**2, N_subplots = 25):
 
     datatype = {'names': ('Plot', 'Subplot', 'Date', 'Obs','tag', 'DBH_ns',

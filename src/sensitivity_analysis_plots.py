@@ -266,7 +266,6 @@ def plot_profile_sensitivity_point_density(figure_number,figure_name,heights,PAD
     plt.show()
     return 0
 
-
 """
 Plot fraction of unsampled layers in profile
 """
@@ -320,6 +319,83 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
     plt.subplots_adjust(hspace=0.4, wspace = 0.4,bottom=0.2)
 
     ax1c.legend(loc=5)
+    plt.savefig(figure_name)
+    plt.show()
+    return 0
+
+"""
+Plot individual profile sensitivity to resolution
+"""
+def plot_profile_sensitivity_to_resolution_individual_CI(figure_number,figure_name,heights,
+                            PAD_profiles_MH_Belian,PAD_profiles_rad_Belian):
+    plt.figure(figure_number, facecolor='White',figsize=[8,4])
+    ax3a = plt.subplot2grid((1,6),(0,0))
+    ax3a.set_ylabel('height / m',fontsize=axis_size)
+    ax3a.annotate('a - 2 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+    ax3b = plt.subplot2grid((1,6),(0,1),sharex=ax3a,sharey=ax3a)
+    ax3b.annotate('b - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+    ax3c = plt.subplot2grid((1,6),(0,2),sharex=ax3a,sharey=ax3a)
+    ax3c.annotate('c - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+    ax3d = plt.subplot2grid((1,6),(0,3),sharex=ax3a,sharey=ax3a)
+    ax3d.annotate('d - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+    ax3e = plt.subplot2grid((1,6),(0,4),sharex=ax3a,sharey=ax3a)
+    ax3e.annotate('e - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+    ax3f = plt.subplot2grid((1,6),(0,5),sharex=ax3a,sharey=ax3a)
+    ax3f.annotate('f - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+
+    # loop through the subplots
+    sp = [ax3a,ax3b,ax3c,ax3d,ax3e,ax3f]
+    pkeys = ['2m','5m','10m','20m','50m','100m']
+    for pp in range(0,len(sp)):
+        MHl = np.nanpercentile(PAD_profiles_MH_Belian[pkeys[pp]]['40'],2.5,axis=0)
+        MH25 = np.nanpercentile(PAD_profiles_MH_Belian[pkeys[pp]]['40'],25,axis=0)
+        MH75 = np.nanpercentile(PAD_profiles_MH_Belian[pkeys[pp]]['40'],75,axis=0)
+        MHu = np.nanpercentile(PAD_profiles_MH_Belian[pkeys[pp]]['40'],97.5,axis=0)
+        MH_95CI_i = ((MHu-MHl)/np.nanmean(PAD_profiles_MH_Belian[pkeys[pp]]['40'],axis=0))*100.
+        MH_50CI_i = ((MH75-MH25)/np.nanmean(PAD_profiles_MH_Belian[pkeys[pp]]['40'],axis=0))*100.
+        MH_95CI = np.nansum(MH_95CI_i,axis=0)/np.sum(np.isfinite(MH_95CI_i),axis=0)
+        MH_50CI = np.nansum(MH_50CI_i,axis=0)/np.sum(np.isfinite(MH_50CI_i),axis=0)
+        sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1)
+        sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1)
+        if pp==2:
+            sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1,label='MacArthur-Horn 95% CI')
+            sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1,label='MacArthur-Horn 50% CI')
+        else:
+            sp[pp].plot(MH_95CI[2:],heights[2:],':',c=colour[0],linewidth=1)
+            sp[pp].plot(MH_50CI[2:],heights[2:],'-',c=colour[0],linewidth=1)
+
+        radl = np.nanpercentile(PAD_profiles_rad_Belian[pkeys[pp]]['40'],2.5,axis=0)
+        rad25 = np.nanpercentile(PAD_profiles_rad_Belian[pkeys[pp]]['40'],25,axis=0)
+        rad75 = np.nanpercentile(PAD_profiles_rad_Belian[pkeys[pp]]['40'],75,axis=0)
+        radu = np.nanpercentile(PAD_profiles_rad_Belian[pkeys[pp]]['40'],97.5,axis=0)
+        rad_95CI_i = ((radu-radl)/np.nanmean(PAD_profiles_rad_Belian[pkeys[pp]]['40'],axis=0))*100.
+        rad_50CI_i = ((rad75-rad25)/np.nanmean(PAD_profiles_rad_Belian[pkeys[pp]]['40'],axis=0))*100.
+        rad_95CI = np.nansum(rad_95CI_i,axis=0)/np.sum(np.isfinite(rad_95CI_i),axis=0)
+        rad_50CI = np.nansum(rad_50CI_i,axis=0)/np.sum(np.isfinite(rad_50CI_i),axis=0)
+        if pp==2:
+            sp[pp].plot(rad_95CI[2:],heights[2:],':',c=colour[1],linewidth=1,label='multi return\nrad trans 95% CI')
+            sp[pp].plot(rad_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1,label='multi return\nrad trans 50% CI')
+            lgd = sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.2), ncol=2)
+        else:
+            sp[pp].plot(rad_95CI[2:],heights[2:],':',c=colour[1],linewidth=1)
+            sp[pp].plot(rad_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1)
+
+    yticklabels = ax3b.get_yticklabels() + ax3c.get_yticklabels() + ax3d.get_yticklabels() + ax3e.get_yticklabels() + ax3f.get_yticklabels()
+    plt.setp(yticklabels,visible=False)
+
+    ax3a.set_ylim(0,89)
+    ax3a.set_xlim(0,520)
+
+    for ax in sp:
+        ax.locator_params(axis='x',nbins=5)
+        ax.yaxis.set_ticks_position('both')
+
+    plt.subplots_adjust(hspace=0.4, wspace = 0.2, bottom = 0.4)
     plt.savefig(figure_name)
     plt.show()
     return 0

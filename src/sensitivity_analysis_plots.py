@@ -533,7 +533,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     df = pd.DataFrame({'plot' : plot,'point density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_rad':PAI_rad})
 
     pp=0
-    fig = plt.figure(figure_number, facecolor='White',figsize=[9,9])
+    fig = plt.figure(figure_number, facecolor='White',figsize=[9,10])
 
     #mask = np.all(((df['plot']==plot_name[pp]),(df['point density']=='5')),axis=0)
     mask = df['point density']=='5'
@@ -605,7 +605,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
         if ax!=ax6e:
             ax.legend_.remove()
         else:
-            ax6e.legend(loc = (0.4,-0.8))
+            ax6e.legend(loc = (0.3,-0.8))
     plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
     plt.savefig(figure_name)
 

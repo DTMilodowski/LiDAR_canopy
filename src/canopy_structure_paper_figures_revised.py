@@ -499,9 +499,19 @@ csp.plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
 # SUPPLEMENT
 # RESULTS
 #-------------------------------
-# Figure S4 - sensitivity analysis, confidence interval sensitivity to resolution
+"""
+# Figure S4 comparison of profiles for the two Danum sites
+"""
+figure_number = 114
+figure_name = output_dir+'FigS4_pointclouds_and_profiles_Danum.png'
+csp.plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,
+                        plot_point_cloud,heights,heights_rad, lidar_profiles,
+                        MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_DTM_LAD,
+                        radiative_DTM_LAD_mean,inventory_LAD)
 
-# Figure S5 - sensitivity analysis, confidence interval sensitivity to density
+# Figure S5 - sensitivity analysis, confidence interval sensitivity to resolution
+
+# Figure S6 - sensitivity analysis, confidence interval sensitivity to density
 
 
 

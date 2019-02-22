@@ -4,6 +4,7 @@ from matplotlib import rcParams
 import matplotlib.ticker as mticker
 import matplotlib.ticker as plticker
 from matplotlib import colorbar
+from matplotlib import cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
@@ -14,6 +15,20 @@ rcParams['legend.numpoints'] = 1
 axis_size = rcParams['font.size']+2
 colour = ['#46E900','#1A2BCE','#E0007F']
 n_subplots=25
+
+import sys
+sys.path.append('/home/dmilodow/DataStore_DTM/FOREST2020/EOdata/EO_data_processing/src/plot_EO_data/colormap/')
+import colormaps as cmaps
+plt.register_cmap(name='viridis', cmap=cmaps.viridis)
+plt.register_cmap(name='plasma', cmap=cmaps.plasma)
+plt.set_cmap(cmaps.viridis)
+
+# code to get trio of nice colourblind friendly colours
+cmap = cm.get_cmap('plasma')
+scale = np.arange(0.,6.)
+scale /=5.
+cmap_colour = cmap(scale)
+
 
 
 """
@@ -247,6 +262,64 @@ def plot_profile_sensitivity_point_density(figure_number,figure_name,heights,PAD
 
     fig.text(0.5, 0.15, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
 
+    plt.savefig(figure_name)
+    plt.show()
+    return 0
+
+
+"""
+Plot fraction of unsampled layers in profile
+"""
+def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Belian,
+                            penetration_lim_E,penetration_lim_BNorth):
+    ## Belian
+    fig =plt.figure(figure_number, facecolor='White',figsize=[6,3])
+    ax1a = plt.subplot2grid((1,3),(0,0))
+    ax1a.set_ylabel('height / m',fontsize=axis_size)
+    ax1a.annotate('a - MLA01\n(old growth)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1a.set_xlabel('occluded voxels / %',fontsize=axis_size)
+
+    ax1b = plt.subplot2grid((1,3),(0,1),sharex=ax1a,sharey=ax1a)
+    ax1b.annotate('b - SAF03\n(moderately logged)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1b.set_xlabel('occluded voxels / %',fontsize=axis_size)
+
+    ax1c = plt.subplot2grid((1,3),(0,2),sharex=ax1a,sharey=ax1a)
+    ax1c.annotate('c - SAF02\n(heavily logged)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    ax1c.set_xlabel('occluded voxels / %',fontsize=axis_size)
+
+    # loop through the subplots
+    sp = [ax1a,ax1b,ax1c]
+    pkeys = ['2m','5m','10m','20m','50m']
+    for pp in range(0,len(pkeys)):
+
+        lim_OG = np.nanmean(penetration_lim_Belian[pkeys[pp]]['40'],axis=1)*100.
+        lim_ML = np.nanmean(penetration_lim_E[pkeys[pp]]['40'],axis=1)*100.
+        lim_HL = np.nanmean(penetration_lim_BNorth[pkeys[pp]]['40'],axis=1)*100.
+
+        limperc_OG = np.nanpercentile(lim_OG,[2.5,50,97.5],axis=0)
+        limperc_ML = np.nanpercentile(lim_ML,[2.5,50,97.5],axis=0)
+        limperc_HL = np.nanpercentile(lim_HL,[2.5,50,97.5],axis=0)
+
+        ax1a.fill_betweenx(heights[2:],limperc_OG[0][2:],limperc_OG[2][2:],color=cmap_colour[pp],alpha=0.3)
+        ax1a.plot(limperc_OG[1][2:],heights[2:],'-',c=cmap_colour[pp],linewidth=1.5)
+        ax1b.fill_betweenx(heights[2:],limperc_ML[0][2:],limperc_ML[2][2:],color=cmap_colour[pp],alpha=0.3)
+        ax1b.plot(limperc_ML[1][2:],heights[2:],'-',c=cmap_colour[pp],linewidth=1.5)
+        ax1c.fill_betweenx(heights[2:],limperc_HL[0][2:],limperc_HL[2][2:],color=cmap_colour[pp],alpha=0.3)
+        ax1c.plot(limperc_HL[1][2:],heights[2:],'-',c=cmap_colour[pp],linewidth=1.5,label=pkeys[pp])
+
+    ax1a.set_ylim(0,89)
+    ax1a.set_xlim(0,100)
+
+    yticklabels = ax1b.get_yticklabels() + ax1c.get_yticklabels()
+    plt.setp(yticklabels,visible=False)
+
+    for ax in sp:
+        ax.locator_params(axis='x',nbins=5)
+        ax.yaxis.set_ticks_position('both')
+
+    plt.subplots_adjust(hspace=0.4, wspace = 0.4,bottom=0.2)
+
+    ax1c.legend(loc=5)
     plt.savefig(figure_name)
     plt.show()
     return 0

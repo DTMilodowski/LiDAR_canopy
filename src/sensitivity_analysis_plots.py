@@ -8,6 +8,9 @@ from matplotlib import cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
+import seaborn as sns
+import pandas as pd
+
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['arial']
 rcParams['font.size'] = 8
@@ -28,7 +31,6 @@ cmap = cm.get_cmap('plasma')
 scale = np.arange(0.,6.)
 scale /=5.
 cmap_colour = cmap(scale)
-
 
 
 """
@@ -380,7 +382,7 @@ def plot_profile_sensitivity_to_resolution_individual_CI(figure_number,figure_na
         if pp==2:
             sp[pp].plot(rad_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1,label='multi return\nrad trans 50% CI')
             sp[pp].plot(rad_95CI[2:],heights[2:],':',c=colour[1],linewidth=1,label='multi return\nrad trans 95% CI')
-            lgd = sp[pp].legend(loc=9, bbox_to_anchor=(0.5, -0.3), ncol=2)
+            lgd = sp[pp].legend(loc=9, bbox_to_anchor=(1, -0.3), ncol=2)
         else:
             sp[pp].plot(rad_95CI[2:],heights[2:],':',c=colour[1],linewidth=1)
             sp[pp].plot(rad_50CI[2:],heights[2:],'-',c=colour[1],linewidth=1)
@@ -396,7 +398,6 @@ def plot_profile_sensitivity_to_resolution_individual_CI(figure_number,figure_na
         ax.yaxis.set_ticks_position('both')
 
     plt.subplots_adjust(hspace=0.4, wspace = 0.2, bottom = 0.4)
-
 
     fig.text(0.5, 0.3, "relative CIs for individual profiles / %",
                     fontsize=axis_size, ha='center')
@@ -484,3 +485,128 @@ def plot_profile_sensitivity_to_point_density_individual_CI(figure_number,figure
     plt.savefig(figure_name)
     plt.show()
     return 0
+
+"""
+Plot sensitivity of PAI estimates
+"""
+def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_profiles_MH_BNorth,PAD_profiles_MH_E,
+                    PAD_profiles_rad_Belian,PAD_profiles_rad_BNorth,PAD_profiles_rad_E):
+
+    res_keys = ['2m','5m','10m','20m','50m','100m']
+    N_res = len(res_keys)
+    dens_keys = ['5','20','40']
+    N_dens = len(dens_keys)
+    dens = []
+    res = []
+    PAI_MH = np.arange(0)
+    PAI_rad = np.arange(0)
+    plot = []
+    plot_name = ['MLA01','SAF03','SAF02']
+    for rr in range(0,N_res):
+        for dd in range(0,N_dens):
+            for pp in range(0,len(plot_name)):
+                if pp==0:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+                if pp==1:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+                if pp==2:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+
+    df = pd.DataFrame({'plot' : plot,'point density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_rad':PAI_rad})
+
+    pp=0
+    fig = plt.figure(figure_number, facecolor='White',figsize=[9,9])
+
+    #mask = np.all(((df['plot']==plot_name[pp]),(df['point density']=='5')),axis=0)
+    mask = df['point density']=='5'
+
+    ax6a = plt.subplot2grid((2,3),(0,0))
+    ax6a.set_title('Point density = 5 pts m$^{-2}$', fontsize=10)
+    ax6a.set_ylabel('PAI',fontsize=axis_size)
+    ax6a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    ax6a.set_ylabel('')
+    ax6a.set_xlabel('')
+    ax6a.set_ylabel('PAI',fontsize=axis_size)
+
+    ax6d = plt.subplot2grid((2,3),(1,0),sharex=ax6a,sharey=ax6a)
+    ax6d.annotate('d - multi return\nrad trans', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    ax6d.set_ylabel('')
+    ax6d.set_xlabel('')
+    ax6d.set_ylabel('PAI',fontsize=axis_size)
+
+    # col two of matrix - point density is 20 pts m-2
+    mask = df['point density']=='20'
+
+    ax6b = plt.subplot2grid((2,3),(0,1),sharex=ax6a,sharey=ax6a)
+    ax6b.set_title('Point density = 20 pts m$^{-2}$', fontsize=10)
+    ax6b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    ax6b.set_ylabel('')
+    ax6b.set_xlabel('')
+    ax6b.set_xlabel('grid resolution')
+
+    ax6e = plt.subplot2grid((2,3),(1,1),sharex=ax6a,sharey=ax6a)
+    ax6e.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    ax6e.set_ylabel('')
+    ax6e.set_xlabel('grid resolution')
+
+    # col three of matrix - point density is 40 pts m-2
+    mask = df['point density']=='40'
+
+    ax6c = plt.subplot2grid((2,3),(0,2),sharex=ax6a,sharey=ax6a)
+    ax6c.set_title('Point density = 40 pts m$^{-2}$', fontsize=10)
+    ax6c.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    ax6c.set_ylabel('')
+    ax6c.set_xlabel('')
+
+
+    ax6f = plt.subplot2grid((2,3),(1,2),sharex=ax6a,sharey=ax6a)
+    ax6f.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    ax6f.set_ylabel('')
+    ax6f.set_xlabel('')
+
+    ax6a.set_ylim(ymax=14)
+
+    axes =[ax6a,ax6b,ax6c,ax6d,ax6e,ax6f]
+    yticklabels = ax6b.get_yticklabels() + ax6c.get_yticklabels() + ax6e.get_yticklabels() + ax6f.get_yticklabels()
+    plt.setp(yticklabels,visible=False)
+
+    for ax in axes:
+        ax.yaxis.set_ticks_position('both')
+        if ax!=ax6e:
+            ax.legend_.remove()
+        else:
+            ax6e.legend(loc = (0.4,-0.8))
+    plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
+    plt.savefig(figure_name)
+
+    plt.show()

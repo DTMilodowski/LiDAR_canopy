@@ -533,79 +533,78 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     df = pd.DataFrame({'plot' : plot,'point density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_rad':PAI_rad})
 
     pp=0
-    fig = plt.figure(figure_number, facecolor='White',figsize=[9,10])
+    fig = plt.figure(figure_number, facecolor='White',figsize=(9,10))
 
-    #mask = np.all(((df['plot']==plot_name[pp]),(df['point density']=='5')),axis=0)
     mask = df['point density']=='5'
 
-    ax6a = plt.subplot2grid((2,3),(0,0))
-    ax6a.set_title('Point density = 5 pts m$^{-2}$', fontsize=10)
-    ax6a.set_ylabel('PAI',fontsize=axis_size)
-    ax6a.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axa = plt.subplot2grid((2,3),(0,0))
+    axa.set_title('Point density = 5 pts m$^{-2}$', fontsize=10)
+    axa.set_ylabel('PAI',fontsize=axis_size)
+    axa.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
                     scale='width',hue="plot",palette = colour,dodge=False)
-    ax6a.set_ylabel('')
-    ax6a.set_xlabel('')
-    ax6a.set_ylabel('PAI',fontsize=axis_size)
+    axa.set_ylabel('')
+    axa.set_xlabel('')
+    axa.set_ylabel('PAI',fontsize=axis_size)
 
-    ax6d = plt.subplot2grid((2,3),(1,0),sharex=ax6a,sharey=ax6a)
-    ax6d.annotate('d - multi return\nrad trans', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axd = plt.subplot2grid((2,3),(1,0),sharex=axa,sharey=axa)
+    axd.annotate('d - multi return\nrad trans', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
                     scale='width',hue="plot",palette = colour,dodge=False)
-    ax6d.set_ylabel('')
-    ax6d.set_xlabel('')
-    ax6d.set_ylabel('PAI',fontsize=axis_size)
+    axd.set_ylabel('')
+    axd.set_xlabel('')
+    axd.set_ylabel('PAI',fontsize=axis_size)
 
     # col two of matrix - point density is 20 pts m-2
     mask = df['point density']=='20'
 
-    ax6b = plt.subplot2grid((2,3),(0,1),sharex=ax6a,sharey=ax6a)
-    ax6b.set_title('Point density = 20 pts m$^{-2}$', fontsize=10)
-    ax6b.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axb = plt.subplot2grid((2,3),(0,1),sharex=axa,sharey=axa)
+    axb.set_title('Point density = 20 pts m$^{-2}$', fontsize=10)
+    axb.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
                     scale='width',hue="plot",palette = colour,dodge=False)
-    ax6b.set_ylabel('')
-    ax6b.set_xlabel('')
-    ax6b.set_xlabel('grid resolution')
+    axb.set_ylabel('')
+    axb.set_xlabel('')
+    axb.set_xlabel('grid resolution')
 
-    ax6e = plt.subplot2grid((2,3),(1,1),sharex=ax6a,sharey=ax6a)
-    ax6e.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axe = plt.subplot2grid((2,3),(1,1),sharex=axa,sharey=axa)
+    axe.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
                     scale='width',hue="plot",palette = colour,dodge=False)
-    ax6e.set_ylabel('')
-    ax6e.set_xlabel('grid resolution')
+    axe.set_ylabel('')
+    axe.set_xlabel('grid resolution')
 
     # col three of matrix - point density is 40 pts m-2
     mask = df['point density']=='40'
 
-    ax6c = plt.subplot2grid((2,3),(0,2),sharex=ax6a,sharey=ax6a)
-    ax6c.set_title('Point density = 40 pts m$^{-2}$', fontsize=10)
-    ax6c.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axc = plt.subplot2grid((2,3),(0,2),sharex=axa,sharey=axa)
+    axc.set_title('Point density = 40 pts m$^{-2}$', fontsize=10)
+    axc.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
                     scale='width',hue="plot",palette = colour,dodge=False)
-    ax6c.set_ylabel('')
-    ax6c.set_xlabel('')
+    axc.set_ylabel('')
+    axc.set_xlabel('')
 
 
-    ax6f = plt.subplot2grid((2,3),(1,2),sharex=ax6a,sharey=ax6a)
-    ax6f.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    axf = plt.subplot2grid((2,3),(1,2),sharex=axa,sharey=axa)
+    axf.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
                     scale='width',hue="plot",palette = colour,dodge=False)
-    ax6f.set_ylabel('')
-    ax6f.set_xlabel('')
+    axf.set_ylabel('')
+    axf.set_xlabel('')
 
-    ax6a.set_ylim(ymax=14)
+    axa.set_ylim(ymax=14)
 
-    axes =[ax6a,ax6b,ax6c,ax6d,ax6e,ax6f]
-    yticklabels = ax6b.get_yticklabels() + ax6c.get_yticklabels() + ax6e.get_yticklabels() + ax6f.get_yticklabels()
+    axes =[axa,axb,axc,axd,axe,axf]
+    yticklabels = axb.get_yticklabels() + axc.get_yticklabels() + axe.get_yticklabels() + axf.get_yticklabels()
     plt.setp(yticklabels,visible=False)
 
     for ax in axes:
         ax.yaxis.set_ticks_position('both')
-        if ax!=ax6e:
+        if ax!=axe:
             ax.legend_.remove()
         else:
-            ax6e.legend(loc = (0.3,-0.8))
+            axe.legend(loc = (0.3,-0.8))
     plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
     plt.savefig(figure_name)
 

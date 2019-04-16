@@ -87,7 +87,6 @@ radiative_DTM_LAI_mean = {}
 
 plot_point_cloud = {}
 max_height_LiDAR={}
-max_height_field={}
 #------------------------------------------------------------------------------------
 # LOADING DATA
 # load coordinates and lidar points for target areas
@@ -98,7 +97,6 @@ all_lidar_pts = io.load_lidar_data(las_file)
 # MAIN ANALYSIS
 # LiDAR PROFILES LOOP
 # loop through all plots to be analysed
-plot_point_cloud= np.load('plot_point_clouds.npz')['arr_0'][()]
 for pp in range(0,N_plots):
     print(Plots[pp])
     Plot_name=Plots[pp]

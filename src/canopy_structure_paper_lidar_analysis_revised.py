@@ -86,7 +86,6 @@ radiative_LAI_mean = {}
 radiative_DTM_LAI_mean = {}
 
 plot_point_cloud = {}
-max_height_LiDAR={}
 #------------------------------------------------------------------------------------
 # LOADING DATA
 # load coordinates and lidar points for target areas
@@ -116,12 +115,10 @@ for pp in range(0,N_plots):
     # SET UP ARRAYS TO HOST RESULTS
     # get some subplot-level information
     n_subplots = subplot_polygons[Plot_name].shape[0]
-    max_height_LiDAR[Plot_name]=np.zeros(n_subplots)
     for ss in range(0,n_subplots):
         subplot_index = int(subplot_labels[Plot_name][ss]-1)
         # filter lidar points into subplot
         sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_polygons[Plot_name][ss,:,:],filter_by_first_return_location=True)
-        max_height_LiDAR[Plot_name][ss]=np.max(sp_pts[:,2])
 
     # set up some arrays to host the radiative transfer based profiles
     LAD_rad = np.zeros((n_subplots,heights_rad.size,max_return))

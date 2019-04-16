@@ -6,6 +6,7 @@
 import numpy as np
 import sys
 from matplotlib import pyplot as plt
+import auxilliary_functions as aux
 import inventory_based_LAD_profiles as field
 import least_squares_fitting as lstsq
 from scipy import stats
@@ -40,6 +41,7 @@ D2_stemcensus = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/Danum/carbon_plot_
 SAFE_stemcensus = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_plots/SAFE_SmallTreeCensus_year1only.csv'
 
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
+subplot_coordinate_file = 'BALI_subplot_coordinates_corrected.csv'
 
 # also define output directory (for saving figures)
 output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/Profiles/'
@@ -48,7 +50,7 @@ output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCan
 # PARAMETERS
 # define important parameters for canopy profile estimation
 Plots = [b'LF',b'E',b'Belian',b'Seraya',b'B North',b'B South',b'DC1',b'DC2']
-#Plots = ['B North']
+#Plots = [b'DC1',b'DC2']
 N_plots = len(Plots)
 n_subplots=25
 max_height = 80
@@ -71,6 +73,7 @@ inventory_LAI_std = {}
 
 #------------------------------------------------------------------------------------
 # LOADING DATA
+subplot_polygons, subplot_labels = aux.load_boundaries(subplot_coordinate_file)
 # load field data and retrieve allometric relationships
 field_data = field.load_crown_survey_data(field_file)
 DBH_BAAD, H_BAAD, D_BAAD = field.load_BAAD_crown_allometry_data(allometry_file)

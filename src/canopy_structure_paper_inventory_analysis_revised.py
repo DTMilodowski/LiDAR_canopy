@@ -48,8 +48,10 @@ output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCan
 # PARAMETERS
 # define important parameters for canopy profile estimation
 Plots = [b'LF',b'E',b'Belian',b'Seraya',b'B North',b'B South',b'DC1',b'DC2']
+Plots = [b'DC1',b'DC2']
 #Plots = ['B North']
 N_plots = len(Plots)
+n_subplots=25
 max_height = 80
 layer_thickness = 1.
 n_layers = np.ceil(max_height/layer_thickness)
@@ -68,7 +70,6 @@ inventory_LAD_std = {}
 inventory_LAI = {}
 inventory_LAI_std = {}
 
-max_height_field={}
 #------------------------------------------------------------------------------------
 # LOADING DATA
 # load field data and retrieve allometric relationships
@@ -93,13 +94,11 @@ a_A, b_A, CF_A, r_sq_A, p_A, temp, PI_u_A, PI_l_A = field.log_log_linear_regress
 a_ht, b_ht, CF_ht, r_sq_ht, p_ht, temp, PI_u_ht, PI_l_ht = field.log_log_linear_regression(field_data['DBH_field'],field_data['Height_field'])
 
 for pp in range(0,N_plots):
-    max_height_field[Plots[pp]]=np.zeros(n_subplots)
     for ss in range(0,n_subplots):# mask out dead and broken trees
         dead_mask = np.all((field_data['dead_flag1']==-1,field_data['dead_flag2']==-1,field_data['dead_flag3']==-1),axis=0)
         brokenlive_mask = field_data['brokenlive_flag']==-1
         mask = np.all((field_data['subplot']==ss-1,field_data['plot']==Plots[pp],np.isfinite(field_data['DBH_field']),np.isfinite(field_data['Xfield']),dead_mask,brokenlive_mask),axis=0)
-        if mask.sum()>0:
-            max_height_field[Plots[pp]][ss]=np.nanmax(field_data[mask]['Height_field'])
+
 
 BAAD_data={}
 BAAD_data['D']=D_BAAD
@@ -174,4 +173,4 @@ for pp in range(0,N_plots):
     inventory_LAD_std[Plot_name] = np.std(field_profiles,axis=0)
     inventory_LAI[Plot_name] = np.sum(field_profiles)*layer_thickness
 
-np.savez('%sinventory_canopy_profiles.npz',(inventory_LAD,inventory_LAD_std,inventory_LAI))
+np.savez('%sinventory_canopy_profiles_DC.npz',(inventory_LAD,inventory_LAD_std,inventory_LAI))

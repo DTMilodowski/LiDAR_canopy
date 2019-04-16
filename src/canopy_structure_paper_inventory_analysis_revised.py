@@ -48,7 +48,6 @@ output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCan
 # PARAMETERS
 # define important parameters for canopy profile estimation
 Plots = [b'LF',b'E',b'Belian',b'Seraya',b'B North',b'B South',b'DC1',b'DC2']
-Plots = [b'DC1',b'DC2']
 #Plots = ['B North']
 N_plots = len(Plots)
 n_subplots=25
@@ -173,4 +172,4 @@ for pp in range(0,N_plots):
     inventory_LAD_std[Plot_name] = np.std(field_profiles,axis=0)
     inventory_LAI[Plot_name] = np.sum(field_profiles)*layer_thickness
 
-np.savez('%sinventory_canopy_profiles_DC.npz',(inventory_LAD,inventory_LAD_std,inventory_LAI))
+np.savez('%sinventory_canopy_profiles.npz',(inventory_LAD,inventory_LAD_std,inventory_LAI))

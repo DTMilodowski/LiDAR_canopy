@@ -4,34 +4,11 @@
 # estimates from hemispherical photographs.
 ###############################################################################################################
 import numpy as np
-import sys
-from matplotlib import pyplot as plt
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
 import LiDAR_MacHorn_LAD_profiles as LAD1
 import LiDAR_radiative_transfer_LAD_profiles as LAD2
-import inventory_based_LAD_profiles as field
-import least_squares_fitting as lstsq
-from scipy import stats
-
-from matplotlib import rcParams
-from datetime import datetime
-
-import load_field_data as cen
-
-import canopy_structure_plots as csp
-
-# Set up some basiic parameters for the plots
-rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['arial']
-rcParams['font.size'] = 8
-rcParams['legend.numpoints'] = 1
-axis_size = rcParams['font.size']+2
-
-colour = ['#46E900','#1A2BCE','#E0007F']
-rgb = [[70,233,0],[26,43,206],[224,0,127]]
-labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
 
 #------------------------------------------------------------------------------------
 # DIRECTORIES

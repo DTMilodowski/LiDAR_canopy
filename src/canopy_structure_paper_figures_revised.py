@@ -5,8 +5,10 @@
 ###############################################################################################################
 import numpy as np
 import sys
+import auxilliary_functions as aux
 import load_field_data as cen
 import canopy_structure_plots as csp
+import inventory_based_LAD_profiles as field
 
 #------------------------------------------------------------------------------------
 # DIRECTORIES
@@ -77,6 +79,7 @@ inventory_PAD=temp['arr_0'][()]
 inventory_PAD_std=temp['arr_1'][()]
 inventory_PAI=temp['arr_2'][()]
 #inventory_PAI_std=temp['arr_3'][()]
+temp = None
 
 #===============================================================================
 # NOW MAKE PLOTS

@@ -78,7 +78,7 @@ inventory_PAD_std=temp['arr_1'][()]
 inventory_PAI=temp['arr_2'][()]
 #inventory_PAI_std=temp['arr_3'][()]
 
-#-------------------------------
+#===============================================================================
 # NOW MAKE PLOTS
 
 #-------------------------------
@@ -99,9 +99,14 @@ figure_number = 2
 csp.plot_point_cloud(figure_name,figure_number,gps_pts_file,plot_point_cloud)
 
 """
-# Figure 3 sketch explaining field-based crown model construction
-# <manual figure>
+# Figure 3 - example crown model
 """
+figure_number = 3
+figure_name = output_dir+'fig3_crown_model_example'
+Plot_name = b'Belian'
+angle = 45.
+csp.plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
+                    a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
 
 """
 # Figure 4 - Allometric models; include confidence intervals, and add vertical band
@@ -218,62 +223,20 @@ csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
                         radiative_LAD,radiative_LAD_mean,
                         radiative_DTM_LAD,radiative_DTM_LAD_mean)
 
-"""
-# Figure S3 - example crown model
-"""
-figure_number = 113
-figure_name = output_dir+'figS3_crown_model_example'
-Plot_name = b'Belian'
-angle = 45.
-csp.plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
-                    a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-
 #-------------------------------
 # SUPPLEMENT
 # RESULTS
 #-------------------------------
 """
-# Figure S4 comparison of profiles for the two Danum sites
+# Figure S3 comparison of profiles for the two Danum sites
 """
-figure_number = 114
-figure_name = output_dir+'FigS4_pointclouds_and_profiles_Danum.png'
+figure_number = 113
+figure_name = output_dir+'Fig3_pointclouds_and_profiles_Danum.png'
 csp.plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,
                         plot_point_cloud,heights,heights_rad, lidar_profiles,
                         MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_DTM_LAD,
                         radiative_DTM_LAD_mean,inventory_LAD)
 
-# Figure S5 - sensitivity analysis, confidence interval sensitivity to resolution
+# Figure S4 - sensitivity analysis, confidence interval sensitivity to resolution
 
-# Figure S6 - sensitivity analysis, confidence interval sensitivity to density
-
-
-
-
-
-"""
-# Figure 6 - PAI comparison between methods
-# Add R-sq for both 20 m x 20 m and 1 ha estimates (to do)
-figure_name = output_dir + 'Fig6_comparing_LiDAR_PAI_estimates.png'
-figure_number = 6
-csp.compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1)
-
-
-# Figure 12 - Comparison against canopy volume estimates
-figure_name = output_dir + 'Fig12_comparing_LiDAR_PAI_and_inventory_test.png'
-figure_number = 12
-csp.plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD,inventory_LAI)
-
-# Figure 13 - Comparison against canopy volume distributions (analagous to Figure 7)
-figure_name = output_dir + 'Fig13_crossplot_LiDAR_and_inventory_profiles_test.png'
-figure_number = 13
-
-
-
-
-#================================
-gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
-import plot_LAD_profiles as pprof
-pprof.plot_subplot_LAD_profiles(radiative_DTM_LAD['Seraya'][:,:,-1],heights_rad[::-1],'g','test','test')
-
-
-"""
+# Figure S5 - sensitivity analysis, confidence interval sensitivity to density

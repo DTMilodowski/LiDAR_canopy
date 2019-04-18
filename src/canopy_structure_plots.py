@@ -638,19 +638,19 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     plt.figure(figure_number, facecolor='White',figsize=[9,4])
 
     # DC1
-    ax1a = plt.subplot2grid((6,6),(0,0),colspan=2)
+    ax1a = plt.subplot2grid((2,6),(0,0),colspan=2)
     ax1a.annotate('a - Old growth, DAN04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
-    # Seraya
-    ax1b = plt.subplot2grid((6,6),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    # DC2
+    ax1b = plt.subplot2grid((2,6),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1b.annotate('b - Old growth, DAN05', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1b.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
-    axes = [ax1a, ax1b, ax1c, ax1d, ax1e, ax1f]
-    for pp in range(0,6):
+    axes = [ax1a, ax1b]
+    for pp in range(0,2):
         plot_lidar_pts = plot_point_cloud_display[fig1_plots[pp]]
         for k in range(0,max_return):
 
@@ -672,27 +672,21 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     #---------------------------------------------------------
     # NOW PLOT PROFILES
     # DC1
-    ax2a = plt.subplot2grid((6,6),(0,2),sharey=ax1a)
+    ax2a = plt.subplot2grid((2,6),(0,2),sharey=ax1a)
     ax2a.annotate('LiDAR returns', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - MacHorn
-    ax3a = plt.subplot2grid((6,6),(0,3),sharey=ax1a)
+    ax3a = plt.subplot2grid((2,6),(0,3),sharey=ax1a)
     ax3a.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - Detto
-    ax4a = plt.subplot2grid((6,6),(0,4),sharey=ax1a,sharex=ax3a)
+    ax4a = plt.subplot2grid((2,6),(0,4),sharey=ax1a,sharex=ax3a)
     ax4a.annotate('multi. return \nrad. trans.', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - Corrected rad trans
-    ax5a = plt.subplot2grid((6,6),(0,5),sharey=ax1a,sharex=ax3a)
+    ax5a = plt.subplot2grid((2,6),(0,5),sharey=ax1a,sharex=ax3a)
     ax5a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 
-    # DC2
-    ax2b = plt.subplot2grid((6,6),(1,2),sharey=ax1a,sharex=ax2a)
-    ax3b = plt.subplot2grid((6,6),(1,3),sharey=ax1a,sharex=ax3a)
-    ax4b = plt.subplot2grid((6,6),(1,4),sharey=ax1a,sharex=ax3a)
-    ax5b = plt.subplot2grid((6,6),(1,5),sharey=ax1a,sharex=ax3a)
-
     # Danum 2
-    ax2b = plt.subplot2grid((2,6),(1,2), sharex = ax1a, sharey = ax2a)
-    ax2b.set_xlabel('Number of returns\n(x1000)',fontsize=axis_size,horizontalalignment='center')
+    ax2b = plt.subplot2grid((2,6),(1,2), sharex = ax2a, sharey = ax1a)
+    ax2b.set_xlabel('Number of returns',fontsize=axis_size,horizontalalignment='center')
     # - MacHorn
     ax3b = plt.subplot2grid((2,6),(1,3),sharey=ax1a, sharex=ax3a)
     ax3b.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
@@ -717,7 +711,7 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
         # plot lidar profile
         return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
         for k in range(0,max_return):
-            axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1)
+            axes1[pp].plot(return_dist[:,k],np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1)
 
             # plot macarthur horn profile
             for i in range(0,n_subplots):
@@ -745,10 +739,10 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
 
     ax1a.set_xlim(0,100)
     ax1a.set_ylim(0,80)
-    ax2a.set_xlim(0,29)
+    ax2a.set_xlim(0,3500)
     ax3a.set_xlim(xmin=0,xmax=0.7)
 
-    ax2b.locator_params(axis='x',nbins=5)
+    ax2b.locator_params(axis='x',nbins=4)
     ax3b.locator_params(axis='x',nbins=5)
     ax4b.locator_params(axis='x',nbins=5)
     ax5b.locator_params(axis='x',nbins=5)

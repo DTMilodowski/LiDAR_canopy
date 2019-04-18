@@ -197,7 +197,6 @@ def calculate_powerlaw_prediction_interval_bootstrap_resampling_residuals(x_i,x_
     log_ll,log_ul = calculate_prediction_interval_bootstrap_resampling_residuals(np.log(x_i),np.log(x_obs),np.log(y_obs),conf,niter)
     return np.exp(log_ll),np.exp(log_ul)
 
-
 # Calculate a prediction based on a linear regression model
 # As above, but this time randomly sampling from prediction interval
 # calculated using random sampling from residuals.

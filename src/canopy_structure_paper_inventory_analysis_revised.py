@@ -153,5 +153,6 @@ for pp in range(0,N_plots):
     inventory_LAD[Plot_name] = np.mean(field_profiles,axis=0)
     inventory_LAD_std[Plot_name] = np.std(field_profiles,axis=0)
     inventory_LAI[Plot_name] = np.sum(field_profiles)*layer_thickness
+    inventory_LAI_std[Plot_name] = np.std(field_profiles)*layer_thickness
 
-np.savez('%sinventory_canopy_profiles.npz',(inventory_LAD,inventory_LAD_std,inventory_LAI))
+np.savez('%sinventory_canopy_profiles.npz' % output_dir,(inventory_LAD,inventory_LAD_std,inventory_LAI,inventory_LAI_std))

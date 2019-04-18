@@ -54,30 +54,39 @@ field_data = field.load_crown_survey_data(field_file)
 plot_point_cloud= np.load('%splot_point_clouds.npz' % data_dir)['arr_0'][()]
 
 # Load LiDAR canopy profiles
-temp = np.load('%slidar_canopy_profiles.npz' % data_dir)
-MacArthurHorn_PAD=temp['arr_0'][()]
-radiative_PAD=temp['arr_1'][()]
-radiative_DTM_PAD=temp['arr_2'][()]
-lidar_profiles=temp['arr_3'][()]
-lidar_profiles_adjusted=temp['arr_4'][()]
-penetration_limit=temp['arr_5'][()]
+temp = np.load('%slidar_canopy_profiles.npz' % data_dir)['arr_0'][()]
+MacArthurHorn_PAD=temp[0]
+radiative_PAD=temp[1]
+radiative_DTM_PAD=temp[2]
+lidar_profiles=temp[3]
+lidar_profiles_adjusted=temp[4]
+penetration_limit=temp[5]
 temp=None
 
+MacArthurHorn_PAD_mean = {}
+radiative_PAD_mean= {}
+radiative_DTM_PAD_mean= {}
+for pp in range(0,N_plots):
+    MacArthurHorn_PAD_mean[Plots[pp]] = np.nansum(MacArthurHorn_PAD[Plots[pp]],axis=0)/(np.sum(np.isfinite(MacArthurHorn_PAD[Plots[pp]]),axis=0)).astype('float')
+    radiative_PAD_mean[Plots[pp]] = np.nansum(radiative_PAD[Plots[pp]],axis=0)/(np.sum(np.isfinite(radiative_PAD[Plots[pp]]),axis=0)).astype('float')
+    radiative_DTM_PAD_mean[Plots[pp]] = np.nansum(radiative_DTM_PAD[Plots[pp]],axis=0)/(np.sum(np.isfinite(radiative_DTM_PAD[Plots[pp]]),axis=0)).astype('float')
+
+
 # Load LiDAR PAI
-temp = np.load('%slidar_PAI.npz' % data_dir)
-MacArthurHorn_PAI=temp['arr_0'][()]
-radiative_PAI=temp['arr_1'][()]
-radiative_DTM_PAI=temp['arr_2'][()]
-MacArthurHorn_PAI_mean=temp['arr_3'][()]
-radiative_PAI_mean=temp['arr_4'][()]
-radiative_DTM_PAI_mean=temp['arr_5'][()]
+temp = np.load('%slidar_PAI.npz' % data_dir)['arr_0'][()]
+MacArthurHorn_PAI=temp[0]
+radiative_PAI=temp[1]
+radiative_DTM_PAI=temp[2]
+MacArthurHorn_PAI_mean=temp[3]
+radiative_PAI_mean=temp[4]
+radiative_DTM_PAI_mean=temp[5]
 temp=None
 
 # Load Inventory profiles
-temp = np.load('%sinventory_canopy_profiles.npz' % data_dir)
-inventory_PAD=temp['arr_0'][()]
-inventory_PAD_std=temp['arr_1'][()]
-inventory_PAI=temp['arr_2'][()]
+temp = np.load('%sinventory_canopy_profiles.npz' % data_dir)['arr_0'][()]
+inventory_PAD=temp[0]
+inventory_PAD_std=temp[1]
+inventory_PAI=temp[2]
 #inventory_PAI_std=temp['arr_3'][()]
 temp = None
 
@@ -131,16 +140,16 @@ figure_number = 5
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
                         plot_point_cloud,heights,heights_rad, lidar_profiles,
-                        MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_DTM_LAD,
-                        radiative_DTM_LAD_mean,inventory_LAD)
+                        MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_DTM_PAD,
+                        radiative_DTM_PAD_mean,inventory_PAD)
 
 """
 # Figure 6 - Cross-plot canopy layers
 """
 figure_name = output_dir + 'Fig6_crossplot_LiDAR_PAD_residual_profiles.png'
 figure_number = 6
-csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,
-                MacArthurHorn_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean)
+csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_PAD,
+                MacArthurHorn_PAD_mean,radiative_DTM_PAD,radiative_DTM_PAD_mean)
 
 """
 # Figure 7 - PAI plotted against basal area
@@ -183,8 +192,8 @@ for pp in range(0,len(Plots_Danum)):
         temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*n_subplots/100.**2
     BA[Plots_Danum[pp]]=temp_BA.copy()
 
-csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                            radiative_DTM_LAD,radiative_DTM_LAD_mean,BA,plot_marker,plot_label,
+csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                            radiative_DTM_PAD,radiative_DTM_PAD_mean,BA,plot_marker,plot_label,
                             plot_colour)
 
 #-------------------------------
@@ -222,9 +231,9 @@ csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
 figure_number = 112
 figure_name = output_dir+'figS2_LiDAR_profiles_comparison.png'
 csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
-                        lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                        radiative_LAD,radiative_LAD_mean,
-                        radiative_DTM_LAD,radiative_DTM_LAD_mean)
+                        lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                        radiative_PAD,radiative_PAD_mean,
+                        radiative_DTM_PAD,radiative_DTM_PAD_mean)
 
 #-------------------------------
 # SUPPLEMENT
@@ -237,8 +246,8 @@ figure_number = 113
 figure_name = output_dir+'Fig3_pointclouds_and_profiles_Danum.png'
 csp.plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,
                         plot_point_cloud,heights,heights_rad, lidar_profiles,
-                        MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_DTM_LAD,
-                        radiative_DTM_LAD_mean,inventory_LAD)
+                        MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_DTM_PAD,
+                        radiative_DTM_PAD_mean,inventory_PAD)
 
 # Figure S4 - sensitivity analysis, confidence interval sensitivity to resolution
 

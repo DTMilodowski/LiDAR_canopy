@@ -1812,3 +1812,17 @@ def plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
     plt.savefig(figure_name)
     plt.show()
     return 0
+
+"""
+Plot distributions of PAD for different canopy subdivisions
+- understory: 5-15 m
+- lower canopy: 15-30 m
+- mid canopy: 30-45 m
+- upper canopy: 45 m
+"""
+def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
+                            heights,heights_rad,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
+                            radiative_LAD,radiative_LAD_mean,
+                            radiative_DTM_LAD,radiative_DTM_LAD_mean):
+
+    return 0

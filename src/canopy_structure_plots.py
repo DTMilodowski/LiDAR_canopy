@@ -1815,7 +1815,7 @@ def plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
 
 """
 Plot distributions of PAD for different canopy subdivisions
-- understory: 5-15 m
+- understory: <15 m
 - lower canopy: 15-30 m
 - mid canopy: 30-45 m
 - upper canopy: 45 m
@@ -1825,4 +1825,125 @@ def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
                             radiative_LAD,radiative_LAD_mean,
                             radiative_DTM_LAD,radiative_DTM_LAD_mean):
 
+    max_k = 2
+    # Create pandas dataframes for upper canopy, mid canopy lower canopy and
+    # understory PAD
+    uc = []
+    lc = []
+    mc = []
+    und = []
+    plot = []
+    method = []
+    uc_mask = heights>=45
+    mc_mask = np.all((heights>=30,heights<45),axis=0)
+    lc_mask = np.all((heights>=15,heights<30),axis=0)
+    und_mask = heights<15
+    uc_mask_ = heights_rad>=45
+    mc_mask_ = np.all((heights_rad>=30,heights_rad<45),axis=0)
+    lc_mask_ = np.all((heights_rad>=15,heights_rad<30),axis=0)
+    und_mask_ = heights_rad<15
+
+    plot_name = ['MLA01','MLA02','DAN04','DAN05','SAF04','SAF03','SAF02','SAF01']
+    plot_colour = ['#46E900','#46E900','#46E900','#46E900','#1A2BCE','#1A2BCE','#E0007F','#E0007F']
+    for pp in range(0,len(plot_name)):
+        for ss in range(0,25):
+            for ii in range(0,2):
+                if ii==0:
+                    PAD = MacArthurHorn_LAD[plot_name[pp]]
+                    uc_mask = heights>=45
+                    mc_mask = np.all((heights>=30,heights<45),axis=0)
+                    lc_mask = np.all((heights>=15,heights<30),axis=0)
+                    und_mask = heights<15
+                else:
+                    PAD = radiative_DTM_LAD[plot_name[pp]][:,:,max_k-1]
+                    uc_mask = heights_rad>=45
+                    mc_mask = np.all((heights_rad>=30,heights_rad<45),axis=0)
+                    lc_mask = np.all((heights_rad>=15,heights_rad<30),axis=0)
+                    und_mask = heights_rad<15
+
+                uc.append(np.nanmean(PAD[ss,uc_mask]))
+                mc.append(np.nanmean(PAD[ss,mc_mask]))
+                lc.append(np.nanmean(PAD[ss,lc_mask]))
+                und.append(np.nanmean(PAD[ss,und_mask]))
+                plot.append(plot_name[pp])
+                method.append(ii)
+
+    mask = method==0
+    df_mh = pd.DataFrame({'plot' : plot[mask],'upper' : uc[mask],'mid' : mc,
+                            'lower':lc[mask],'understory':und[mask]})
+    mask = method==1
+    df_rad = pd.DataFrame({'plot' : plot[mask],'upper' : uc[mask],'mid' : mc,
+                            'lower':lc[mask],'understory':und[mask]})
+
+    pp=0
+    fig = plt.figure(figure_number, facecolor='White',figsize=(8,7))
+
+    axa = plt.subplot2grid((4,2),(0,0))
+    axa.set_title('MacArthur-Horn', fontsize=10)
+    axa.set_ylabel('average PAD m$^2$m$^{-2}$m$^{-1}$',fontsize=axis_size)
+    axa.annotate('a - upper canopy', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='upper',data=df_mh,inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    axa.set_xlabel('')
+
+    axb = plt.subplot2grid((4,2),(0,1),sharex=axa,sharey=axa)
+    axb.set_title('multi return\nrad. trans.', fontsize=10)
+    axb.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='upper',data=df_rad,inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    axb.set_xlabel('')
+
+    axc = plt.subplot2grid((4,2),(1,0),sharex=axa,sharey=axa)
+    axc.set_ylabel('average PAD m$^2$m$^{-2}$m$^{-1}$',fontsize=axis_size)
+    axc.annotate('c - mid canopy', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='upper',data=df_mh,inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    axc.set_xlabel('')
+
+    axd = plt.subplot2grid((4,2),(1,1),sharex=axa,sharey=axa)
+    axd.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='upper',data=df_rad,inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    axd.set_xlabel('')
+
+    axe = plt.subplot2grid((4,2),(2,0),sharex=axa,sharey=axa)
+    axe.set_ylabel('average PAD m$^2$m$^{-2}$m$^{-1}$',fontsize=axis_size)
+    axe.annotate('e - lower canopy', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='upper',data=df_mh,inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    axe.set_xlabel('')
+
+    axf = plt.subplot2grid((4,2),(2,1),sharex=axa,sharey=axa)
+    axg.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='upper',data=df_rad,inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    axf.set_xlabel('')
+
+    axg = plt.subplot2grid((4,2),(3,0),sharex=axa,sharey=axa)
+    axg.set_ylabel('average PAD m$^2$m$^{-2}$m$^{-1}$',fontsize=axis_size)
+    axg.annotate('g - understory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='upper',data=df_mh,inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    axg.set_xlabel('')
+
+    axh = plt.subplot2grid((4,2),(3,1),sharex=axa,sharey=axa)
+    axh.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='resolution',y='upper',data=df_rad,inner=None,linewidth=0.5,
+                    scale='width',hue="plot",palette = colour,dodge=False)
+    axh.set_xlabel('')
+
+    axes =[axa,axb,axc,axd,axe,axf,axg,axh]
+    yticklabels = axb.get_yticklabels() + axd.get_yticklabels() + axf.get_yticklabels() + axh.get_yticklabels()
+    plt.setp(yticklabels,visible=False)
+
+    for ax in axes:
+        ax.yaxis.set_ticks_position('both')
+        if ax!=axd:
+            ax.legend_.remove()
+        else:
+            axd.legend(loc = (1.1,-1))
+    plt.subplots_adjust(wspace = 0.2,hspace=0.3,right=0.5)
+    plt.savefig(figure_name)
+
+    plt.show()
     return 0

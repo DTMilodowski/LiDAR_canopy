@@ -196,6 +196,17 @@ csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
                             radiative_DTM_PAD,radiative_DTM_PAD_mean,BA,plot_marker,plot_label,
                             plot_colour)
 
+"""
+# Figure 8 - PAD distributions for distinct canopy layers
+"""
+figure_name = output_dir + 'Fig8_canopy_sublevel_PAD.png'
+figure_number = 8
+csp.plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
+                            heights,heights_rad,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                            radiative_PAD,radiative_PAD_mean,
+                            radiative_DTM_PAD,radiative_DTM_PAD_mean)
+
+
 #-------------------------------
 # RESULTS - SENSITIVITY ANALYSIS
 # see sensitivity analysis plots

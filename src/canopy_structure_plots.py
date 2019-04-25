@@ -1,9 +1,9 @@
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
-import LiDAR_MacHorn_LAD_profiles as LAD1
-import LiDAR_radiative_transfer_LAD_profiles as LAD2
-import inventory_based_LAD_profiles as field
+import LiDAR_MacHorn_PAD_profiles as LAD1
+import LiDAR_radiative_transfer_PAD_profiles as LAD2
+import inventory_based_PAD_profiles as field
 import least_squares_fitting as lstsq
 import geospatial_utility_tools as geo
 
@@ -136,8 +136,8 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
 """
 def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
                             plot_point_cloud,heights,heights_rad, lidar_profiles,
-                            MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,
-                            radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
+                            MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_PAD,radiative_PAD_mean,
+                            radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD):
 
     max_return=3
     n_subplots = 25
@@ -325,23 +325,23 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
 
             # plot macarthur horn profile
             for i in range(0,n_subplots):
-                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
-            axes2[pp].plot(MacArthurHorn_LAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
+            axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
             # plot detto profile
             for i in range(0,n_subplots):
-                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
-            axes3[pp].plot(radiative_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+            axes3[pp].plot(radiative_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
             # plot corrective radiative transfer profile
             for i in range(0,n_subplots):
-                axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
-            axes4[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+                axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+            axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
             # field inventory
             #for i in range(0,n_subplots):
-                #axes5[pp].fill_betweenx(heights[2:],0,inventory_LAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
-            #axes5[pp].plot(np.mean(inventory_LAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
-            axes5[pp].plot(inventory_LAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+                #axes5[pp].fill_betweenx(heights[2:],0,inventory_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
+            #axes5[pp].plot(np.mean(inventory_PAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
+            axes5[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
         yticklabels.append(axes1[pp].get_yticklabels())
         yticklabels.append(axes2[pp].get_yticklabels())
@@ -377,8 +377,8 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
     return 0
 
 def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad,
-                                lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                                radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
+                                lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                                radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD):
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
@@ -551,19 +551,19 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 
             # plot macarthur horn profile
             for i in range(0,n_subplots):
-                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
-            axes2[pp].plot(MacArthurHorn_LAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
+            axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
 
             # plot corrective radiative transfer profile
             for i in range(0,n_subplots):
-                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
-            axes3[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+            axes3[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
             # field inventory
             #for i in range(0,n_subplots):
-                #axes5[pp].fill_betweenx(heights[2:],0,inventory_LAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
-            #axes5[pp].plot(np.mean(inventory_LAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
-            axes4[pp].plot(inventory_LAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+                #axes5[pp].fill_betweenx(heights[2:],0,inventory_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
+            #axes5[pp].plot(np.mean(inventory_PAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
+            axes4[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
         yticklabels.append(axes1[pp].get_yticklabels())
         yticklabels.append(axes2[pp].get_yticklabels())
@@ -596,8 +596,8 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     return 0
 
 def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad,
-                                lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                                radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
+                                lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                                radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD):
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
@@ -715,16 +715,16 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
 
             # plot macarthur horn profile
             for i in range(0,n_subplots):
-                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
-            axes2[pp].plot(MacArthurHorn_LAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
+            axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
 
             # plot corrective radiative transfer profile
             for i in range(0,n_subplots):
-                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
-            axes3[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+            axes3[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
             # field inventory
-            axes4[pp].plot(inventory_LAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+            axes4[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
         yticklabels.append(axes1[pp].get_yticklabels())
         yticklabels.append(axes2[pp].get_yticklabels())
@@ -760,12 +760,12 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
 """
 # Compare LiDAR approaches
 """
-def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                        radiative_LAD,radiative_LAD_mean,
-                        radiative_DTM_LAD,radiative_DTM_LAD_mean,layer_thickness=1):
-    Plots = MacArthurHorn_LAD.keys()
+def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                        radiative_PAD,radiative_PAD_mean,
+                        radiative_DTM_PAD,radiative_DTM_PAD_mean,layer_thickness=1):
+    Plots = MacArthurHorn_PAD.keys()
     N_plots = len(Plots)
-    N_subplots = np.shape(MacArthurHorn_LAD[Plots[0]])[0]
+    N_subplots = np.shape(MacArthurHorn_PAD[Plots[0]])[0]
     mh_1ha = np.zeros(N_plots)
     mh_20m = np.zeros((N_plots,N_subplots))
     rad2_1ha = np.zeros(N_plots)
@@ -779,19 +779,19 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_
 
     for pp in range(0,N_plots):
         print(Plots[pp])
-        mh_20m[pp,:]=np.nansum(MacArthurHorn_LAD[Plots[pp]],axis=1)*layer_thickness
-        rad2_20m[pp,:]=np.nansum(radiative_LAD[Plots[pp]][:,:,1],axis=1)*layer_thickness
-        rad3_20m[pp,:]=np.nansum(radiative_LAD[Plots[pp]][:,:,2],axis=1)*layer_thickness
-        rad2_DTM_20m[pp,:]=np.nansum(radiative_DTM_LAD[Plots[pp]][:,:,1],axis=1)*layer_thickness
-        rad3_DTM_20m[pp,:]=np.nansum(radiative_DTM_LAD[Plots[pp]][:,:,2],axis=1)*layer_thickness
+        mh_20m[pp,:]=np.nansum(MacArthurHorn_PAD[Plots[pp]],axis=1)*layer_thickness
+        rad2_20m[pp,:]=np.nansum(radiative_PAD[Plots[pp]][:,:,1],axis=1)*layer_thickness
+        rad3_20m[pp,:]=np.nansum(radiative_PAD[Plots[pp]][:,:,2],axis=1)*layer_thickness
+        rad2_DTM_20m[pp,:]=np.nansum(radiative_DTM_PAD[Plots[pp]][:,:,1],axis=1)*layer_thickness
+        rad3_DTM_20m[pp,:]=np.nansum(radiative_DTM_PAD[Plots[pp]][:,:,2],axis=1)*layer_thickness
         print(rad2_DTM_20m[pp].astype('int'))
         print(mh_20m[pp])
 
-        mh_1ha[pp] = np.nansum(MacArthurHorn_LAD_mean[Plots[pp]])*layer_thickness
-        rad2_1ha[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,1])*layer_thickness
-        rad3_1ha[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,2])*layer_thickness
-        rad2_DTM_1ha[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,1])*layer_thickness
-        rad3_DTM_1ha[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,2])*layer_thickness
+        mh_1ha[pp] = np.nansum(MacArthurHorn_PAD_mean[Plots[pp]])*layer_thickness
+        rad2_1ha[pp] = np.nansum(radiative_PAD_mean[Plots[pp]][:,1])*layer_thickness
+        rad3_1ha[pp] = np.nansum(radiative_PAD_mean[Plots[pp]][:,2])*layer_thickness
+        rad2_DTM_1ha[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,1])*layer_thickness
+        rad3_DTM_1ha[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,2])*layer_thickness
         print(rad2_DTM_1ha[pp])
         print(mh_1ha[pp])
 
@@ -846,12 +846,12 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_
 """
 # LAI vs. canopy volume
 """
-def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                            radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,
-                            radiative_DTM_LAD_mean,Inventory_LAD,Inventory_LAI,layer_thickness=1):
-    Plots = MacArthurHorn_LAD.keys()
+def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                            radiative_PAD,radiative_PAD_mean,radiative_DTM_PAD,
+                            radiative_DTM_PAD_mean,Inventory_PAD,Inventory_LAI,layer_thickness=1):
+    Plots = MacArthurHorn_PAD.keys()
     N_plots = len(Plots)
-    N_subplots = np.shape(MacArthurHorn_LAD[Plots[0]])[0]
+    N_subplots = np.shape(MacArthurHorn_PAD[Plots[0]])[0]
     vol = np.zeros(N_plots)
     mh = np.zeros(N_plots)
     rad2 = np.zeros(N_plots)
@@ -863,12 +863,12 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
         print(Plots[pp])
         # for 1 ha averages, want to avoid nodata
         # these should be identifiable based on penetration limit
-        vol[pp] = np.sum(Inventory_LAD[Plots[pp]])
-        mh[pp] = np.nansum(MacArthurHorn_LAD_mean[Plots[pp]])*layer_thickness
-        rad2[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,1])*layer_thickness
-        rad3[pp] = np.nansum(radiative_LAD_mean[Plots[pp]][:,2])*layer_thickness
-        radDTM2[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,1])*layer_thickness
-        radDTM3[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,2])*layer_thickness
+        vol[pp] = np.sum(Inventory_PAD[Plots[pp]])
+        mh[pp] = np.nansum(MacArthurHorn_PAD_mean[Plots[pp]])*layer_thickness
+        rad2[pp] = np.nansum(radiative_PAD_mean[Plots[pp]][:,1])*layer_thickness
+        rad3[pp] = np.nansum(radiative_PAD_mean[Plots[pp]][:,2])*layer_thickness
+        radDTM2[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,1])*layer_thickness
+        radDTM3[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,2])*layer_thickness
 
     # annotate with stats
     r_sq_a =   aux.get_rsquared_annotation(vol,mh)
@@ -892,7 +892,7 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
         x_err=np.nan#np.std(inventory_LAI[Plots[i]])/np.sqrt(n_subplots)
         y_err=np.nan#np.std(MacArthurHorn_LAI[Plots[i]])/np.sqrt(n_subplots)
         #ax1.errorbar(np.mean(Inventory_LAI[Plots[i]]),np.mean(MacArthurHorn_LAI[Plots[i]]),xerr=x_err,yerr=y_err,marker='o',color='black')
-        ax1.errorbar(np.mean(Inventory_LAI[Plots[i]]),np.nansum(MacArthurHorn_LAD_mean[Plots[i]])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color='black')
+        ax1.errorbar(np.mean(Inventory_LAI[Plots[i]]),np.nansum(MacArthurHorn_PAD_mean[Plots[i]])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color='black')
 
 
     ax2 = plt.subplot2grid((1,3),(0,1), sharex=ax1)#, sharey=ax1)
@@ -917,10 +917,10 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
             if i==0:
                 leg_label = '$k_{max}=$' + str(k+1)
                 #ax2.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
-                ax2.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_LAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
+                ax2.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_PAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
             else:
                 #ax2.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
-                ax2.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_LAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k])
+                ax2.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_PAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k])
 
     ax3 = plt.subplot2grid((1,3),(0,2), sharex=ax1)#, sharey=ax1)
     ax3.annotate('c - radiative transfer (modified)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
@@ -944,10 +944,10 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
             if i==0:
                 leg_label = '$k_{max}=$' + str(k+1)
                 #ax3.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
-                ax3.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_DTM_LAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
+                ax3.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_DTM_PAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k],label=leg_label)
             else:
                 #ax3.errorbar(np.mean(inventory_LAI[Plots[i]]),np.mean(radiative_DTM_LAI[Plots[i]][:,k]),xerr=x_err,yerr=y_err,marker='o',color=colour[k])
-                ax3.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_DTM_LAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k])
+                ax3.errorbar(np.mean(Inventory_LAI[Plots[i]]), np.nansum(radiative_DTM_PAD_mean[Plots[i]][:,k])*layer_thickness,xerr=x_err,yerr=y_err,marker='o',color=colour[k])
 
     ax3.legend(loc=4)
 
@@ -960,14 +960,14 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_LAD,MacArthurH
 """
 # LAI vs. basal area
 """
-def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                            radiative_DTM_LAD,radiative_DTM_LAD_mean,BasalArea,
+def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                            radiative_DTM_PAD,radiative_DTM_PAD_mean,BasalArea,
                             plot_marker,plot_label,plot_colour,layer_thickness=1):
 
 
-    Plots = list(MacArthurHorn_LAD.keys())
+    Plots = list(MacArthurHorn_PAD.keys())
     N_plots = len(Plots)
-    N_subplots = np.shape(MacArthurHorn_LAD[Plots[0]])[0]
+    N_subplots = np.shape(MacArthurHorn_PAD[Plots[0]])[0]
     BA = np.zeros(N_plots)
     mh = np.zeros(N_plots)
     rad2 = np.zeros(N_plots)
@@ -981,9 +981,9 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_LAD,MacArthur
         # for 1 ha averages, want to avoid nodata
         # these should be identifiable based on penetration limit
         BA[pp] = np.mean(BasalArea[Plots_str]).copy()
-        mh[pp] = np.nansum(MacArthurHorn_LAD_mean[Plots[pp]])*layer_thickness
-        radDTM2[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,1])*layer_thickness
-        radDTM3[pp] = np.nansum(radiative_DTM_LAD_mean[Plots[pp]][:,2])*layer_thickness
+        mh[pp] = np.nansum(MacArthurHorn_PAD_mean[Plots[pp]])*layer_thickness
+        radDTM2[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,1])*layer_thickness
+        radDTM3[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,2])*layer_thickness
 
     # annotate with stats
     r_sq_a =   aux.get_rsquared_annotation(BA,mh)
@@ -1132,7 +1132,7 @@ def plot_location_map(figure_name,figure_number):
 
 
 # Cross-plot canopy layers (new)
-def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD):
+def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_PAD,radiative_PAD_mean,radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD):
 
     # Process the profiles
 
@@ -1142,33 +1142,33 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
 
     # First up - old-growth forest
     Plot_name='Belian'
-    x=np.cumsum(MacArthurHorn_LAD_mean[Plot_name][2:][::-1])
-    y1=np.cumsum(radiative_LAD_mean[Plot_name][:-3,1])
-    y2=np.cumsum(radiative_DTM_LAD_mean[Plot_name][:-3,1])
+    x=np.cumsum(MacArthurHorn_PAD_mean[Plot_name][2:][::-1])
+    y1=np.cumsum(radiative_PAD_mean[Plot_name][:-3,1])
+    y2=np.cumsum(radiative_DTM_PAD_mean[Plot_name][:-3,1])
     t=heights[2:][::-1]
     ax1 = plt.subplot2grid((3,2),(0,0))
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
-        ax1.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
+        ax1.plot(np.cumsum(MacArthurHorn_PAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_PAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
     plot_colourline(ax1,x,y1,t,linewidth=5,cmap='plasma')
 
     ax2 = plt.subplot2grid((3,2),(0,1),sharex=ax1,sharey=ax1)
     ax2.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
-        ax2.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_DTM_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
+        ax2.plot(np.cumsum(MacArthurHorn_PAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_DTM_PAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
     plot_colourline(ax2,x,y2,t,linewidth=5,cmap='plasma')
 
     # Next up - Moderately logged forest
     Plot_name='E'
-    x=np.cumsum(MacArthurHorn_LAD_mean[Plot_name][2:][::-1])
-    y1=np.cumsum(radiative_LAD_mean[Plot_name][:-3,1])
-    y2=np.cumsum(radiative_DTM_LAD_mean[Plot_name][:-3,1])
+    x=np.cumsum(MacArthurHorn_PAD_mean[Plot_name][2:][::-1])
+    y1=np.cumsum(radiative_PAD_mean[Plot_name][:-3,1])
+    y2=np.cumsum(radiative_DTM_PAD_mean[Plot_name][:-3,1])
     ax3 = plt.subplot2grid((3,2),(1,0),sharex=ax1,sharey=ax1)
     ax3.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax3.set_ylabel('cumulative PAD$_{rad trans (Detto)}$ (m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
 
     for i in range(0,n_subplots):
-        ax3.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
+        ax3.plot(np.cumsum(MacArthurHorn_PAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_PAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
     plot_colourline(ax3,x,y1,t,linewidth=5,cmap='plasma')
 
     ax4 = plt.subplot2grid((3,2),(1,1),sharex=ax1,sharey=ax1)
@@ -1179,27 +1179,27 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
     ax4.yaxis.set_ticks_position('both')
 
     for i in range(0,n_subplots):
-        ax4.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_DTM_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
+        ax4.plot(np.cumsum(MacArthurHorn_PAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_DTM_PAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
 
     plot_colourline(ax4,x,y2,t,linewidth=5,cmap='plasma')
 
     # Finally heavily logged forest
     Plot_name = 'B North'
-    x=np.cumsum(MacArthurHorn_LAD_mean[Plot_name][2:][::-1])
-    y1=np.cumsum(radiative_LAD_mean[Plot_name][:-3,1])
-    y2=np.cumsum(radiative_DTM_LAD_mean[Plot_name][:-3,1])
+    x=np.cumsum(MacArthurHorn_PAD_mean[Plot_name][2:][::-1])
+    y1=np.cumsum(radiative_PAD_mean[Plot_name][:-3,1])
+    y2=np.cumsum(radiative_DTM_PAD_mean[Plot_name][:-3,1])
     ax5 = plt.subplot2grid((3,2),(2,0),sharex=ax1,sharey=ax1)
     ax5.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
 
     for i in range(0,n_subplots):
-        ax5.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
+        ax5.plot(np.cumsum(MacArthurHorn_PAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_PAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
     plot_colourline(ax5,x,y1,t,linewidth=5,cmap='plasma')
 
     ax6 = plt.subplot2grid((3,2),(2,1),sharex=ax1,sharey=ax1)
     ax6.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
 
     for i in range(0,n_subplots):
-        ax6.plot(np.cumsum(MacArthurHorn_LAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_DTM_LAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
+        ax6.plot(np.cumsum(MacArthurHorn_PAD[Plot_name][i,2:][::-1]),np.cumsum(radiative_DTM_PAD[Plot_name][i,:-3,1]),'-',color='k',linewidth=0.5)
 
     plot_colourline(ax6,x,y2,t,linewidth=5,cmap='plasma')
 
@@ -1236,7 +1236,7 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
 # radiative transfer approachself.
 # Old version also includes the uncorrected Detto model
 """
-def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,max_return=2):
+def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_PAD,radiative_PAD_mean,radiative_DTM_PAD,radiative_DTM_PAD_mean,max_return=2):
 
     # 2 columns (plotting MacHorn on x axis, multi return on y axis)
     # 3 rows (old growth, moderately logged, heavily logged)
@@ -1245,16 +1245,16 @@ def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurH
     # First up - old-growth forest
     Plot_name='Belian'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x1=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
-    x2=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x1=radiative_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x2=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
 
     ax1 = plt.subplot2grid((3,2),(0,0))
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
-        ax1.plot((radiative_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+        ax1.plot((radiative_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax1.plot(x1-x,y,linewidth=2,color='k')
 
     ax2 = plt.subplot2grid((3,2),(0,1),sharex=ax1,sharey=ax1)
@@ -1262,23 +1262,23 @@ def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurH
     ax2.yaxis.tick_right()
     ax2.yaxis.set_ticks_position('both')
     for i in range(0,n_subplots):
-        ax2.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+        ax2.plot((radiative_DTM_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax2.plot(x2-x,y,linewidth=2,color='k')
 
     # Next up - Moderately logged forest
     Plot_name='E'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x1=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
-    x2=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x1=radiative_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x2=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     ax3 = plt.subplot2grid((3,2),(1,0),sharex=ax1,sharey=ax1)
     ax3.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax3.set_ylabel('height (m)',fontsize=axis_size)
 
     for i in range(0,n_subplots):
-        ax3.plot((radiative_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+        ax3.plot((radiative_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax3.plot(x1-x,y,linewidth=2,color='k')
 
     ax4 = plt.subplot2grid((3,2),(1,1),sharex=ax1,sharey=ax1)
@@ -1289,23 +1289,23 @@ def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurH
     ax4.yaxis.set_ticks_position('both')
 
     for i in range(0,n_subplots):
-        ax4.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+        ax4.plot((radiative_DTM_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax4.plot(x2-x,y,linewidth=2,color='k')
 
     # Finally heavily logged forest
     Plot_name = 'B South'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x1=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
-    x2=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x1=radiative_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x2=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     ax5 = plt.subplot2grid((3,2),(2,0),sharex=ax1,sharey=ax1)
     ax5.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
     ax5.set_xlabel('PAD$_{rad trans-Detto}$-PAD$_{MacArthur-Horn}$\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
 
     for i in range(0,n_subplots):
-        ax5.plot((radiative_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+        ax5.plot((radiative_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax5.plot(x1-x,y,linewidth=2,color='k')
 
     ax6 = plt.subplot2grid((3,2),(2,1),sharex=ax1,sharey=ax1)
@@ -1315,7 +1315,7 @@ def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurH
     ax6.yaxis.set_ticks_position('both')
 
     for i in range(0,n_subplots):
-        ax6.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
+        ax6.plot((radiative_DTM_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax6.plot(x2-x,y,linewidth=2,color='k')
 
     # tidy up tick labels
@@ -1325,8 +1325,8 @@ def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurH
     plt.tight_layout()
     plt.show()
 
-def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                                radiative_DTM_LAD,radiative_DTM_LAD_mean,max_return=2):
+def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                                radiative_DTM_PAD,radiative_DTM_PAD_mean,max_return=2):
 
     # 3 columns (old growth, moderately logged, heavily logged)
     fig = plt.figure(figure_number, facecolor='White',figsize=[8,4])
@@ -1334,31 +1334,31 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     # First up - old-growth forest
     Plot_name=b'Belian'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x1=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x1=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
 
     ax1 = plt.subplot2grid((1,3),(0,0))
     ax1.annotate('a - MLA-01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
                     horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
-        ax1.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),
+        ax1.plot((radiative_DTM_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),
                     y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax1.plot(x1-x,y,linewidth=2,color='k')
 
     # Next up - Moderately logged forest
     Plot_name=b'E'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x1=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x1=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     ax2 = plt.subplot2grid((1,3),(0,1),sharex=ax1,sharey=ax1)
     ax2.annotate('b - SAF-03', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
                     horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
-        ax2.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),
+        ax2.plot((radiative_DTM_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),
                     y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax2.plot(x1-x,y,linewidth=2,color='k')
     ax2.set_xlabel('PAD$_{rad trans}$ - PAD$_{MacArthur-Horn}$ / (m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size)
@@ -1367,15 +1367,15 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
     # Finally heavily logged forest
     Plot_name = b'B South'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x1=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x1=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
     ax3 = plt.subplot2grid((1,3),(0,2),sharex=ax1,sharey=ax1)
     ax3.annotate('c - SAF-01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',
                 horizontalalignment='left', verticalalignment='top', fontsize=12)
     for i in range(0,n_subplots):
-        ax3.plot((radiative_DTM_LAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_LAD[Plot_name][i,2:idmax]),
+        ax3.plot((radiative_DTM_PAD[Plot_name][i,:-1,max_return-1][::-1][2:idmax]-MacArthurHorn_PAD[Plot_name][i,2:idmax]),
                 y,'-',color='0.5',linewidth=0.5,alpha=0.5)
     ax3.plot(x1-x,y,linewidth=2,color='k')
     # tidy up tick labels
@@ -1398,18 +1398,18 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
 """
 # plot PAD-volume ratios
 """
-def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,radiative_LAD,radiative_LAD_mean,radiative_DTM_LAD,radiative_DTM_LAD_mean,inventory_LAD,max_return=2):
+def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_PAD,radiative_PAD_mean,radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD,max_return=2):
     fig = plt.figure(figure_number, facecolor='White',figsize=[8,9])
 
     # First up - old-growth forest
     Plot_name='Belian'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=np.mean(inventory_LAD[Plot_name],axis=0)[2:idmax]
-    x1=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x2=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
-    x3=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=np.mean(inventory_PAD[Plot_name],axis=0)[2:idmax]
+    x1=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x2=radiative_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x3=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
 
     ax1 = plt.subplot2grid((3,3),(0,0))
     ax1.annotate('a', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
@@ -1428,12 +1428,12 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
     # Next up - Moderately logged forest
     Plot_name='E'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=np.mean(inventory_LAD[Plot_name],axis=0)[2:idmax]
-    x1=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x2=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
-    x3=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=np.mean(inventory_PAD[Plot_name],axis=0)[2:idmax]
+    x1=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x2=radiative_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x3=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
 
     ax4 = plt.subplot2grid((3,3),(1,0),sharex=ax1,sharey=ax1)
     ax4.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
@@ -1455,12 +1455,12 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
     # Finally heavily logged forest
     Plot_name = 'B South'
     ids = np.arange(heights.size)
-    idmax = ids[MacArthurHorn_LAD_mean[Plot_name]>0][-1]+1
+    idmax = ids[MacArthurHorn_PAD_mean[Plot_name]>0][-1]+1
     y=heights[2:idmax]
-    x=np.mean(inventory_LAD[Plot_name],axis=0)[2:idmax]
-    x1=MacArthurHorn_LAD_mean[Plot_name][2:idmax]
-    x2=radiative_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
-    x3=radiative_DTM_LAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x=np.mean(inventory_PAD[Plot_name],axis=0)[2:idmax]
+    x1=MacArthurHorn_PAD_mean[Plot_name][2:idmax]
+    x2=radiative_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
+    x3=radiative_DTM_PAD_mean[Plot_name][:-1,max_return-1][::-1][2:idmax]
 
     ax7 = plt.subplot2grid((3,3),(2,0),sharex=ax1,sharey=ax1)
     ax7.annotate('g', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=12)
@@ -1603,9 +1603,9 @@ def plot_transmittance_ratio(figure_number,figure_name,pts):
 # Plot comparison of LiDAR derived profiles: Mac-Horn, Detto, Detto-corrected
 """
 def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
-                        lidar_profiles,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                        radiative_LAD,radiative_LAD_mean,
-                        radiative_DTM_LAD,radiative_DTM_LAD_mean):
+                        lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                        radiative_PAD,radiative_PAD_mean,
+                        radiative_DTM_PAD,radiative_DTM_PAD_mean):
     max_return=3
     n_subplots = 25
     fig_plots = [b'Belian',b'E',b'B South']
@@ -1680,22 +1680,22 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
         # plot macarthur horn profile
         for i in range(0,n_subplots):
-            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_LAD[Plot_name][i,2:],
+            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],
                                     color=colour[0],alpha=0.02)
-        axes2[pp].plot(MacArthurHorn_LAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+        axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
 
         # plot original Detto radiative transfer profile
         for i in range(0,n_subplots):
-            axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_LAD[Plot_name][i,:-3,-1][::-1],
+            axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_PAD[Plot_name][i,:-3,-1][::-1],
                                     color=colour[1],alpha=0.02)
-        axes3[pp].plot(radiative_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
+        axes3[pp].plot(radiative_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
                                     '-',c=colour[1],linewidth=2)
 
         # plot corrective radiative transfer profile
         for i in range(0,n_subplots):
-            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_LAD[Plot_name][i,:-3,-1][::-1],
+            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],
                                     color=colour[1],alpha=0.02)
-        axes4[pp].plot(radiative_DTM_LAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
+        axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
                                     '-',c=colour[1],linewidth=2)
 
 
@@ -1821,9 +1821,9 @@ Plot distributions of PAD for different canopy subdivisions
 - upper canopy: 45 m
 """
 def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
-                            heights,heights_rad,MacArthurHorn_LAD,MacArthurHorn_LAD_mean,
-                            radiative_LAD,radiative_LAD_mean,
-                            radiative_DTM_LAD,radiative_DTM_LAD_mean):
+                            heights,heights_rad,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                            radiative_PAD,radiative_PAD_mean,
+                            radiative_DTM_PAD,radiative_DTM_PAD_mean):
 
     max_k = 2
     # Create pandas dataframes for upper canopy, mid canopy lower canopy and
@@ -1849,13 +1849,13 @@ def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
         for ss in range(0,25):
             for ii in range(0,2):
                 if ii==0:
-                    PAD = MacArthurHorn_LAD[plot_name[pp]]
+                    PAD = MacArthurHorn_PAD[plot_name[pp]]
                     uc_mask = heights>=45
                     mc_mask = np.all((heights>=30,heights<45),axis=0)
                     lc_mask = np.all((heights>=15,heights<30),axis=0)
                     und_mask = heights<15
                 else:
-                    PAD = radiative_DTM_LAD[plot_name[pp]][:,:,max_k-1]
+                    PAD = radiative_DTM_PAD[plot_name[pp]][:,:,max_k-1]
                     uc_mask = heights_rad>=45
                     mc_mask = np.all((heights_rad>=30,heights_rad<45),axis=0)
                     lc_mask = np.all((heights_rad>=15,heights_rad<30),axis=0)

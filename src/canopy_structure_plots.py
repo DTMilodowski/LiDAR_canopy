@@ -1,9 +1,9 @@
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
-import LiDAR_MacHorn_PAD_profiles as LAD1
-import LiDAR_radiative_transfer_PAD_profiles as LAD2
-import inventory_based_PAD_profiles as field
+import LiDAR_MacHorn_LAD_profiles as LAD1
+import LiDAR_radiative_transfer_LAD_profiles as LAD2
+import inventory_based_LAD_profiles as field
 import least_squares_fitting as lstsq
 import geospatial_utility_tools as geo
 
@@ -1614,10 +1614,10 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
     # Belian
     ax1a = plt.subplot2grid((3,4),(0,0))
-    ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',
+    ax1a.annotate('a -  MLA01\nOld growth', xy=(0.05,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
                 fontsize=10)
-    ax1a.annotate('Return profile', xy=(0.95,0.95), xycoords='axes fraction',
+    ax1a.annotate('Return profile', xy=(0.95,0.05), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
     ax2a = plt.subplot2grid((3,4),(0,1),sharey=ax1a)
@@ -1635,7 +1635,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
     # E
     ax1b = plt.subplot2grid((3,4),(1,0),sharey=ax1a,sharex=ax1a)
-    ax1b.annotate('b - Moderately logged, SAF05', xy=(0.05,0.95), xycoords='axes fraction',
+    ax1b.annotate('b - SAF05\nModerately logged', xy=(0.05,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
                 fontsize=10)
     ax2b = plt.subplot2grid((3,4),(1,1),sharey=ax1a,sharex=ax2a)
@@ -1644,7 +1644,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
     # B South
     ax1c = plt.subplot2grid((3,4),(2,0),sharey=ax1a,sharex=ax1a)
-    ax1c.annotate('c - Heavily logged, SAF01', xy=(0.05,0.95), xycoords='axes fraction',
+    ax1c.annotate('c - SAF01\nHeavily logged', xy=(0.05,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
                 fontsize=10)
     ax2c = plt.subplot2grid((3,4),(2,1),sharey=ax1a,sharex=ax2a)
@@ -1731,28 +1731,25 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 # Plot comparison of LiDAR derived profiles using stochastic radiative transfer
 # assuming different leaf angle distributions
 """
-def plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,heights_rad,
+def plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,heights,
                         spherical_PAD_mean,erectophile_PAD_mean,planophile_PAD_mean):
-    max_return=3
+    max_return=2
     fig_plots = [b'Belian',b'E',b'B South']
 
     plt.figure(figure_number, facecolor='White',figsize=[7,4])
 
     # Belian
     ax1 = plt.subplot2grid((1,3),(0,0))
-    ax1.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',
+    ax1.annotate('a - MLA01\nOld growth', xy=(0.05,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
                 fontsize=10)
     ax2 = plt.subplot2grid((1,3),(0,1),sharey=ax1,sharex=ax1)
-    ax2.annotate('b - SAF03\nmoderately logged', xy=(0.95,0.95), xycoords='axes fraction',
-                backgroundcolor='none',horizontalalignment='right',
+    ax2.annotate('b - SAF05\nmoderately logged', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left',
                 verticalalignment='top', fontsize=9)
-    ax2.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',
-                backgroundcolor='none',horizontalalignment='right',
-                verticalalignment='top', fontsize=9)
-    ax3 = plt.subplot2grid((3,4),(0,2),sharey=ax1,sharex=ax1)
-    ax3.annotate('c - SAF02\nheavily logged', xy=(0.95,0.95), xycoords='axes fraction',
-                backgroundcolor='none',horizontalalignment='right',
+    ax3 = plt.subplot2grid((1,3),(0,2),sharey=ax1,sharex=ax1)
+    ax3.annotate('c - SAF01\nheavily logged', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left',
                 verticalalignment='top', fontsize=9)
 
     ax1.set_ylabel('Height / m',fontsize=axis_size)
@@ -1767,14 +1764,14 @@ def plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,he
     for pp in range(0,3):
         Plot_name = fig_plots[pp]
         if pp<2:
-            axes[pp].plot(spherical_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
-            axes[pp].plot(planophile_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[1],linewidth=2)
-            axes[pp].plot(erectophile_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+            axes[pp].plot(spherical_PAD_mean[Plot_name][:-2,max_return-1][::-1],heights[2:],'-',c=colour[0],linewidth=1)
+            axes[pp].plot(planophile_PAD_mean[Plot_name][:-2,max_return-1][::-1],heights[2:],'-',c=colour[1],linewidth=1)
+            axes[pp].plot(erectophile_PAD_mean[Plot_name][:-2,max_return-1][::-1],heights[2:],'-',c=colour[2],linewidth=1)
 
         else:
-            axes[pp].plot(spherical_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2,label='spherical')
-            axes[pp].plot(planophile_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[1],linewidth=2,label='planophile')
-            axes[pp].plot(erectophile_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2,label='erectophile')
+            axes[pp].plot(spherical_PAD_mean[Plot_name][:-2,max_return-1][::-1],heights[2:],'-',c=colour[0],linewidth=1,label='spherical')
+            axes[pp].plot(planophile_PAD_mean[Plot_name][:-2,max_return-1][::-1],heights[2:],'-',c=colour[1],linewidth=1,label='planophile')
+            axes[pp].plot(erectophile_PAD_mean[Plot_name][:-2,max_return-1][::-1],heights[2:],'-',c=colour[2],linewidth=1,label='erectophile')
 
     ax1.set_ylim(0,80)
     ax2.set_xlim(xmin=0,xmax=1)

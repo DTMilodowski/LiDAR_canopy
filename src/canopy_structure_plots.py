@@ -1728,6 +1728,75 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
     return 0
 
 """
+# Plot comparison of LiDAR derived profiles using stochastic radiative transfer
+# assuming different leaf angle distributions
+"""
+def plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,heights_rad,
+                        spherical_PAD_mean,erectophile_PAD_mean,planophile_PAD_mean):
+    max_return=3
+    fig_plots = [b'Belian',b'E',b'B South']
+
+    plt.figure(figure_number, facecolor='White',figsize=[7,4])
+
+    # Belian
+    ax1 = plt.subplot2grid((1,3),(0,0))
+    ax1.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
+                fontsize=10)
+    ax2 = plt.subplot2grid((1,3),(0,1),sharey=ax1,sharex=ax1)
+    ax2.annotate('b - SAF03\nmoderately logged', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right',
+                verticalalignment='top', fontsize=9)
+    ax2.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right',
+                verticalalignment='top', fontsize=9)
+    ax3 = plt.subplot2grid((3,4),(0,2),sharey=ax1,sharex=ax1)
+    ax3.annotate('c - SAF02\nheavily logged', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right',
+                verticalalignment='top', fontsize=9)
+
+    ax1.set_ylabel('Height / m',fontsize=axis_size)
+    ax1.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    ax2.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    ax3.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    #---------------------------------------------------------
+
+    axes = [ax1,  ax2, ax3]
+    yticklabels=[];yticklabels.append(ax2.get_yticklabels()); yticklabels.append(ax3.get_yticklabels())
+
+    for pp in range(0,3):
+        Plot_name = fig_plots[pp]
+        if pp<2:
+            axes[pp].plot(spherical_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+            axes[pp].plot(planophile_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[1],linewidth=2)
+            axes[pp].plot(erectophile_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+
+        else:
+            axes[pp].plot(spherical_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2,label='spherical')
+            axes[pp].plot(planophile_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[1],linewidth=2,label='planophile')
+            axes[pp].plot(erectophile_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2,label='erectophile')
+
+    ax1.set_ylim(0,80)
+    ax2.set_xlim(xmin=0,xmax=1)
+
+    ax2.locator_params(axis='x',nbins=5)
+    ax3.locator_params(axis='x',nbins=5)
+    ax1.locator_params(axis='x',nbins=5)
+
+    ax3.legend(loc = 'center right')
+
+    plt.setp(yticklabels,visible=False)
+    plt.subplots_adjust(hspace=0.2, wspace = 0.1)
+
+    plt.tight_layout()
+    plt.savefig(figure_name)
+    plt.show()
+
+    return 0
+
+
+
+"""
 # Plot example crown model
 """
 def plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,

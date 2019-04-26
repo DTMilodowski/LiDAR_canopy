@@ -10,6 +10,8 @@ import geospatial_utility_tools as geo
 import sys
 import numpy as np
 from scipy import stats
+import pandas as pd
+import seaborn as sns
 from osgeo import gdal
 import numpy.ma as ma
 
@@ -1667,7 +1669,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
     yticklabels=[]
     xticklabels=[]
-    
+
     for pp in range(0,3):
         Plot_name = fig_plots[pp]
 
@@ -1886,128 +1888,132 @@ Plot distributions of PAD for different canopy subdivisions
 - upper canopy: 45 m
 """
 def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
-                            heights,heights_rad,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
-                            radiative_PAD,radiative_PAD_mean,
-                            radiative_DTM_PAD,radiative_DTM_PAD_mean):
+                            heights,heights_rad,MacArthurHorn_PAD,
+                            radiative_PAD,radiative_DTM_PAD):
 
     max_k = 2
     # Create pandas dataframes for upper canopy, mid canopy lower canopy and
     # understory PAD
-    uc = []
-    lc = []
-    mc = []
-    und = []
+    uc = np.zeros(8*25*2)
+    lc = np.zeros(8*25*2)
+    mc = np.zeros(8*25*2)
+    und = np.zeros(8*25*2)
     plot = []
-    method = []
-    uc_mask = heights>=45
-    mc_mask = np.all((heights>=30,heights<45),axis=0)
-    lc_mask = np.all((heights>=15,heights<30),axis=0)
-    und_mask = heights<15
-    uc_mask_ = heights_rad>=45
-    mc_mask_ = np.all((heights_rad>=30,heights_rad<45),axis=0)
-    lc_mask_ = np.all((heights_rad>=15,heights_rad<30),axis=0)
-    und_mask_ = heights_rad<15
-
+    method = np.zeros(8*25*2)
+    plot_name_1 = [b'Belian',b'Seraya',b'DC1',b'DC2',b'LF',b'E',b'B North',b'B South']
     plot_name = ['MLA01','MLA02','DAN04','DAN05','SAF04','SAF03','SAF02','SAF01']
     plot_colour = ['#46E900','#46E900','#46E900','#46E900','#1A2BCE','#1A2BCE','#E0007F','#E0007F']
-    for pp in range(0,len(plot_name)):
+    cc=0
+    for pp in range(0,8):
         for ss in range(0,25):
             for ii in range(0,2):
                 if ii==0:
-                    PAD = MacArthurHorn_PAD[plot_name[pp]]
+                    PAD = MacArthurHorn_PAD[plot_name_1[pp]][ss]
                     uc_mask = heights>=45
                     mc_mask = np.all((heights>=30,heights<45),axis=0)
                     lc_mask = np.all((heights>=15,heights<30),axis=0)
                     und_mask = heights<15
+
+                    uc[cc]=np.nanmean(PAD[uc_mask])
+                    mc[cc]=np.nanmean(PAD[mc_mask])
+                    lc[cc]=np.nanmean(PAD[lc_mask])
+                    und[cc]=np.nanmean(PAD[und_mask])
+
                 else:
-                    PAD = radiative_DTM_PAD[plot_name[pp]][:,:,max_k-1]
+                    PAD = radiative_DTM_PAD[plot_name_1[pp]][ss,:,max_k-1]
                     uc_mask = heights_rad>=45
                     mc_mask = np.all((heights_rad>=30,heights_rad<45),axis=0)
                     lc_mask = np.all((heights_rad>=15,heights_rad<30),axis=0)
                     und_mask = heights_rad<15
 
-                uc.append(np.nanmean(PAD[ss,uc_mask]))
-                mc.append(np.nanmean(PAD[ss,mc_mask]))
-                lc.append(np.nanmean(PAD[ss,lc_mask]))
-                und.append(np.nanmean(PAD[ss,und_mask]))
+                    uc[cc]=np.nanmean(PAD[uc_mask[::-1]])
+                    mc[cc]=np.nanmean(PAD[mc_mask[::-1]])
+                    lc[cc]=np.nanmean(PAD[lc_mask[::-1]])
+                    und[cc]=np.nanmean(PAD[und_mask[::-1]])
+
                 plot.append(plot_name[pp])
-                method.append(ii)
+                method[cc]=ii
+                cc+=1
 
-    mask = method==0
-    df_mh = pd.DataFrame({'plot' : plot[mask],'upper' : uc[mask],'mid' : mc,
-                            'lower':lc[mask],'understory':und[mask]})
-    mask = method==1
-    df_rad = pd.DataFrame({'plot' : plot[mask],'upper' : uc[mask],'mid' : mc,
-                            'lower':lc[mask],'understory':und[mask]})
+    df = pd.DataFrame({'plot' : plot,'upper' : uc,'mid' : mc,
+                            'lower':lc,'understory':und})
+    df_mh = df[method==0]
+    df_rad = df[method==1]
 
-    pp=0
-    fig = plt.figure(figure_number, facecolor='White',figsize=(8,7))
+    fig = plt.figure(figure_number, facecolor='White',figsize=(7,8))
 
     axa = plt.subplot2grid((4,2),(0,0))
     axa.set_title('MacArthur-Horn', fontsize=10)
-    axa.set_ylabel('average PAD m$^2$m$^{-2}$m$^{-1}$',fontsize=axis_size)
-    axa.annotate('a - upper canopy', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='upper',data=df_mh,inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+    axa.annotate('a - upper canopy (>45 m)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='plot',y='upper',data=df_mh,inner="box",linewidth=0.5,
+                    scale='width',hue="plot",palette = plot_colour,dodge=False,saturation=0.7,cut=0)
     axa.set_xlabel('')
+    axa.set_ylabel('')
 
     axb = plt.subplot2grid((4,2),(0,1),sharex=axa,sharey=axa)
     axb.set_title('multi return\nrad. trans.', fontsize=10)
     axb.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='upper',data=df_rad,inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+    sns.violinplot(x='plot',y='upper',data=df_rad,inner="box",linewidth=0.5,
+                    scale='width',hue="plot",palette = plot_colour,dodge=False,saturation=0.7,cut=0)
     axb.set_xlabel('')
+    axb.set_ylabel('')
 
     axc = plt.subplot2grid((4,2),(1,0),sharex=axa,sharey=axa)
-    axc.set_ylabel('average PAD m$^2$m$^{-2}$m$^{-1}$',fontsize=axis_size)
-    axc.annotate('c - mid canopy', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='upper',data=df_mh,inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+    axc.annotate('c - mid canopy (30-45 m)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='plot',y='mid',data=df_mh,inner="box",linewidth=0.5,
+                    scale='width',hue="plot",palette = plot_colour,dodge=False,saturation=0.7,cut=0)
     axc.set_xlabel('')
+    axc.set_ylabel('')
 
     axd = plt.subplot2grid((4,2),(1,1),sharex=axa,sharey=axa)
     axd.annotate('d', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='upper',data=df_rad,inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+    sns.violinplot(x='plot',y='mid',data=df_rad,inner="box",linewidth=0.5,
+                    scale='width',hue="plot",palette = plot_colour,dodge=False,saturation=0.7,cut=0)
     axd.set_xlabel('')
+    axd.set_ylabel('')
 
     axe = plt.subplot2grid((4,2),(2,0),sharex=axa,sharey=axa)
-    axe.set_ylabel('average PAD m$^2$m$^{-2}$m$^{-1}$',fontsize=axis_size)
-    axe.annotate('e - lower canopy', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='upper',data=df_mh,inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+    axe.annotate('e - lower canopy (15-30 m)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='plot',y='lower',data=df_mh,inner="box",linewidth=0.5,
+                    scale='width',hue="plot",palette = plot_colour,dodge=False,saturation=0.7,cut=0)
     axe.set_xlabel('')
+    axe.set_ylabel('')
 
     axf = plt.subplot2grid((4,2),(2,1),sharex=axa,sharey=axa)
-    axg.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='upper',data=df_rad,inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+    axf.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='plot',y='lower',data=df_rad,inner="box",linewidth=0.5,
+                    scale='width',hue="plot",palette = plot_colour,dodge=False,saturation=0.7,cut=0)
     axf.set_xlabel('')
+    axf.set_ylabel('')
 
     axg = plt.subplot2grid((4,2),(3,0),sharex=axa,sharey=axa)
-    axg.set_ylabel('average PAD m$^2$m$^{-2}$m$^{-1}$',fontsize=axis_size)
-    axg.annotate('g - understory', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='upper',data=df_mh,inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+    axg.annotate('g - understory (<15 m)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='plot',y='understory',data=df_mh,inner="box",linewidth=0.5,
+                    scale='width',hue="plot",palette = plot_colour,dodge=False,saturation=0.7,cut=0)
     axg.set_xlabel('')
+    axg.set_ylabel('')
 
     axh = plt.subplot2grid((4,2),(3,1),sharex=axa,sharey=axa)
     axh.annotate('h', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='upper',data=df_rad,inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+    sns.violinplot(x='plot',y='understory',data=df_rad,inner="box",linewidth=0.5,
+                    scale='width',hue="plot",palette = plot_colour,dodge=False,saturation=0.7,cut=0)
     axh.set_xlabel('')
+    axh.set_ylabel('')
 
     axes =[axa,axb,axc,axd,axe,axf,axg,axh]
     yticklabels = axb.get_yticklabels() + axd.get_yticklabels() + axf.get_yticklabels() + axh.get_yticklabels()
     plt.setp(yticklabels,visible=False)
 
-    for ax in axes:
+    for ii,ax in enumerate(axes):
         ax.yaxis.set_ticks_position('both')
-        if ax!=axd:
-            ax.legend_.remove()
-        else:
-            axd.legend(loc = (1.1,-1))
-    plt.subplots_adjust(wspace = 0.2,hspace=0.3,right=0.5)
+        ax.legend_.remove()
+        for item in ax.get_xticklabels():
+            item.set_rotation(90)
+        if ii<6:
+            plt.setp(ax.get_xticklabels(),visible=False)
+
+    fig.text(0.04, 0.5, 'average PAD m$^2$m$^{-2}$m$^{-1}$', va='center', rotation='vertical', fontsize=10)
+    plt.subplots_adjust(wspace = 0.2,hspace=0.1)
     plt.savefig(figure_name)
 
     plt.show()

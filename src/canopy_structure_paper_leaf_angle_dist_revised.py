@@ -127,3 +127,5 @@ for pp in range(0,N_plots):
 # Plot profiles
 figure_name = 'figS1_leaf_angle_distributions_PAD.png'
 figure_number = 111
+csp.plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,heights_rad,
+                        spherical_PAD_mean,erectophile_PAD_mean,planophile_PAD_mean)

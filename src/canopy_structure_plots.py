@@ -1582,7 +1582,7 @@ def plot_transmittance_ratio(figure_number,figure_name,pts):
     plt.figure(figure_number, facecolor='White',figsize=[3,3])
     ax = plt.subplot2grid((1,1),(0,0))
     ax.set_xlabel('return number, k')
-    ax.set_ylabel('$N_{observed}$ / $N_{expected}$')
+    ax.set_ylabel(r'$\gamma$')
     for i in range(0,4):
         if i==0:
             ax.plot(1,1,'o',color='#1A2BCE')

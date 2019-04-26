@@ -542,7 +542,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     axa.set_ylabel('PAI',fontsize=axis_size)
     axa.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axa.set_ylabel('')
     axa.set_xlabel('')
     axa.set_ylabel('PAI',fontsize=axis_size)
@@ -550,7 +550,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     axd = plt.subplot2grid((2,3),(1,0),sharex=axa,sharey=axa)
     axd.annotate('d - multi return\nrad trans', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axd.set_ylabel('')
     axd.set_xlabel('')
     axd.set_ylabel('PAI',fontsize=axis_size)
@@ -562,7 +562,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     axb.set_title('Point density = 20 pts m$^{-2}$', fontsize=10)
     axb.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axb.set_ylabel('')
     axb.set_xlabel('')
     axb.set_xlabel('grid resolution')
@@ -570,7 +570,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     axe = plt.subplot2grid((2,3),(1,1),sharex=axa,sharey=axa)
     axe.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axe.set_ylabel('')
     axe.set_xlabel('grid resolution')
 
@@ -581,7 +581,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     axc.set_title('Point density = 40 pts m$^{-2}$', fontsize=10)
     axc.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axc.set_ylabel('')
     axc.set_xlabel('')
 
@@ -589,7 +589,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     axf = plt.subplot2grid((2,3),(1,2),sharex=axa,sharey=axa)
     axf.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False)
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axf.set_ylabel('')
     axf.set_xlabel('')
 

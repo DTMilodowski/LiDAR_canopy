@@ -230,17 +230,17 @@ csp.plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
 # METHODS
 #-------------------------------
 """
-# Figure S1 - "transmission ratio"
+# Figure S2 - "transmission ratio"
 """
-figure_number = 111
-figure_name = output_dir+'figS1_transmittance_ratios.png'
+figure_number = 112
+figure_name = output_dir+'figS2_transmittance_ratios.png'
 csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
 
 """
 # Figure S2 - comparison of Detto vs. modified algorithm
 """
-figure_number = 112
-figure_name = output_dir+'figS2_LiDAR_profiles_comparison.png'
+figure_number = 113
+figure_name = output_dir+'figS3_LiDAR_profiles_comparison.png'
 csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
                         lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
                         radiative_PAD,radiative_PAD_mean,

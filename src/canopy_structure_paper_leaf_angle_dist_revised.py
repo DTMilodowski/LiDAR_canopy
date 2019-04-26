@@ -8,7 +8,7 @@ import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
 import LiDAR_radiative_transfer_LAD_profiles as PAD
-
+import canopy_structure_plots as csp
 #------------------------------------------------------------------------------------
 # DIRECTORIES
 # start by defining input files
@@ -124,7 +124,7 @@ for pp in range(0,N_plots):
     erectophile_PAD_mean[Plot_name] = PAD_ere_mean.copy()
 #----------------------------------------------------------------------------
 # Plot profiles
-figure_name = 'figS1_leaf_angle_distributions_PAD.png'
+figure_name = output_dir+'figS1_leaf_angle_distributions_PAD.png'
 figure_number = 111
 csp.plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,heights_rad,
                         spherical_PAD_mean,erectophile_PAD_mean,planophile_PAD_mean)

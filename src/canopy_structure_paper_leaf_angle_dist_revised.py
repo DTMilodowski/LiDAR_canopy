@@ -28,7 +28,6 @@ N_plots = len(Plots)
 max_height = 80
 max_return = 3
 layer_thickness = 1.
-n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 plot_area = 10.**4
 subplot_area = 20.*20.

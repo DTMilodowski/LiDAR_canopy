@@ -1619,7 +1619,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
                 fontsize=10)
     ax1a.annotate('Return profile', xy=(0.95,0.05), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='right',
-                verticalalignment='top', fontsize=9)
+                verticalalignment='bottom', fontsize=9)
     ax2a = plt.subplot2grid((3,4),(0,1),sharey=ax1a)
     ax2a.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='right',
@@ -1667,8 +1667,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
     yticklabels=[]
     xticklabels=[]
-    xticklabels.append(ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xticklabels())
-
+    
     for pp in range(0,3):
         Plot_name = fig_plots[pp]
 

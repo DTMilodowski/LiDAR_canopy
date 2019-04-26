@@ -22,7 +22,7 @@ output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCan
 #------------------------------------------------------------------------------------
 # PARAMETERS
 # define important parameters for canopy profile estimation
-Plots = [b'Belian',b'E',b'B North']
+Plots = [b'Belian',b'E',b'B South']
 #Plots = ['B North']
 N_plots = len(Plots)
 max_height = 80
@@ -40,7 +40,9 @@ heights_rad = np.arange(0,max_height+layer_thickness,layer_thickness)
 planophile_PAD = {}
 erectophile_PAD = {}
 spherical_PAD = {}
-
+planophile_PAD_mean = {}
+erectophile_PAD_mean = {}
+spherical_PAD_mean = {}
 #------------------------------------------------------------------------------------
 # LOADING DATA
 # load coordinates and lidar points for target areas

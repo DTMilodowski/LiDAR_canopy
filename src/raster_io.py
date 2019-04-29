@@ -205,7 +205,7 @@ def load_GeoTIFF_band_and_georeferencing(File,band_number=1):
 
     try:
         ds = gdal.Open(File)
-    except RuntimeError, e:
+    except(RuntimeError, e):
         print('unable to open ' + File)
         print(e)
         sys.exit(1)

@@ -252,7 +252,7 @@ def load_lidar_file_by_polygon(lasfile,polygon,max_pts_per_tree = 10**6,print_ke
 # equivalent scripts for laz files - calls las2las to transform to .las files
 # before reading in with laspy
 def find_laz_files_by_polygon(file_list,polygon,print_keep=False):
-    laz_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
+    laz_files = np.genfromtxt(file_list,delimiter=',',dtype='unicode')
     keep = []
     n_files = laz_files.size
     for i in range(0,n_files):

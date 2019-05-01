@@ -1914,10 +1914,16 @@ def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
                     lc_mask = np.all((heights>=15,heights<30),axis=0)
                     und_mask = heights<15
 
+                    uc[cc]=np.nansum(PAD[uc_mask])
+                    mc[cc]=np.nansum(PAD[mc_mask])
+                    lc[cc]=np.nansum(PAD[lc_mask])
+                    und[cc]=np.nansum(PAD[und_mask])
+                    """
                     uc[cc]=np.nanmean(PAD[uc_mask])
                     mc[cc]=np.nanmean(PAD[mc_mask])
                     lc[cc]=np.nanmean(PAD[lc_mask])
                     und[cc]=np.nanmean(PAD[und_mask])
+                    """
 
                 else:
                     PAD = radiative_DTM_PAD[plot_name_1[pp]][ss,:,max_k-1]
@@ -1926,10 +1932,10 @@ def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
                     lc_mask = np.all((heights_rad>=15,heights_rad<30),axis=0)
                     und_mask = heights_rad<15
 
-                    uc[cc]=np.nanmean(PAD[uc_mask[::-1]])
-                    mc[cc]=np.nanmean(PAD[mc_mask[::-1]])
-                    lc[cc]=np.nanmean(PAD[lc_mask[::-1]])
-                    und[cc]=np.nanmean(PAD[und_mask[::-1]])
+                    uc[cc]=np.nansum(PAD[uc_mask[::-1]])
+                    mc[cc]=np.nansum(PAD[mc_mask[::-1]])
+                    lc[cc]=np.nansum(PAD[lc_mask[::-1]])
+                    und[cc]=np.nansum(PAD[und_mask[::-1]])
 
                 plot.append(plot_name[pp])
                 method[cc]=ii
@@ -2012,7 +2018,7 @@ def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
         if ii<6:
             plt.setp(ax.get_xticklabels(),visible=False)
 
-    fig.text(0.04, 0.5, 'average PAD m$^2$m$^{-2}$m$^{-1}$', va='center', rotation='vertical', fontsize=10)
+    fig.text(0.04, 0.5, 'contribution to PAI m$^2$m$^{-2}$', va='center', rotation='vertical', fontsize=10)
     plt.subplots_adjust(wspace = 0.2,hspace=0.1)
     plt.savefig(figure_name)
 

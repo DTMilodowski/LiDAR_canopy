@@ -155,4 +155,4 @@ for pp in range(0,N_plots):
     inventory_LAI[Plot_name] = np.sum(field_profiles,axis=1)*layer_thickness
     inventory_LAD_all[Plot_name] = field_profiles.copy()
 
-np.savez('%sinventory_canopy_profiles.npz' % output_dir,(inventory_LAD,inventory_LAD_std,inventory_LAI,inventory_LAI_std))
+np.savez('%sinventory_canopy_profiles.npz' % output_dir,(inventory_LAD,inventory_LAD_std,inventory_LAI,inventory_LAD_all))

@@ -4,6 +4,7 @@
 # estimates from hemispherical photographs.
 ###############################################################################################################
 import numpy as np
+from scipy import stats
 import sys
 import auxilliary_functions as aux
 import load_field_data as cen
@@ -87,8 +88,27 @@ temp = np.load('%sinventory_canopy_profiles.npz' % data_dir)['arr_0'][()]
 inventory_PAD=temp[0]
 inventory_PAD_std=temp[1]
 inventory_PAI=temp[2]
-#inventory_PAI_std=temp['arr_3'][()]
+#inventory_PAD_all=temp[3]
 temp = None
+
+#===============================================================================
+# Summary statistics
+table_plots = [b'Belian',b'Seraya',b'DC1',b'DC2',b'E',b'LF',b'B North',b'B South']
+print("Plot    \tMH\t+/-\trad_2\t+/-\trad_3\t+/-\tcv\t+/-")
+for pp,plot in enumerate(table_plots):
+    mh = np.mean(MacArthurHorn_PAI[plot])
+    mh_s = stats.sem(MacArthurHorn_PAI[plot])
+    r2 = np.mean(radiative_DTM_PAI[plot][:,1])
+    r2_s = stats.sem(radiative_DTM_PAI[plot][:,1])
+    r3 = np.mean(radiative_DTM_PAI[plot][:,2])
+    r3_s = stats.sem(radiative_DTM_PAI[plot][:,2])
+    cv = np.mean(inventory_PAI[plot])
+    cv_s = stats.sem(inventory_PAI[plot])
+
+    print('%s\t    %.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t' % (plot,mh,mh_s,
+                            r2,r2_s,r3,r3_s,cv,cv_s))
+    #print('%s    \t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f' % (plot,mh,mh_s,
+    #                        r2,r2_s,r3,r3_s,cv))
 
 #===============================================================================
 # NOW MAKE PLOTS

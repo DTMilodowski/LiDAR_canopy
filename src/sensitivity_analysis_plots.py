@@ -32,7 +32,6 @@ scale = np.arange(0.,6.)
 scale /=5.
 cmap_colour = cmap(scale)
 
-
 """
 Plot sensitivity of 1ha profiles to spatial resolution
 """

@@ -29,12 +29,12 @@ axis_size = rcParams['font.size']+2
 las_file = 'Carbon_plot_point_cloud_buffer.las'
 
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting_sensitivity_analysis_version.csv'
-datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('S32','f16','f16','f16','f16')}
+datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('<U16','f16','f16','f16','f16')}
 plot_coordinates = np.genfromtxt(gps_pts_file, skip_header = 0, delimiter = ',',dtype=datatype)
 
-plot = 'Belian'
+#plot = 'Belian'
 #plot = 'E'
-#plot = 'B North'
+plot = 'B North'
 
 max_height = 80.
 layer_thickness = 1.
@@ -44,7 +44,7 @@ n_layers = heights.size
 plot_width = 100.
 sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
 keys = ['2m','5m','10m','20m','25m','50m','100m']
-kappa = 0.72
+kappa = 0.70
 max_k = 2
 n_iter = 250
 
@@ -74,6 +74,7 @@ PAD_profiles_rad2 = {}
 penetration_limit = {}
 
 # Loop through all the spatial scales of interest
+print("generating sample grid")
 for ss in range(0,sample_res.size):
     print(sample_res[ss])
     # Now create the subplot grids
@@ -133,6 +134,7 @@ temp_dic = None
 #-----------------------------------------------------
 # now do the sensitivity analysis
 # Loop through all the target point densities
+print("sensitivity analysis")
 for dd in range(0,target_points.size):
     print('target point density = ', target_point_density[dd])
     # iterate through all iterations, so that we sample point cloud minimum number of times

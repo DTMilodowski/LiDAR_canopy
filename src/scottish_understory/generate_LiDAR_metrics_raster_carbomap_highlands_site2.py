@@ -20,6 +20,7 @@
 #===============================================================================
 import numpy as np
 import sys
+sys.path.append('../')
 import os
 import laspy as las
 import LiDAR_io as io
@@ -59,10 +60,10 @@ raster_res = 2. # resolution of output rasters
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
 # define bbox for region 3 (S)
-N_ = 6207200
-S_ = 6206000
-W_ = 345000
-E_ = 346400
+N_ = 6206400
+S_ = 6205400
+W_ = 344000
+E_ = 345200
 
 
 bbox  = np.array([[W_,N_],[E_,N_],[E_,S_],[W_,S_]])
@@ -76,6 +77,9 @@ rows_ii = np.arange(y_coords.size)
 cols_jj = np.arange(x_coords.size)
 
 PAI = np.zeros((rows,cols))*np.nan
+PAI_1_2m = np.zeros((rows,cols))*np.nan
+PAI_2_5m = np.zeros((rows,cols))*np.nan
+PAI_5m_up = np.zeros((rows,cols))*np.nan
 PAD = np.zeros((rows,cols,layers))*np.nan
 pulse_dens = np.zeros((rows,cols))
 n_ground = np.zeros((rows,cols))
@@ -151,6 +155,10 @@ for i in range(0,n_files):
                     PAD_iter[heights<min_height]=0
                     PAI[row_ii,col_jj] = np.nansum(PAD_iter)
 
+                    PAI_1_2m[row_ii,col_jj] = np.nansum(PAD_iter[np.all((heights>1,heights<=2),axis=0)])
+                    PAI_2_5m[row_ii,col_jj] = np.nansum(PAD_iter[np.all((heights>2,heights<=5),axis=0)])
+                    PAI_5m_up[row_ii,col_jj] = np.nansum(PAD_iter[heights>5])
+
                     # other metrics
                     pulse_dens[row_ii,col_jj] = np.sum(sample_pts[:,3]==1)/(raster_res**2.)
                     n_ground[row_ii,col_jj]= n_ground_returns
@@ -160,7 +168,8 @@ for i in range(0,n_files):
     trees = None
     starting_ids_for_trees = None
 
-np.savez('%s%s_metrics_10m' % (savedir,site),pulse_density=pulse_dens,pai=PAI, pad=PAD, n_ground=n_ground)
+np.savez('%s%s_metrics_10m' % (savedir,site),pulse_density=pulse_dens,pai=PAI,
+                pad=PAD, n_ground=n_ground, pai_1_2m=PAI_1_2m, pai_2_5m=PAI_2_5m, pai_5m_up=PAI_5m_up)
 
 metrics = np.load('%s%s_metrics_10m.npz' % (savedir,site))
 

@@ -36,17 +36,17 @@ E=345640.
 
 max_height = 30.
 layer_thickness = 0.5
-heights = np.arange(0.,max_height,layer_thickness)+1
-heights_rad = np.arange(0,max_height+1,layer_thickness)
+heights = np.arange(0.,max_height,layer_thickness)+0.5
+heights_rad = np.arange(0,max_height+0.5,layer_thickness)
 n_layers = heights.size
-plot_width = 100.
-sample_res = np.array([1.,2.,5.,10.])
-keys = ['1m','2m','5m','10m']
+plot_width = 50.
+sample_res = np.array([2.,5.,10.])
+keys = ['2m','5m','10m']
 kappa = 1.
 max_k = 3
 n_iter = 100
 
-area = 10.**4
+area = 50.*50.
 target_pulse_density = np.array([20., 50., 100., 500., 1000.])
 keys_2 = ['20','50','100','500','1000']
 target_shots = (area*target_pulse_density).astype('int')
@@ -74,13 +74,10 @@ for ss in range(0,sample_res.size):
     # Now create the subplot grids
     rows = int(plot_width/sample_res[ss])
     cols = int(plot_width/sample_res[ss])
-    x=np.arange(0,plot_width+sample_res[ss],sample_res[ss])
-    y=np.arange(0,plot_width+sample_res[ss],sample_res[ss])
+    x=np.arange(0,plot_width+sample_res[ss],sample_res[ss])+W
+    y=np.arange(0,plot_width+sample_res[ss],sample_res[ss])+S
 
     xv,yv=np.asarray(np.meshgrid(x,y))
-
-    xv=xv.reshape(xv.size)
-    yv=yv.reshape(yv.size)
 
     count = 0
     subplot = []
@@ -96,7 +93,7 @@ for ss in range(0,sample_res.size):
     PAD = np.zeros((n_iter,n_subplots,n_layers),dtype='float')
     # set up dictionaries to hold the profiles
     temp_dic={}
-    for dd in range(0,target_points.size):
+    for dd in range(0,target_shots.size):
         temp_dic[keys_2[dd]] = PAD.copy()
 
     # store all profiles in relevant dictionary
@@ -111,12 +108,12 @@ temp_dic = None
 # now do the sensitivity analysis
 # Loop through all the target point densities
 print("sensitivity analysis")
-for dd in range(0,target_points.size):
+for dd in range(0,target_shots.size):
     print('target pulse density = ', target_pulse_density[dd])
     # iterate through all iterations, so that we sample point cloud minimum number of times
     for ii in range(0,n_iter):
         start_time = time.time()
-        print('iteration ', ii+1,'/',n_iter, ' for point density ', dd+1,' of ', target_points.size)
+        print('iteration ', ii+1,'/',n_iter, ' for pulse density ', dd+1,' of ', target_shots.size)
         # subsample the point cloud - this is tricky because we are sampling with replacement, but for
         # every sample there could be up to kmax returns!  All these returns need to be pulled out so
         # that we are resampling by pulse, not point
@@ -156,14 +153,20 @@ for dd in range(0,target_points.size):
                 for tt in range(0,N_trees):
                     ids = trees[tt].query_ball_point([centre_x,centre_y], radius)
                     if len(ids)>0:
-                        if sample_pts.size==0:
-                            sample_pts = lidar.filter_lidar_data_by_polygon(pts[np.asarray(ids)+starting_ids_for_trees[tt]],pixel_bbox)
+                        if sp_pts.size==0:
+                            sp_pts = lidar.filter_lidar_data_by_polygon(pts[np.asarray(ids)+starting_ids[tt]],subplots[keys[ss]][pp])
                         else:
-                            sample_iter = lidar.filter_lidar_data_by_polygon(pts[np.asarray(ids)+starting_ids_for_trees[tt]],pixel_bbox)
-                            sample_pts = np.concatenate((sample_pts,sample_iter),axis=0)
-                            sample_iter = None
+                            sp_iter = lidar.filter_lidar_data_by_polygon(pts[np.asarray(ids)+starting_ids[tt]],subplots[keys[ss]][pp])
+                            sp_pts = np.concatenate((sp_pts,sp_iter),axis=0)
+                            sp_iter = None
                 #------
-                if np.sum(sp_pts[:,3]==1)>0:
+                if sp_pts.size==0:
+                    print("NO RETURNS")
+                    PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = np.nan
+                    PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:]=np.nan
+                    penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = 1.
+                elif np.sum(sp_pts[:,3]==1)>0:
+                    print("\tRETURNS!")
                     heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
                     PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
                     penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = np.cumsum(first_return_profile)==0

@@ -88,7 +88,7 @@ temp = np.load('%sinventory_canopy_profiles.npz' % data_dir)['arr_0'][()]
 inventory_PAD=temp[0]
 inventory_PAD_std=temp[1]
 inventory_PAI=temp[2]
-#inventory_PAD_all=temp[3]
+inventory_PAD_all=temp[3]
 temp = None
 
 #===============================================================================
@@ -105,9 +105,9 @@ for pp,plot in enumerate(table_plots):
     cv = np.mean(inventory_PAI[plot])
     cv_s = stats.sem(inventory_PAI[plot])
 
-    print('%s\t    %.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t' % (plot,mh,mh_s,
+    print('%s       \t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.2f\t' % (plot,mh,mh_s,
                             r2,r2_s,r3,r3_s,cv,cv_s))
-    #print('%s    \t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f' % (plot,mh,mh_s,
+    #print('%s\t    %.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f' % (plot,mh,mh_s,
     #                        r2,r2_s,r3,r3_s,cv))
 
 #===============================================================================

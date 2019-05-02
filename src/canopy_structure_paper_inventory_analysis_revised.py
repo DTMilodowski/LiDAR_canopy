@@ -48,7 +48,7 @@ heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 inventory_LAD = {}
 inventory_LAD_std = {}
 inventory_LAI = {}
-inventory_LAI_std = {}
+inventory_LAD_all = {}
 
 #------------------------------------------------------------------------------------
 # LOADING DATA

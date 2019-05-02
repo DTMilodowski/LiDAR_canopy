@@ -6,6 +6,7 @@ import sys
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
 
+sys.path.append('../')
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
@@ -26,50 +27,43 @@ axis_size = rcParams['font.size']+2
 
 #---------------------------------------------------------------------------------------------------------------
 # Some filenames & params
-las_file = 'Carbon_plot_point_cloud_buffer.las'
+laz_list = '../las_lists/carbomap_site2_laztiles.txt'
 
-gps_pts_file = 'GPS_points_file_for_least_squares_fitting_sensitivity_analysis_version.csv'
-datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('<U16','f16','f16','f16','f16')}
-plot_coordinates = np.genfromtxt(gps_pts_file, skip_header = 0, delimiter = ',',dtype=datatype)
+N=6206610.
+S=6206560.
+W=345590.
+E=345640.
 
-#plot = 'Belian'
-#plot = 'E'
-plot = 'B North'
-
-max_height = 80.
-layer_thickness = 1.
-heights = np.arange(0.,max_height)+1
-heights_rad = np.arange(0,max_height+1)
+max_height = 30.
+layer_thickness = 0.5
+heights = np.arange(0.,max_height,layer_thickness)+1
+heights_rad = np.arange(0,max_height+1,layer_thickness)
 n_layers = heights.size
 plot_width = 100.
-sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
-keys = ['2m','5m','10m','20m','25m','50m','100m']
-kappa = 0.70
-max_k = 2
-n_iter = 250
+sample_res = np.array([1.,2.,5.,10.])
+keys = ['1m','2m','5m','10m']
+kappa = 1.
+max_k = 3
+n_iter = 100
 
 area = 10.**4
-target_point_density = np.array([5., 10., 15., 20., 25., 30., 40.])
-keys_2 = ['5','10','15','20','25','30','40']
-target_points = area*target_point_density
+target_pulse_density = np.array([20., 50., 100., 500., 1000.])
+keys_2 = ['20','50','100','500','1000']
+target_shots = (area*target_pulse_density).astype('int')
 
 #---------------------------------------------------------------------------------------------------------------
 # Load the data etc.
-mask = plot_coordinates['plot']==plot
-affine=lstsq.least_squares_affine_matrix(plot_coordinates['x'][mask],plot_coordinates['y'][mask],plot_coordinates['x_prime'][mask],plot_coordinates['y_prime'][mask])
-plot_bbox = np.array(lstsq.apply_affine_transformation(np.array([0.,100.,100.,0.]),np.array([100.,100.,0.,0.]),affine)).transpose() # simple square bounding box applied for all sensitivity analyses
+plot_bbox = np.asarray([[W,N],[E,N],[E,S],[W,S]])
+pts, starting_ids, trees = io.load_lidar_data_by_polygon(laz_list,plot_bbox,laz_files=True,max_pts_per_tree = 5*10**5)
+N_trees = len(trees)
 
-pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox,filter_by_first_return_location=True)
 pts[pts[:,2]<0,2]=0
+shots = np.unique(pts[:,6]) # gps times
 n_returns = pts.shape[0]
-shots = np.unique(pts[:,6])
 n_shots=shots.size
-target_shots = (np.ceil(target_points*n_shots/float(n_returns))).astype('int')
-shots = np.unique(pts[:,6])
 
 subplots = {}
 PAD_profiles_MH = {}
-PAD_profiles_rad1 = {}
 PAD_profiles_rad2 = {}
 penetration_limit = {}
 
@@ -88,29 +82,12 @@ for ss in range(0,sample_res.size):
     xv=xv.reshape(xv.size)
     yv=yv.reshape(yv.size)
 
-    xy=np.asarray([xv,yv])
-
-    n_points_in_grid = xv.size
-    xi=np.zeros(n_points_in_grid)
-    yi=np.zeros(n_points_in_grid)
-    for ii in range(0,n_points_in_grid):
-        Xi = np.ones((3,1))
-        Xi[0]=xv[ii]
-        Xi[1]=yv[ii]
-
-        Xi_prime = np.dot(affine,Xi)
-        xi[ii] = Xi_prime[0]
-        yi[ii] = Xi_prime[1]
-
-    x_prime = xi.reshape(rows+1,cols+1)
-    y_prime = yi.reshape(rows+1,cols+1)
-
     count = 0
     subplot = []
     for i in range(0,rows):
         for j in range(0,cols):
-            bbox = [ [x_prime[i,j], x_prime[i+1,j], x_prime[i+1,j+1], x_prime[i,j+1], x_prime[i,j]],
-                     [y_prime[i,j], y_prime[i+1,j], y_prime[i+1,j+1], y_prime[i,j+1], y_prime[i,j]] ]
+            bbox = [ [xv[i,j], xv[i+1,j], xv[i+1,j+1], xv[i,j+1], xv[i,j]],
+                     [yv[i,j], yv[i+1,j], yv[i+1,j+1], yv[i,j+1], yv[i,j]] ]
             subplot.append( np.asarray(bbox).transpose() )
 
     subplots[keys[ss]] = subplot
@@ -124,9 +101,8 @@ for ss in range(0,sample_res.size):
 
     # store all profiles in relevant dictionary
     PAD_profiles_MH[keys[ss]] = copy.deepcopy(temp_dic)
-    PAD_profiles_rad1[keys[ss]] = copy.deepcopy(temp_dic)#temp_dic.copy()
-    PAD_profiles_rad2[keys[ss]] = copy.deepcopy(temp_dic)#temp_dic.copy()
-    penetration_limit[keys[ss]] = copy.deepcopy(temp_dic)#temp_dic.copy()
+    PAD_profiles_rad2[keys[ss]] = copy.deepcopy(temp_dic)
+    penetration_limit[keys[ss]] = copy.deepcopy(temp_dic)
 
 PAD = None
 temp_dic = None
@@ -136,7 +112,7 @@ temp_dic = None
 # Loop through all the target point densities
 print("sensitivity analysis")
 for dd in range(0,target_points.size):
-    print('target point density = ', target_point_density[dd])
+    print('target pulse density = ', target_pulse_density[dd])
     # iterate through all iterations, so that we sample point cloud minimum number of times
     for ii in range(0,n_iter):
         start_time = time.time()
@@ -162,6 +138,7 @@ for dd in range(0,target_points.size):
             temp_shots = np.delete(temp_shots,idx_start)
         #-------------------
         starting_ids, trees = io.create_KDTree(pts_iter)
+        N_trees = len(trees)
         # loop through each sampling resolution
         for ss in range(0,sample_res.size):
             print('\t - sample res = ', keys[ss])
@@ -173,29 +150,34 @@ for dd in range(0,target_points.size):
                 centre_x = np.mean(subplots[keys[ss]][pp][0:4,0])
                 centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
                 radius = np.sqrt(sample_res[ss]**2/2.)
-                ids = trees[0].query_ball_point([centre_x,centre_y], radius)
-                sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp],filter_by_first_return_location=False)
+
+                # retrieve point clouds samples
+                sp_pts = np.array([])
+                for tt in range(0,N_trees):
+                    ids = trees[tt].query_ball_point([centre_x,centre_y], radius)
+                    if len(ids)>0:
+                        if sample_pts.size==0:
+                            sample_pts = lidar.filter_lidar_data_by_polygon(pts[np.asarray(ids)+starting_ids_for_trees[tt]],pixel_bbox)
+                        else:
+                            sample_iter = lidar.filter_lidar_data_by_polygon(pts[np.asarray(ids)+starting_ids_for_trees[tt]],pixel_bbox)
+                            sample_pts = np.concatenate((sample_pts,sample_iter),axis=0)
+                            sample_iter = None
                 #------
                 if np.sum(sp_pts[:,3]==1)>0:
                     heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
                     PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
                     penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = np.cumsum(first_return_profile)==0
                     #------
-                    u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
-                    PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
-                    #------
                     u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
                     PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
                 else:
                     PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = np.nan
-                    PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=np.nan
                     PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:]=np.nan
                     penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = 1.
 
         end_time = time.time()
         print('\t loop time = ', end_time - start_time)
 
-np.save("MH_sensitivity_%s_test.npy" % plot, PAD_profiles_MH)
-np.save("rad1_sensitivity_%s_test.npy" % plot, PAD_profiles_rad1)
-np.save("rad2_sensitivity_%s_test.npy" % plot, PAD_profiles_rad2)
-np.save("penetration_limit_%s_test.npy" % plot, penetration_limit)
+np.save("MH_sensitivity_scottish_understory.npy", PAD_profiles_MH)
+np.save("rad2_sensitivity_scottish_understory.npy", PAD_profiles_rad2)
+np.save("penetration_limit_scottish_understory.npy", penetration_limit)

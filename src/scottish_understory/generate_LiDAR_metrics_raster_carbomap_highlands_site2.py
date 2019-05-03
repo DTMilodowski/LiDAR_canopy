@@ -60,10 +60,10 @@ raster_res = 2. # resolution of output rasters
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
 # define bbox for region 3 (S)
-N_ = 6206400
-S_ = 6205400
-W_ = 344000
-E_ = 345200
+N_ = 6207200
+S_ = 6206000
+W_ = 345000
+E_ = 346400
 
 
 bbox  = np.array([[W_,N_],[E_,N_],[E_,S_],[W_,S_]])

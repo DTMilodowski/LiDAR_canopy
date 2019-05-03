@@ -30,8 +30,9 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
     n_files = las_files.size
 
     if laz_files:
-        os.system("las2las %s temp.las" % las_files[0])
-        lasFile = las.file.File('temp.las',mode='r-')
+        temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
+        os.system("las2las %s %s" % (las_files[0],temp_file))
+        lasFile = las.file.File('%s' temp_file,mode='r-')
         max_xyz = lasFile.header.max
         min_xyz = lasFile.header.min
         xmin = min_xyz[0]
@@ -41,12 +42,12 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
         zmin = min_xyz[2]
         zmax = max_xyz[2]
         lasFile.close()
-        os.system("rm temp.las")
+        os.system("rm %s" % temp_file)
 
         for i in range(1,n_files):
-
-            os.system("las2las %s temp.las" % las_files[i])
-            lasFile = las.file.File('temp.las',mode='r-')
+            temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
+            os.system("las2las %s %s" % (las_files[i],temp_file))
+            lasFile = las.file.File('%s' temp_file,mode='r-')
             max_xyz = lasFile.header.max
             min_xyz = lasFile.header.min
             xmin = min(xmin,min_xyz[0])
@@ -56,7 +57,7 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
             zmin = min(zmin,max_xyz[2])
             zmax = max(zmax,max_xyz[2])
             lasFile.close()
-            os.system("rm temp.las")
+            os.system("rm %s" % temp_file)
 
     else:
 
@@ -203,9 +204,11 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
     # otherwise, we have work to do!
     else:
         if laz_files:
-            os.system("las2las %s temp.las" % keep_files[0])
-            tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
-            os.system("rm temp.las")
+            temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
+            os.system("las2las %s %s" % (keep_files[0],temp_file))
+            #os.system("las2las %s temp.las" % keep_files[0])
+            tile_pts = load_lidar_data_by_bbox(temp_file,N,S,E,W,print_npts=False)
+            os.system("rm %s" temp_file)
         else:
             tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False)
 
@@ -214,9 +217,10 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
         # now repeat for subsequent tiles
         for i in range(1,n_files):
             if laz_files:
-                os.system("las2las %s temp.las" % keep_files[i])
-                tile_pts = load_lidar_data_by_bbox('temp.las',N,S,E,W,print_npts=False)
-                os.system("rm temp.las")
+                temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
+                os.system("las2las %s %s" % (keep_files[i],temp_file))
+                tile_pts = load_lidar_data_by_bbox(temp_file,N,S,E,W,print_npts=False)
+                os.system("rm %s") % temp_file
             else:
                 tile_pts = load_lidar_data_by_bbox(keep_files[i],N,S,E,W,print_npts=False)
 
@@ -256,13 +260,14 @@ def find_laz_files_by_polygon(file_list,polygon,print_keep=False):
     keep = []
     n_files = laz_files.size
     for i in range(0,n_files):
-        os.system("las2las %s temp.las" % laz_files[i])
-        UR, LR, UL, LL = get_lasfile_bbox('temp.las')
+        temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
+        os.system("las2las %s %s" % (laz_files[i],temp_file))
+        UR, LR, UL, LL = get_lasfile_bbox(temp_file)
         las_box = np.asarray([UR,LR,LL,UL])
         x,y,inside = lidar.points_in_poly(las_box[:,0],las_box[:,1],polygon)
         if inside.sum()>0:
             keep.append(laz_files[i])
-        os.system("rm temp.las")
+        os.system("rm %s" % temp_file)
     if print_keep:
         print('las tiles to load in:', len(keep))
         for ll in range(0,len(keep)):

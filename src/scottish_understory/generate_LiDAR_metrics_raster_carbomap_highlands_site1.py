@@ -32,7 +32,7 @@ import raster_io as raster
 
 #-------------------------------------------------------------------------------
 # Input files
-laz_list = 'carbomap_site1_laztiles.txt'
+laz_list = '../las_lists/carbomap_site1_laztiles.txt'
 savedir = '/home/dmilodow/DataStore_DTM/FOREST2020/LiDAR/carbomap_highlands/canopy_metrics/'
 laz_files = True ## CHANGE AS REQUIRED - note that if laszip is installed, this
                   ## can safely be set to False for both las and laz files. If

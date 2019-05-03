@@ -32,7 +32,7 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
     if laz_files:
         temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
         os.system("las2las %s %s" % (las_files[0],temp_file))
-        lasFile = las.file.File('%s' temp_file,mode='r-')
+        lasFile = las.file.File('%s' % temp_file,mode='r-')
         max_xyz = lasFile.header.max
         min_xyz = lasFile.header.min
         xmin = min_xyz[0]
@@ -47,7 +47,7 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
         for i in range(1,n_files):
             temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
             os.system("las2las %s %s" % (las_files[i],temp_file))
-            lasFile = las.file.File('%s' temp_file,mode='r-')
+            lasFile = las.file.File('%s' % temp_file,mode='r-')
             max_xyz = lasFile.header.max
             min_xyz = lasFile.header.min
             xmin = min(xmin,min_xyz[0])
@@ -208,7 +208,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
             os.system("las2las %s %s" % (keep_files[0],temp_file))
             #os.system("las2las %s temp.las" % keep_files[0])
             tile_pts = load_lidar_data_by_bbox(temp_file,N,S,E,W,print_npts=False)
-            os.system("rm %s" temp_file)
+            os.system("rm %s" % temp_file)
         else:
             tile_pts = load_lidar_data_by_bbox(keep_files[0],N,S,E,W,print_npts=False)
 
@@ -220,7 +220,7 @@ def load_lidar_data_by_polygon(file_list,polygon,max_pts_per_tree = 10**6, laz_f
                 temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
                 os.system("las2las %s %s" % (keep_files[i],temp_file))
                 tile_pts = load_lidar_data_by_bbox(temp_file,N,S,E,W,print_npts=False)
-                os.system("rm %s") % temp_file
+                os.system("rm %s" % temp_file)
             else:
                 tile_pts = load_lidar_data_by_bbox(keep_files[i],N,S,E,W,print_npts=False)
 

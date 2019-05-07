@@ -48,7 +48,7 @@ site = 'carbomap_site2'
 temp,temp_geoT,coord_sys = raster.load_GeoTIFF_band_and_georeferencing('/home/dmilodow/DataStore_DTM/BALI/Thetford_CHM_5m_2017.tif')
 
 # Some parameters
-radius = np.sqrt(10) # for buffer
+radius = 10.#np.sqrt(10) # for buffer
 max_height = 28.   # max tree height
 min_height = 1.     # minimum height for inclusion in PAI
 layer_thickness = 1 # thickness of vertical strata
@@ -80,6 +80,7 @@ PAI = np.zeros((rows,cols))*np.nan
 PAI_1_2m = np.zeros((rows,cols))*np.nan
 PAI_2_5m = np.zeros((rows,cols))*np.nan
 PAI_5m_up = np.zeros((rows,cols))*np.nan
+can_height = np.zeros((rows,cols))*np.nan
 PAD = np.zeros((rows,cols,layers))*np.nan
 pulse_dens = np.zeros((rows,cols))
 n_ground = np.zeros((rows,cols))
@@ -159,6 +160,8 @@ for i in range(0,n_files):
                     PAI_2_5m[row_ii,col_jj] = np.nansum(PAD_iter[np.all((heights>2,heights<=5),axis=0)])
                     PAI_5m_up[row_ii,col_jj] = np.nansum(PAD_iter[heights>5])
 
+                    can_height[row_ii,col_jj] = np.percentile(sample_pts[:,2],99)
+
                     # other metrics
                     pulse_dens[row_ii,col_jj] = np.sum(sample_pts[:,3]==1)/(raster_res**2.)
                     n_ground[row_ii,col_jj]= n_ground_returns
@@ -169,7 +172,8 @@ for i in range(0,n_files):
     starting_ids_for_trees = None
 
 np.savez('%s%s_metrics_10m' % (savedir,site),pulse_density=pulse_dens,pai=PAI,
-                pad=PAD, n_ground=n_ground, pai_1_2m=PAI_1_2m, pai_2_5m=PAI_2_5m, pai_5m_up=PAI_5m_up)
+                pad=PAD, n_ground=n_ground, pai_1_2m=PAI_1_2m, pai_2_5m=PAI_2_5m, pai_5m_up=PAI_5m_up,
+                canopy_height=can_height)
 
 metrics = np.load('%s%s_metrics_10m.npz' % (savedir,site))
 
@@ -182,4 +186,4 @@ for kk in range(0,len(metric_keys)):
     var = metric_keys[kk]
     print("\t\t\t Saving rasters: %s" % var)
     metrics[var][np.isnan(metrics[var])]=-9999
-    raster.write_array_to_GeoTiff_with_coordinate_system(metrics[var], geoTransform, coord_sys,'%s%s_pointcloud_metrics_10m_%s.tif' % (savedir,site,var),north_up=False)
+    raster.write_array_to_GeoTiff_with_coordinate_system(metrics[var], geoTransform, coord_sys,'%s%s_2m_%s.tif' % (savedir,site,var),north_up=False)

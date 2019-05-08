@@ -11,8 +11,11 @@ def bin_returns(pts_in, max_height, layer_thickness):
 
     # calculate n ground points
     n_ground_returns = np.sum(pts[:,4]==2)
-    # filter to consider only veg returns
-    can_pts = pts[pts[:,4]==1,:]
+    # filter to consider only veg returns (class 1 = unclassified (usual
+    # scenario); class 3 = low vegetation; class 4 = medium vegetation;
+    # class 5 = high vegetation)
+    veg_mask = np.all((pts[:,4]==1,pts[:,4]==3,pts[:,4]==4,pts[:,4]==5),axis=0)
+    can_pts = pts[veg_mask,:]
 
     # now set up bins
     lower_lims=np.arange(0,max_height,layer_thickness)

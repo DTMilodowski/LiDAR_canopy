@@ -45,7 +45,7 @@ laz_files = True ## CHANGE AS REQUIRED - note that if laszip is installed, this
 site = 'carbomap_site1'
 
 # load in a raster to get coordinate system info for later
-temp,temp_geoT,coord_sys = raster.load_GeoTIFF_band_and_georeferencing('/home/dmilodow/DataStore_DTM/BALI/Thetford_CHM_5m_2017.tif')
+temp,temp_geoT,coord_sys = raster.load_GeoTIFF_band_and_georeferencing('/home/dmilodow/DataStore_DTM/FOREST2020/LiDAR/carbomap_highlands/carbomap_layers/Site2__Canopy_Height_Model_UTM.tif')
 
 # Some parameters
 radius = np.sqrt(10) # for buffer

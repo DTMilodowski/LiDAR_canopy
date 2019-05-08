@@ -45,7 +45,7 @@ laz_files = True ## CHANGE AS REQUIRED - note that if laszip is installed, this
 site = 'carbomap_site2'
 
 # load in a raster to get coordinate system info for later
-temp,temp_geoT,coord_sys = raster.load_GeoTIFF_band_and_georeferencing('/home/dmilodow/DataStore_DTM/BALI/Thetford_CHM_5m_2017.tif')
+temp,temp_geoT,coord_sys = raster.load_GeoTIFF_band_and_georeferencing('/home/dmilodow/DataStore_DTM/FOREST2020/LiDAR/carbomap_highlands/carbomap_layers/Site2__Canopy_Height_Model_UTM.tif')
 
 # Some parameters
 radius = 10.#np.sqrt(10) # for buffer
@@ -60,10 +60,17 @@ raster_res = 2. # resolution of output rasters
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
 # define bbox for region 3 (S)
+
 N_ = 6207200
 S_ = 6206000
 W_ = 345000
 E_ = 346400
+"""
+N_ = 6206500
+S_ = 6206400
+W_ = 345580
+E_ = 346680
+"""
 
 
 bbox  = np.array([[W_,N_],[E_,N_],[E_,S_],[W_,S_]])

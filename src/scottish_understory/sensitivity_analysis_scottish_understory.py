@@ -57,6 +57,7 @@ plot_bbox = np.asarray([[W,N],[E,N],[E,S],[W,S]])
 pts, starting_ids, trees = io.load_lidar_data_by_polygon(laz_list,plot_bbox,laz_files=True,max_pts_per_tree = 5*10**5)
 N_trees = len(trees)
 
+pts[np.any((pts[:,4]==3,pts[:,4]==4,pts[:,4]==5),axis=0),4]=1
 pts[pts[:,2]<0,2]=0
 shots = np.unique(pts[:,6]) # gps times
 n_returns = pts.shape[0]

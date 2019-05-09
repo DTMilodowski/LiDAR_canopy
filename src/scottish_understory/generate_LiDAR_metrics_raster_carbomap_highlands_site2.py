@@ -49,13 +49,13 @@ temp,temp_geoT,coord_sys = raster.load_GeoTIFF_band_and_georeferencing('/home/dm
 
 # Some parameters
 radius = 10.#np.sqrt(10) # for buffer
-max_height = 28.   # max tree height
+max_height = 30.   # max tree height
 min_height = 1.     # minimum height for inclusion in PAI
 layer_thickness = 1 # thickness of vertical strata
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 layers = heights.size
 kappa = 1. # correction factor (clumping and leaf angles)
-raster_res = 2. # resolution of output rasters
+raster_res = 5. # resolution of output rasters
 
 #-------------------------------------------------------------------------------
 # Phase one - get bounding box of all las tiles.
@@ -178,11 +178,11 @@ for i in range(0,n_files):
     trees = None
     starting_ids_for_trees = None
 
-np.savez('%s%s_metrics_10m' % (savedir,site),pulse_density=pulse_dens,pai=PAI,
+np.savez('%s%s_metrics_5m' % (savedir,site),pulse_density=pulse_dens,pai=PAI,
                 pad=PAD, n_ground=n_ground, pai_1_2m=PAI_1_2m, pai_2_5m=PAI_2_5m, pai_5m_up=PAI_5m_up,
                 canopy_height=can_height)
 
-metrics = np.load('%s%s_metrics_10m.npz' % (savedir,site))
+metrics = np.load('%s%s_metrics_5m.npz' % (savedir,site))
 
 # Now that the raster is filled, just need to write it to file
 XMinimum = x_coords.min() - raster_res/2.
@@ -193,4 +193,4 @@ for kk in range(0,len(metric_keys)):
     var = metric_keys[kk]
     print("\t\t\t Saving rasters: %s" % var)
     metrics[var][np.isnan(metrics[var])]=-9999
-    raster.write_array_to_GeoTiff_with_coordinate_system(metrics[var], geoTransform, coord_sys,'%s%s_2m_%s.tif' % (savedir,site,var),north_up=False)
+    raster.write_array_to_GeoTiff_with_coordinate_system(metrics[var], geoTransform, coord_sys,'%s%s_5m_%s.tif' % (savedir,site,var),north_up=False)

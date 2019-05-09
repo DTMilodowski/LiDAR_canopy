@@ -29,10 +29,10 @@ axis_size = rcParams['font.size']+2
 # Some filenames & params
 laz_list = '../las_lists/carbomap_site2_laztiles.txt'
 
-N=6206610.
-S=6206560.
-W=345590.
-E=345640.
+N=6206500.
+S=6206400.
+W=345580.
+E=345680.
 
 max_height = 30.
 layer_thickness = 0.5
@@ -40,8 +40,8 @@ heights = np.arange(0.,max_height,layer_thickness)+0.5
 heights_rad = np.arange(0,max_height+0.5,layer_thickness)
 n_layers = heights.size
 plot_width = 50.
-sample_res = np.array([2.,5.,10.])
-keys = ['2m','5m','10m']
+sample_res = np.array([2.,5.,10.,20.,50.])
+keys = ['2m','5m','10m','20m','50m']
 kappa = 1.
 max_k = 3
 n_iter = 100

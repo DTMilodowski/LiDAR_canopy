@@ -459,18 +459,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([])):
     use = indices[np.isfinite(u)]
     u = np.interp(indices,use,u[use])
     u[use[-1]+1:]=np.nan # python's interpolation function by default extends to end of given x range, which is not desired.
-    """
-    for mm in range(0,M):
-        print indices[mm],status[mm], penetration_limit[mm], np.sum(n1[mm,:]), alpha[mm], beta[mm], u[mm]
-    """
-    """
-    import matplotlib.pyplot as plt
-    plt.plot(penetration_limit,'+b')
-    plt.plot(status,'.g')
-    plt.ylim(ymax=3,ymin=-0.1)
 
-    plt.show()
-    """
     return u,n,I,U
 
 #----------------------------------------------------------------------------------------

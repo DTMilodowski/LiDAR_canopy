@@ -225,7 +225,13 @@ csp.plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
                             heights,heights_rad,MacArthurHorn_PAD,
                             radiative_PAD,radiative_DTM_PAD)
 
-
+"""
+# Figure 11 - Cumulative PAD with Depth
+"""
+figure_name = output_dir + 'Fig10_cumulative_PAD_with_depth.png'
+figure_number = 11
+csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
+                        radiative_DTM_PAD, method=0)
 #-------------------------------
 # RESULTS - SENSITIVITY ANALYSIS
 # see sensitivity analysis plots

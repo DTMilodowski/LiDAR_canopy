@@ -2024,3 +2024,84 @@ def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
 
     plt.show()
     return 0
+
+"""
+# Plot subcanopy environments
+# Plot subplot level profiles showing the cumulative distribution of effective
+# plant area as you move down through the canopy with depth. Depth is defined
+# relative to the maximum canopy height in a given subplot. Subplot profiles are
+# plotted across four subplots, corresponding to old growth - Maliau Basin, old
+# growth - Danum VAlley, Moderately logged - SAFE and heavily logged - SAFE
+# Optional arguments: method (0 = MacArthur-Horn; 1 = Radiative transfer)
+"""
+def plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
+                        radiative_DTM_PAD, method=0):
+    max_return=2
+    fig_plots = [[b'Belian',b'Seraya'],[b'DC1',b'DC2'],[b'LF',b'E'],[b'B North',b'B South']]
+
+    plt.figure(figure_number, facecolor='White',figsize=[6,8])
+
+    # Belian
+    ax1 = plt.subplot2grid((2,2),(0,0))
+    ax1.annotate('a - Maliau Basin\nOld growth', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
+                fontsize=10)
+    ax2 = plt.subplot2grid((2,2),(0,1),sharey=ax1,sharex=ax1)
+    ax2.annotate('b - Danum Valley\nOld growth', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left',
+                verticalalignment='top', fontsize=9)
+    ax3 = plt.subplot2grid((2,2),(1,1),sharey=ax1,sharex=ax1)
+    ax3.annotate('c - SAFE\nheavily logged', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left',
+                verticalalignment='top', fontsize=9)
+    ax4 = plt.subplot2grid((2,2),(1,1),sharey=ax1,sharex=ax1)
+    ax4.annotate('d - SAFE\nmoderately logged', xy=(0.05,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='left',
+                verticalalignment='top', fontsize=9)
+
+    ax1.set_ylabel('Depth in canopy / m',fontsize=axis_size)
+    ax3.set_ylabel('Depth in canopy / m',fontsize=axis_size)
+    ax3.set_xlabel('cumulative PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    ax4.set_xlabel('cumulative PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    #---------------------------------------------------------
+
+    axes = [ax1,  ax2, ax3, ax4]
+    yticklabels=[];yticklabels.append(ax2.get_yticklabels()); yticklabels.append(ax4.get_yticklabels())
+    xticklabels=[];xticklabels.append(ax1.get_xticklabels()); xticklabels.append(ax2.get_xticklabels())
+
+    for pp in range(0,4):
+        Plot_name = fig_plots[pp]
+        depth = np.arange(0,80)
+        if pp<2:
+            col = colour[0]
+        elif pp<3:
+            col = colour[1]
+        else:
+            col=colour[2]
+        for plot in enumerate(fig_plots[pp]):
+            if method == 0:
+                PAD = MacArthurHorn_PAD[plot][:,2:][:,::-1]
+                for ss in range(0,25):
+                    cumulative_PAD = np.cumsum(PAD[ss])
+                    mask = cumulative_PAD>0
+                    axes[pp].plot(cumulative_PAD[mask],depth[:mask.sum()],'-',color=col,linewidth=1)
+            elif method ==1:
+                PAD = radiative_DTM_PAD[plot][:,:-2,max_return-1]
+                for ss in range(0,25):
+                    cumulative_PAD = np.cumsum(PAD[ss])
+                    mask = cumulative_PAD>0
+                    axes[pp].plot(cumulative_PAD[mask],depth[:mask.sum()],'-',color=col,linewidth=1)
+
+    ax1.set_ylim(0,80)
+    ax2.set_xlim(xmin=0,xmax=20)
+
+    for ax in enumerate(axes):
+        ax.locator_params(axis='x',nbins=5)
+
+    plt.setp(yticklabels,visible=False)
+    plt.setp(xticklabels,visible=False)
+    plt.subplots_adjust(hspace=0.2, wspace = 0.1)
+
+    plt.tight_layout()
+    plt.savefig(figure_name)
+    plt.show()

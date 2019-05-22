@@ -2043,20 +2043,20 @@ def plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
 
     # Belian
     ax1 = plt.subplot2grid((2,2),(0,0))
-    ax1.annotate('a - Maliau Basin\nOld growth', xy=(0.05,0.95), xycoords='axes fraction',
-                backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
+    ax1.annotate('a - Maliau Basi; Old growth', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right', verticalalignment='top',
                 fontsize=10)
     ax2 = plt.subplot2grid((2,2),(0,1),sharey=ax1,sharex=ax1)
-    ax2.annotate('b - Danum Valley\nOld growth', xy=(0.05,0.95), xycoords='axes fraction',
-                backgroundcolor='none',horizontalalignment='left',
+    ax2.annotate('b - Danum Valley; Old growth', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
-    ax3 = plt.subplot2grid((2,2),(1,1),sharey=ax1,sharex=ax1)
-    ax3.annotate('c - SAFE\nheavily logged', xy=(0.05,0.95), xycoords='axes fraction',
-                backgroundcolor='none',horizontalalignment='left',
+    ax3 = plt.subplot2grid((2,2),(1,0),sharey=ax1,sharex=ax1)
+    ax3.annotate('c - SAFE; moderately logged', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
     ax4 = plt.subplot2grid((2,2),(1,1),sharey=ax1,sharex=ax1)
-    ax4.annotate('d - SAFE\nmoderately logged', xy=(0.05,0.95), xycoords='axes fraction',
-                backgroundcolor='none',horizontalalignment='left',
+    ax4.annotate('d - SAFE; heavily logged', xy=(0.95,0.95), xycoords='axes fraction',
+                backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
 
     ax1.set_ylabel('Depth in canopy / m',fontsize=axis_size)
@@ -2078,24 +2078,27 @@ def plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
             col = colour[1]
         else:
             col=colour[2]
-        for plot in enumerate(fig_plots[pp]):
+        for plot in fig_plots[pp]:
             if method == 0:
                 PAD = MacArthurHorn_PAD[plot][:,2:][:,::-1]
                 for ss in range(0,25):
                     cumulative_PAD = np.cumsum(PAD[ss])
                     mask = cumulative_PAD>0
-                    axes[pp].plot(cumulative_PAD[mask],depth[:mask.sum()],'-',color=col,linewidth=1)
+                    axes[pp].plot(cumulative_PAD[mask],depth[:mask.sum()],'-',color=col,
+                                    alpha=0.25,linewidth=1)
             elif method ==1:
                 PAD = radiative_DTM_PAD[plot][:,:-2,max_return-1]
                 for ss in range(0,25):
                     cumulative_PAD = np.cumsum(PAD[ss])
                     mask = cumulative_PAD>0
-                    axes[pp].plot(cumulative_PAD[mask],depth[:mask.sum()],'-',color=col,linewidth=1)
+                    axes[pp].plot(cumulative_PAD[mask],depth[:mask.sum()],'-',color=col,
+                                    alpha=0.25,linewidth=1)
 
     ax1.set_ylim(0,80)
-    ax2.set_xlim(xmin=0,xmax=20)
+    ax1.set_xlim(0,13)
+    ax1.invert_yaxis()
 
-    for ax in enumerate(axes):
+    for ax in axes:
         ax.locator_params(axis='x',nbins=5)
 
     plt.setp(yticklabels,visible=False)

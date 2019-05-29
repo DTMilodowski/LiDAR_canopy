@@ -27,12 +27,12 @@ axis_size = rcParams['font.size']+2
 
 #---------------------------------------------------------------------------------------------------------------
 # Some filenames & params
-laz_list = '../las_lists/carbomap_site2_laztiles.txt'
+laz_list = '../las_lists/carbomap_site1_laztiles.txt'
 
-N=6206500.
-S=6206400.
-W=345580.
-E=345680.
+N=6206000.
+S=6205900.
+W=344500.
+E=344600.
 
 max_height = 30.
 layer_thickness = 0.5

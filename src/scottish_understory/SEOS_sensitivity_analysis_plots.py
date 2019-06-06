@@ -45,11 +45,61 @@ def plot_profile_sensitivity_resolution(figure_number,figure_name,heights,PAD_pr
         ax.fill_betweenx(heights[2:],MHperc[0][2:],MHperc[1][2:],color=colour[0],alpha=0.3)
 
         if ii==4:
-            ax.plot(MH[1:],heights[1:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
+            ax.plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
             ax.legend(loc=9, bbox_to_anchor=(-0.1, -0.15), ncol=3)
         else:
-            ax.plot(MH[1:],heights[1:],'-',c=colour[0],linewidth=1.5)
-        print(np.sum(MH[1:]))
+            ax.plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+        print('%.3f' % np.sum(MH[2:]))
+    yticklabels = axb.get_yticklabels() + axc.get_yticklabels() + axd.get_yticklabels() + axe.get_yticklabels()
+    plt.setp(yticklabels,visible=False)
+
+    axa.set_ylim(0,80)
+    axa.set_xlim(0,0.38)
+    for ax in axes:
+        ax.locator_params(axis='x',nbins=4)
+        ax.yaxis.set_ticks_position('both')
+
+    plt.subplots_adjust(hspace=0.4, wspace = 0.2, bottom = 0.2)
+
+    axa.set_ylabel('height / m',fontsize=axis_size)
+    fig.text(0.5, 0.05, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
+
+    plt.savefig(figure_name)
+    #plt.show()
+    return 0
+
+
+def plot_profile_sensitivity_density(figure_number,figure_name,heights,PAD_profiles_MH):
+
+    ## Belian
+    fig = plt.figure(figure_number, facecolor='White',figsize=[8,4])
+    axa = plt.subplot2grid((1,5),(0,0))
+    axb = plt.subplot2grid((1,5),(0,1),sharex=axa,sharey=axa)
+    axc = plt.subplot2grid((1,5),(0,2),sharex=axa,sharey=axa)
+    axd = plt.subplot2grid((1,5),(0,3),sharex=axa,sharey=axa)
+    axe = plt.subplot2grid((1,5),(0,4),sharex=axa,sharey=axa)
+
+    annotations = ['a - 20 shots m$^{-2}$','b - 50 shots m$^{-2}$',
+                    'c - 100 shots m$^{-2}$','d - 500 shots m$^{-2}$',
+                    'e - 1000 shots m$^{-2}$']
+    axes = [axa,axb,axc,axd,axe]
+    # loop through the subplots
+    keys = ['20','50','100','500','1000']
+    for ii,ax in enumerate(axes):
+        ax.annotate(annotations[ii], xy=(0.05,0.95), xycoords='axes fraction',
+                    backgroundcolor='none',ha='left', va='top', fontsize=8)
+        #rad_sp = np.nanmean(PAD_profiles_rad[keys[ii]],axis=1)
+        MH_sp = np.nanmean(PAD_profiles_MH[keys[ii]],axis=1)
+        MH = np.nanmedian(MH_sp,axis=0)
+        MHperc = np.nanpercentile(MH_sp,[2.5,97.5],axis=0)
+        ax.fill_betweenx(heights[2:],MHperc[0][2:],MHperc[1][2:],color=colour[0],alpha=0.3)
+
+        if ii==4:
+            ax.plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
+            ax.legend(loc=9, bbox_to_anchor=(-0.1, -0.15), ncol=3)
+        else:
+            ax.plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+        print('%.3f' % np.sum(MH[2:]))
     yticklabels = axb.get_yticklabels() + axc.get_yticklabels() + axd.get_yticklabels() + axe.get_yticklabels()
     plt.setp(yticklabels,visible=False)
 

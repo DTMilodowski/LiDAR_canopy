@@ -42,7 +42,7 @@ chm.values[mask] = np.nan
 
 elev_range =[np.nanmin(dem.values),np.nanmax(dsm.values)]
 height_range =[np.nanmin(chm.values),60]
-fig,axes= plt.subplots(1,3,figsize = [9,4])
+fig,axes= plt.subplots(1,3,figsize = [9,5])
 dsm.plot(vmin=elev_range[0],vmax=elev_range[1],cmap = 'viridis',ax=axes[0],
         add_colorbar=True,cbar_kwargs={'label': 'Elevation A.S.L. / m',
                     'orientation':'horizontal'})
@@ -69,23 +69,7 @@ for ax in axes:
     ax.yaxis.set_ticks_position('both')
     ax.set_aspect("equal")
 
-
-    if add_colorbar:
-        extend = 'neither'
-        if vmin > np.nanmin(xarr.values):
-            if vmax < np.nanmax(xarr.values):
-                extend = 'both'
-            else:
-                extend = 'min'
-        else:
-            if vmax < np.nanmax(xarr.values):
-                extend = 'max'
-        xarr.plot.imshow(ax=axis, vmin=vmin, vmax=vmax, cmap=cmap, add_colorbar=add_colorbar,
-                    extend=extend, cbar_kwargs=cbar_kwargs,transform = subplot_kw['projection'])
-    else:
-        xarr.plot.imshow(ax=axis, vmin=vmin, vmax=vmax, cmap=cmap, add_colorbar=add_colorbar,transform = subplot_kw['projection'])
-    axis.set_aspect("equal")
-    axis.set_title(title,fontsize=16)
+fig.show()
 
 #------------------------------------------------------------------------------------
 # PARAMETERS

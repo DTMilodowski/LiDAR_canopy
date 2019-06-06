@@ -17,6 +17,7 @@ import least_squares_fitting as lstsq
 from scipy import stats
 import time
 import copy
+import SEOS_sensitivity_analysis_plots as splt
 
 # Set up some basiic parameters for the plots
 rcParams['font.family'] = 'sans-serif'
@@ -39,7 +40,7 @@ layer_thickness = 0.5
 heights = np.arange(0.,max_height,layer_thickness)+0.5
 heights_rad = np.arange(0,max_height+0.5,layer_thickness)
 n_layers = heights.size
-plot_width = 50.
+plot_width = 100.
 sample_res = np.array([2.,5.,10.,20.,50.])
 keys = ['2m','5m','10m','20m','50m']
 kappa = 1.
@@ -168,6 +169,8 @@ for ii in range(0,n_iter):
     end_time = time.time()
     print('\t loop time = ', end_time - start_time)
 
-np.save("SEOS_MH_sensitivity_resolutio.npy", PAD_profiles_MH)
+np.save("SEOS_MH_sensitivity_resolution.npy", PAD_profiles_MH)
 np.save("SEOS_rad2_sensitivity_resolution.npy", PAD_profiles_rad2)
 np.save("SEOS_penetration_limit_resolution.npy", penetration_limit)
+
+splt.plot_profile_sensitivity_resolution(1,'SEOS_sensitivity_analysis_resolution.png',heights,PAD_profiles_MH)

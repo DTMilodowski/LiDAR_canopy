@@ -9,6 +9,7 @@ import xarray as xr
 #import auxilliary_functions as aux
 #import canopy_structure_plots as csp
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import seaborn as sns
 
 #------------------------------------------------------------------------------------
@@ -68,7 +69,40 @@ plt.setp(yticklabels,visible=False)
 for ax in axes:
     ax.yaxis.set_ticks_position('both')
     ax.set_aspect("equal")
+fig.savefig('%s/canopy_height_model.png' % output_dir)
+fig.show()
 
+#-----------------------------------------------------------------------------------
+# Plot point cloud samples (classification, height above ground)
+N=4397200.
+S=4396800.
+W=647400.
+E=647410.
+plot_bbox = np.asarray([[W,N],[E,N],[E,S],[W,S]])
+pts, starting_ids, trees = io.load_lidar_file_by_polygon(las_file,plot_bbox,max_pts_per_tree = 5*10**5)
+pts[:,0]=pts[:,0]-x[0]
+pts[:,1]=pts[:,1]-y[-1]
+
+XX,YY = np.meshgrid(x-x[0],y-y[-1])
+XX=XX.ravel()
+YY=YY.ravel()
+ZZ=dem.values.ravel()
+mask = np.all((XX<=E-x[0],XX>=W-x[0],YY>=S-y[-1],YY<=N-y[-1]),axis=0)
+temp_ids, dem_trees = io.create_KDTree(np.array([XX[mask],YY[mask]]).T)
+heights = np.zeros(pts.shape[0])
+for pp in range(0,heights.size):
+    dist,id = dem_trees[0].query(pts[pp,:2],k=1)
+    heights[pp] = pts[pp,2]-ZZ[mask][id]
+
+fig,axes= plt.subplots(2,1,figsize = [8,7])
+axes[0].scatter(pts[:,1],pts[:,2],marker='.',s=0.1,c=pts[:,4],cmap = 'viridis_r',
+                vmin=0.6)
+axes[1].scatter(pts[:,1],pts[:,2],marker='.',s=0.1,c=heights)
+axes[0].annotate('a - Point Classifications', fontsize=12, xy=(0.95,0.95), xycoords='axes fraction',horizontalalignment='right', verticalalignment='top')
+axes[1].annotate('b - Height Above Ground', fontsize=12, xy=(0.95,0.95), xycoords='axes fraction',horizontalalignment='right', verticalalignment='top')
+for ax in axes:
+    ax.set_aspect('equal')
+fig.savefig('%s/point_cloud.png' % output_dir)
 fig.show()
 
 #------------------------------------------------------------------------------------

@@ -171,4 +171,4 @@ for dd in range(0,target_shots.size):
 np.save("SEOS_MH_sensitivity_pulse_density.npy", PAD_profiles_MH)
 np.save("SEOS_rad2_sensitivity_pulse_density.npy", PAD_profiles_rad2)
 np.save("SEOS_penetration_limit_pulse_density.npy", penetration_limit)
-splt.plot_profile_sensitivity_resolution(1,'SEOS_sensitivity_analysis_resolution.png',heights,PAD_profiles_MH)
+splt.plot_profile_sensitivity_density(1,'SEOS_sensitivity_analysis_resolution.png',heights,PAD_profiles_MH)

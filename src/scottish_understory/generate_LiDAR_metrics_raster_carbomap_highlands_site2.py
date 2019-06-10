@@ -32,9 +32,9 @@ import raster_io as raster
 
 #-------------------------------------------------------------------------------
 # Input files
-laz_list = '../las_lists/carbomap_site2_laztiles.txt'
+las_list = '../las_lists/carbomap_site2_lastiles.txt'
 savedir = '/home/dmilodow/DataStore_DTM/FOREST2020/LiDAR/carbomap_highlands/canopy_metrics/'
-laz_files = True ## CHANGE AS REQUIRED - note that if laszip is installed, this
+laz_files = False ## CHANGE AS REQUIRED - note that if laszip is installed, this
                   ## can safely be set to False for both las and laz files. If
                   ## True, this leads to a workaround for cases where laszip is
                   ## not available, in which las2las is called to write a temp
@@ -93,7 +93,7 @@ pulse_dens = np.zeros((rows,cols))
 n_ground = np.zeros((rows,cols))
 
 # Phase three - loop through las tiles and gradually fill the array
-laz_files = io.find_laz_files_by_polygon(laz_list,bbox)
+laz_files = io.find_las_files_by_polygon(las_list,bbox)
 n_files = len(laz_files)
 for i in range(0,n_files):
     print("Processing tile %i of %i" % (i+1,n_files))
@@ -111,7 +111,8 @@ for i in range(0,n_files):
 
     # Read in LiDAR points for region of interest
     polygon = np.asarray([[W,N],[E,N],[E,S],[W,S]])
-    lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(laz_list,polygon,laz_files=True,max_pts_per_tree = 5*10**5)
+    lidar_pts, starting_ids_for_trees, trees = io.load_lidar_data_by_polygon(las_list,
+                                    polygon,laz_files=False,max_pts_per_tree = 5*10**5)
     N_trees = len(trees)
 
     # Get the positions and indices of grid points within the bounds of the tile

@@ -6,6 +6,7 @@ import LiDAR_radiative_transfer_LAD_profiles as LAD2
 import inventory_based_LAD_profiles as field
 import least_squares_fitting as lstsq
 import geospatial_utility_tools as geo
+import structural_metrics as metrics
 
 import sys
 import numpy as np
@@ -2108,3 +2109,41 @@ def plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
     plt.tight_layout()
     plt.savefig(figure_name)
     plt.show()
+
+
+"""
+Plot canopy Shannon Index and PAI
+Violin plot for canopy shannon index and PAI for different methods
+"""
+def plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn_PAD,
+                                        radiative_PAD):
+    n_plots = length(MacArthurHorn_PAD.keys())
+    Shannon = np.zeros(n_subplots*n_plots)
+    PAI = np.zeros(n_subplots*n_plots)
+    subplots = np.zeros(n_subplots*n_plots)
+    plots = []
+    region = []
+    for pp,plot in enumerate(MacArthurHorn_PAD.keys()):
+        subplots[pp*n_subplots:(pp+1)*n_subplots]= np.arange(n_subplots)+1
+        plots+=[plot]*n_subplots
+        if plot in [b'Belian',b'Seraya']:
+            region += ['Maliau Basin']*n_subplots
+        elif plot in [b'DC1',b'DC2']:
+            region += ['Danum Valley']*n_subplots
+        elif plot in [b'LF',b'E']
+            region += ['SAFE moderately logged']*n_subplots
+        else:
+            region += ['SAFE heavily logged']*n_subplots
+        MH = MacArthurHorn_PAD[plot].copy()
+        for ii in range(MH.shape[1]):
+            MH[np.isnan(MH[:,ii])]=np.mean(MH[np.isfinite(MH[:,ii])])
+        for ii in range(n_subplots):
+            Shannon[pp*n_subplots+ss]=metrics.calculate_Shannon_index(MH[ii])
+            PAI[pp*n_subplots+ss]=np.nansum(MH[ii])
+    df = pd.DataFrame({'Plot':plots,'Subplot':subplots,'ShannonIndex':Shannon,
+                        'PAI':PAI,'Region':region})
+
+    # Now plot the distributions for the two approaches
+    # distributions = plot
+    # hue = region
+    # facet = method

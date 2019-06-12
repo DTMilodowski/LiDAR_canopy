@@ -2115,65 +2115,79 @@ def plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
 Plot canopy Shannon Index and PAI
 Violin plot for canopy shannon index and PAI for different methods
 """
-def plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn_PAD,
-                                        radiative_PAD):
-    n_plots = length(MacArthurHorn_PAD.keys())
+def plot_PAI_Shannon_Index_distributions(figure_name,figure_number,PAD):
+    n_plots = len(PAD.keys())
     Shannon = np.zeros(n_subplots*n_plots)
     PAI = np.zeros(n_subplots*n_plots)
     subplots = np.zeros(n_subplots*n_plots)
     plots = []
     region = []
-    for pp,plot in enumerate(MacArthurHorn_PAD.keys()):
+    forest_type = []
+    for pp,plot in enumerate(PAD.keys()):
         subplots[pp*n_subplots:(pp+1)*n_subplots]= np.arange(n_subplots)+1
         plots+=[plot]*n_subplots
         if plot in [b'Belian',b'Seraya']:
-            region += ['Maliau Basin']*n_subplots
+            region += ['Maliau\nBasin']*n_subplots
+            forest_type += ['OG']*n_subplots
         elif plot in [b'DC1',b'DC2']:
-            region += ['Danum Valley']*n_subplots
-        elif plot in [b'LF',b'E']
-            region += ['SAFE moderately logged']*n_subplots
+            region += ['Danum\nValley']*n_subplots
+            forest_type += ['OG']*n_subplots
+        elif plot in [b'LF',b'E']:
+            region += ['SAFE\nmoderately\nlogged']*n_subplots
+            forest_type += ['ML']*n_subplots
         else:
-            region += ['SAFE heavily logged']*n_subplots
-        MH = MacArthurHorn_PAD[plot].copy()
-        for ii in range(MH.shape[1]):
-            MH[np.isnan(MH[:,ii])]=np.mean(MH[np.isfinite(MH[:,ii])])
+            region += ['SAFE\nheavily\nlogged']*n_subplots
+            forest_type += ['HL']*n_subplots
+        P = PAD[plot][:,2:]
+        for ii in range(P.shape[1]):
+            P[np.isnan(P[:,ii])]=np.mean(P[np.isfinite(P[:,ii])])
         for ii in range(n_subplots):
-            Shannon[pp*n_subplots+ss]=metrics.calculate_Shannon_index(MH[ii])
-            PAI[pp*n_subplots+ss]=np.nansum(MH[ii])
+            Shannon[pp*n_subplots+ii]=metrics.calculate_Shannon_index(P[ii])
+            PAI[pp*n_subplots+ii]=np.nansum(P[ii])
     df = pd.DataFrame({'Plot':plots,'Subplot':subplots,'ShannonIndex':Shannon,
-                        'PAI':PAI,'Region':region})
-    palette_colour = ['#46E900','#46E900','#1A2BCE','#E0007F']
+                        'PAI':PAI,'Region':region,'forest_type':forest_type})
+    palette_colour = ['#46E900','#1A2BCE','#E0007F']
 
     # Now plot the distributions for the two approaches
     # distributions = plot
     # hue = region
     # facet = method
-    fig = plt.figure(figure_number, facecolor='White',figsize=(8,4))
+    fig = plt.figure(figure_number, facecolor='White',figsize=(7,3))
 
-    axa = plt.subplot2grid((2,2),(0,0))
-    axa.annotate('a - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='region',y='PAI',data=df,inner="box",linewidth=0.5,
-                    scale='width',hue="region",palette = palette_colour,dodge=False,saturation=0.7,cut=0)
+    axa = plt.subplot2grid((1,2),(0,0))
+    axa.annotate('a - PAI', xy=(0.95,0.95), xycoords='axes fraction',
+                    backgroundcolor='none',horizontalalignment='right',
+                    verticalalignment='top', fontsize=10)
+    sns.violinplot(x='Region',y='PAI',data=df,inner="box",linewidth=0.5,
+                    scale='width',hue="forest_type",hue_order=['OG','ML','HL'],
+                    order=['Maliau\nBasin', 'Danum\nValley',
+                    'SAFE\nmoderately\nlogged','SAFE\nheavily\nlogged'],
+                    palette = palette_colour,dodge=False,saturation=0.7,cut=0)
     axa.set_xlabel('')
     axa.set_ylabel('PAI / m$^2$m$^{-2}$')
 
-    axb = plt.subplot2grid((2,2),(0,1))
-    axb.annotate('b - Shannon Index', xy=(0.05,0.95), xycoords='axes fraction',
-                    backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='region',y='ShannonIndex',data=df,inner="box",linewidth=0.5,
-                    scale='width',hue="region",palette = palette_colour,dodge=False,
-                    saturation=0.7,cut=0)
+    axb = plt.subplot2grid((1,2),(0,1))
+    axb.annotate('b - Shannon Index', xy=(0.95,0.95), xycoords='axes fraction',
+                    backgroundcolor='none',horizontalalignment='right',
+                    verticalalignment='top', fontsize=10)
+    sns.violinplot(x='Region',y='ShannonIndex',data=df,inner="box",linewidth=0.5,
+                    scale='width',hue="forest_type",hue_order=['OG','ML','HL'],
+                    order=['Maliau\nBasin', 'Danum\nValley',
+                    'SAFE\nmoderately\nlogged','SAFE\nheavily\nlogged'],
+                    palette = palette_colour,dodge=False,saturation=0.7,cut=0)
     axb.set_xlabel('')
-    axa.set_ylabel('Shannon Index')
+    axb.set_ylabel('Shannon Index')
 
     axes =[axa,axb]
     for ii,ax in enumerate(axes):
         ax.yaxis.set_ticks_position('both')
-        ax.legend_.remove()
         for item in ax.get_xticklabels():
             item.set_rotation(90)
 
-    fig.subplots_adjust(wspace = 0.2,hspace=0.1)
-    fig.savefig(figure_name)
-    fig.show()
+
+    axa.legend_.remove()
+
+    plt.subplots_adjust(wspace = 0.4,hspace=0.1,bottom=0.3)
+    plt.savefig(figure_name)
+    plt.show()
     return 0

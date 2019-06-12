@@ -2142,8 +2142,38 @@ def plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn
             PAI[pp*n_subplots+ss]=np.nansum(MH[ii])
     df = pd.DataFrame({'Plot':plots,'Subplot':subplots,'ShannonIndex':Shannon,
                         'PAI':PAI,'Region':region})
+    palette_colour = ['#46E900','#46E900','#1A2BCE','#E0007F']
 
     # Now plot the distributions for the two approaches
     # distributions = plot
     # hue = region
     # facet = method
+    fig = plt.figure(figure_number, facecolor='White',figsize=(8,4))
+
+    axa = plt.subplot2grid((2,2),(0,0))
+    axa.annotate('a - PAI', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='region',y='PAI',data=df,inner="box",linewidth=0.5,
+                    scale='width',hue="region",palette = palette_colour,dodge=False,saturation=0.7,cut=0)
+    axa.set_xlabel('')
+    axa.set_ylabel('PAI / m$^2$m$^{-2}$')
+
+    axb = plt.subplot2grid((2,2),(0,1))
+    axb.annotate('b - Shannon Index', xy=(0.05,0.95), xycoords='axes fraction',
+                    backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
+    sns.violinplot(x='region',y='ShannonIndex',data=df,inner="box",linewidth=0.5,
+                    scale='width',hue="region",palette = palette_colour,dodge=False,
+                    saturation=0.7,cut=0)
+    axb.set_xlabel('')
+    axa.set_ylabel('Shannon Index')
+
+    axes =[axa,axb]
+    for ii,ax in enumerate(axes):
+        ax.yaxis.set_ticks_position('both')
+        ax.legend_.remove()
+        for item in ax.get_xticklabels():
+            item.set_rotation(90)
+
+    fig.subplots_adjust(wspace = 0.2,hspace=0.1)
+    fig.savefig(figure_name)
+    fig.show()
+    return 0

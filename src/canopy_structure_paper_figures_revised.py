@@ -232,6 +232,15 @@ figure_name = output_dir + 'Fig11_cumulative_PAD_with_depth.png'
 figure_number = 11
 csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
                         radiative_DTM_PAD, method=0)
+
+"""
+# Figure 12 - PAI and Shannon INdex
+"""
+figure_name = output_dir + 'Fig11_cumulative_PAD_with_depth.png'
+figure_number = 11
+csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
+                        radiative_DTM_PAD, method=0)
+
 #-------------------------------
 # RESULTS - SENSITIVITY ANALYSIS
 # see sensitivity analysis plots

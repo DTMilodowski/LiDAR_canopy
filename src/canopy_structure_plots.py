@@ -2286,4 +2286,5 @@ def plot_cumulative_PAD_histograms(figure_name,figure_number,PAD,heights,
     ax.set_xlim((0,14))
     ax.legend()
     fig.tight_layout()
+    fig.savefig(figure_name)
     fig.show()

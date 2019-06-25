@@ -2191,3 +2191,99 @@ def plot_PAI_Shannon_Index_distributions(figure_name,figure_number,PAD):
     plt.savefig(figure_name)
     plt.show()
     return 0
+
+
+"""
+Plot histograms of cumulative PAD
+Summarise subcanopy environments by calculating the volume occupied by
+sub-canopy environments with different levels of overstory vegetation,
+characterised by differing levels of PAD. This plot should highlight which
+environmental niches are particularly sensitive to disturbance across the
+disturbance gradient
+"""
+def plot_cumulative_PAD_histograms(figure_name,figure_number,PAD,heights,
+                        horizontal_resolution = 20):
+
+    vertical_resolution = 1
+    fig_plots = [[b'Belian',b'Seraya'],[b'DC1',b'DC2'],[b'LF',b'E'],[b'B North',b'B South']]
+
+    n_plots = len(PAD.keys())
+    n_layers = heights.size-2
+    cumulative_PAD = np.zeros(n_subplots*n_plots*n_layers)
+    plots = []
+    region = []
+    forest_type = []
+
+    # Loop through the plots calculating cumulative PAD for each subplot
+    for pp,plot in enumerate(PAD.keys()):
+
+        plots+=[plot]*n_subplots*n_layers
+        if plot in [b'Belian',b'Seraya']:
+            region += ['Maliau\nBasin']*n_subplots*n_layers
+            forest_type += ['OG']*n_subplots*n_layers
+        elif plot in [b'DC1',b'DC2']:
+            region += ['Danum\nValley']*n_subplots*n_layers
+            forest_type += ['OG']*n_subplots*n_layers
+        elif plot in [b'LF',b'E']:
+            region += ['SAFE\nmoderately\nlogged']*n_subplots*n_layers
+            forest_type += ['ML']*n_subplots*n_layers
+        else:
+            region += ['SAFE\nheavily\nlogged']*n_subplots*n_layers
+            forest_type += ['HL']*n_subplots*n_layers
+
+        P = PAD[plot][:,2:]
+        for ii in range(P.shape[1]):
+            P[np.isnan(P[:,ii])]=np.mean(P[np.isfinite(P[:,ii])])
+        for ii in range(n_subplots):
+            cumulative_PAD[pp*n_subplots*n_layers+ii*n_layers:pp*n_subplots*n_layers+(ii+1)*n_layers] = np.cumsum(P[ii,::-1])
+    # mask out areas above canopy (cuulative PAD=0)
+    mask = cumulative_PAD>0
+    df = pd.DataFrame({'Plot':np.asarray(plots)[mask],'cumulative_PAD':cumulative_PAD[mask],
+                        'Region':np.asarray(region)[mask],'forest_type':np.asarray(forest_type)[mask]})
+
+    palette_colour = ['#46E900','#1A2BCE','#E0007F']
+
+    # Now plot cumulative PAD distributions by region, coloured by forest type
+    fig = plt.figure('cal/val random',figsize=(4,3))
+    fig.clf()
+    ax = fig.add_subplot(1,1,1)
+    ax = sns.distplot(df['cumulative_PAD'][df['Region']=='Maliau\nBasin'],
+                        color = '#30A000',label='Maliau Basin',
+                        kde=False,norm_hist=False,bins=np.arange(0,14,0.5),
+                        ax=ax,hist_kws={'alpha':1})
+    ax = sns.distplot(df['cumulative_PAD'][df['Region']=='Danum\nValley'],
+                        color = palette_colour[0],label='Danum Valley',
+                        kde=False,norm_hist=False,bins=np.arange(0,14,0.5),
+                        ax=ax,hist_kws={'alpha':1})
+    ax = sns.distplot(df['cumulative_PAD'][df['Region']=='SAFE\nmoderately\nlogged'],
+                        color = palette_colour[1],label='SAFE (moderately logged)',
+                        kde=False,norm_hist=False,bins=np.arange(0,14,0.5),
+                        ax=ax,hist_kws={'alpha':1})
+    ax = sns.distplot(df['cumulative_PAD'][df['Region']=='SAFE\nheavily\nlogged'],
+                        color = palette_colour[2],label='SAFE (heavily logged)',
+                        kde=False,norm_hist=False,bins=np.arange(0,14,0.5),
+                        ax=ax,hist_kws={'alpha':1})
+    ax = sns.distplot(df['cumulative_PAD'][df['Region']=='SAFE\nheavily\nlogged'],
+                        color = palette_colour[2],
+                        hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1},
+                        kde=False,norm_hist=False,bins=np.arange(0,14,0.5),ax=ax)
+    ax = sns.distplot(df['cumulative_PAD'][df['Region']=='SAFE\nmoderately\nlogged'],
+                        color = palette_colour[1],
+                        hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1},
+                        ax=ax,kde=False,norm_hist=False,bins=np.arange(0,14,0.5))
+    ax = sns.distplot(df['cumulative_PAD'][df['Region']=='Danum\nValley'],
+                        color = palette_colour[0],
+                        hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1}, ax=ax,
+                        kde=False,norm_hist=False,bins=np.arange(0,14,0.5),)
+    ax = sns.distplot(df['cumulative_PAD'][df['Region']=='Maliau\nBasin'],
+                        color = '#30A000',
+                        hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1},
+                        kde=False,norm_hist=False,bins=np.arange(0,14,0.5),ax=ax)
+    ax.set_xlabel('Cumulative overlying PAD / m$^2$m$^{-2}$')
+    ax.set_ylabel('Subcanopy volume / m$^3$ m$^{-2}$')
+    y_ticks = ax.get_yticks()
+    ax.set_yticklabels(['{:3.0f}'.format(i*vertical_resolution/(2.*n_subplots)) for i in y_ticks])
+    ax.set_xlim((0,14))
+    ax.legend()
+    fig.tight_layout()
+    fig.show()

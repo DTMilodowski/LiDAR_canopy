@@ -2279,7 +2279,7 @@ def plot_cumulative_PAD_histograms(figure_name,figure_number,PAD,heights,
                         color = '#30A000',
                         hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1},
                         kde=False,norm_hist=False,bins=np.arange(0,14,0.5),ax=ax)
-    ax.set_xlabel('Cumulative overlying PAD / m$^2$m$^{-2}$')
+    ax.set_xlabel('Overlying plant area / m$^2$m$^{-2}$')
     ax.set_ylabel('Subcanopy volume / m$^3$ m$^{-2}$')
     y_ticks = ax.get_yticks()
     ax.set_yticklabels(['{:3.0f}'.format(i*vertical_resolution/(2.*n_subplots)) for i in y_ticks])

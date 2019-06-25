@@ -234,12 +234,18 @@ csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
                         radiative_DTM_PAD, method=0)
 
 """
-# Figure 12 - PAI and Shannon INdex
+# Figure 12 - PAI and Shannon Index
 """
 figure_name = output_dir + 'Fig12_PAI_shannon_distributions.png'
 figure_number = 12
 csp.plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn_PAD,
                                         radiative_PAD)
+"""
+# Figure 12 - abundance of subcanopy volume for different levels of overstory PAD
+"""
+figure_name = output_dir + 'Fig13_cumulative_PAD_histograms.png'
+figure_number = 13
+csp.plot_cumulative_PAD_histograms(figure_name,figure_number,MacArthurHorn_PAD,heights) 
 
 #-------------------------------
 # RESULTS - SENSITIVITY ANALYSIS

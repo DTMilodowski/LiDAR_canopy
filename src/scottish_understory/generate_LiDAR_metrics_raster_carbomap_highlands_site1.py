@@ -49,7 +49,7 @@ temp,temp_geoT,coord_sys = raster.load_GeoTIFF_band_and_georeferencing('/home/dm
 
 # Some parameters
 radius = np.sqrt(10) # for buffer
-max_height = 30.   # max tree height
+max_height = 32.   # max tree height
 min_height = 1.     # minimum height for inclusion in PAI
 layer_thickness = 1 # thickness of vertical strata
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness

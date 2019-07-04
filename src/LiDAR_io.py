@@ -97,11 +97,27 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
 
 # Load lidar data => x,y,z,return,class, scan angle, gps_time
 # Returns: - a numpy array containing the points
+# Added checks to see what scan angle information is available
 def load_lidar_data(las_file,print_npts=True):
     lasFile = las.file.File(las_file,mode='r')
-    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num,
+
+    try:
+        pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num,
+                    lasFile.classification, lasFile.scan_angle,
+                    lasFile.gps_time, lasFile.num_returns)).transpose()
+    except:
+        try:
+            pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num,
                     lasFile.classification, lasFile.scan_angle_rank,
                     lasFile.gps_time, lasFile.num_returns)).transpose()
+        except:
+            print('warning - no scan angle information, assuming zero for all points')
+            pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num,
+                    lasFile.classification, lasFile.x.size),
+                    lasFile.gps_time, lasFile.num_returns)).transpose()
+        else:
+            print('warning - scan angle not present, returning scan angle rank')
+
     pts = pts[pts[:,2]>=0,:]
     if print_npts:
         print("loaded ", pts[:,0].size, " points")
@@ -118,10 +134,28 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
     Z_valid = lasFile.z >= 0
     ii = np.where(np.logical_and(X_valid, Y_valid, Z_valid))
 
-    pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii],
-                    lasFile.return_num[ii], lasFile.classification[ii],
-                    lasFile.scan_angle_rank[ii], lasFile.gps_time[ii],
-                    lasFile.num_returns[ii])).transpose()
+    try:
+        pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii],
+                    lasFile.classification[ii], lasFile.scan_angle[ii],
+                    lasFile.gps_time[ii], lasFile.num_returns[ii])).transpose()
+    except:
+        try:
+            pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii],
+                    lasFile.classification[ii], lasFile.scan_angle_rank[ii],
+                    lasFile.gps_time[ii], lasFile.num_returns[ii])).transpose()
+        except:
+            print('warning - no scan angle information, assuming zero for all points')
+            pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii],
+                    lasFile.classification[ii], np.zeros(lasFile.x[ii].size),
+                    lasFile.gps_time[ii], lasFile.num_returns[ii])).transpose()
+        else:
+            print('warning - scan angle not present, returning scan angle rank')
+
+    #pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii],
+    #                lasFile.return_num[ii], lasFile.classification[ii],
+    #                lasFile.scan_angle_rank[ii], lasFile.gps_time[ii],
+    #                lasFile.num_returns[ii])).transpose()
+
     if print_npts:
         print("loaded ", pts[:,0].size, " points")
     lasFile.close()

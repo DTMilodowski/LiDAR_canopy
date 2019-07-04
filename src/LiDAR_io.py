@@ -99,7 +99,7 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
 # Returns: - a numpy array containing the points
 def load_lidar_data(las_file,print_npts=True):
     lasFile = las.file.File(las_file,mode='r')
-    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank, lasFile.gps_time)).transpose()
+    pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num, lasFile.classification, lasFile.scan_angle_rank, lasFile.gps_time, lasFile.num_returns)).transpose()
     pts = pts[pts[:,2]>=0,:]
     if print_npts:
         print("loaded ", pts[:,0].size, " points")
@@ -116,7 +116,7 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
     Z_valid = lasFile.z >= 0
     ii = np.where(np.logical_and(X_valid, Y_valid, Z_valid))
 
-    pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii], lasFile.gps_time[ii])).transpose()
+    pts = np.vstack((lasFile.x[ii], lasFile.y[ii], lasFile.z[ii], lasFile.return_num[ii], lasFile.classification[ii], lasFile.scan_angle_rank[ii], lasFile.gps_time[ii], lasFile.num_returns[ii])).transpose()
     if print_npts:
         print("loaded ", pts[:,0].size, " points")
     lasFile.close()

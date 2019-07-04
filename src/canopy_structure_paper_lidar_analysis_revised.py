@@ -34,8 +34,6 @@ n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 plot_area = 10.**4
 subplot_area = 20.*20.
-beta_min = 0.26 # 95% range reported for US tree species by Purves et al. (2007)
-beta_max = 0.44 # 95% range reported for US tree species by Purves et al. (2007)
 kappa = 0.70
 
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
@@ -46,6 +44,8 @@ heights_rad = np.arange(0,max_height+layer_thickness,layer_thickness)
 # define dictionaries to host the various canopy profiles and LAI estimates that will be produced
 MacArthurHorn_LAD = {}
 MacArthurHorn_LAD_mean = {}
+MacArthurHorn_weighted_LAD = {}
+MacArthurHorn_weighted_LAD_mean = {}
 radiative_LAD = {}
 radiative_DTM_LAD = {}
 radiative_DTM_LAD_old = {}
@@ -56,6 +56,7 @@ lidar_profiles_adjusted ={}
 penetration_limit ={}
 
 MacArthurHorn_LAI = {}
+MacArthurHorn_weighted_LAI = {}
 radiative_LAI = {}
 radiative_DTM_LAI = {}
 MacArthurHorn_LAI_mean = {}
@@ -105,6 +106,7 @@ for pp in range(0,N_plots):
     # set up some arrays to host the MacArthur-Horn profiles
     #heights = np.arange(0,max_height)+1
     LAD_MH = np.zeros((n_subplots, heights.size))
+    LAD_MH_wt = np.zeros((n_subplots, heights.size))
 
     # set up array to host the lidar return profiles
     lidar_return_profiles = np.zeros((n_subplots, heights_rad.size, max_return))
@@ -142,7 +144,10 @@ for pp in range(0,N_plots):
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
         LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-        # get the LiDAR penetration limits for the subplots
+        # and do the same for weighted returns (i.e. not just first hits)
+        heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts, max_height, layer_thickness)
+        LAD_MH_wt[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(weighted_first_return_profile, weighted_n_ground_returns, layer_thickness, kappa)
+        # get the LiDAR penetration limits to first hit for the subplots
         penetration_lim[subplot_index,np.cumsum(first_return_profile)==0]=1.
 
     print("average point density = ", pt_count/10.**4, " pts/m^2")

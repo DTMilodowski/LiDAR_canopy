@@ -175,6 +175,7 @@ for pp in range(0,N_plots):
     penetration_limit[Plot_name] = penetration_lim.copy()
 
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
+    MacArthurHorn_weighted_LAD[Plot_name] = LAD_MH_wt.copy()
     radiative_LAD[Plot_name] = LAD_rad.copy()
     radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
     radiative_DTM_LAD_old[Plot_name] = LAD_rad_DTM_old.copy()
@@ -184,6 +185,7 @@ for pp in range(0,N_plots):
 
     # Also ready to store their respective LAI profiles
     MacArthurHorn_LAI[Plot_name] = np.nansum(LAD_MH,axis=1)*layer_thickness
+    MacArthurHorn_weighted_LAI[Plot_name] = np.nansum(LAD_MH_wt,axis=1)*layer_thickness
     radiative_LAI[Plot_name] = np.nansum(LAD_rad,axis=1)*layer_thickness
     radiative_DTM_LAI[Plot_name] = np.nansum(LAD_rad_DTM,axis=1)*layer_thickness
     MacArthurHorn_LAI_mean[Plot_name] = np.nansum(LAD_MH,axis=1)*layer_thickness

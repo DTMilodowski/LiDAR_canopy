@@ -1,9 +1,27 @@
+"""
+================================================================================
+LiDAR_MacHorn_LAD_profiles.py
+--------------------------------------------------------------------------------
+Functions that are required to construct PAD profiles using the MacArthur-Horn
+approach.
+Note that point cloud information currently stored in columns are as follows:
+0 = x
+1 = y
+2 = z
+3 = return number
+4 = classification
+5 = scan angle
+6 = GPS time
+7 = number of returns recorded for pulse
+"""
 import numpy as np
 import laspy as las
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
 
-# bin lidar returns
+"""
+# bin lidar returns into height bins
+"""
 def bin_returns(pts_in, max_height, layer_thickness):
 
     mask= pts_in[:,3]==1
@@ -34,6 +52,44 @@ def bin_returns(pts_in, max_height, layer_thickness):
             profile[bin[i]]+=1
 
     return heights,profile,n_ground_returns
+
+"""
+# bin lidar returns into height bins, but this time weight the returns by the
+# number of returns per pulse
+"""
+def bin_returns_weighted_by_num_returns(pts_in, max_height, layer_thickness):
+
+    pts = pts_in
+    weights = 1/pts[pts[:,7]]
+
+    # calculate n ground points
+    n_ground_returns = np.sum(weights[pts[:,4]==2])
+    # filter to consider only veg returns (class 1 = unclassified (usual
+    # scenario); class 3 = low vegetation; class 4 = medium vegetation;
+    # class 5 = high vegetation)
+    veg_mask = np.any((pts[:,4]==1,pts[:,4]==3,pts[:,4]==4,pts[:,4]==5),axis=0)
+    can_pts = pts[veg_mask,:]
+    can_weights = weights[veg_mask]
+
+    # now set up bins
+    lower_lims=np.arange(0,max_height,layer_thickness)
+    upper_lims = lower_lims + layer_thickness
+    n_bins = lower_lims.size
+    profile = np.zeros(n_bins)
+    heights = lower_lims+layer_thickness
+    n_returns = can_pts.shape[0]
+
+    # bin data
+    bin = can_pts[:,2]//layer_thickness
+    bin = bin.astype(int)
+
+    for i in range(0,n_returns):
+        if bin[i]<n_bins and bin[i]>=0: # in case there are some spuriously high returns outside the permitted range
+            #profile[bin[i]]+=1
+            profile[bin[i]]+=can_weights[i]
+
+    return heights,profile,n_ground_returns
+
 
 # Use MacArthur-Horn method to estimate LAD profile from the lidar return profile.  See methods described by Stark et al., Ecology Letters, 2012
 def estimate_LAD_MacArthurHorn(lidar_profile,n_ground_returns,layer_thickness,k,zero_nodata=True):

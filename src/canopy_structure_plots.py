@@ -362,7 +362,7 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
     ax1a.set_xlim(0,100)
     ax1a.set_ylim(0,80)
     ax2a.set_xlim(0,29)
-    ax3a.set_xlim(xmin=0,xmax=0.7)
+    ax3a.set_xlim(left=0,right=0.7)
 
     ax2f.locator_params(axis='x',nbins=5)
     ax3f.locator_params(axis='x',nbins=5)
@@ -379,9 +379,10 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
     plt.show()
     return 0
 
-def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad,
-                                lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
-                                radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD):
+def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,
+                                heights,heights_rad,lidar_profiles,MacArthurHorn_PAD,
+                                MacArthurHorn_PAD_mean,radiative_DTM_PAD,
+                                radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all):
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
@@ -566,6 +567,8 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
             #for i in range(0,n_subplots):
                 #axes5[pp].fill_betweenx(heights[2:],0,inventory_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
             #axes5[pp].plot(np.mean(inventory_PAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
+            llim,ulim = np.percentile(inventory_PAD_all[Plot_name],[2.5,97.5],axis =0)
+            axes4[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[2],alpha=0.2)
             axes4[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
         yticklabels.append(axes1[pp].get_yticklabels())
@@ -582,7 +585,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     ax1a.set_xlim(0,100)
     ax1a.set_ylim(0,80)
     ax2a.set_xlim(0,29)
-    ax3a.set_xlim(xmin=0,xmax=0.7)
+    ax3a.set_xlim(left=0,right=0.7)
 
     ax2f.locator_params(axis='x',nbins=5)
     ax3f.locator_params(axis='x',nbins=5)
@@ -743,7 +746,7 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     ax1a.set_xlim(0,100)
     ax1a.set_ylim(0,80)
     ax2a.set_xlim(0,3500)
-    ax3a.set_xlim(xmin=0,xmax=0.7)
+    ax3a.set_xlim(left=0,right=0.7)
 
     ax2b.locator_params(axis='x',nbins=4)
     ax3b.locator_params(axis='x',nbins=5)
@@ -1713,7 +1716,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
     ax1a.set_ylim(0,80)
     ax1a.set_xlim(0,29)
-    ax2a.set_xlim(xmin=0,xmax=0.7)
+    ax2a.set_xlim(left=0,right=0.7)
 
     ax2c.locator_params(axis='x',nbins=5)
     ax3c.locator_params(axis='x',nbins=5)
@@ -1776,7 +1779,7 @@ def plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,he
             axes[pp].plot(erectophile_PAD_mean[Plot_name][:-2,max_return-1][::-1],heights[2:],'-',c=colour[2],linewidth=1,label='erectophile')
 
     ax1.set_ylim(0,80)
-    ax2.set_xlim(xmin=0,xmax=1)
+    ax2.set_xlim(left=0,right=1)
 
     ax2.locator_params(axis='x',nbins=5)
     ax3.locator_params(axis='x',nbins=5)

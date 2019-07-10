@@ -181,7 +181,7 @@ gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
                         plot_point_cloud,heights,heights_rad, lidar_profiles,
                         MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_DTM_PAD,
-                        radiative_DTM_PAD_mean,inventory_PAD)
+                        radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all)
 
 """
 # Figure 6 - Cross-plot canopy layers

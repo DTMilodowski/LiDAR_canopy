@@ -194,15 +194,25 @@ csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
 """
 # Figure 7 - PAI plotted against basal area
 """
-figure_name = output_dir + 'Fig7_PAI_vs_basal_area.png'
+figure_name = output_dir + 'Fig7_PAI_vs_basal_area_test.png'
 figure_number = 7
 
 census_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_TreeCensus.csv'
 census = cen.collate_plot_level_census_data(census_file)
 
+# Basal area (m^2 / ha) and standard errors
+# data from table 1 of Riutta et al, GCB, 2018
 BA = {}
-Plots_SAFE = ['Belian', 'Seraya', 'LF', 'E','B North', 'B South']
-Plots_Danum = ['DC1', 'DC2']
+BA['Belian']=(41.6,3.59)
+BA['Seraya']=(34.7,2.74)
+BA['LF']= (19.3,1.7)
+BA['E']= (19.6,1.88)
+BA['B North']=(11.1,1.81)
+BA['B South']=(6.81,1.00)
+BA['DC1']=(32.0,3.3)
+BA['DC2']=(30.6,3.37)
+
+colour = ['#46E900','#1A2BCE','#E0007F']
 plot_colour = {}
 plot_colour['Belian']=colour[0];plot_colour['Seraya']=colour[0];plot_colour['DC1']=colour[0]
 plot_colour['DC2']=colour[0];plot_colour['LF']=colour[1];plot_colour['E']=colour[1]
@@ -214,24 +224,6 @@ plot_marker['LF']='o';plot_marker['E']='v';plot_marker['B North']='o';plot_marke
 plot_label = {}
 plot_label['Belian']='MLA01';plot_label['Seraya']='MLA02';plot_label['DC1']='DAN04';plot_label['DC2']='DAN05'
 plot_label['LF']='SAF04';plot_label['E']='SAF03';plot_label['B North']='SAF02';plot_label['B South']='SAF01'
-
-for pp in range(0,len(Plots_SAFE)):
-    temp_BA = np.zeros(n_subplots)
-    for ss in range(0,n_subplots):
-        # check basal area
-        temp_BA[ss] = census[Plots_SAFE[pp]]['BasalArea'][ss,0]*n_subplots/100**2
-    temp_BA[np.isnan(temp_BA)]=0
-    BA[Plots_SAFE[pp]]=temp_BA.copy()
-
-for pp in range(0,len(Plots_Danum)):
-    temp_BA = np.zeros(n_subplots)
-    for ss in range(0,n_subplots):
-        indices = np.all((field_data['plot']==str.encode(Plots_Danum[pp]),
-                                field_data['subplot']==ss+1,
-                                np.isfinite(field_data['DBH'])),axis=0)
-        temp_BA[ss] = np.sum((field_data['DBH'][indices]/2)**2*np.pi)*n_subplots/100.**2
-    BA[Plots_Danum[pp]]=temp_BA.copy()
-
 csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
                             radiative_DTM_PAD,radiative_DTM_PAD_mean,BA,plot_marker,plot_label,
                             plot_colour)

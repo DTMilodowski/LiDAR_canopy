@@ -55,6 +55,7 @@ field_data = field.load_crown_survey_data(field_file)
 plot_point_cloud= np.load('%splot_point_clouds.npz' % data_dir)['arr_0'][()]
 
 # Load LiDAR canopy profiles
+"""
 temp = np.load('%slidar_canopy_profiles.npz' % data_dir)['arr_0'][()]
 MacArthurHorn_PAD=temp[0]
 radiative_PAD=temp[1]
@@ -63,17 +64,29 @@ lidar_profiles=temp[3]
 lidar_profiles_adjusted=temp[4]
 penetration_limit=temp[5]
 temp=None
+"""
+temp = np.load('%slidar_canopy_profiles_adaptive.npz' % data_dir)['arr_0'][()]
+MacArthurHorn_PAD=temp[0]
+MacArthurHorn_wt_PAD=temp[1]
+radiative_PAD=temp[2]
+radiative_DTM_PAD=temp[3]
+lidar_profiles=temp[4]
+lidar_profiles_adjusted=temp[5]
+penetration_limit=temp[6]
+temp=None
 
 MacArthurHorn_PAD_mean = {}
+MacArthurHorn_wt_PAD_mean = {}
 radiative_PAD_mean= {}
 radiative_DTM_PAD_mean= {}
 for pp in range(0,N_plots):
     MacArthurHorn_PAD_mean[Plots[pp]] = np.nansum(MacArthurHorn_PAD[Plots[pp]],axis=0)/(np.sum(np.isfinite(MacArthurHorn_PAD[Plots[pp]]),axis=0)).astype('float')
+    MacArthurHorn_wt_PAD_mean[Plots[pp]] = np.nansum(MacArthurHorn_wt_PAD[Plots[pp]],axis=0)/(np.sum(np.isfinite(MacArthurHorn_PAD[Plots[pp]]),axis=0)).astype('float')
     radiative_PAD_mean[Plots[pp]] = np.nansum(radiative_PAD[Plots[pp]],axis=0)/(np.sum(np.isfinite(radiative_PAD[Plots[pp]]),axis=0)).astype('float')
     radiative_DTM_PAD_mean[Plots[pp]] = np.nansum(radiative_DTM_PAD[Plots[pp]],axis=0)/(np.sum(np.isfinite(radiative_DTM_PAD[Plots[pp]]),axis=0)).astype('float')
 
-
 # Load LiDAR PAI
+"""
 temp = np.load('%slidar_PAI.npz' % data_dir)['arr_0'][()]
 MacArthurHorn_PAI=temp[0]
 radiative_PAI=temp[1]
@@ -81,6 +94,13 @@ radiative_DTM_PAI=temp[2]
 MacArthurHorn_PAI_mean=temp[3]
 radiative_PAI_mean=temp[4]
 radiative_DTM_PAI_mean=temp[5]
+temp=None
+"""
+temp = np.load('%slidar_PAI_adaptive.npz' % data_dir)['arr_0'][()]
+MacArthurHorn_PAI=temp[0]
+MacArthurHorn_wt_PAI=temp[1]
+radiative_PAI=temp[2]
+radiative_DTM_PAI=temp[3]
 temp=None
 
 # Load Inventory profiles
@@ -155,7 +175,7 @@ csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry
 """
 # Figure 5 - Point clouds and profiles across degradation gradient
 """
-figure_name = output_dir + 'Fig5_pointclouds_and_profiles.png'
+figure_name = output_dir + 'Fig5_pointclouds_and_profiles_test.png'
 figure_number = 5
 gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
@@ -245,7 +265,7 @@ csp.plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn
 """
 figure_name = output_dir + 'Fig13_cumulative_PAD_histograms.png'
 figure_number = 13
-csp.plot_cumulative_PAD_histograms(figure_name,figure_number,MacArthurHorn_PAD,heights) 
+csp.plot_cumulative_PAD_histograms(figure_name,figure_number,MacArthurHorn_PAD,heights)
 
 #-------------------------------
 # RESULTS - SENSITIVITY ANALYSIS

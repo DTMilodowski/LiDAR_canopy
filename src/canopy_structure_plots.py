@@ -554,13 +554,21 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
             axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1)
 
             # plot macarthur horn profile
+
             for i in range(0,n_subplots):
                 axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
+
+            #llim,ulim = np.percentile(MacArthurHorn_PAD[Plot_name],[25,75],axis =0)
+            #axes2[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[0],alpha=0.2)
             axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
 
             # plot corrective radiative transfer profile
+
             for i in range(0,n_subplots):
                 axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+
+            #llim,ulim = np.percentile(radiative_DTM_PAD[Plot_name][:,:,1],[25,75],axis =0)
+            #axes3[pp].fill_betweenx(heights_rad[3:],llim[:-3][::-1],ulim[:-3][::-1],color=colour[1],alpha=0.2)
             axes3[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
             # field inventory
@@ -975,10 +983,13 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
     N_plots = len(Plots)
     N_subplots = np.shape(MacArthurHorn_PAD[Plots[0]])[0]
     BA = np.zeros(N_plots)
+    BAerr = np.zeros(N_plots)
     mh = np.zeros(N_plots)
+    mherr = np.zeros(N_plots)
     rad2 = np.zeros(N_plots)
     rad3 = np.zeros(N_plots)
     radDTM2 = np.zeros(N_plots)
+    radDTMerr = np.zeros(N_plots)
     radDTM3 = np.zeros(N_plots)
 
     for pp in range(0,N_plots):
@@ -986,9 +997,12 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
         Plots_str = str(Plots[pp], 'utf-8')
         # for 1 ha averages, want to avoid nodata
         # these should be identifiable based on penetration limit
-        BA[pp] = np.mean(BasalArea[Plots_str]).copy()
+        BA[pp] = BasalArea[Plots_str][0]
+        BAerr[pp] = BasalArea[Plots_str][1]
         mh[pp] = np.nansum(MacArthurHorn_PAD_mean[Plots[pp]])*layer_thickness
+        mherr[pp] = stats.sem(np.nansum(MacArthurHorn_PAD[Plots[pp]],axis=1)*layer_thickness)
         radDTM2[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,1])*layer_thickness
+        radDTMerr[pp] = stats.sem(np.nansum(radiative_DTM_PAD[Plots[pp]][:,:,1],axis=1)*layer_thickness)
         radDTM3[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,2])*layer_thickness
 
     # annotate with stats
@@ -1008,25 +1022,29 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
     ax1.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
         Plot_str = str(Plots[i], 'utf-8')
+        ax1.errorbar(BA[i],mh[i],xerr=BAerr[i],yerr=mherr[i],marker='None',
+                    color=plot_colour[Plot_str],alpha=0.5)
         ax1.plot(BA[i],mh[i],marker=plot_marker[Plot_str],
                     color=plot_colour[Plot_str],linestyle='None')
 
-    ax3 = plt.subplot2grid((1,2),(0,1), sharex=ax1)#, sharey=ax1)
-    ax3.annotate('b - multi. return\nradiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-    ax3.annotate(r_sq_b, xy=(0.5,0.05), xycoords='axes fraction',backgroundcolor='none',
+    ax2 = plt.subplot2grid((1,2),(0,1), sharex=ax1)#, sharey=ax1)
+    ax2.annotate('b - multi. return\nradiative transfer', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
+    ax2.annotate(r_sq_b, xy=(0.5,0.05), xycoords='axes fraction',backgroundcolor='none',
             horizontalalignment='center', verticalalignment='bottom', fontsize=axis_size)
-    ax3.set_ylabel('PAI',fontsize=axis_size)
-    ax3.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
+    ax2.set_ylabel('PAI',fontsize=axis_size)
+    ax2.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
 
     m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = field.linear_regression(BA,radDTM3,conf=0.95)
-    ax3.fill_between(x_i,CI_l,CI_u,color='0.75')
-    ax3.plot(x_i,y_i,'-',color='black')
+    ax2.fill_between(x_i,CI_l,CI_u,color='0.75')
+    ax2.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
         Plot_str = str(Plots[i], 'utf-8')
-        ax3.plot(BA[i],radDTM3[i],marker=plot_marker[Plot_str],
+        ax2.errorbar(BA[i],radDTM3[i],xerr=BAerr[i],yerr=radDTMerr[i],marker='None',
+                    color=plot_colour[Plot_str],alpha=0.5)
+        ax2.plot(BA[i],radDTM3[i],marker=plot_marker[Plot_str],
                     color=plot_colour[Plot_str],linestyle='None',label=plot_label[Plot_str])
 
-    ax3.legend(loc=4)
+    ax2.legend(loc=4)
 
     plt.tight_layout()
     plt.savefig(figure_name)

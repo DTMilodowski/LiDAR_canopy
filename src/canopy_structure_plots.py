@@ -611,7 +611,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 
 def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad,
                                 lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
-                                radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD):
+                                radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all):
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
@@ -738,6 +738,8 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
             axes3[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
             # field inventory
+            llim,ulim = np.percentile(inventory_PAD_all[Plot_name],[2.5,97.5],axis =0)
+            axes4[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[2],alpha=0.2)
             axes4[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
         yticklabels.append(axes1[pp].get_yticklabels())
@@ -1709,7 +1711,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
         # plot original Detto radiative transfer profile
         for i in range(0,n_subplots):
-            axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_PAD[Plot_name][i,:-3,-1][::-1],
+            axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_PAD[Plot_name][i,:-3,1][::-1],
                                     color=colour[1],alpha=0.02)
         axes3[pp].plot(radiative_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
                                     '-',c=colour[1],linewidth=2)

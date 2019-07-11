@@ -7,7 +7,6 @@ import numpy as np
 from scipy import stats
 import sys
 import auxilliary_functions as aux
-import load_field_data as cen
 import canopy_structure_plots as csp
 import inventory_based_LAD_profiles as field
 
@@ -197,9 +196,6 @@ csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
 figure_name = output_dir + 'Fig7_PAI_vs_basal_area_test.png'
 figure_number = 7
 
-census_file = '/home/dmilodow/DataStore_DTM/BALI/BALI_Cplot_data/SAFE_CarbonPlots_TreeCensus.csv'
-census = cen.collate_plot_level_census_data(census_file)
-
 # Basal area (m^2 / ha) and standard errors
 # data from table 1 of Riutta et al, GCB, 2018
 BA = {}
@@ -231,7 +227,7 @@ csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
 """
 # Figure 8 - PAD distributions for distinct canopy layers
 """
-figure_name = output_dir + 'Fig8_canopy_sublevel_PAD.png'
+figure_name = output_dir + 'Fig8_canopy_sublevel_PAD_test.png'
 figure_number = 8
 csp.plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
                             heights,heights_rad,MacArthurHorn_PAD,
@@ -240,7 +236,7 @@ csp.plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
 """
 # Figure 11 - Cumulative PAD with Depth
 """
-figure_name = output_dir + 'Fig11_cumulative_PAD_with_depth.png'
+figure_name = output_dir + 'Fig11_cumulative_PAD_with_depth_test.png'
 figure_number = 11
 csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
                         radiative_DTM_PAD, method=0)
@@ -248,14 +244,14 @@ csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
 """
 # Figure 12 - PAI and Shannon Index
 """
-figure_name = output_dir + 'Fig12_PAI_shannon_distributions.png'
+figure_name = output_dir + 'Fig12_PAI_shannon_distributions_test.png'
 figure_number = 12
-csp.plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn_PAD,
-                                        radiative_PAD)
+csp.plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn_PAD)
+                                        #radiative_PAD)
 """
 # Figure 12 - abundance of subcanopy volume for different levels of overstory PAD
 """
-figure_name = output_dir + 'Fig13_cumulative_PAD_histograms.png'
+figure_name = output_dir + 'Fig13_cumulative_PAD_histograms_test.png'
 figure_number = 13
 csp.plot_cumulative_PAD_histograms(figure_name,figure_number,MacArthurHorn_PAD,heights)
 
@@ -292,7 +288,7 @@ csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
 # Figure S2 - comparison of Detto vs. modified algorithm
 """
 figure_number = 113
-figure_name = output_dir+'figS3_LiDAR_profiles_comparison.png'
+figure_name = output_dir+'figS3_LiDAR_profiles_comparison_test.png'
 csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
                         lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
                         radiative_PAD,radiative_PAD_mean,
@@ -306,11 +302,11 @@ csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 # Figure S3 comparison of profiles for the two Danum sites
 """
 figure_number = 113
-figure_name = output_dir+'Fig3_pointclouds_and_profiles_Danum.png'
+figure_name = output_dir+'Fig3_pointclouds_and_profiles_Danum_test.png'
 csp.plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,
                         plot_point_cloud,heights,heights_rad, lidar_profiles,
                         MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_DTM_PAD,
-                        radiative_DTM_PAD_mean,inventory_PAD)
+                        radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all)
 
 # Figure S4 - sensitivity analysis, confidence interval sensitivity to resolution
 

@@ -23,7 +23,6 @@ output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCan
 # PARAMETERS
 # define important parameters for canopy profile estimation
 Plots = [b'LF',b'E',b'Belian',b'Seraya',b'B North',b'B South',b'DC1',b'DC2']
-#Plots = ['B North']
 N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
@@ -115,13 +114,7 @@ for pp in range(0,N_plots):
     for i in range(0,n_subplots):
         subplot_index = int(subplot_labels[Plot_name][i]-1)
         # filter lidar points into subplot
-        sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,
-                                                    subplot_polygons[Plot_name][i,:,:],
-                                                    filter_by_first_return_location=True)
-
-        subplot_index = int(subplot_labels[Plot_name][i]-1)
         subplot_poly = subplot_polygons[Plot_name][i,:,:]
-        # filter lidar points into subplot
         sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_poly,
                                                     filter_by_first_return_location=True)
         pt_count += sp_pts.shape[0]
@@ -138,14 +131,23 @@ for pp in range(0,N_plots):
             max_k=rr+1
             u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
             LAD_rad_DTM[subplot_index,:,rr]=u.copy()
+
         lidar_return_profiles_adj[subplot_index,:,:n.shape[2]] = np.sum(n.copy(),axis=1)
 
         # now get MacArthur-Horn profiles
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
-        LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+        LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile,
+                                                                    n_ground_returns,
+                                                                    layer_thickness,
+                                                                    kappa,
+                                                                    zero_nodata=False)
         # and do the same for weighted returns (i.e. not just first hits)
         heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts, max_height, layer_thickness)
-        LAD_MH_wt[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile, weighted_n_ground_returns, layer_thickness, kappa)
+        LAD_MH_wt[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,
+                                                                    weighted_n_ground_returns,
+                                                                    layer_thickness,
+                                                                    kappa,
+                                                                    zero_nodata=False)
         # get the LiDAR penetration limits to first hit for the subplots
         penetration_lim[subplot_index,np.cumsum(first_return_profile)==0]=1.
 
@@ -155,13 +157,14 @@ for pp in range(0,N_plots):
         # iteratively, so that we can build up a full vertical profile. Note that
         # this potentially gives rise to coarsening effective resolution down the
         # profile, but this seems preferable to more crude gap-filling schemes.
-        nodata_test = np.any((np.any(np.isnan(LAD_MH[subplot_index])),
-                        np.any(np.isnan(np.mean(LAD_rad[subplot_index,:-1,:],axis=1))),
-                        np.any(np.isnan(np.mean(LAD_rad_DTM[subplot_index,:-1,:],axis=1)))))
+        nodata_test = np.any((np.any(~np.isfinite(LAD_MH[subplot_index])),
+                        np.any(~np.isfinite(np.mean(LAD_rad[subplot_index,:-1,:],axis=1))),
+                        np.any(~np.isfinite(np.mean(LAD_rad_DTM[subplot_index,:-1,:],axis=1)))))
         centre_x = np.mean(subplot_poly[0:4,0])
         centre_y = np.mean(subplot_poly[0:4,1])
         radius=subplot_width/2.
         iter_count = 0
+
         while nodata_test:
             # expand neighbourhood for point cloud sample
             ids = trees[0].query_ball_point([centre_x,centre_y], radius)
@@ -175,39 +178,44 @@ for pp in range(0,N_plots):
                 u,n,I,U = LAD2.calculate_LAD(sp_pts_iter,heights_rad,max_k,'spherical')
                 LAD_rad[subplot_index,nodata_gaps,rr]=u[nodata_gaps]
 
-            # now repeat but for adjusted profiles, accounting for imperfect penetration of LiDAR pulses into canopy
+            # now repeat but for adjusted profiles
             for rr in range(0,max_return):
-                nodata_gaps = np.isnan(LAD_rad_DTM[subplot_index,:,rr])
+                nodata_gaps = ~np.isfinite(LAD_rad_DTM[subplot_index,:,rr])
                 max_k=rr+1
                 u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_iter,heights_rad,max_k,'spherical')
                 LAD_rad_DTM[subplot_index,nodata_gaps,rr]=u[nodata_gaps]
 
             # now get MacArthur-Horn profiles
-            nodata_gaps = np.isnan(LAD_MH[subplot_index])
+            nodata_gaps = ~np.isfinite(LAD_MH[subplot_index])
             heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts_iter, max_height, layer_thickness)
-            LAD_MH[subplot_index,nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)[nodata_gaps]
+            LAD_MH[subplot_index,nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile,
+                                                                    n_ground_returns,
+                                                                    layer_thickness,
+                                                                    kappa,
+                                                                    zero_nodata=False)[nodata_gaps]
 
             # and do the same for weighted returns (i.e. not just first hits)
-            nodata_gaps = np.isnan(LAD_MH_wt[subplot_index])
+            nodata_gaps = ~np.isfinite(LAD_MH_wt[subplot_index])
             heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts_iter, max_height, layer_thickness)
-            LAD_MH_wt[subplot_index,nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile, weighted_n_ground_returns, layer_thickness, kappa)[nodata_gaps]
+            LAD_MH_wt[subplot_index,nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,
+                                                                    n_ground_returns,
+                                                                    layer_thickness,
+                                                                    kappa,
+                                                                    zero_nodata=False)[nodata_gaps]
 
             # update check
             iter_count+=1
-            radius+=0.5
-            nodata_test = np.any((np.any(np.isnan(LAD_MH[subplot_index])),
-                        np.any(np.isnan(np.mean(LAD_rad[subplot_index],axis=1))),
-                        np.any(np.isnan(np.mean(LAD_rad_DTM[subplot_index],axis=1)))))
-            print(iter_count,radius)
-        print(Plot_name,subplot_index,iter_count)
+            radius+=1.
+            nodata_test = np.any((np.any(~np.isfinite(LAD_MH[subplot_index])),
+                        np.any(~np.isfinite(np.mean(LAD_rad[subplot_index],axis=1))),
+                        np.any(~np.isfinite(np.mean(LAD_rad_DTM[subplot_index],axis=1)))))
+            #print(Plot_name,i,subplot_index,iter_count)
     print("average point density = ", pt_count/10.**4, " pts/m^2")
 
     #------------------------------------------------------------------------------------
     # AVERAGE 1 ha PROFILES
-    #LAD_MH_mean = np.nansum(LAD_MH,axis=0)/(np.sum(np.isfinite(LAD_MH),axis=0)).astype('float')
-    #LAD_rad_mean = np.nansum(LAD_rad,axis=0)/(np.sum(np.isfinite(LAD_rad),axis=0)).astype('float')
-    #LAD_rad_DTM_mean = np.nansum(LAD_rad_DTM,axis=0)/(np.sum(np.isfinite(LAD_rad_DTM),axis=0)).astype('float')
     LAD_MH_mean = np.mean(LAD_MH,axis=0)
+    LAD_MH_wt_mean = np.mean(LAD_MH_wt,axis=0)
     LAD_rad_mean = np.mean(LAD_rad,axis=0)
     LAD_rad_DTM_mean = np.mean(LAD_rad_DTM,axis=0)
 
@@ -217,6 +225,7 @@ for pp in range(0,N_plots):
     # - remove all profile values below minimum height prior to comparison
     mask = heights <= minimum_height
     LAD_MH[:,mask]=np.nan
+    LAD_MH_wt[:,mask]=np.nan
     mask = np.max(heights_rad)-heights_rad<=minimum_height
     LAD_rad[:,mask]=np.nan
     LAD_rad_DTM[:,mask]=np.nan
@@ -231,6 +240,7 @@ for pp in range(0,N_plots):
     radiative_LAD[Plot_name] = LAD_rad.copy()
     radiative_DTM_LAD[Plot_name] = LAD_rad_DTM.copy()
     MacArthurHorn_LAD_mean[Plot_name] = LAD_MH_mean.copy()
+    MacArthurHorn_weighted_LAD_mean[Plot_name] = LAD_MH_wt_mean.copy()
     radiative_LAD_mean[Plot_name] = LAD_rad_mean.copy()
     radiative_DTM_LAD_mean[Plot_name] = LAD_rad_DTM_mean.copy()
 
@@ -239,15 +249,15 @@ for pp in range(0,N_plots):
     MacArthurHorn_weighted_LAI[Plot_name] = np.nansum(LAD_MH_wt,axis=1)*layer_thickness
     radiative_LAI[Plot_name] = np.nansum(LAD_rad,axis=1)*layer_thickness
     radiative_DTM_LAI[Plot_name] = np.nansum(LAD_rad_DTM,axis=1)*layer_thickness
-    MacArthurHorn_LAI_mean[Plot_name] = np.nansum(LAD_MH,axis=1)*layer_thickness
-    radiative_LAI_mean[Plot_name] = np.nansum(LAD_rad,axis=1)*layer_thickness
-    radiative_DTM_LAI_mean[Plot_name] = np.nansum(LAD_rad_DTM,axis=1)*layer_thickness
+    #MacArthurHorn_LAI_mean[Plot_name] = np.nansum(LAD_MH,axis=1)*layer_thickness
+    #radiative_LAI_mean[Plot_name] = np.nansum(LAD_rad,axis=1)*layer_thickness
+    #radiative_DTM_LAI_mean[Plot_name] = np.nansum(LAD_rad_DTM,axis=1)*layer_thickness
 #----------------------------------------------------------------------------
 np.savez('%splot_point_clouds.npz' % output_dir,plot_point_cloud)
 
-np.savez('%slidar_canopy_profiles.npz' % output_dir,(MacArthurHorn_LAD,radiative_LAD,
-        radiative_DTM_LAD,lidar_profiles,lidar_profiles_adjusted,penetration_limit))
+np.savez('%slidar_canopy_profiles_adaptive.npz' % output_dir,(MacArthurHorn_LAD,
+        MacArthurHorn_weighted_LAD, radiative_LAD, radiative_DTM_LAD,
+        lidar_profiles, lidar_profiles_adjusted, penetration_limit))
 
-np.savez('%slidar_PAI.npz' % output_dir,(MacArthurHorn_LAI,radiative_LAI,
-        radiative_DTM_LAI,MacArthurHorn_LAI_mean,radiative_LAI_mean,
-        radiative_DTM_LAI_mean))
+np.savez('%slidar_PAI_adaptive.npz' % output_dir,(MacArthurHorn_LAI,MacArthurHorn_weighted_LAI,
+        radiative_LAI,radiative_DTM_LAI))#,MacArthurHorn_LAI_mean,radiative_LAI_mean,radiative_DTM_LAI_mean))

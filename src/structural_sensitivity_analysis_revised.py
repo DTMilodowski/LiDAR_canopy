@@ -34,16 +34,21 @@ plot_coordinates = np.genfromtxt(gps_pts_file, skip_header = 0, delimiter = ',',
 
 #plot = 'Belian'
 #plot = 'E'
-plot = 'B North'
-
+#plot = 'B North'
+plot = sys.argv[1]
+if plot == 'BNorth':
+    plot = 'B North'
+print(plot)
 max_height = 80.
 layer_thickness = 1.
 heights = np.arange(0.,max_height)+1
 heights_rad = np.arange(0,max_height+1)
 n_layers = heights.size
 plot_width = 100.
-sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
-keys = ['2m','5m','10m','20m','25m','50m','100m']
+#sample_res = np.array([2.,5.,10.,20.,25.,50.,100.])
+#keys = ['2m','5m','10m','20m','25m','50m','100m']
+sample_res = np.array([5.,10.,20.,25.,50.,100.])
+keys = ['5m','10m','20m','25m','50m','100m']
 kappa = 0.70
 max_k = 2
 n_iter = 250
@@ -69,6 +74,7 @@ shots = np.unique(pts[:,6])
 
 subplots = {}
 PAD_profiles_MH = {}
+PAD_profiles_MH_wt = {}
 PAD_profiles_rad1 = {}
 PAD_profiles_rad2 = {}
 penetration_limit = {}
@@ -124,6 +130,7 @@ for ss in range(0,sample_res.size):
 
     # store all profiles in relevant dictionary
     PAD_profiles_MH[keys[ss]] = copy.deepcopy(temp_dic)
+    PAD_profiles_MH_wt[keys[ss]] = copy.deepcopy(temp_dic)
     PAD_profiles_rad1[keys[ss]] = copy.deepcopy(temp_dic)#temp_dic.copy()
     PAD_profiles_rad2[keys[ss]] = copy.deepcopy(temp_dic)#temp_dic.copy()
     penetration_limit[keys[ss]] = copy.deepcopy(temp_dic)#temp_dic.copy()
@@ -176,26 +183,81 @@ for dd in range(0,target_points.size):
                 ids = trees[0].query_ball_point([centre_x,centre_y], radius)
                 sp_pts = lidar.filter_lidar_data_by_polygon(pts_iter[ids],subplots[keys[ss]][pp],filter_by_first_return_location=False)
                 #------
-                if np.sum(sp_pts[:,3]==1)>0:
+                if np.sum(sp_pts[:,3]==1)>0: # check for returns within this column
                     heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
-                    PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
-                    penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = np.cumsum(first_return_profile)==0
+                    mh_profile = LAD1.estimate_LAD_MacArthurHorn(first_return_profile, n_ground_returns, layer_thickness, kappa)
+                    pen_limit = np.cumsum(first_return_profile)==0
+                    #------
+                    heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts, max_height, layer_thickness)
+                    mh_wt_profile = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,n_ground_returns,layer_thickness,kappa,zero_nodata=False)
                     #------
                     u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
-                    PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
+                    rad1_profile=u[::-1][1:].copy()
                     #------
                     u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
-                    PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:]=u[::-1][1:].copy()
+                    rad2_profile=u[::-1][1:].copy()
                 else:
-                    PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = np.nan
-                    PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:]=np.nan
-                    PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:]=np.nan
-                    penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = 1.
+                    mh_profile      = np.zeros(heights.size)*np.nan
+                    mh_wt_profile   = np.zeros(heights.size)*np.nan
+                    rad1_profile    = np.zeros(heights.size)*np.nan
+                    rad2_profile    = np.zeros(heights.size)*np.nan
+                    pen_limit       = np.ones(heights.size)
+
+                # adaptive neighbourhood expansion to account for penetration
+                # limitations, particularly for fine grids/low point densities
+                nodata_test = np.any((np.any(~np.isfinite(mh_profile)),
+                                      np.any(~np.isfinite(rad1_profile)),
+                                      np.any(~np.isfinite(rad2_profile))))
+
+                while nodata_test:
+                    # expand neighbourhood for point cloud sample
+                    sp_pts_iter = pts_iter[trees[0].query_ball_point([centre_x,centre_y], radius)]
+
+                    # recalculate profiles at coarser resolution and use these
+                    # for gap-filling
+                    nodata_gaps = np.isnan(rad1_profile)
+                    u,n,I,U = LAD2.calculate_LAD(sp_pts_iter,heights_rad,max_k,'spherical')
+                    rad1_profile[nodata_gaps]=u[::-1][1:][nodata_gaps]
+
+                    # now repeat but for adjusted profiles, accounting for imperfect penetration of LiDAR pulses into canopy
+                    nodata_gaps = np.isnan(rad2_profile)
+                    u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_iter,heights_rad,max_k,'spherical')
+                    rad2_profile[nodata_gaps]=u[::-1][1:][nodata_gaps]
+
+                    # now get MacArthur-Horn profiles
+                    nodata_gaps = ~np.isfinite(mh_profile)
+                    heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts_iter, max_height, layer_thickness)
+                    mh_profile[nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile,
+                                                                            n_ground_returns,
+                                                                            layer_thickness,
+                                                                            kappa,
+                                                                            zero_nodata=False)[nodata_gaps]
+                    # and do the same for weighted returns
+                    nodata_gaps = ~np.isfinite(mh_wt_profile)
+                    heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts_iter, max_height, layer_thickness)
+                    mh_wt_profile[nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,
+                                                                            n_ground_returns,
+                                                                            layer_thickness,
+                                                                            kappa,
+                                                                            zero_nodata=False)[nodata_gaps]
+                    # update check
+                    radius+=1
+                    nodata_test = np.any((np.any(~np.isfinite(mh_profile)),
+                                          np.any(~np.isfinite(rad1_profile)),
+                                          np.any(~np.isfinite(rad2_profile))))
+
+                # Fill dictionaries
+                PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = mh_profile.copy()
+                PAD_profiles_MH_wt[keys[ss]][keys_2[dd]][ii,pp,:] = mh_wt_profile.copy()
+                PAD_profiles_rad1[keys[ss]][keys_2[dd]][ii,pp,:] = rad1_profile.copy()
+                PAD_profiles_rad2[keys[ss]][keys_2[dd]][ii,pp,:] = rad2_profile.copy()
+                penetration_limit[keys[ss]][keys_2[dd]][ii,pp,:] = pen_limit.copy()
 
         end_time = time.time()
         print('\t loop time = ', end_time - start_time)
 
-np.save("MH_sensitivity_%s_test.npy" % plot, PAD_profiles_MH)
-np.save("rad1_sensitivity_%s_test.npy" % plot, PAD_profiles_rad1)
-np.save("rad2_sensitivity_%s_test.npy" % plot, PAD_profiles_rad2)
-np.save("penetration_limit_%s_test.npy" % plot, penetration_limit)
+np.save("MH_sensitivity_adaptive_%s.npy" % plot, PAD_profiles_MH)
+np.save("MH_wt_sensitivity_adaptive_%s.npy" % plot, PAD_profiles_MH_wt)
+np.save("rad1_sensitivity_adaptive_%s.npy" % plot, PAD_profiles_rad1)
+np.save("rad2_sensitivity_adaptive_%s.npy" % plot, PAD_profiles_rad2)
+np.save("penetration_limit_adaptive_%s.npy" % plot, penetration_limit)

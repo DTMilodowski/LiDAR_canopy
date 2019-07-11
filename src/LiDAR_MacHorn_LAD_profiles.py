@@ -60,7 +60,7 @@ def bin_returns(pts_in, max_height, layer_thickness):
 def bin_returns_weighted_by_num_returns(pts_in, max_height, layer_thickness):
 
     pts = pts_in
-    weights = 1/pts[pts[:,7]]
+    weights = 1/pts[:,7]
 
     # calculate n ground points
     n_ground_returns = np.sum(weights[pts[:,4]==2])

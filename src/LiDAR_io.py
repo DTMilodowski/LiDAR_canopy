@@ -113,7 +113,7 @@ def load_lidar_data(las_file,print_npts=True):
         except:
             print('warning - no scan angle information, assuming zero for all points')
             pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num,
-                    lasFile.classification, lasFile.x.size),
+                    lasFile.classification, np.zeros(lasFile.x.size),
                     lasFile.gps_time, lasFile.num_returns)).transpose()
         else:
             print('warning - scan angle not present, returning scan angle rank')

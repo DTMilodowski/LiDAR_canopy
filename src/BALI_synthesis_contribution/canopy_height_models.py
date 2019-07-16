@@ -35,11 +35,6 @@ plot = sys.argv[1]
 if plot == 'BNorth':
     plot = 'B North'
 print(plot)
-max_height = 80.
-layer_thickness = 1.
-heights = np.arange(0.,max_height)+1
-heights_rad = np.arange(0,max_height+1)
-n_layers = heights.size
 plot_width = 100.
 sample_res = 0.5
 

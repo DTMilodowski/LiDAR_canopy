@@ -45,6 +45,7 @@ sample_res = 0.5
 
 #---------------------------------------------------------------------------------------------------------------
 # Load the data etc.
+print(plot_coordinates['plot'])
 mask = plot_coordinates['plot']==plot
 affine=lstsq.least_squares_affine_matrix(plot_coordinates['x'][mask],plot_coordinates['y'][mask],plot_coordinates['x_prime'][mask],plot_coordinates['y_prime'][mask])
 plot_bbox = np.array(lstsq.apply_affine_transformation(np.array([0.,100.,100.,0.]),np.array([100.,100.,0.,0.]),affine)).transpose() # simple square bounding box applied for all sensitivity analyses

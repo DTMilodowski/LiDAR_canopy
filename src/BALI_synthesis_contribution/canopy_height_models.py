@@ -6,13 +6,12 @@ import sys
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
 
+sys.path.append('../')
 import LiDAR_io as io
 import LiDAR_tools as lidar
 import auxilliary_functions as aux
 import least_squares_fitting as lstsq
-from scipy import stats
 import time
-import copy
 
 # Set up some basiic parameters for the plots
 rcParams['font.family'] = 'sans-serif'
@@ -23,9 +22,9 @@ axis_size = rcParams['font.size']+2
 
 #---------------------------------------------------------------------------------------------------------------
 # Some filenames & params
-las_file = 'Carbon_plot_point_cloud_buffer.las'
+las_file = '../Carbon_plot_point_cloud_buffer.las'
 
-gps_pts_file = 'GPS_points_file_for_least_squares_fitting_sensitivity_analysis_version.csv'
+gps_pts_file = '../GPS_points_file_for_least_squares_fitting_sensitivity_analysis_version.csv'
 datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('<U16','f16','f16','f16','f16')}
 plot_coordinates = np.genfromtxt(gps_pts_file, skip_header = 0, delimiter = ',',dtype=datatype)
 
@@ -42,7 +41,7 @@ heights = np.arange(0.,max_height)+1
 heights_rad = np.arange(0,max_height+1)
 n_layers = heights.size
 plot_width = 100.
-sample_res = 0.25
+sample_res = 0.5
 
 #---------------------------------------------------------------------------------------------------------------
 # Load the data etc.
@@ -58,10 +57,10 @@ n_returns = pts.shape[0]
 # Loop through all the spatial scales of interest
 print("generating sample grid")
 # Now create the subplot grids
-rows = int(plot_width/sample_res[ss])
-cols = int(plot_width/sample_res[ss])
-x=np.arange(0,plot_width+sample_res[ss],sample_res[ss])
-y=np.arange(0,plot_width+sample_res[ss],sample_res[ss])
+rows = int(plot_width/sample_res)
+cols = int(plot_width/sample_res)
+x=np.arange(0,plot_width+sample_res,sample_res)
+y=np.arange(0,plot_width+sample_res,sample_res)
 
 xv,yv=np.asarray(np.meshgrid(x,y))
 
@@ -94,10 +93,10 @@ for i in range(0,rows):
         bbox = [ [x_prime[i,j], x_prime[i+1,j], x_prime[i+1,j+1], x_prime[i,j+1], x_prime[i,j]],
                  [y_prime[i,j], y_prime[i+1,j], y_prime[i+1,j+1], y_prime[i,j+1], y_prime[i,j]] ]
         subplots.append( np.asarray(bbox).transpose() )
-        row_idx.append[i]
-        col_idx.append[j]
+        row_idx.append(i)
+        col_idx.append(j)
 
-n_subplots=len(subplot)
+n_subplots=len(subplots)
 chm = np.zeros((rows,cols),dtype='float')*np.nan
 
 #-----------------------------------------------------
@@ -109,9 +108,9 @@ starting_ids, trees = io.create_KDTree(pts)
 for pp in range(0,n_subplots):
     # query the tree to locate points of interest
     # note that we will only have one tree for the number of points in sensitivity analysis
-    centre_x = np.mean(subplots[keys[ss]][pp][0:4,0])
-    centre_y = np.mean(subplots[keys[ss]][pp][0:4,1])
-    radius = np.sqrt(sample_res[ss]**2/2.)
+    centre_x = np.mean(subplots[pp][0:4,0])
+    centre_y = np.mean(subplots[pp][0:4,1])
+    radius = np.sqrt(sample_res**2/2.)
     ids = trees[0].query_ball_point([centre_x,centre_y], radius)
     sp_pts = lidar.filter_lidar_data_by_polygon(pts[ids],subplots[pp],filter_by_first_return_location=False)
     #------
@@ -127,10 +126,8 @@ for pp in range(0,n_subplots):
             sp_pts_iter = pts[trees[0].query_ball_point([centre_x,centre_y], radius)]
             if np.sum(sp_pts_iter[:,2]>=0)>0: # check for returns within this column
                 chm[row_idx[pp],col_idx[pp]] = np.max(sp_pts_iter[:,2])
-            radius+=0.1
+            radius+=0.5
             nodata_test = np.isnan(chm[row_idx[pp],col_idx[pp]])
 
-end_time = time.time()
-print('\t loop time = ', end_time - start_time)
-
-np.save("CHM_25cm_%s.npy" % plot, chm)
+plt.imshow(chm);plt.show()
+np.save("CHM_50cm_%s.npy" % plot, chm)

@@ -162,7 +162,7 @@ for pp in range(0,N_plots):
                         np.any(~np.isfinite(np.mean(LAD_rad_DTM[subplot_index,:-1,:],axis=1)))))
         centre_x = np.mean(subplot_poly[0:4,0])
         centre_y = np.mean(subplot_poly[0:4,1])
-        radius=subplot_width/2.
+        radius=np.sqrt(subplot_width**2/2.)
         iter_count = 0
 
         while nodata_test:

@@ -60,10 +60,10 @@ for plot in (plots):
     n_arrow_text[plot][:,1]-=shift_y
 
 # Plot up the figure
-labels = ['Old growth (MLA-01)','Moderately logged (SAF-03)','Heavily logged (SAF-02)','Oil Palm (OP)']
-fig,axes = plt.subplots(nrows=2,ncols=2,figsize=[6,6],subplot_kw={'aspect':'equal',
+labels = ['OGF (MLA-01)','MLF (SAF-03)','HLF (SAF-02)','OP']
+fig,axes = plt.subplots(nrows=1,ncols=4,figsize=[10,4.5],subplot_kw={'aspect':'equal',
                         'xlim':(0,100),'ylim':(0,100)})
-for pp,ax in enumerate(axes.ravel()):
+for pp,ax in enumerate(axes):
     mean_prof = np.mean(canopy_profiles[plots_b[pp]],axis=0)
     sem_prof = stats.sem(canopy_profiles[plots_b[pp]],axis=0)
     # chm
@@ -86,8 +86,8 @@ for pp,ax in enumerate(axes.ravel()):
     ax.set_xticklabels(ax.get_xticklabels(),visible=False)
     ax.set_yticklabels(ax.get_yticklabels(),visible=False)
 
-fig.subplots_adjust(right=0.8)
-cbar_ax = fig.add_axes([0.84,0.245,0.04,0.51])
-fig.colorbar(im,cax=cbar_ax, label='canopy height / m')
-fig.savefig('canopy_structure_across_gradient.png')
+fig.subplots_adjust(bottom=0.1)
+cbar_ax = fig.add_axes([0.33333,0.2,0.33333,0.04])
+fig.colorbar(im,cax=cbar_ax, orientation='horizontal',label='canopy height / m')
+fig.savefig('canopy_structure_across_gradient.pdf')
 fig.show()

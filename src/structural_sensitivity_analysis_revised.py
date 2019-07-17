@@ -205,9 +205,9 @@ for dd in range(0,target_points.size):
 
                 # adaptive neighbourhood expansion to account for penetration
                 # limitations, particularly for fine grids/low point densities
-                nodata_test = np.any((np.any(~np.isfinite(mh_profile)),
-                                      np.any(~np.isfinite(rad1_profile)),
-                                      np.any(~np.isfinite(rad2_profile))))
+                nodata_test = np.any((np.any(~np.isfinite(mh_profile[2:])),
+                                      np.any(~np.isfinite(rad1_profile[2:])),
+                                      np.any(~np.isfinite(rad2_profile[2:]))))
 
                 while nodata_test:
                     # expand neighbourhood for point cloud sample
@@ -241,10 +241,10 @@ for dd in range(0,target_points.size):
                                                                             kappa,
                                                                             zero_nodata=False)[nodata_gaps]
                     # update check
-                    radius+=1
-                    nodata_test = np.any((np.any(~np.isfinite(mh_profile)),
-                                          np.any(~np.isfinite(rad1_profile)),
-                                          np.any(~np.isfinite(rad2_profile))))
+                    radius+=2.5
+                    nodata_test = np.any((np.any(~np.isfinite(mh_profile[2:])),
+                                          np.any(~np.isfinite(rad1_profile[2:])),
+                                          np.any(~np.isfinite(rad2_profile[2:]))))
 
                 # Fill dictionaries
                 PAD_profiles_MH[keys[ss]][keys_2[dd]][ii,pp,:] = mh_profile.copy()

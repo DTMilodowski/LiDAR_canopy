@@ -44,7 +44,7 @@ sample_res = np.array([5.,10.,20.,50.,100.])
 keys = ['5m','10m','20m','50m','100m']
 kappa = 0.70
 max_k = 2
-n_iter = 1#250
+n_iter = 250
 
 area = 10.**4
 #target_point_density = np.array([5., 10., 20., 30., 40.])

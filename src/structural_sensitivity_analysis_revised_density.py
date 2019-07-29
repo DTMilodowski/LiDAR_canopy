@@ -42,7 +42,7 @@ sample_res = np.array([20.])
 keys = ['20m']
 kappa = 0.70
 max_k = 2
-n_iter = 1#250
+n_iter = 250
 
 area = 10.**4
 target_pulse_density = np.array([5., 10., 20., 30., 40.])

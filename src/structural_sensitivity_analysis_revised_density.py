@@ -217,12 +217,10 @@ for dd in range(0,target_shots.size):
                     u,n,I,U = LAD2.calculate_LAD(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=True)
                     rad1_profile[nodata_gaps]=u[::-1][1:][nodata_gaps]
 
-                    # now repeat but for adjusted profiles, accounting for imperfect penetration of LiDAR pulses into canopy
+                    # now repeat but for adjusted profiles, accounting for
+                    # imperfect penetration of LiDAR pulses into canopy
                     nodata_gaps = np.isnan(rad2_profile)
-                    if sample_res[ss]>=10:
-                        u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=True)
-                    else:
-                        u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=True)
+                    u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=True)
 
                     rad2_profile[nodata_gaps]=u[::-1][1:][nodata_gaps]
 

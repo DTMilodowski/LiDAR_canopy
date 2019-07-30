@@ -194,10 +194,10 @@ for dd in range(0,target_shots.size):
                     heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts, max_height, layer_thickness)
                     mh_wt_profile = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,n_ground_returns,layer_thickness,kappa,zero_nodata=False)
                     #------
-                    u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical')
+                    u,n,I,U = LAD2.calculate_LAD(sp_pts,heights_rad,max_k,'spherical',test_sensitivity=True)
                     rad1_profile=u[::-1][1:].copy()
                     #------
-                    u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical')
+                    u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts,heights_rad,max_k,'spherical',test_sensitivity=True)
                     rad2_profile=u[::-1][1:].copy()
                 else:
                     mh_profile      = np.zeros(heights.size)*np.nan
@@ -212,7 +212,7 @@ for dd in range(0,target_shots.size):
                                       np.any(~np.isfinite(rad1_profile[2:])),
                                       np.any(~np.isfinite(rad2_profile[2:]))))
 
-                while nodata_test:
+                while np.all((nodata_test,radius<=50)):
                     # expand neighbourhood for point cloud sample
                     radius+=2.5
                     sp_pts_iter = pts_iter[trees[0].query_ball_point([centre_x,centre_y], radius)]
@@ -220,7 +220,7 @@ for dd in range(0,target_shots.size):
                     # recalculate profiles at coarser resolution and use these
                     # for gap-filling
                     nodata_gaps = np.isnan(rad1_profile)
-                    u,n,I,U = LAD2.calculate_LAD(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=False)
+                    u,n,I,U = LAD2.calculate_LAD(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=True)
                     rad1_profile[nodata_gaps]=u[::-1][1:][nodata_gaps]
 
                     # now repeat but for adjusted profiles, accounting for imperfect penetration of LiDAR pulses into canopy
@@ -228,7 +228,7 @@ for dd in range(0,target_shots.size):
                     if sample_res[ss]>=10:
                         u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=True)
                     else:
-                        u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=False)
+                        u,n,I,U = LAD2.calculate_LAD_DTM(sp_pts_iter,heights_rad,max_k,'spherical',test_sensitivity=True)
 
                     rad2_profile[nodata_gaps]=u[::-1][1:][nodata_gaps]
 

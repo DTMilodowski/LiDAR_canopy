@@ -46,14 +46,14 @@ def plot_profile_sensitivity_resolution(figure_number,figure_name,heights,PAD_pr
 
         if ii==4:
             ax.plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
-            ax.legend(loc=9, bbox_to_anchor=(-0.1, -0.15), ncol=3)
+            #ax.legend(loc=9, bbox_to_anchor=(-0.1, -0.15), ncol=3)
         else:
             ax.plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
         print('%.3f' % np.sum(MH[2:]))
     yticklabels = axb.get_yticklabels() + axc.get_yticklabels() + axd.get_yticklabels() + axe.get_yticklabels()
     plt.setp(yticklabels,visible=False)
 
-    axa.set_ylim(0,80)
+    axa.set_ylim(0,40)
     axa.set_xlim(0,0.38)
     for ax in axes:
         ax.locator_params(axis='x',nbins=4)
@@ -96,14 +96,14 @@ def plot_profile_sensitivity_density(figure_number,figure_name,heights,PAD_profi
 
         if ii==4:
             ax.plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
-            ax.legend(loc=9, bbox_to_anchor=(-0.1, -0.15), ncol=3)
+            #ax.legend(loc=9, bbox_to_anchor=(-0.1, -0.15), ncol=3)
         else:
             ax.plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
         print('%.3f' % np.sum(MH[2:]))
     yticklabels = axb.get_yticklabels() + axc.get_yticklabels() + axd.get_yticklabels() + axe.get_yticklabels()
     plt.setp(yticklabels,visible=False)
 
-    axa.set_ylim(0,80)
+    axa.set_ylim(0,40)
     axa.set_xlim(0,0.55)
     for ax in axes:
         ax.locator_params(axis='x',nbins=5)

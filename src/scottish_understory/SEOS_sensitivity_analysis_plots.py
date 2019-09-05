@@ -12,6 +12,7 @@ import seaborn as sns
 import pandas as pd
 sns.set()
 
+colour = ['#46E900','#1A2BCE','#E0007F']
 """
 Plot sensitivity of 1ha profiles to spatial resolution
 """

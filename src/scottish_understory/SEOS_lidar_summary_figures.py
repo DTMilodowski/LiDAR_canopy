@@ -25,11 +25,11 @@ sns.set()
 import sys
 sys.path.append('../')
 import LiDAR_io as io
-import LiDAR_tools as lidar
+import LiDAR_MacHorn_LAD_profiles as LAD
 
 # import SEOS specific libraries
 import SEOS_sensitivity_analysis_plots as splt
-
+import SEOS_profile_plots as lplt
 """
 PART A: LOAD DATA
 --------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ Sensitivity analyses results
 file_id = 'carbomap_site1_5m'
 path2data = '/exports/csce/datastore/geos/users/dmilodow/FOREST2020/LiDAR/carbomap_highlands/canopy_metrics/'
 path2fig = '/exports/csce/datastore/geos/users/dmilodow/FOREST2020/LiDAR/carbomap_highlands/figures/'
-os.mkdir('%s/sensitivity_analysis' % path2fig)
+os.system('mkdir %s/sensitivity_analysis' % path2fig)
 las_list = '../las_lists/carbomap_site1_lastiles.txt'
 pad_file = '%s%s_pad.tif' % (path2data,file_id)
 
@@ -75,6 +75,9 @@ sample_res = 5.
 kappa = 1.
 n_iter = 100
 
+# bin lidar returns
+heights,first_return_profile,n_ground_returns = LAD.bin_returns(pts, max_height, layer_thickness)
+
 """
 PART B: Plot canopy profiles
 --------------------------------------------------------------------------------
@@ -84,7 +87,8 @@ A couple of plots here
 2) Random sample of individual 5m x 5m profiles from within the 1 ha plot
 --------------------------------------------------------------------------------
 """
-
+lplt.plot_point_cloud_and_profiles('%s/SEOS_point_cloud_canopy_profiles.png' % path2fig,
+    pts,resolution_sensitivity['5m'],heights,first_return_profile)
 
 """
 PART C: Sensitivity analysis

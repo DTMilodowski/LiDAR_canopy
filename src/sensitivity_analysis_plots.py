@@ -40,6 +40,117 @@ def plot_profile_sensitivity_resolution(figure_number,figure_name,heights,PAD_pr
                             PAD_profiles_rad_BNorth,PAD_profiles_rad_E):
     ## Belian
     fig = plt.figure(figure_number, facecolor='White',figsize=[8,9])
+    ax1a = plt.subplot2grid((3,5),(0,0))
+    ax1a.set_title('MLA01 - old growth', fontsize=10)
+    ax1a.set_ylabel('height / m',fontsize=axis_size)
+    ax1a.annotate('a - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1b = plt.subplot2grid((3,5),(0,1),sharex=ax1a,sharey=ax1a)
+    ax1b.annotate('b - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1c = plt.subplot2grid((3,5),(0,2),sharex=ax1a,sharey=ax1a)
+    ax1c.annotate('c - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1d = plt.subplot2grid((3,5),(0,3),sharex=ax1a,sharey=ax1a)
+    ax1d.annotate('d - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1e = plt.subplot2grid((3,5),(0,4),sharex=ax1a,sharey=ax1a)
+    ax1e.annotate('e - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ## E
+    ax1f = plt.subplot2grid((3,5),(1,0),sharex=ax1a,sharey=ax1a)
+    ax1f.set_title('SAF03 - moderately logged', fontsize=10)
+    ax1f.set_ylabel('height / m',fontsize=axis_size)
+    ax1f.annotate('f - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1g = plt.subplot2grid((3,5),(1,1),sharex=ax1a,sharey=ax1a)
+    ax1g.annotate('g - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1h = plt.subplot2grid((3,5),(1,2),sharex=ax1a,sharey=ax1a)
+    ax1h.annotate('h - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1i = plt.subplot2grid((3,5),(1,3),sharex=ax1a,sharey=ax1a)
+    ax1i.annotate('i - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1j = plt.subplot2grid((3,5),(1,4),sharex=ax1a,sharey=ax1a)
+    ax1j.annotate('j - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ## B North
+    ax1k = plt.subplot2grid((3,5),(2,0),sharex=ax1a,sharey=ax1a)
+    ax1k.set_title('SAF02 - heavily logged', fontsize=10)
+    ax1k.set_ylabel('height / m',fontsize=axis_size)
+    ax1k.annotate('k - 5 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1l = plt.subplot2grid((3,5),(2,1),sharex=ax1a,sharey=ax1a)
+    ax1l.annotate('l - 10 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1m = plt.subplot2grid((3,5),(2,2),sharex=ax1a,sharey=ax1a)
+    ax1m.annotate('m - 20 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1n = plt.subplot2grid((3,5),(2,3),sharex=ax1a,sharey=ax1a)
+    ax1n.annotate('n - 50 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    ax1o = plt.subplot2grid((3,5),(2,4),sharex=ax1a,sharey=ax1a)
+    ax1o.annotate('o - 100 m', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',ha='left', va='top', fontsize=10)
+
+    # loop through the subplots
+    sp = [ax1a,ax1b,ax1c,ax1d,ax1e,ax1f,ax1g,ax1h,ax1i,ax1j,ax1k,ax1l,ax1m,ax1n,ax1o]
+    pkeys = ['5m','10m','20m','50m','100m']
+    for pp in range(0,len(sp)):
+
+        if pp<5:
+            rad_sp = np.nanmean(PAD_profiles_rad_Belian[pkeys[pp]]['25'],axis=1)
+            MH_sp = np.nanmean(PAD_profiles_MH_Belian[pkeys[pp]]['25'],axis=1)
+        elif pp<10:
+            rad_sp = np.nanmean(PAD_profiles_rad_E[pkeys[pp-5]]['25'],axis=1)
+            MH_sp = np.nanmean(PAD_profiles_MH_E[pkeys[pp-5]]['25'],axis=1)
+        else:
+            rad_sp = np.nanmean(PAD_profiles_rad_BNorth[pkeys[pp-10]]['25'],axis=1)
+            MH_sp = np.nanmean(PAD_profiles_MH_BNorth[pkeys[pp-10]]['25'],axis=1)
+
+        rad = np.nanmedian(rad_sp,axis=0)
+        radperc = np.nanpercentile(rad_sp,[2.5,97.5],axis=0)
+        sp[pp].fill_betweenx(heights[2:],radperc[0][2:],radperc[1][2:],color=colour[1],alpha=0.3)
+
+        MH = np.nanmedian(MH_sp,axis=0)
+        MHperc = np.nanpercentile(MH_sp,[2.5,97.5],axis=0)
+        sp[pp].fill_betweenx(heights[2:],MHperc[0][2:],MHperc[1][2:],color=colour[0],alpha=0.3)
+
+        if pp==17:
+            sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
+            sp[pp].plot(rad[2:],heights[2:],'-',c=colour[1],linewidth=1.5, label = 'multi. return\nrad trans')
+            sp[pp].legend(loc=9, bbox_to_anchor=(-0.1, -0.15), ncol=3)
+        else:
+            sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+            sp[pp].plot(rad[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
+
+    yticklabels = ax1b.get_yticklabels() + ax1c.get_yticklabels() + ax1d.get_yticklabels() + ax1e.get_yticklabels() + \
+                  ax1g.get_yticklabels() + ax1h.get_yticklabels() + ax1i.get_yticklabels() + ax1j.get_yticklabels() + \
+                  ax1l.get_yticklabels() + ax1m.get_yticklabels() + ax1n.get_yticklabels() + ax1o.get_yticklabels()
+    xticklabels = ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xticklabels() + ax1d.get_xticklabels() + ax1e.get_xticklabels() +  \
+                  ax1f.get_xticklabels() + ax1g.get_xticklabels() + ax1h.get_xticklabels() + ax1i.get_xticklabels() + ax1j.get_xticklabels()
+
+    plt.setp(yticklabels,visible=False)
+
+    ax1a.set_ylim(0,89)
+    ax1a.set_xlim(0,0.55)
+    for ax in sp:
+        ax.locator_params(axis='x',nbins=5)
+        ax.yaxis.set_ticks_position('both')
+
+    plt.subplots_adjust(hspace=0.4, wspace = 0.2, bottom = 0.2)
+
+    fig.text(0.5, 0.15, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
+
+    plt.savefig(figure_name)
+    plt.show()
+    return 0
+
+def plot_profile_sensitivity_resolution_old(figure_number,figure_name,heights,PAD_profiles_MH_Belian,
+                            PAD_profiles_MH_BNorth,PAD_profiles_MH_E,PAD_profiles_rad_Belian,
+                            PAD_profiles_rad_BNorth,PAD_profiles_rad_E):
+    ## Belian
+    fig = plt.figure(figure_number, facecolor='White',figsize=[8,9])
     ax1a = plt.subplot2grid((3,6),(0,0))
     ax1a.set_title('MLA01 - old growth', fontsize=10)
     ax1a.set_ylabel('height / m',fontsize=axis_size)
@@ -155,11 +266,121 @@ def plot_profile_sensitivity_resolution(figure_number,figure_name,heights,PAD_pr
     plt.show()
     return 0
 
+"""
+Plot sensitivity of 1ha profiles to point density
+"""
+def plot_profile_sensitivity_density(figure_number,figure_name,heights,PAD_profiles_MH_Belian,
+                            PAD_profiles_MH_BNorth,PAD_profiles_MH_E,PAD_profiles_rad_Belian,
+                            PAD_profiles_rad_BNorth,PAD_profiles_rad_E):
+
+    fig = plt.figure(figure_number, facecolor='White',figsize=[7,9])
+    ax2a = plt.subplot2grid((3,5),(0,0))
+    ax2a.set_title('MLA01 - old growth', fontsize=10)
+    ax2a.set_ylabel('height / m',fontsize=axis_size)
+    ax2a.annotate('a - 5 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2b = plt.subplot2grid((3,5),(0,1),sharex=ax2a,sharey=ax2a)
+    ax2b.annotate('b - 10 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2c = plt.subplot2grid((3,5),(0,2),sharex=ax2a,sharey=ax2a)
+    ax2c.annotate('c - 15 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2d = plt.subplot2grid((3,5),(0,3),sharex=ax2a,sharey=ax2a)
+    ax2d.annotate('d - 20 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2e = plt.subplot2grid((3,5),(0,4),sharex=ax2a,sharey=ax2a)
+    ax2e.annotate('e - 25 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2f = plt.subplot2grid((3,5),(1,0),sharex=ax2a,sharey=ax2a)
+    ax2f.set_title('SAF03 - moderately logged', fontsize=10)
+    ax2f.set_ylabel('height / m',fontsize=axis_size)
+    ax2f.annotate('f - 5 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2g = plt.subplot2grid((3,5),(1,1),sharex=ax2a,sharey=ax2a)
+    ax2g.annotate('g - 10 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2h = plt.subplot2grid((3,5),(1,2),sharex=ax2a,sharey=ax2a)
+    ax2h.annotate('h - 15 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2i = plt.subplot2grid((3,5),(1,3),sharex=ax2a,sharey=ax2a)
+    ax2i.annotate('i - 20 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2j = plt.subplot2grid((3,5),(1,4),sharex=ax2a,sharey=ax2a)
+    ax2j.annotate('j - 25 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2k = plt.subplot2grid((3,5),(2,0),sharex=ax2a,sharey=ax2a)
+    ax2k.set_title('SAF02 - heavily logged', fontsize=10)
+    ax2k.set_ylabel('height / m',fontsize=axis_size)
+    ax2k.annotate('k - 5 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2l = plt.subplot2grid((3,5),(2,1),sharex=ax2a,sharey=ax2a)
+    ax2l.annotate('l - 10 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2m = plt.subplot2grid((3,5),(2,2),sharex=ax2a,sharey=ax2a)
+    ax2m.annotate('m - 15 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2n = plt.subplot2grid((3,5),(2,3),sharex=ax2a,sharey=ax2a)
+    ax2n.annotate('n - 20 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    ax2o = plt.subplot2grid((3,5),(2,4),sharex=ax2a,sharey=ax2a)
+    ax2o.annotate('o - 25 shots m$^{-2}$', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=8)
+
+    # loop through the subplots
+    sp = [ax2a,ax2b,ax2c,ax2d,ax2e,ax2f,ax2g,ax2h,ax2i,ax2j,ax2k,ax2l,ax2m,ax2n,ax2o]
+    pkeys = ['5','10','15','20','25']
+    for pp in range(0,len(sp)):
+        if pp<5:
+            rad_sp = np.nanmean(PAD_profiles_rad_Belian['20m'][pkeys[pp]],axis=1)
+            MH_sp = np.nanmean(PAD_profiles_MH_Belian['20m'][pkeys[pp]],axis=1)
+        elif pp<10:
+            rad_sp = np.nanmean(PAD_profiles_rad_E['20m'][pkeys[pp-5]],axis=1)
+            MH_sp = np.nanmean(PAD_profiles_MH_E['20m'][pkeys[pp-5]],axis=1)
+        else:
+            rad_sp = np.nanmean(PAD_profiles_rad_BNorth['20m'][pkeys[pp-10]],axis=1)
+            MH_sp = np.nanmean(PAD_profiles_MH_BNorth['20m'][pkeys[pp-10]],axis=1)
+
+        rad = np.nanmedian(rad_sp,axis=0)
+        radperc = np.nanpercentile(rad_sp,[2.5,97.5],axis=0)
+        sp[pp].fill_betweenx(heights[2:],radperc[0][2:],radperc[1][2:],color=colour[1],alpha=0.3)
+
+        MH = np.median(MH_sp,axis=0)
+        MHperc = np.percentile(MH_sp,[2.5,97.5],axis=0)
+        sp[pp].fill_betweenx(heights[2:],MHperc[0][2:],MHperc[1][2:],color=colour[0],alpha=0.3)
+
+        if pp==14:
+            sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5, label = 'MacArthur-Horn')
+            sp[pp].plot(rad[2:],heights[2:],'-',c=colour[1],linewidth=1.5, label = 'multi return\nrad trans')
+            sp[pp].legend(loc=9, bbox_to_anchor=(-0.1, -0.15), ncol=3)#(loc='upper right')
+        else:
+            sp[pp].plot(MH[2:],heights[2:],'-',c=colour[0],linewidth=1.5)
+            sp[pp].plot(rad[2:],heights[2:],'-',c=colour[1],linewidth=1.5)
+
+    ax2a.set_ylim(0,89);ax2a.set_xlim(0,0.55)
+
+    yticklabels = ax2b.get_yticklabels() + ax2c.get_yticklabels() + ax2d.get_yticklabels() + ax2e.get_yticklabels() + \
+                  ax2g.get_yticklabels() + ax2h.get_yticklabels() + ax2i.get_yticklabels() + ax2j.get_yticklabels() + \
+                  ax2l.get_yticklabels() + ax2m.get_yticklabels() + ax2n.get_yticklabels() + ax2o.get_yticklabels()
+    xticklabels = ax2a.get_xticklabels() + ax2b.get_xticklabels() + ax2c.get_xticklabels() + ax2d.get_xticklabels() + ax2e.get_xticklabels() + \
+                  ax2f.get_xticklabels() + ax2g.get_xticklabels() + ax2h.get_xticklabels() + ax2i.get_xticklabels() + ax2j.get_xticklabels()
+
+    plt.setp(yticklabels,visible=False);plt.setp(xticklabels,visible=False)
+
+    for ax in sp:
+        ax.locator_params(axis='x',nbins=5)
+        ax.yaxis.set_ticks_position('both')
+
+    plt.subplots_adjust(hspace=0.4, wspace = 0.2, bottom = 0.2)
+
+    fig.text(0.5, 0.15, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
+
+    plt.savefig(figure_name)
+    plt.show()
+    return 0
 
 """
 Plot sensitivity of 1ha profiles to point density
 """
-def plot_profile_sensitivity_point_density(figure_number,figure_name,heights,PAD_profiles_MH_Belian,
+def plot_profile_sensitivity_point_density_old(figure_number,figure_name,heights,PAD_profiles_MH_Belian,
                             PAD_profiles_MH_BNorth,PAD_profiles_MH_E,PAD_profiles_rad_Belian,
                             PAD_profiles_rad_BNorth,PAD_profiles_rad_E):
 
@@ -605,6 +826,157 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
         else:
             axe.legend(loc = (0.3,-0.5))
     plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.2)
+    plt.savefig(figure_name)
+
+    plt.show()
+
+
+def plot_PAI_sensitivity_resolution(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_profiles_MH_BNorth,PAD_profiles_MH_E,
+                    PAD_profiles_rad_Belian,PAD_profiles_rad_BNorth,PAD_profiles_rad_E):
+
+    res_keys = ['10m','20m','50m','100m']
+    N_res = len(res_keys)
+    dens_keys = ['25']
+    N_dens = len(dens_keys)
+    dens = []
+    res = []
+    PAI_MH = np.arange(0)
+    PAI_rad = np.arange(0)
+    plot = []
+    plot_name = ['MLA01','SAF03','SAF02']
+    for rr in range(0,N_res):
+        for dd in range(0,N_dens):
+            for pp in range(0,len(plot_name)):
+                if pp==0:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+                if pp==1:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+                if pp==2:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+
+    df = pd.DataFrame({'plot' : plot,'point density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_rad':PAI_rad})
+
+    pp=0
+    fig = plt.figure(figure_number, facecolor='White',figsize=(6,4))
+    axa = plt.subplot2grid((1,2),(0,0))
+    axa.set_title('a - MacArthur-Horn', fontsize=10)
+    axa.set_ylabel('PAI',fontsize=axis_size)
+    sns.violinplot(x='resolution',y='PAI_MH',data=df,linewidth=0.5,inner='box',
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7)#,cut=0)
+    axa.set_xlabel('grid resolution')
+    axa.set_ylabel('PAI',fontsize=axis_size)
+
+    axb = plt.subplot2grid((1,2),(0,1),sharex=axa,sharey=axa)
+    axb.set_title('b - multi return radiative transfer', fontsize=10)
+    sns.violinplot(x='resolution',y='PAI_rad',data=df,linewidth=0.5,inner='box',
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7)#,cut=0)
+    axb.set_ylabel('')
+    axb.set_xlabel('grid resolution')
+    axa.set_ylim(top=16)
+
+    axes =[axa,axb]
+    plt.setp(axb.get_yticklabels(),visible=False)
+
+    for ax in axes:
+        ax.yaxis.set_ticks_position('both')
+        if ax!=axb:
+            ax.legend_.remove()
+        else:
+            axb.legend(loc = (-0.7,-0.3),ncol=3)
+    plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
+    plt.savefig(figure_name)
+
+    plt.show()
+
+def plot_PAI_sensitivity_density(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_profiles_MH_BNorth,PAD_profiles_MH_E,
+                    PAD_profiles_rad_Belian,PAD_profiles_rad_BNorth,PAD_profiles_rad_E):
+
+    res_keys = ['20m']
+    N_res = len(res_keys)
+    dens_keys = ['5','10','15','20','25']
+    N_dens = len(dens_keys)
+    dens = []
+    res = []
+    PAI_MH = np.arange(0)
+    PAI_rad = np.arange(0)
+    plot = []
+    plot_name = ['MLA01','SAF03','SAF02']
+    for rr in range(0,N_res):
+        for dd in range(0,N_dens):
+            for pp in range(0,len(plot_name)):
+                if pp==0:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+                if pp==1:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+                if pp==2:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+
+    df = pd.DataFrame({'plot' : plot,'density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_rad':PAI_rad})
+    df['density'][df['density']=='5']='05'
+    pp=0
+    fig = plt.figure(figure_number, facecolor='White',figsize=(6,4))
+    axa = plt.subplot2grid((1,2),(0,0))
+    axa.set_title('a - MacArthur-Horn', fontsize=10)
+    axa.set_ylabel('PAI',fontsize=axis_size)
+    sns.violinplot(x='density',y='PAI_MH',data=df,linewidth=0.5,inner='box',
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7)#,cut=0)
+    axa.set_xlabel('pulse density / pts m$^{-2}$')
+    axa.set_ylabel('PAI',fontsize=axis_size)
+
+    axb = plt.subplot2grid((1,2),(0,1),sharex=axa,sharey=axa)
+    axb.set_title('b - multi return radiative transfer', fontsize=10)
+    sns.violinplot(x='density',y='PAI_rad',data=df,linewidth=0.5,inner='box',
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7)#,cut=0)
+    axb.set_ylabel('')
+    axb.set_xlabel('pulse density / pts m$^{-2}$')
+    axa.set_ylim(top=16)
+
+    axes =[axa,axb]
+    plt.setp(axb.get_yticklabels(),visible=False)
+
+    for ax in axes:
+        ax.yaxis.set_ticks_position('both')
+        if ax!=axb:
+            ax.legend_.remove()
+        else:
+            axb.legend(loc = (-0.7,-0.3),ncol=3)
+    plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
     plt.savefig(figure_name)
 
     plt.show()

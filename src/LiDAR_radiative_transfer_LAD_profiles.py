@@ -433,7 +433,8 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([]),test_sensitivity=True):
         # that if sensitivity is an order of magnitde or more, then should be
         # considered unreliable.
         sensitivity = sensitivity_test(pts,n,max_k,tl,zi,u.copy())
-        status[sensitivity>10]=3 # set nan-values if sensitivity is greater than factor of ten
+        status[sensitivity>2]=3 # set nan-values if sensitivity is greater than factor of two
+        #status[sensitivity>10]=3 # set nan-values if sensitivity is greater than factor of ten
 
     # Now do the interpolation across nodata gaps.
     u[status==1] = 0. # status 1 -> no returns, but above penetration limit

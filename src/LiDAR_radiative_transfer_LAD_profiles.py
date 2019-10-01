@@ -433,10 +433,7 @@ def calculate_LAD(pts,zi,max_k,tl,n=np.array([]),test_sensitivity=True):
         # that if sensitivity is an order of magnitde or more, then should be
         # considered unreliable.
         sensitivity = sensitivity_test(pts,n,max_k,tl,zi,u.copy())
-        #print_mask = np.all((zi[::-1]>1,u>2),axis =0)
-        #if print_mask.sum()>0:
-        #    print(zi[::-1][print_mask],u[print_mask],sensitivity[print_mask])
-        status[sensitivity>=2]=3 # set nan-values if sensitivity is on order of magnitude
+        status[sensitivity>10]=3 # set nan-values if sensitivity is greater than factor of ten
 
     # Now do the interpolation across nodata gaps.
     u[status==1] = 0. # status 1 -> no returns, but above penetration limit
@@ -497,13 +494,13 @@ def Gfunction(LAD,ze,zi):
 # "missing information" from the LiDAR returns, especially within the lower canopy
 # that manifests itself as a negative bias in leaf area lower in the canopy.
 
-def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
+def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10,test_sensitivity=True):
 
     # First check -  if there are not sufficient later returns, then the results from their
     # inclusion are likely to be poor.  In the simplest case, there are not enought returns
     # at k=kmax, irrespective of scan angle. Therefore, we decrease kmax to compensate.
     while np.all((np.sum(pts[:,3]==max_k)<min_returns, max_k>1)):
-        print('\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1)
+        #print('\t\t WARNING: not enough returns for kmax = ', max_k, '. Resetting kmax = ', max_k-1)
         max_k-=1
     #print "Calculating LAD using radiative tranfer model"
     # first unpack pts
@@ -597,8 +594,8 @@ def calculate_LAD_DTM(pts,zi,max_k,tl,min_returns = 10):
             else:
                 CF[s,k]=N_veg_kprev/N_k
             n[:,s,k]*=np.product(CF[s,:this_k])
-    #n[:,:,0]+=1
-    u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n,test_sensitivity=True)
+
+    u,n,I,U = calculate_LAD(pts,zi,max_k,tl,n,test_sensitivity=test_sensitivity)
 
     return u,n,I,U
 
@@ -729,11 +726,21 @@ def calculate_LAD_DTM_old(pts,zi,max_k,tl,min_returns = 10):
 def sensitivity_test(pts,n,max_k,tl,zi,u):
     levels = n.shape[0]
     sensitivity = np.zeros(levels)
+
+    # Full version, which iterates through the canopy layers
     for mm in range(levels):
         n_test=n.copy()
         n_test[mm,:,0]+=1 # add extra first return to this canopy depth
         u_test,n_test,I_test,U_test = calculate_LAD(pts,zi,max_k,tl,n=n_test,test_sensitivity=False)
         sensitivity[mm]=(u/u_test)[mm]
+
+    # alternative version which doesn't require iterating 80 times, but gives
+    # similar results
+    #n_test=n.copy()
+    #n_test[:,:,0]+=1 # add extra first return to this canopy depth
+    #u_test,n_test,I_test,U_test = calculate_LAD(pts,zi,max_k,tl,n=n_test,test_sensitivity=False)
+    #sensitivity=(u/u_test)
+
     return sensitivity
 
 # Overall wrapper for radiative transfer model

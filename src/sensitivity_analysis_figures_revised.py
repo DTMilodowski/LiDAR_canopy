@@ -8,13 +8,17 @@ output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCan
 max_height=80
 heights = np.arange(0.,max_height)+1
 
+resolution_wt_Belian = np.load('MH_resolution_wt_sensitivity_adaptive_Belian.npy')[()]
+resolution_wt_BNorth = np.load('MH_resolution_wt_sensitivity_adaptive_BNorth.npy')[()]
+resolution_wt_E = np.load('MH_resolution_wt_sensitivity_adaptive_E.npy')[()]
+
 resolution_MH_Belian = np.load('MH_resolution_sensitivity_adaptive_Belian.npy')[()]
 resolution_MH_BNorth = np.load('MH_resolution_sensitivity_adaptive_BNorth.npy')[()]
 resolution_MH_E = np.load('MH_resolution_sensitivity_adaptive_E.npy')[()]
 
-resolution_rad_Belian = np.load('rad2_resolution_sensitivity_adaptive_Belian.npy')[()]
-resolution_rad_BNorth = np.load('rad2_resolution_sensitivity_adaptive_BNorth.npy')[()]
-resolution_rad_E = np.load('rad2_resolution_sensitivity_adaptive_E.npy')[()]
+resolution_rad_Belian = np.load('rad2_resolution_sensitivity_adaptive_Belian_sensitivity2.npy')[()]
+resolution_rad_BNorth = np.load('rad2_resolution_sensitivity_adaptive_BNorth_sensitivity2.npy')[()]
+resolution_rad_E = np.load('rad2_resolution_sensitivity_adaptive_E_sensitivity2.npy')[()]
 
 penetration_lim_Belian = np.load('penetration_limit_resolution_adaptive_Belian.npy')[()]
 penetration_lim_BNorth = np.load('penetration_limit_resolution_adaptive_BNorth.npy')[()]
@@ -24,10 +28,13 @@ density_MH_Belian = np.load('MH_density_sensitivity_Belian.npy')[()]
 density_MH_BNorth = np.load('MH_density_sensitivity_BNorth.npy')[()]
 density_MH_E = np.load('MH_density_sensitivity_E.npy')[()]
 
-density_rad_Belian = np.load('rad2_density_sensitivity_Belian.npy')[()]
-density_rad_BNorth = np.load('rad2_density_sensitivity_BNorth.npy')[()]
-density_rad_E = np.load('rad2_density_sensitivity_E.npy')[()]
+density_rad_Belian = np.load('rad2_density_sensitivity_Belian_sensitivity2.npy')[()]
+density_rad_BNorth = np.load('rad2_density_sensitivity_BNorth_sensitivity2.npy')[()]
+density_rad_E = np.load('rad2_density_sensitivity_E_sensitivity2.npy')[()]
 
+density_wt_Belian = np.load('MH_wt_density_sensitivity_Belian.npy')[()]
+density_wt_BNorth = np.load('MH_wt_density_sensitivity_BNorth.npy')[()]
+density_wt_E = np.load('MH_wt_density_sensitivity_E.npy')[()]
 
 #-------------------------------
 # RESULTS - SENSITIVITY ANALYSIS
@@ -37,10 +44,11 @@ density_rad_E = np.load('rad2_density_sensitivity_E.npy')[()]
  Comparison of OG vs Moderately Logged vs. Heavily Logged
 """
 figure_number = 8
-figure_name = output_dir + "fig8_profile_sensitivity_to_resolution_adaptive.png"
-sp.plot_profile_sensitivity_resolution(figure_number,figure_name,heights,resolution_MH_Belian,
+figure_name = output_dir + "fig8_profile_sensitivity_to_resolution_adaptive_sensitivity2.png"
+sp.plot_profile_sensitivity_resolution_full(figure_number,figure_name,heights,resolution_MH_Belian,
                             resolution_MH_BNorth,resolution_MH_E,resolution_rad_Belian,
-                            resolution_rad_BNorth,resolution_rad_E)
+                            resolution_rad_BNorth,resolution_rad_E,resolution_wt_Belian,
+                            resolution_wt_BNorth,resolution_wt_E)
 
 """
 Figure 9 - Sensitivity analysis of unsampled voxels
@@ -57,24 +65,26 @@ figure_number = 10
 figure_name = output_dir + "fig10_profile_sensitivity_to_pulse_density.png"
 sp.plot_profile_sensitivity_density(figure_number,figure_name,heights,density_MH_Belian,
                             density_MH_BNorth,density_MH_E,density_rad_Belian,
-                            density_rad_BNorth,density_rad_E)
+                            density_rad_BNorth,density_rad_E,density_wt_Belian,
+                            density_wt_BNorth,density_wt_E)
 
 """
 # Figure 11 - Summary plots from sensitivity analysis for PAI vs. resolution
 """
 figure_number = 11
-figure_name = output_dir + "fig11_PAI_sensitivity_resolution.png"
+figure_name = output_dir + "fig11_PAI_sensitivity_resolution_sensitivity2.png"
 sp.plot_PAI_sensitivity_resolution(figure_number,figure_name,resolution_MH_Belian,
                         resolution_MH_BNorth,resolution_MH_E,resolution_rad_Belian,
-                        resolution_rad_BNorth,resolution_rad_E)
+                        resolution_rad_BNorth,resolution_rad_E,resolution_wt_Belian,
+                        resolution_wt_BNorth,resolution_wt_E)
 """
 # Figure 12 - Summary plots from sensitivity analysis for PAI vs. pulse density
 """
 figure_number = 12
 figure_name = output_dir + "fig12_PAI_sensitivity_density.png"
 sp.plot_PAI_sensitivity_density(figure_number,figure_name,density_MH_Belian,density_MH_BNorth,
-                        density_MH_E,density_rad_Belian,
-                        density_rad_BNorth,density_rad_E)
+                        density_MH_E,density_rad_Belian,density_rad_BNorth,density_rad_E,
+                        density_wt_Belian,density_wt_BNorth,density_wt_E)
 #-------------------------------
 # SUPPLEMENT
 # RESULTS
@@ -85,11 +95,11 @@ sp.plot_PAI_sensitivity_density(figure_number,figure_name,density_MH_Belian,dens
 figure_number = 115
 figure_name = output_dir + "figS5_profile_sensitivity_to_resolution_individual_CI.png"
 sp.plot_profile_sensitivity_to_resolution_individual_CI(figure_number,figure_name,heights,
-                    PAD_profiles_MH_Belian,PAD_profiles_rad_Belian)
+                    resolution_MH_Belian,resolution_rad_Belian,resolution_wt_Belian)
 """
 # Figure S6 - sensitivity analysis, confidence interval sensitivity to density
 """
 figure_number = 116
 figure_name = output_dir + "figS6_profile_sensitivity_to_point_density_individual_CI.png"
 sp.plot_profile_sensitivity_to_point_density_individual_CI(figure_number,figure_name,heights,
-                    PAD_profiles_MH_Belian,PAD_profiles_rad_Belian)
+                    density_MH_Belian,density_rad_Belian,density_wt_Belian)

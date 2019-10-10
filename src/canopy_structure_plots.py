@@ -552,8 +552,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     axes4 = [ax5a,  ax5b, ax5c, ax5d, ax5e, ax5f]
     axes5 = [ax6a,  ax6b, ax6c, ax6d, ax6e, ax6f]
 
-    yticklabels=[]
-    xticklabels=[]
+    yticklabels=[]; xticklabels=[]
     xticklabels.append(ax1a.get_xticklabels() + ax1b.get_xticklabels() + ax1c.get_xticklabels() + ax1d.get_xticklabels() + ax1e.get_xticklabels())
 
     for pp in range(0,6):
@@ -563,61 +562,39 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
         return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
         for k in range(0,max_return):
             axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1)
+        # plot LIDAR profiles
+        for i in range(0,n_subplots):
+            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.1)
+            axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.1)
+            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.1)
+        axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+        axes3[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+        axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+        # inventory
+        llim,ulim = np.percentile(inventory_PAD_all[Plot_name],[2.5,97.5],axis =0)
+        axes5[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color='black',alpha=0.5)
+        axes5[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c='black',linewidth=2)
 
-            # plot macarthur horn profile
+        #llim,ulim = np.percentile(MacArthurHorn_PAD[Plot_name],[25,75],axis =0)
+        #axes2[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[0],alpha=0.2)
+        #llim,ulim = np.percentile(radiative_DTM_PAD[Plot_name][:,:,1],[25,75],axis =0)
+        #axes3[pp].fill_betweenx(heights_rad[3:],llim[:-3][::-1],ulim[:-3][::-1],color=colour[1],alpha=0.2)
+        # field inventory
+        #for i in range(0,n_subplots):
+            #axes5[pp].fill_betweenx(heights[2:],0,inventory_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
+        #axes5[pp].plot(np.mean(inventory_PAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
+        for ax in [axes1,axes2,axes3,axes4,axes5]:
+            yticklabels.append(ax[pp].get_yticklabels())
+            if pp < 5:
+                xticklabels.append(ax[pp].get_xticklabels())
 
-            for i in range(0,n_subplots):
-                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
-                axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.01)
+    ax1a.set_xlim(0,100); ax1a.set_ylim(0,80)
+    ax2a.set_xlim(0,29);  ax3a.set_xlim(left=0,right=0.7)
 
-            #llim,ulim = np.percentile(MacArthurHorn_PAD[Plot_name],[25,75],axis =0)
-            #axes2[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[0],alpha=0.2)
-            axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
-            axes3[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+    for ax in [ax2f,ax3f,ax4f,ax5f,ax6f]:
+        ax.locator_params(axis='x',nbins=5)
 
-            # plot corrective radiative transfer profile
-
-            for i in range(0,n_subplots):
-                axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
-
-            #llim,ulim = np.percentile(radiative_DTM_PAD[Plot_name][:,:,1],[25,75],axis =0)
-            #axes3[pp].fill_betweenx(heights_rad[3:],llim[:-3][::-1],ulim[:-3][::-1],color=colour[1],alpha=0.2)
-            axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
-
-            # field inventory
-            #for i in range(0,n_subplots):
-                #axes5[pp].fill_betweenx(heights[2:],0,inventory_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
-            #axes5[pp].plot(np.mean(inventory_PAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
-            llim,ulim = np.percentile(inventory_PAD_all[Plot_name],[2.5,97.5],axis =0)
-            axes5[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color='black',alpha=0.2)
-            axes5[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c='black',linewidth=2)
-
-        yticklabels.append(axes1[pp].get_yticklabels())
-        yticklabels.append(axes2[pp].get_yticklabels())
-        yticklabels.append(axes3[pp].get_yticklabels())
-        yticklabels.append(axes4[pp].get_yticklabels())
-        yticklabels.append(axes5[pp].get_yticklabels())
-
-        if pp < 5:
-            xticklabels.append(axes1[pp].get_xticklabels())
-            xticklabels.append(axes2[pp].get_xticklabels())
-            xticklabels.append(axes3[pp].get_xticklabels())
-            xticklabels.append(axes4[pp].get_xticklabels())
-            xticklabels.append(axes5[pp].get_xticklabels())
-
-    ax1a.set_xlim(0,100)
-    ax1a.set_ylim(0,80)
-    ax2a.set_xlim(0,29)
-    ax3a.set_xlim(left=0,right=0.7)
-
-    ax2f.locator_params(axis='x',nbins=5)
-    ax3f.locator_params(axis='x',nbins=5)
-    ax4f.locator_params(axis='x',nbins=5)
-    ax5f.locator_params(axis='x',nbins=5)
-    ax6f.locator_params(axis='x',nbins=5)
-
-    plt.setp(yticklabels,visible=False)
-    plt.setp(xticklabels,visible=False)
+    plt.setp(yticklabels,visible=False);plt.setp(xticklabels,visible=False)
     plt.subplots_adjust(hspace=0.2, wspace = 0.1)
 
     plt.tight_layout()
@@ -625,9 +602,12 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     plt.show()
     return 0
 
-def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,plot_point_cloud,heights,heights_rad,
-                                lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
-                                radiative_DTM_PAD,radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all):
+def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,
+                                plot_point_cloud,heights,heights_rad,lidar_profiles,
+                                MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                                MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
+                                radiative_DTM_PAD,radiative_DTM_PAD_mean,
+                                inventory_PAD,inventory_PAD_all):
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
@@ -668,13 +648,13 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     plt.figure(figure_number, facecolor='White',figsize=[9,4])
 
     # DC1
-    ax1a = plt.subplot2grid((2,6),(0,0),colspan=2)
+    ax1a = plt.subplot2grid((2,7),(0,0),colspan=2)
     ax1a.annotate('a - Old growth, DAN04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
     # DC2
-    ax1b = plt.subplot2grid((2,6),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1b = plt.subplot2grid((2,7),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1b.annotate('b - Old growth, DAN05', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1b.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
@@ -702,85 +682,81 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     #---------------------------------------------------------
     # NOW PLOT PROFILES
     # DC1
-    ax2a = plt.subplot2grid((2,6),(0,2),sharey=ax1a)
+    ax2a = plt.subplot2grid((2,7),(0,2),sharey=ax1a)
     ax2a.annotate('LiDAR returns', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - MacHorn
-    ax3a = plt.subplot2grid((2,6),(0,3),sharey=ax1a)
-    ax3a.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
-    # - Detto
-    ax4a = plt.subplot2grid((2,6),(0,4),sharey=ax1a,sharex=ax3a)
-    ax4a.annotate('multi. return \nrad. trans.', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
-    # - Corrected rad trans
-    ax5a = plt.subplot2grid((2,6),(0,5),sharey=ax1a,sharex=ax3a)
+    ax3a = plt.subplot2grid((2,7),(0,3),sharey=ax1a)
+    ax3a.annotate('M1a', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    ax4a = plt.subplot2grid((2,7),(0,4),sharey=ax1a,sharex=ax3a)
+    ax4a.annotate('M1b', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    # - rad. trans
+    ax5a = plt.subplot2grid((2,7),(0,5),sharey=ax1a,sharex=ax3a)
+    ax5a.annotate('M2', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    # - crown volume
+    ax5a = plt.subplot2grid((2,7),(0,5),sharey=ax1a,sharex=ax3a)
     ax5a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 
     # Danum 2
-    ax2b = plt.subplot2grid((2,6),(1,2), sharex = ax2a, sharey = ax1a)
+    ax2b = plt.subplot2grid((2,7),(1,2), sharex = ax2a, sharey = ax1a)
     ax2b.set_xlabel('Number of returns',fontsize=axis_size,horizontalalignment='center')
     # - MacHorn
-    ax3b = plt.subplot2grid((2,6),(1,3),sharey=ax1a, sharex=ax3a)
+    ax3b = plt.subplot2grid((2,7),(1,3),sharey=ax1a, sharex=ax3a)
     ax3b.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
-    # - Corrected rad trans
-    ax4b = plt.subplot2grid((2,6),(1,4),sharey=ax1a,sharex=ax3a)
+    ax4b = plt.subplot2grid((2,7),(1,4),sharey=ax1a,sharex=ax3a)
     ax4b.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    # - Corrected rad trans
+    ax5b = plt.subplot2grid((2,7),(1,5),sharey=ax1a,sharex=ax3a)
+    ax5b.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
     # - Inventory
-    ax5b = plt.subplot2grid((2,6),(1,5),sharey=ax1a,sharex=ax3a)
-    ax5b.set_xlabel('Crown Volume\n(m$^3$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    ax6b = plt.subplot2grid((2,7),(1,6),sharey=ax1a,sharex=ax3a)
+    ax6b.set_xlabel('Crown Volume\n(m$^3$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
 
     axes1 = [ax2a,  ax2b]
     axes2 = [ax3a,  ax3b]
     axes3 =  [ax4a,  ax4b]
     axes4 = [ax5a,  ax5b]
+    axes5 = [ax6a,  ax6b]
 
-    yticklabels=[]
-    xticklabels=[]
+    yticklabels=[]; xticklabels=[]
 
     for pp in range(0,2):
         Plot_name = fig1_plots[pp]
 
-        # plot lidar profile
+        # plot lidar profiles
         return_dist     = np.sum(lidar_profiles[Plot_name],axis=0)
         for k in range(0,max_return):
             axes1[pp].plot(return_dist[:,k],np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1)
 
-            # plot macarthur horn profile
-            for i in range(0,n_subplots):
-                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
-            axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+        # plot macarthur horn profile
+        for i in range(0,n_subplots):
+            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.1)
+            axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.1)
 
-            # plot corrective radiative transfer profile
-            for i in range(0,n_subplots):
-                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
-            axes3[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+        axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+        axes3[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
-            # field inventory
-            llim,ulim = np.percentile(inventory_PAD_all[Plot_name],[2.5,97.5],axis =0)
-            axes4[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[2],alpha=0.2)
-            axes4[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+        # plot corrective radiative transfer profile
+        for i in range(0,n_subplots):
+            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,1][::-1],color=colour[1],alpha=0.1)
+        axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
-        yticklabels.append(axes1[pp].get_yticklabels())
-        yticklabels.append(axes2[pp].get_yticklabels())
-        yticklabels.append(axes3[pp].get_yticklabels())
-        yticklabels.append(axes4[pp].get_yticklabels())
+        # field inventory
+        llim,ulim = np.percentile(inventory_PAD_all[Plot_name],[2.5,97.5],axis =0)
+        axes5[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color='black',alpha=0.5)
+        axes5[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c='black',linewidth=2)
 
-        if pp == 0:
-            xticklabels.append(axes1[pp].get_xticklabels())
-            xticklabels.append(axes2[pp].get_xticklabels())
-            xticklabels.append(axes3[pp].get_xticklabels())
-            xticklabels.append(axes4[pp].get_xticklabels())
+        for ax in [axes1,axes2,axes3,axes4,axes5]:
+            yticklabels.append(ax[pp].get_yticklabels())
+            if pp < 5:
+                xticklabels.append(ax[pp].get_xticklabels())
 
-    ax1a.set_xlim(0,100)
-    ax1a.set_ylim(0,80)
-    ax2a.set_xlim(0,3500)
-    ax3a.set_xlim(left=0,right=0.7)
+    for ax in [ax2b,ax3b,ax4b,ax5b,ax6b]:
+        ax.locator_params(axis='x',nbins=5)
 
-    ax2b.locator_params(axis='x',nbins=4)
-    ax3b.locator_params(axis='x',nbins=5)
-    ax4b.locator_params(axis='x',nbins=5)
-    ax5b.locator_params(axis='x',nbins=5)
+    ax1a.set_xlim(0,100); ax1a.set_ylim(0,80)
+    ax2a.set_xlim(0,3500); ax3a.set_xlim(left=0,right=0.7)
 
-    plt.setp(yticklabels,visible=False)
-    plt.setp(xticklabels,visible=False)
+    plt.setp(yticklabels,visible=False); plt.setp(xticklabels,visible=False)
     plt.subplots_adjust(hspace=0.2, wspace = 0.1)
 
     plt.tight_layout()

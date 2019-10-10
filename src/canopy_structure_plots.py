@@ -564,9 +564,9 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
             axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,'-',c=colour[k],linewidth=1)
         # plot LIDAR profiles
         for i in range(0,n_subplots):
-            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.1)
-            axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.1)
-            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.1)
+            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.05)
+            axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
+            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.05)
         axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
         axes3[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
         axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
@@ -729,15 +729,15 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
 
         # plot macarthur horn profile
         for i in range(0,n_subplots):
-            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.1)
-            axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.1)
+            axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.05)
+            axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
 
         axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
         axes3[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
         # plot corrective radiative transfer profile
         for i in range(0,n_subplots):
-            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,1][::-1],color=colour[1],alpha=0.1)
+            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,1][::-1],color=colour[1],alpha=0.05)
         axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
         # field inventory

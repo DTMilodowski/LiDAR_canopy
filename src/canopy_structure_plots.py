@@ -69,7 +69,7 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
 
     max_return=3
     colour = ['#46E900','#1A2BCE','#E0007F']
-    rgb = [[70,233,0],[26,43,206],[224,0,127]]
+    rgb = [np.array([[70,233,0]]),np.array([[26,43,206]]),np.array([[224,0,127]])]
     labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
 
     # first up, going to need to find affine transformation to rotate the point cloud for
@@ -145,7 +145,7 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
-    rgb = [[70,233,0],[26,43,206],[224,0,127]]
+    rgb = [np.array([[70,233,0]]),np.array([[26,43,206]]),np.array([[224,0,127]])]
     labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
 
     # first up, going to need to find affine transformation to rotate the point cloud for
@@ -388,7 +388,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
-    rgb = [[70,233,0],[26,43,206],[224,0,127]]
+    rgb = [np.array([[70,233,0]]),np.array([[26,43,206]]),np.array([[224,0,127]])]
     labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
 
     # first up, going to need to find affine transformation to rotate the point cloud for
@@ -611,7 +611,7 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
-    rgb = [[70,233,0],[26,43,206],[224,0,127]]
+    rgb = [np.array([[70,233,0]]),np.array([[26,43,206]]),np.array([[224,0,127]])]
     labels = ['$1^{st}$', '$2^{nd}$', '$3^{rd}$', '$4^{th}$']
 
     # first up, going to need to find affine transformation to rotate the point cloud for

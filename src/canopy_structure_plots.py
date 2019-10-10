@@ -529,7 +529,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     ax3e = plt.subplot2grid((6,7),(4,3),sharey=ax1a,sharex=ax3a)
     ax4e = plt.subplot2grid((6,7),(4,4),sharey=ax1a,sharex=ax3a)
     ax5e = plt.subplot2grid((6,7),(4,5),sharey=ax1a,sharex=ax3a)
-    ax5e = plt.subplot2grid((6,7),(4,6),sharey=ax1a,sharex=ax3a)
+    ax6e = plt.subplot2grid((6,7),(4,6),sharey=ax1a,sharex=ax3a)
 
     # B South
     ax2f = plt.subplot2grid((6,7),(5,2), sharex = ax1a, sharey = ax2a)

@@ -239,17 +239,17 @@ csp.plot_cumulative_PAD_histograms(figure_name,figure_number,MacArthurHorn_PAD,h
 # METHODS
 #-------------------------------
 """
-# Figure S2 - "transmission ratio"
+# Figure S1 - "transmission ratio"
 """
-figure_number = 112
-figure_name = output_dir+'figS2_transmittance_ratios.png'
+figure_number = 111
+figure_name = output_dir+'figS1_transmittance_ratios.png'
 csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
 
 """
 # Figure S3 - comparison of Detto vs. modified algorithm
 """
-figure_number = 113
-figure_name = output_dir+'figS3_LiDAR_profiles_comparison_test.png'
+figure_number = 112
+figure_name = output_dir+'figS2_LiDAR_profiles_comparison_test.png'
 csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
                         lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
                         radiative_PAD,radiative_PAD_mean,

@@ -124,7 +124,7 @@ for pp in range(0,N_plots):
     erectophile_PAD_mean[Plot_name] = PAD_ere_mean.copy()
 #----------------------------------------------------------------------------
 # Plot profiles
-figure_name = output_dir+'figS1_leaf_angle_distributions_PAD.png'
-figure_number = 111
+figure_name = output_dir+'figS3_leaf_angle_distributions_PAD.png'
+figure_number = 113
 csp.plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,heights_rad,
                         spherical_PAD_mean,erectophile_PAD_mean,planophile_PAD_mean)

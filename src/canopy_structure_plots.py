@@ -1622,52 +1622,59 @@ def plot_transmittance_ratio(figure_number,figure_name,pts):
 """
 def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
                         lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                        MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
                         radiative_PAD,radiative_PAD_mean,
                         radiative_DTM_PAD,radiative_DTM_PAD_mean):
     max_return=3
     n_subplots = 25
     fig_plots = [b'Belian',b'E',b'B South']
 
-    plt.figure(figure_number, facecolor='White',figsize=[8,8])
+    plt.figure(figure_number, facecolor='White',figsize=[8,7])
 
     # Belian
-    ax1a = plt.subplot2grid((3,4),(0,0))
+    ax1a = plt.subplot2grid((3,5),(0,0))
     ax1a.annotate('a -  MLA01\nOld growth', xy=(0.05,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
                 fontsize=10)
     ax1a.annotate('Return profile', xy=(0.95,0.05), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='bottom', fontsize=9)
-    ax2a = plt.subplot2grid((3,4),(0,1),sharey=ax1a)
-    ax2a.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',
+    ax2a = plt.subplot2grid((3,5),(0,1),sharey=ax1a)
+    ax2a.annotate('M1a', xy=(0.95,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
-    ax3a = plt.subplot2grid((3,4),(0,2),sharey=ax1a,sharex=ax2a)
-    ax3a.annotate('multi. return \nrad. trans.\npre-correction', xy=(0.95,0.95),
+    ax3a = plt.subplot2grid((3,5),(0,2),sharey=ax1a,sharex=ax2a)
+    ax3a.annotate('M1b', xy=(0.95,0.95),
                 xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
-    ax4a = plt.subplot2grid((3,4),(0,3),sharey=ax1a,sharex=ax2a)
-    ax4a.annotate('multi. return \nrad. trans.\npost-correction', xy=(0.95,0.95),
+    ax4a = plt.subplot2grid((3,5),(0,3),sharey=ax1a,sharex=ax2a)
+    ax4a.annotate('M2 (pre-correction)', xy=(0.95,0.95),
+                xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right',
+                verticalalignment='top', fontsize=9)
+    ax5a = plt.subplot2grid((3,5),(0,4),sharey=ax1a,sharex=ax2a)
+    ax5a.annotate('M2 (post-correction', xy=(0.95,0.95),
                 xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right',
                 verticalalignment='top', fontsize=9)
 
     # E
-    ax1b = plt.subplot2grid((3,4),(1,0),sharey=ax1a,sharex=ax1a)
+    ax1b = plt.subplot2grid((3,5),(1,0),sharey=ax1a,sharex=ax1a)
     ax1b.annotate('b - SAF05\nModerately logged', xy=(0.05,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
                 fontsize=10)
-    ax2b = plt.subplot2grid((3,4),(1,1),sharey=ax1a,sharex=ax2a)
-    ax3b = plt.subplot2grid((3,4),(1,2),sharey=ax1a,sharex=ax3a)
-    ax4b = plt.subplot2grid((3,4),(1,3),sharey=ax1a,sharex=ax3a)
+    ax2b = plt.subplot2grid((3,5),(1,1),sharey=ax1a,sharex=ax2a)
+    ax3b = plt.subplot2grid((3,5),(1,2),sharey=ax1a,sharex=ax3a)
+    ax4b = plt.subplot2grid((3,5),(1,3),sharey=ax1a,sharex=ax3a)
+    ax5b = plt.subplot2grid((3,5),(1,4),sharey=ax1a,sharex=ax3a)
 
     # B South
-    ax1c = plt.subplot2grid((3,4),(2,0),sharey=ax1a,sharex=ax1a)
+    ax1c = plt.subplot2grid((3,5),(2,0),sharey=ax1a,sharex=ax1a)
     ax1c.annotate('c - SAF01\nHeavily logged', xy=(0.05,0.95), xycoords='axes fraction',
                 backgroundcolor='none',horizontalalignment='left', verticalalignment='top',
                 fontsize=10)
-    ax2c = plt.subplot2grid((3,4),(2,1),sharey=ax1a,sharex=ax2a)
-    ax3c = plt.subplot2grid((3,4),(2,2),sharey=ax1a,sharex=ax3a)
-    ax4c = plt.subplot2grid((3,4),(2,3),sharey=ax1a,sharex=ax3a)
+    ax2c = plt.subplot2grid((3,5),(2,1),sharey=ax1a,sharex=ax2a)
+    ax3c = plt.subplot2grid((3,5),(2,2),sharey=ax1a,sharex=ax3a)
+    ax4c = plt.subplot2grid((3,5),(2,3),sharey=ax1a,sharex=ax3a)
+    ax5c = plt.subplot2grid((3,5),(2,4),sharey=ax1a,sharex=ax3a)
 
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
     ax1b.set_ylabel('Height / m',fontsize=axis_size)
@@ -1676,15 +1683,14 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
     ax2c.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
     ax3c.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
     ax4c.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    ax5c.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
     #---------------------------------------------------------
 
-    axes1 = [ax1a,  ax1b, ax1c]
-    axes2 = [ax2a,  ax2b, ax2c]
-    axes3 =  [ax3a,  ax3b, ax3c]
-    axes4 = [ax4a,  ax4b, ax4c]
+    axes1 = [ax1a, ax1b, ax1c]; axes2 = [ax2a,  ax2b, ax2c]
+    axes3 = [ax3a, ax3b, ax3c]; axes4 = [ax4a,  ax4b, ax4c]
+    axes5 = [ax5a,  ax5b, ax5c]
 
-    yticklabels=[]
-    xticklabels=[]
+    yticklabels=[]; xticklabels=[]
 
     for pp in range(0,3):
         Plot_name = fig_plots[pp]
@@ -1695,47 +1701,33 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
             axes1[pp].plot(return_dist[:,k]/1000.,np.max(heights_rad)-heights_rad,
             '-',c=colour[k], linewidth=1)
 
-        # plot macarthur horn profile
         for i in range(0,n_subplots):
             axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],
-                                    color=colour[0],alpha=0.02)
+                                    color=colour[0],alpha=0.05)
+            axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],
+                                    color=colour[2],alpha=0.05)
+            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_PAD[Plot_name][i,:-3,1][::-1],
+                                    color=colour[1],alpha=0.05)
+            axes5[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,1][::-1],
+                                    color=colour[1],alpha=0.05)
         axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+        axes3[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+        axes4[pp].plot(radiative_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+        axes5[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
-        # plot original Detto radiative transfer profile
-        for i in range(0,n_subplots):
-            axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_PAD[Plot_name][i,:-3,1][::-1],
-                                    color=colour[1],alpha=0.02)
-        axes3[pp].plot(radiative_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
-                                    '-',c=colour[1],linewidth=2)
+        axes = [axes2,axes3,axes4,axes5]
+        for ax in axes:
+            yticklabels.append(ax[pp].get_yticklabels())
+            if pp < 2:
+                xticklabels.append(ax[pp].get_xticklabels())
 
-        # plot corrective radiative transfer profile
-        for i in range(0,n_subplots):
-            axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],
-                                    color=colour[1],alpha=0.02)
-        axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],
-                                    '-',c=colour[1],linewidth=2)
+    ax1a.set_ylim(0,80); ax1a.set_xlim(0,29); ax2a.set_xlim(left=0,right=0.7)
 
+    axes = [ax2c,ax3c,ax4c,ax5c]
+    for ax in axes:
+        ax.locator_params(axis='x',nbins=5)
 
-        yticklabels.append(axes2[pp].get_yticklabels())
-        yticklabels.append(axes3[pp].get_yticklabels())
-        yticklabels.append(axes4[pp].get_yticklabels())
-
-        if pp < 2:
-            xticklabels.append(axes1[pp].get_xticklabels())
-            xticklabels.append(axes2[pp].get_xticklabels())
-            xticklabels.append(axes3[pp].get_xticklabels())
-            xticklabels.append(axes4[pp].get_xticklabels())
-
-    ax1a.set_ylim(0,80)
-    ax1a.set_xlim(0,29)
-    ax2a.set_xlim(left=0,right=0.7)
-
-    ax2c.locator_params(axis='x',nbins=5)
-    ax3c.locator_params(axis='x',nbins=5)
-    ax4c.locator_params(axis='x',nbins=5)
-
-    plt.setp(yticklabels,visible=False)
-    plt.setp(xticklabels,visible=False)
+    plt.setp(yticklabels,visible=False);plt.setp(xticklabels,visible=False)
     plt.subplots_adjust(hspace=0.2, wspace = 0.1)
 
     plt.tight_layout()

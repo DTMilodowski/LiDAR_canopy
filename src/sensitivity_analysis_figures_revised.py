@@ -40,66 +40,67 @@ density_wt_E = np.load('MH_wt_density_sensitivity_E.npy')[()]
 # RESULTS - SENSITIVITY ANALYSIS
 #-------------------------------
 """
- Figure 8 - Sensitivity analysis of vertical profiles to spatial resolution
+ Figure 5 - Sensitivity analysis of vertical profiles to spatial resolution
  Comparison of OG vs Moderately Logged vs. Heavily Logged
 """
-figure_number = 8
-figure_name = output_dir + "fig8_profile_sensitivity_to_resolution_adaptive_sensitivity2.png"
+figure_number = 5
+figure_name = output_dir + "fig5_profile_sensitivity_to_resolution_adaptive_sensitivity.png"
 sp.plot_profile_sensitivity_resolution_full(figure_number,figure_name,heights,resolution_MH_Belian,
                             resolution_MH_BNorth,resolution_MH_E,resolution_rad_Belian,
                             resolution_rad_BNorth,resolution_rad_E,resolution_wt_Belian,
                             resolution_wt_BNorth,resolution_wt_E)
 
 """
-Figure 9 - Sensitivity analysis of unsampled voxels
+# Figure 6 - Sensitivity analysis of vertical profiles to point density
 """
-figure_number = 9
-figure_name = output_dir + "figs9_unsampled_voxels.png"
-sp.plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Belian,
-                            penetration_lim_E,penetration_lim_BNorth)
-
-"""
-# Figure 10 - Sensitivity analysis of vertical profiles to point density
-"""
-figure_number = 10
-figure_name = output_dir + "fig10_profile_sensitivity_to_pulse_density.png"
+figure_number = 6
+figure_name = output_dir + "fig6_profile_sensitivity_to_pulse_density.png"
 sp.plot_profile_sensitivity_density(figure_number,figure_name,heights,density_MH_Belian,
                             density_MH_BNorth,density_MH_E,density_rad_Belian,
                             density_rad_BNorth,density_rad_E,density_wt_Belian,
                             density_wt_BNorth,density_wt_E)
 
 """
-# Figure 11 - Summary plots from sensitivity analysis for PAI vs. resolution
+# Figure 7 - Summary plots from sensitivity analysis for PAI vs. resolution
 """
-figure_number = 11
-figure_name = output_dir + "fig11_PAI_sensitivity_resolution_sensitivity2.png"
+figure_number = 7
+figure_name = output_dir + "fig7_PAI_sensitivity_resolution_sensitivity.png"
 sp.plot_PAI_sensitivity_resolution(figure_number,figure_name,resolution_MH_Belian,
                         resolution_MH_BNorth,resolution_MH_E,resolution_rad_Belian,
                         resolution_rad_BNorth,resolution_rad_E,resolution_wt_Belian,
                         resolution_wt_BNorth,resolution_wt_E)
 """
-# Figure 12 - Summary plots from sensitivity analysis for PAI vs. pulse density
+# Figure 8 - Summary plots from sensitivity analysis for PAI vs. pulse density
 """
-figure_number = 12
-figure_name = output_dir + "fig12_PAI_sensitivity_density.png"
+figure_number = 8
+figure_name = output_dir + "fig8_PAI_sensitivity_density.png"
 sp.plot_PAI_sensitivity_density(figure_number,figure_name,density_MH_Belian,density_MH_BNorth,
                         density_MH_E,density_rad_Belian,density_rad_BNorth,density_rad_E,
                         density_wt_Belian,density_wt_BNorth,density_wt_E)
+
 #-------------------------------
 # SUPPLEMENT
 # RESULTS
 #-------------------------------
 """
-# Figure S5 - sensitivity analysis, confidence interval sensitivity to resolution
+Figure S7 - Sensitivity analysis of unsampled voxels
 """
-figure_number = 115
-figure_name = output_dir + "figS5_profile_sensitivity_to_resolution_individual_CI.png"
+figure_number = 117
+figure_name = output_dir + "figS7_unsampled_voxels.png"
+sp.plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Belian,
+                            penetration_lim_E,penetration_lim_BNorth)
+
+"""
+# Figure S8 - sensitivity analysis, confidence interval sensitivity to resolution
+"""
+figure_number = 118
+figure_name = output_dir + "figS8_profile_sensitivity_to_resolution_individual_CI.png"
 sp.plot_profile_sensitivity_to_resolution_individual_CI(figure_number,figure_name,heights,
                     resolution_MH_Belian,resolution_rad_Belian,resolution_wt_Belian)
 """
-# Figure S6 - sensitivity analysis, confidence interval sensitivity to density
+# Figure S9 - sensitivity analysis, confidence interval sensitivity to density
 """
-figure_number = 116
-figure_name = output_dir + "figS6_profile_sensitivity_to_point_density_individual_CI.png"
+figure_number = 119
+figure_name = output_dir + "figS9_profile_sensitivity_to_point_density_individual_CI.png"
 sp.plot_profile_sensitivity_to_point_density_individual_CI(figure_number,figure_name,heights,
                     density_MH_Belian,density_rad_Belian,density_wt_Belian)

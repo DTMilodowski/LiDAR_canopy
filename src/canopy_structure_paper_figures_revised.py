@@ -149,52 +149,16 @@ figure_name = output_dir+'Fig2_sample_point_cloud.png'
 figure_number = 2
 csp.plot_point_cloud(figure_name,figure_number,gps_pts_file,plot_point_cloud)
 
-"""
-# Figure 3 - example crown model
-"""
-figure_number = 3
-figure_name = output_dir+'fig3_crown_model_example'
-Plot_name = b'Belian'
-angle = 45.
-csp.plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
-                    a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
-
-"""
-# Figure 4 - Allometric models; include confidence intervals, and add vertical band
-# illustrating the 10 cm DBH cutoff
-"""
-figure_name = output_dir + 'Fig4_allometric_relationships.png'
-figure_number = 4
-csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file)
 
 #-------------------------------
 # RESULTS - STRUCTURAL CHANGES
 #           ACROSS GRADIENT
 #-------------------------------
 """
-# Figure 5 - Point clouds and profiles across degradation gradient
+# Figure 3 - PAI plotted against basal area
 """
-figure_name = output_dir + 'Fig5_pointclouds_and_profiles_test.png'
-figure_number = 5
-gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
-csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
-                        plot_point_cloud,heights,heights_rad, lidar_profiles,
-                        MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_DTM_PAD,
-                        radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all)
-
-"""
-# Figure 6 - Cross-plot canopy layers
-"""
-figure_name = output_dir + 'Fig6_crossplot_LiDAR_PAD_residual_profiles.png'
-figure_number = 6
-csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_PAD,
-                MacArthurHorn_PAD_mean,radiative_DTM_PAD,radiative_DTM_PAD_mean)
-
-"""
-# Figure 7 - PAI plotted against basal area
-"""
-figure_name = output_dir + 'Fig7_PAI_vs_basal_area_test.png'
-figure_number = 7
+figure_name = output_dir + 'Fig3_PAI_vs_basal_area.png'
+figure_number = 3
 
 # Basal area (m^2 / ha) and standard errors
 # data from table 1 of Riutta et al, GCB, 2018
@@ -221,38 +185,35 @@ plot_label = {}
 plot_label['Belian']='MLA01';plot_label['Seraya']='MLA02';plot_label['DC1']='DAN04';plot_label['DC2']='DAN05'
 plot_label['LF']='SAF04';plot_label['E']='SAF03';plot_label['B North']='SAF02';plot_label['B South']='SAF01'
 csp.plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                            MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
                             radiative_DTM_PAD,radiative_DTM_PAD_mean,BA,plot_marker,plot_label,
                             plot_colour)
 
 """
-# Figure 8 - PAD distributions for distinct canopy layers
+# Figure 4 - Point clouds and profiles across degradation gradient
 """
-figure_name = output_dir + 'Fig8_canopy_sublevel_PAD_test.png'
-figure_number = 8
-csp.plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
-                            heights,heights_rad,MacArthurHorn_PAD,
-                            radiative_PAD,radiative_DTM_PAD)
+figure_name = output_dir + 'Fig4_pointclouds_and_profiles.png'
+figure_number = 4
+gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
+csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
+                        plot_point_cloud,heights,heights_rad, lidar_profiles,
+                        MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                        MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
+                        radiative_DTM_PAD,radiative_DTM_PAD_mean,
+                        inventory_PAD,inventory_PAD_all)
 
 """
-# Figure 11 - Cumulative PAD with Depth
+# Figure 9 - PAI and Shannon Index
 """
-figure_name = output_dir + 'Fig11_cumulative_PAD_with_depth_test.png'
-figure_number = 11
-csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
-                        radiative_DTM_PAD, method=0)
-
-"""
-# Figure 12 - PAI and Shannon Index
-"""
-figure_name = output_dir + 'Fig12_PAI_shannon_distributions_test.png'
-figure_number = 12
+figure_name = output_dir + 'Fig9_PAI_shannon_distributions.png'
+figure_number = 9
 csp.plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn_PAD)
                                         #radiative_PAD)
 """
 # Figure 12 - abundance of subcanopy volume for different levels of overstory PAD
 """
-figure_name = output_dir + 'Fig13_cumulative_PAD_histograms_test.png'
-figure_number = 13
+figure_name = output_dir + 'Fig10_cumulative_PAD_histograms.png'
+figure_number = 10
 csp.plot_cumulative_PAD_histograms(figure_name,figure_number,MacArthurHorn_PAD,heights)
 
 #-------------------------------
@@ -285,7 +246,7 @@ figure_name = output_dir+'figS2_transmittance_ratios.png'
 csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
 
 """
-# Figure S2 - comparison of Detto vs. modified algorithm
+# Figure S3 - comparison of Detto vs. modified algorithm
 """
 figure_number = 113
 figure_name = output_dir+'figS3_LiDAR_profiles_comparison_test.png'
@@ -294,20 +255,70 @@ csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
                         radiative_PAD,radiative_PAD_mean,
                         radiative_DTM_PAD,radiative_DTM_PAD_mean)
 
+
+"""
+#-------------------------------
+# Figure S4 - example crown model
+"""
+figure_number = 114
+figure_name = output_dir+'figS4_crown_model_example'
+Plot_name = b'Belian'
+angle = 45.
+csp.plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
+                    a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+
+"""
+# Figure S5 - Allometric models; include confidence intervals, and add vertical band
+# illustrating the 10 cm DBH cutoff
+"""
+figure_name = output_dir + 'FigS5_allometric_relationships.png'
+figure_number = 115
+csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file)
+
 #-------------------------------
 # SUPPLEMENT
 # RESULTS
 #-------------------------------
 """
-# Figure S3 comparison of profiles for the two Danum sites
+# Figure S6 comparison of profiles for the two Danum sites
 """
-figure_number = 113
-figure_name = output_dir+'Fig3_pointclouds_and_profiles_Danum_test.png'
+figure_number = 116
+figure_name = output_dir+'FigS6_pointclouds_and_profiles_Danum.png'
 csp.plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,
                         plot_point_cloud,heights,heights_rad, lidar_profiles,
-                        MacArthurHorn_PAD,MacArthurHorn_PAD_mean,radiative_DTM_PAD,
-                        radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all)
+                        MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                        MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
+                        radiative_DTM_PAD,radiative_DTM_PAD_mean,
+                        inventory_PAD,inventory_PAD_all)
 
-# Figure S4 - sensitivity analysis, confidence interval sensitivity to resolution
+# Figure S7 - sensitivity analysis, confidence interval sensitivity to resolution
 
-# Figure S5 - sensitivity analysis, confidence interval sensitivity to density
+# Figure S8 - sensitivity analysis, confidence interval sensitivity to density
+
+
+"""
+================================================================================
+No Longer required
+================================================================================
+
+# Figure 6 - Cross-plot canopy layers
+figure_name = output_dir + 'Fig6_crossplot_LiDAR_PAD_residual_profiles.png'
+figure_number = 6
+csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_PAD,
+                MacArthurHorn_PAD_mean,radiative_DTM_PAD,radiative_DTM_PAD_mean)
+
+
+# Figure 8 - PAD distributions for distinct canopy layers
+figure_name = output_dir + 'Fig8_canopy_sublevel_PAD_test.png'
+figure_number = 8
+csp.plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
+                            heights,heights_rad,MacArthurHorn_PAD,
+                            radiative_PAD,radiative_DTM_PAD)
+
+
+# Figure 11 - Cumulative PAD with Depth
+figure_name = output_dir + 'Fig11_cumulative_PAD_with_depth_test.png'
+figure_number = 11
+csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
+                        radiative_DTM_PAD, method=0)
+"""

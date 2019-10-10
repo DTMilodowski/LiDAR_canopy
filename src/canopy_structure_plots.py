@@ -693,7 +693,7 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     ax5a = plt.subplot2grid((2,7),(0,5),sharey=ax1a,sharex=ax3a)
     ax5a.annotate('M2', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - crown volume
-    ax6a = plt.subplot2grid((2,7),(0,5),sharey=ax1a,sharex=ax3a)
+    ax6a = plt.subplot2grid((2,7),(0,6),sharey=ax1a,sharex=ax3a)
     ax6a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 
     # Danum 2
@@ -1006,7 +1006,8 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
 
     # annotate with stats
     r_sq_a =   aux.get_rsquared_annotation(BA,mh)
-    r_sq_b = aux.get_rsquared_annotation(BA,radDTM3)
+    r_sq_b =   aux.get_rsquared_annotation(BA,mh_wt)
+    r_sq_c = aux.get_rsquared_annotation(BA,radDTM3)
 
     plt.figure(figure_number, facecolor='White',figsize=[8,3.5])
     ax1 = plt.subplot2grid((1,3),(0,0))
@@ -1034,7 +1035,7 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
     ax2.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
 
     # plot linear regression
-    m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = field.linear_regression(BA,mh,conf=0.95)
+    m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = field.linear_regression(BA,mh_wt,conf=0.95)
     ax2.fill_between(x_i,CI_l,CI_u,color='0.75')
     ax2.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
@@ -1046,7 +1047,7 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
 
     ax3 = plt.subplot2grid((1,3),(0,2), sharex=ax1)#, sharey=ax1)
     ax3.annotate('c - M2', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-    ax3.annotate(r_sq_b, xy=(0.5,0.05), xycoords='axes fraction',backgroundcolor='none',
+    ax3.annotate(r_sq_c, xy=(0.5,0.05), xycoords='axes fraction',backgroundcolor='none',
             horizontalalignment='center', verticalalignment='bottom', fontsize=axis_size)
     ax3.set_ylabel('PAI',fontsize=axis_size)
     ax3.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
@@ -1602,12 +1603,12 @@ def plot_allometric_relationships(figure_name,figure_number,field_file,
     ax3.annotate(eq, xy=(0.08,0.85), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax3.axvspan(0,10,color='0.8')
 
-    ax1.set_xlim(xmin=0)
-    ax2.set_xlim(xmin=0)
-    ax3.set_xlim(xmin=0)
-    ax1.set_ylim(ymin=0)
-    ax2.set_ylim(ymin=0)
-    ax3.set_ylim(ymin=0)
+    ax1.set_xlim(left=0)
+    ax2.set_xlim(left=0)
+    ax3.set_xlim(left=0)
+    ax1.set_ylim(bottom=0)
+    ax2.set_ylim(bottom=0)
+    ax3.set_ylim(bottom=0)
     plt.tight_layout()
     plt.savefig(figure_name)
     #plt.show()

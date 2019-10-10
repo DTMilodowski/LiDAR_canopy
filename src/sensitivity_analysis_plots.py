@@ -28,8 +28,8 @@ plt.set_cmap(cmaps.viridis)
 
 # code to get trio of nice colourblind friendly colours
 cmap = cm.get_cmap('plasma')
-scale = np.arange(0.,6.)
-scale /=5.
+scale = np.arange(0.,5.)
+scale /=4.
 cmap_colour = cmap(scale)
 
 """
@@ -654,7 +654,7 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
 
     # loop through the subplots
     sp = [ax1a,ax1b,ax1c]
-    pkeys = ['5m','10m','20m','50m','100m']
+    pkeys = ['5m','10m','20m','50m']
     for pp in range(0,len(pkeys)):
 
         lim_OG = np.nanmean(penetration_lim_Belian[pkeys[pp]]['25'],axis=1)*100.

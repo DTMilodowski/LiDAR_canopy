@@ -128,7 +128,7 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
     ax.set_ylim(0,80)
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -376,7 +376,7 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,
@@ -599,7 +599,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file,
@@ -761,7 +761,7 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 #=======================================================================================
@@ -847,7 +847,7 @@ def compare_LiDAR_PAI(figure_name,figure_number,MacArthurHorn_PAD,MacArthurHorn_
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 #===============================================================================
@@ -962,7 +962,7 @@ def plot_LAI_vs_inventory(figure_name,figure_number,MacArthurHorn_PAD,MacArthurH
     #ax1.set_ylim((0,20))
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -981,6 +981,8 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
     BAerr = np.zeros(N_plots)
     mh = np.zeros(N_plots)
     mherr = np.zeros(N_plots)
+    mh_wt = np.zeros(N_plots)
+    mh_wterr = np.zeros(N_plots)
     rad2 = np.zeros(N_plots)
     rad3 = np.zeros(N_plots)
     radDTM2 = np.zeros(N_plots)
@@ -1063,7 +1065,7 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -1166,7 +1168,7 @@ def plot_location_map(figure_name,figure_number):
         fontsize=12,color='black', fontweight='bold')
 
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 
@@ -1266,7 +1268,7 @@ def cross_plot_canopy_layers_LiDAR(figure_name,figure_number,heights,heights_rad
     cbar= colorbar.ColorbarBase(cbaxes, cmap=cmap,norm=norm, ticks=[0.,40.,80.], orientation='vertical')
     cbar.set_label('Height (m)')
     plt.tight_layout()
-    plt.show()
+    #plt.show()
 
     return 0
 
@@ -1362,7 +1364,7 @@ def plot_canopy_layer_residuals_old(figure_name,figure_number,heights,MacArthurH
     plt.setp(xticklabels,visible=False)
 
     plt.tight_layout()
-    plt.show()
+    #plt.show()
 
 def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
                                 radiative_DTM_PAD,radiative_DTM_PAD_mean,max_return=2):
@@ -1430,7 +1432,7 @@ def plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
 
     return 0
 
@@ -1523,7 +1525,7 @@ def plot_canopy_layer_PAD_volume_ratio(figure_name,figure_number,heights,MacArth
     plt.setp(xticklabels,visible=False)
 
     plt.tight_layout()
-    plt.show()
+    #plt.show()
 
 """
 # Plot allometric relationships
@@ -1608,7 +1610,7 @@ def plot_allometric_relationships(figure_name,figure_number,field_file,
     ax3.set_ylim(ymin=0)
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 
@@ -1635,7 +1637,7 @@ def plot_transmittance_ratio(figure_number,figure_name,pts):
     plt.xticks(np.arange(4)+1)
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -1753,7 +1755,7 @@ def plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
 
     return 0
 
@@ -1817,7 +1819,7 @@ def plot_leaf_angle_distribution_profile_comparison(figure_name,figure_number,he
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
 
     return 0
 
@@ -1906,7 +1908,7 @@ def plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
     cbar2.ax.set_ylabel('Crown volume density / m$^3$m$^{-2}$m$^{-1}$',fontsize = 10)
     cbar2.solids.set_edgecolor("face")
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -2051,7 +2053,7 @@ def plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
     plt.subplots_adjust(wspace = 0.2,hspace=0.1)
     plt.savefig(figure_name)
 
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -2136,7 +2138,7 @@ def plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
 
     plt.tight_layout()
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
 
 
 """
@@ -2217,7 +2219,7 @@ def plot_PAI_Shannon_Index_distributions(figure_name,figure_number,PAD):
 
     plt.subplots_adjust(wspace = 0.4,hspace=0.1,bottom=0.3)
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 

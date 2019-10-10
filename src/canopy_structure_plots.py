@@ -381,7 +381,8 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
 
 def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,
                                 heights,heights_rad,lidar_profiles,MacArthurHorn_PAD,
-                                MacArthurHorn_PAD_mean,radiative_DTM_PAD,
+                                MacArthurHorn_PAD_mean,MacArthurHorn_wt_PAD,
+                                MacArthurHorn_wt_PAD_mean,radiative_DTM_PAD,
                                 radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all):
     max_return=3
     n_subplots = 25
@@ -491,10 +492,10 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     ax2a.annotate('LiDAR returns', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - MacHorn
     ax3a = plt.subplot2grid((6,6),(0,3),sharey=ax1a)
-    ax3a.annotate('MacArthur-Horn', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    ax3a.annotate('M1a (green); M1b (magenta)', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - Detto
     ax4a = plt.subplot2grid((6,6),(0,4),sharey=ax1a,sharex=ax3a)
-    ax4a.annotate('multi. return \nrad. trans.', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    ax4a.annotate('M2.', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - Corrected rad trans
     ax5a = plt.subplot2grid((6,6),(0,5),sharey=ax1a,sharex=ax3a)
     ax5a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
@@ -557,10 +558,12 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 
             for i in range(0,n_subplots):
                 axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
+                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.01)
 
             #llim,ulim = np.percentile(MacArthurHorn_PAD[Plot_name],[25,75],axis =0)
             #axes2[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[0],alpha=0.2)
             axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
+            axes2[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
             # plot corrective radiative transfer profile
 
@@ -576,8 +579,8 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
                 #axes5[pp].fill_betweenx(heights[2:],0,inventory_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
             #axes5[pp].plot(np.mean(inventory_PAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
             llim,ulim = np.percentile(inventory_PAD_all[Plot_name],[2.5,97.5],axis =0)
-            axes4[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[2],alpha=0.2)
-            axes4[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+            axes4[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color='black',alpha=0.2)
+            axes4[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c='black',linewidth=2)
 
         yticklabels.append(axes1[pp].get_yticklabels())
         yticklabels.append(axes2[pp].get_yticklabels())

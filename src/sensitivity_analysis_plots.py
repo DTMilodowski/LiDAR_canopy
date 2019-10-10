@@ -657,9 +657,9 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
     pkeys = ['5m','10m','20m','50m','100m']
     for pp in range(0,len(pkeys)):
 
-        lim_OG = np.nanmean(penetration_lim_Belian[pkeys[pp]]['40'],axis=1)*100.
-        lim_ML = np.nanmean(penetration_lim_E[pkeys[pp]]['40'],axis=1)*100.
-        lim_HL = np.nanmean(penetration_lim_BNorth[pkeys[pp]]['40'],axis=1)*100.
+        lim_OG = np.nanmean(penetration_lim_Belian[pkeys[pp]]['25'],axis=1)*100.
+        lim_ML = np.nanmean(penetration_lim_E[pkeys[pp]]['25'],axis=1)*100.
+        lim_HL = np.nanmean(penetration_lim_BNorth[pkeys[pp]]['25'],axis=1)*100.
 
         limperc_OG = np.nanpercentile(lim_OG,[2.5,50,97.5],axis=0)
         limperc_ML = np.nanpercentile(lim_ML,[2.5,50,97.5],axis=0)

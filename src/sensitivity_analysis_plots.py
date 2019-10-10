@@ -783,7 +783,7 @@ def plot_profile_sensitivity_to_resolution_individual_CI(figure_number,figure_na
                     fontsize=axis_size, ha='center')
 
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """

@@ -20,7 +20,7 @@ gps_pts_file = 'GPS_points_file_for_least_squares_fitting.csv'
 
 # also define output directory (for saving figures)
 data_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/Profiles/'
-output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/FiguresRevised/'
+output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/FiguresRevised/201910/'
 
 #------------------------------------------------------------------------------------
 # PARAMETERS

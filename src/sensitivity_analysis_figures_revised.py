@@ -1,7 +1,7 @@
 import numpy as np
 import sensitivity_analysis_plots as sp
 
-output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/FiguresRevised/'
+output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCanopyStructureBALI/FiguresRevised/201910/'
 
 
 # Load in the sensitivity analysis results

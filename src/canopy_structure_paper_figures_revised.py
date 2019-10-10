@@ -9,6 +9,7 @@ import sys
 import auxilliary_functions as aux
 import canopy_structure_plots as csp
 import inventory_based_LAD_profiles as field
+import LiDAR_io as io
 
 #------------------------------------------------------------------------------------
 # DIRECTORIES
@@ -54,16 +55,6 @@ field_data = field.load_crown_survey_data(field_file)
 plot_point_cloud= np.load('%splot_point_clouds.npz' % data_dir)['arr_0'][()]
 
 # Load LiDAR canopy profiles
-"""
-temp = np.load('%slidar_canopy_profiles.npz' % data_dir)['arr_0'][()]
-MacArthurHorn_PAD=temp[0]
-radiative_PAD=temp[1]
-radiative_DTM_PAD=temp[2]
-lidar_profiles=temp[3]
-lidar_profiles_adjusted=temp[4]
-penetration_limit=temp[5]
-temp=None
-"""
 temp = np.load('%slidar_canopy_profiles_adaptive.npz' % data_dir)['arr_0'][()]
 MacArthurHorn_PAD=temp[0]
 MacArthurHorn_wt_PAD=temp[1]
@@ -85,16 +76,6 @@ for pp in range(0,N_plots):
     radiative_DTM_PAD_mean[Plots[pp]] = np.nansum(radiative_DTM_PAD[Plots[pp]],axis=0)/(np.sum(np.isfinite(radiative_DTM_PAD[Plots[pp]]),axis=0)).astype('float')
 
 # Load LiDAR PAI
-"""
-temp = np.load('%slidar_PAI.npz' % data_dir)['arr_0'][()]
-MacArthurHorn_PAI=temp[0]
-radiative_PAI=temp[1]
-radiative_DTM_PAI=temp[2]
-MacArthurHorn_PAI_mean=temp[3]
-radiative_PAI_mean=temp[4]
-radiative_DTM_PAI_mean=temp[5]
-temp=None
-"""
 temp = np.load('%slidar_PAI_adaptive.npz' % data_dir)['arr_0'][()]
 MacArthurHorn_PAI=temp[0]
 MacArthurHorn_wt_PAI=temp[1]
@@ -109,25 +90,6 @@ inventory_PAD_std=temp[1]
 inventory_PAI=temp[2]
 inventory_PAD_all=temp[3]
 temp = None
-
-#===============================================================================
-# Summary statistics
-table_plots = [b'Belian',b'Seraya',b'DC1',b'DC2',b'E',b'LF',b'B North',b'B South']
-print("Plot    \tMH\t+/-\trad_2\t+/-\trad_3\t+/-\tcv\t+/-")
-for pp,plot in enumerate(table_plots):
-    mh = np.mean(MacArthurHorn_PAI[plot])
-    mh_s = stats.sem(MacArthurHorn_PAI[plot])
-    r2 = np.mean(radiative_DTM_PAI[plot][:,1])
-    r2_s = stats.sem(radiative_DTM_PAI[plot][:,1])
-    r3 = np.mean(radiative_DTM_PAI[plot][:,2])
-    r3_s = stats.sem(radiative_DTM_PAI[plot][:,2])
-    cv = np.mean(inventory_PAI[plot])
-    cv_s = stats.sem(inventory_PAI[plot])
-
-    print('%s       \t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.2f\t' % (plot,mh,mh_s,
-                            r2,r2_s,r3,r3_s,cv,cv_s))
-    #print('%s\t    %.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f' % (plot,mh,mh_s,
-    #                        r2,r2_s,r3,r3_s,cv))
 
 #===============================================================================
 # NOW MAKE PLOTS
@@ -241,6 +203,8 @@ csp.plot_cumulative_PAD_histograms(figure_name,figure_number,MacArthurHorn_PAD,h
 """
 # Figure S1 - "transmission ratio"
 """
+las_file = 'Carbon_plot_point_cloud_buffer.las'
+all_lidar_pts = io.load_lidar_data(las_file)
 figure_number = 111
 figure_name = output_dir+'figS1_transmittance_ratios.png'
 csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
@@ -252,6 +216,7 @@ figure_number = 112
 figure_name = output_dir+'figS2_LiDAR_profiles_comparison_test.png'
 csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
                         lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                        MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
                         radiative_PAD,radiative_PAD_mean,
                         radiative_DTM_PAD,radiative_DTM_PAD_mean)
 
@@ -260,6 +225,9 @@ csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad
 #-------------------------------
 # Figure S4 - example crown model
 """
+field_data = field.load_crown_survey_data(field_file)
+a, b, CF, r_sq, p, H, D, H_i, PI_u, PI_l = field.retrieve_crown_allometry(allometry_file)
+a_ht, b_ht, CF_ht, a_A, b_A, CF_A = field.calculate_allometric_equations_from_survey(field_data)
 figure_number = 114
 figure_name = output_dir+'figS4_crown_model_example'
 Plot_name = b'Belian'
@@ -295,6 +263,27 @@ csp.plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
 
 # Figure S8 - sensitivity analysis, confidence interval sensitivity to density
 
+
+#===============================================================================
+# Summary statistics
+table_plots = [b'Belian',b'Seraya',b'DC1    ',b'DC2    ',b'E     ',b'LF     ',b'B North',b'B South']
+print("Plot    \tMH\t+/-\tMHwt\t+/-\trad_2\t+/-\trad_3\t+/-\tcv\t+/-")
+for pp,plot in enumerate(table_plots):
+    mh = np.mean(MacArthurHorn_PAI[plot])
+    mh_s = stats.sem(MacArthurHorn_PAI[plot])
+    mh_wt = np.mean(MacArthurHorn_PAI[plot])
+    mh_wt_s = stats.sem(MacArthurHorn_PAI[plot])
+    r2 = np.mean(radiative_DTM_PAI[plot][:,1])
+    r2_s = stats.sem(radiative_DTM_PAI[plot][:,1])
+    r3 = np.mean(radiative_DTM_PAI[plot][:,2])
+    r3_s = stats.sem(radiative_DTM_PAI[plot][:,2])
+    cv = np.mean(inventory_PAI[plot])
+    cv_s = stats.sem(inventory_PAI[plot])
+
+    print('%s       \t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.2f\t' % (plot,mh,mh_s,
+                            mhwt,mhwt_s,r2,r2_s,r3,r3_s,cv,cv_s))
+    #print('%s\t    %.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f' % (plot,mh,mh_s,
+    #                        r2,r2_s,r3,r3_s,cv))
 
 """
 ================================================================================

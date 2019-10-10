@@ -103,7 +103,7 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
     ax = plt.subplot2grid((1,1),(0,0))
     ax.annotate('Old growth forest, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     plot_lidar_pts = plot_point_cloud_display
     for k in range(0,max_return):
@@ -115,13 +115,13 @@ def plot_point_cloud(figure_name,figure_number, gps_pts_file,plot_point_cloud):
 
         alpha_max = 0.1
         colours = np.zeros((points_x.size,4))
-        colours[:,0]=rgb[k][0]/255.
-        colours[:,1]=rgb[k][1]/255.
-        colours[:,2]=rgb[k][2]/255.
+        colours[:,0]=rgb[k][0,0]/255.
+        colours[:,1]=rgb[k][0,1]/255.
+        colours[:,2]=rgb[k][0,2]/255.
 
         colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
         ax.scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=2)
-        ax.scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=2,
+        ax.scatter(0,0,marker='o',c=np.array(colours[0,0:3]).reshape(1,3),edgecolors='none',s=2,
                         label=labels[k])
 
     ax.set_xlim(0,100)
@@ -191,38 +191,38 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
     ax1a = plt.subplot2grid((6,6),(0,0),colspan=2)
     ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # Seraya
     ax1b = plt.subplot2grid((6,7),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1b.annotate('b - Old growth, MLA02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1b.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # LF
     ax1c = plt.subplot2grid((6,7),(2,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1c.annotate('c - Moderately logged, SAF04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1c.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # E
     ax1d = plt.subplot2grid((6,7),(3,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1d.annotate('d - Moderately logged, SAF05', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1d.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # B North
     ax1e = plt.subplot2grid((6,7),(4,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1e.annotate('e - Heavily logged, SAF02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1e.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # B South
     ax1f = plt.subplot2grid((6,7),(5,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1f.annotate('f - Heavily logged, SAF01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1f.set_ylabel('Height / m',fontsize=axis_size)
     ax1f.set_xlabel('Horizontal distance / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     axes = [ax1a, ax1b, ax1c, ax1d, ax1e, ax1f]
     for pp in range(0,6):
@@ -236,13 +236,13 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
 
             alpha_max = 0.1
             colours = np.zeros((points_x.size,4))
-            colours[:,0]=rgb[k][0]/255.
-            colours[:,1]=rgb[k][1]/255.
-            colours[:,2]=rgb[k][2]/255.
+            colours[:,0]=rgb[k][0,0]/255.
+            colours[:,1]=rgb[k][0,1]/255.
+            colours[:,2]=rgb[k][0,2]/255.
 
             colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
             axes[pp].scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=1)
-            axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=1,label=labels[k])
+            axes[pp].scatter(0,0,marker='o',c=np.array(colours[0,0:3]).reshape(1,3),edgecolors='none',s=1,label=labels[k])
 
     #x1a.legend(loc=1,fontsize=axis_size)
 
@@ -433,38 +433,38 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     ax1a = plt.subplot2grid((6,7),(0,0),colspan=2)
     ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # Seraya
     ax1b = plt.subplot2grid((6,7),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1b.annotate('b - Old growth, MLA02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1b.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # LF
     ax1c = plt.subplot2grid((6,7),(2,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1c.annotate('c - Moderately logged, SAF04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1c.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # E
     ax1d = plt.subplot2grid((6,7),(3,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1d.annotate('d - Moderately logged, SAF05', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1d.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # B North
     ax1e = plt.subplot2grid((6,7),(4,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1e.annotate('e - Heavily logged, SAF02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1e.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # B South
     ax1f = plt.subplot2grid((6,7),(5,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1f.annotate('f - Heavily logged, SAF01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1f.set_ylabel('Height / m',fontsize=axis_size)
     ax1f.set_xlabel('Horizontal distance / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     axes = [ax1a, ax1b, ax1c, ax1d, ax1e, ax1f]
     for pp in range(0,6):
@@ -478,13 +478,13 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 
             alpha_max = 0.1
             colours = np.zeros((points_x.size,4))
-            colours[:,0]=rgb[k][0]/255.
-            colours[:,1]=rgb[k][1]/255.
-            colours[:,2]=rgb[k][2]/255.
+            colours[:,0]=rgb[k][0,0]/255.
+            colours[:,1]=rgb[k][0,1]/255.
+            colours[:,2]=rgb[k][0,2]/255.
 
             colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
             axes[pp].scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=1)
-            axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=1,label=labels[k])
+            axes[pp].scatter(0,0,marker='o',c=np.array(colours[0,0:3]).reshape(1,3),edgecolors='none',s=1,label=labels[k])
 
     #---------------------------------------------------------
     # NOW PLOT PROFILES
@@ -651,13 +651,13 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     ax1a = plt.subplot2grid((2,7),(0,0),colspan=2)
     ax1a.annotate('a - Old growth, DAN04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     # DC2
     ax1b = plt.subplot2grid((2,7),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1b.annotate('b - Old growth, DAN05', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1b.set_ylabel('Height / m',fontsize=axis_size)
-    plt.gca().set_aspect('equal', adjustable='box-forced')
+    plt.gca().set_aspect('equal', adjustable='box')
 
     axes = [ax1a, ax1b]
     for pp in range(0,2):
@@ -671,13 +671,13 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
 
             alpha_max = 0.1
             colours = np.zeros((points_x.size,4))
-            colours[:,0]=rgb[k][0]/255.
-            colours[:,1]=rgb[k][1]/255.
-            colours[:,2]=rgb[k][2]/255.
+            colours[:,0]=rgb[k][0,0]/255.
+            colours[:,1]=rgb[k][0,1]/255.
+            colours[:,2]=rgb[k][0,2]/255.
 
             colours[:,3]=alpha_max*(1-points_x/(points_x.max()+1))
             axes[pp].scatter(points_y,points_z,marker='o',c=colours,edgecolors='none',s=1)
-            axes[pp].scatter(0,0,marker='o',c=colours[0,0:3],edgecolors='none',s=1,label=labels[k])
+            axes[pp].scatter(0,0,marker='o',c=np.array(colours[0,0:3]).reshape(1,3),edgecolors='none',s=1,label=labels[k])
 
     #---------------------------------------------------------
     # NOW PLOT PROFILES
@@ -693,8 +693,8 @@ def plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
     ax5a = plt.subplot2grid((2,7),(0,5),sharey=ax1a,sharex=ax3a)
     ax5a.annotate('M2', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - crown volume
-    ax5a = plt.subplot2grid((2,7),(0,5),sharey=ax1a,sharex=ax3a)
-    ax5a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    ax6a = plt.subplot2grid((2,7),(0,5),sharey=ax1a,sharex=ax3a)
+    ax6a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 
     # Danum 2
     ax2b = plt.subplot2grid((2,7),(1,2), sharex = ax2a, sharey = ax1a)

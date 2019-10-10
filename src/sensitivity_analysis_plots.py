@@ -164,7 +164,7 @@ def plot_profile_sensitivity_resolution_full(figure_number,figure_name,heights,P
     fig.text(0.5, 0.15, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
 
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 
@@ -276,7 +276,7 @@ def plot_profile_sensitivity_resolution(figure_number,figure_name,heights,PAD_pr
     fig.text(0.5, 0.15, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
 
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 def plot_profile_sensitivity_resolution_old(figure_number,figure_name,heights,PAD_profiles_MH_Belian,
@@ -396,7 +396,7 @@ def plot_profile_sensitivity_resolution_old(figure_number,figure_name,heights,PA
     fig.text(0.5, 0.15, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
 
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -518,7 +518,7 @@ def plot_profile_sensitivity_density(figure_number,figure_name,heights,PAD_profi
     fig.text(0.5, 0.15, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
 
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -629,7 +629,7 @@ def plot_profile_sensitivity_point_density_old(figure_number,figure_name,heights
     fig.text(0.5, 0.15, 'PAD / m$^2$m$^{-3}$',fontsize=axis_size, ha='center')
 
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -654,7 +654,7 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
 
     # loop through the subplots
     sp = [ax1a,ax1b,ax1c]
-    pkeys = ['2m','5m','10m','20m','50m']
+    pkeys = ['5m','10m','20m','50m','100m']
     for pp in range(0,len(pkeys)):
 
         lim_OG = np.nanmean(penetration_lim_Belian[pkeys[pp]]['40'],axis=1)*100.
@@ -686,7 +686,7 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
 
     ax1c.legend(loc=5)
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -882,7 +882,7 @@ def plot_profile_sensitivity_to_point_density_individual_CI(figure_number,figure
 
     plt.subplots_adjust(hspace=0.4, wspace = 0.2, bottom = 0.3)
     plt.savefig(figure_name)
-    plt.show()
+    #plt.show()
     return 0
 
 """
@@ -1007,7 +1007,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_pr
     plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.2)
     plt.savefig(figure_name)
 
-    plt.show()
+    #plt.show()
 
 
 def plot_PAI_sensitivity_resolution(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_profiles_MH_BNorth,PAD_profiles_MH_E,
@@ -1112,7 +1112,7 @@ def plot_PAI_sensitivity_resolution(figure_number,figure_name,PAD_profiles_MH_Be
     plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
     plt.savefig(figure_name)
 
-    plt.show()
+    #plt.show()
 
 def plot_PAI_sensitivity_density(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_profiles_MH_BNorth,PAD_profiles_MH_E,
                     PAD_profiles_rad_Belian,PAD_profiles_rad_BNorth,PAD_profiles_rad_E,
@@ -1198,4 +1198,4 @@ def plot_PAI_sensitivity_density(figure_number,figure_name,PAD_profiles_MH_Belia
     plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
     plt.savefig(figure_name)
 
-    plt.show()
+    #plt.show()

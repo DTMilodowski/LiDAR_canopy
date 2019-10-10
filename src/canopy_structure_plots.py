@@ -380,10 +380,11 @@ def plot_point_clouds_and_profiles_old(figure_name,figure_number, gps_pts_file,
     return 0
 
 def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_point_cloud,
-                                heights,heights_rad,lidar_profiles,MacArthurHorn_PAD,
-                                MacArthurHorn_PAD_mean,MacArthurHorn_wt_PAD,
-                                MacArthurHorn_wt_PAD_mean,radiative_DTM_PAD,
-                                radiative_DTM_PAD_mean,inventory_PAD,inventory_PAD_all):
+                                heights,heights_rad,lidar_profiles,
+                                MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+                                MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
+                                radiative_DTM_PAD,radiative_DTM_PAD_mean,
+                                inventory_PAD,inventory_PAD_all):
     max_return=3
     n_subplots = 25
     colour = ['#46E900','#1A2BCE','#E0007F']
@@ -429,37 +430,37 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     plt.figure(figure_number, facecolor='White',figsize=[9,12])
 
     # Belian
-    ax1a = plt.subplot2grid((6,6),(0,0),colspan=2)
+    ax1a = plt.subplot2grid((6,7),(0,0),colspan=2)
     ax1a.annotate('a - Old growth, MLA01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1a.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
     # Seraya
-    ax1b = plt.subplot2grid((6,6),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1b = plt.subplot2grid((6,7),(1,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1b.annotate('b - Old growth, MLA02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1b.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
     # LF
-    ax1c = plt.subplot2grid((6,6),(2,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1c = plt.subplot2grid((6,7),(2,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1c.annotate('c - Moderately logged, SAF04', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1c.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
     # E
-    ax1d = plt.subplot2grid((6,6),(3,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1d = plt.subplot2grid((6,7),(3,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1d.annotate('d - Moderately logged, SAF05', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1d.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
     # B North
-    ax1e = plt.subplot2grid((6,6),(4,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1e = plt.subplot2grid((6,7),(4,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1e.annotate('e - Heavily logged, SAF02', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1e.set_ylabel('Height / m',fontsize=axis_size)
     plt.gca().set_aspect('equal', adjustable='box-forced')
 
     # B South
-    ax1f = plt.subplot2grid((6,6),(5,0),sharey=ax1a,sharex=ax1a,colspan=2)
+    ax1f = plt.subplot2grid((6,7),(5,0),sharey=ax1a,sharex=ax1a,colspan=2)
     ax1f.annotate('f - Heavily logged, SAF01', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
     ax1f.set_ylabel('Height / m',fontsize=axis_size)
     ax1f.set_xlabel('Horizontal distance / m',fontsize=axis_size)
@@ -488,59 +489,68 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     #---------------------------------------------------------
     # NOW PLOT PROFILES
     # Belian
-    ax2a = plt.subplot2grid((6,6),(0,2),sharey=ax1a)
+    ax2a = plt.subplot2grid((6,7),(0,2),sharey=ax1a)
     ax2a.annotate('LiDAR returns', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - MacHorn
-    ax3a = plt.subplot2grid((6,6),(0,3),sharey=ax1a)
-    ax3a.annotate('M1a (green); M1b (magenta)', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    ax3a = plt.subplot2grid((6,7),(0,3),sharey=ax1a)
+    ax3a.annotate('M1a', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    ax4a = plt.subplot2grid((6,7),(0,4),sharey=ax1a,sharex=ax3a)
+    ax4a.annotate('M1b', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - Detto
-    ax4a = plt.subplot2grid((6,6),(0,4),sharey=ax1a,sharex=ax3a)
-    ax4a.annotate('M2.', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    ax5a = plt.subplot2grid((6,7),(0,5),sharey=ax1a,sharex=ax3a)
+    ax5a.annotate('M2.', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
     # - Corrected rad trans
-    ax5a = plt.subplot2grid((6,6),(0,5),sharey=ax1a,sharex=ax3a)
-    ax5a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
+    ax6a = plt.subplot2grid((6,7),(0,6),sharey=ax1a,sharex=ax3a)
+    ax6a.annotate('crown volume', xy=(0.95,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='right', verticalalignment='top', fontsize=9)
 
     # Seraya
-    ax2b = plt.subplot2grid((6,6),(1,2),sharey=ax1a,sharex=ax2a)
-    ax3b = plt.subplot2grid((6,6),(1,3),sharey=ax1a,sharex=ax3a)
-    ax4b = plt.subplot2grid((6,6),(1,4),sharey=ax1a,sharex=ax3a)
-    ax5b = plt.subplot2grid((6,6),(1,5),sharey=ax1a,sharex=ax3a)
+    ax2b = plt.subplot2grid((6,7),(1,2),sharey=ax1a,sharex=ax2a)
+    ax3b = plt.subplot2grid((6,7),(1,3),sharey=ax1a,sharex=ax3a)
+    ax4b = plt.subplot2grid((6,7),(1,4),sharey=ax1a,sharex=ax3a)
+    ax5b = plt.subplot2grid((6,7),(1,5),sharey=ax1a,sharex=ax3a)
+    ax6b = plt.subplot2grid((6,7),(1,6),sharey=ax1a,sharex=ax3a)
 
     # LF
-    ax2c = plt.subplot2grid((6,6),(2,2),sharey=ax1a,sharex=ax2a)
-    ax3c = plt.subplot2grid((6,6),(2,3),sharey=ax1a,sharex=ax3a)
-    ax4c = plt.subplot2grid((6,6),(2,4),sharey=ax1a,sharex=ax3a)
-    ax5c = plt.subplot2grid((6,6),(2,5),sharey=ax1a,sharex=ax3a)
+    ax2c = plt.subplot2grid((6,7),(2,2),sharey=ax1a,sharex=ax2a)
+    ax3c = plt.subplot2grid((6,7),(2,3),sharey=ax1a,sharex=ax3a)
+    ax4c = plt.subplot2grid((6,7),(2,4),sharey=ax1a,sharex=ax3a)
+    ax5c = plt.subplot2grid((6,7),(2,5),sharey=ax1a,sharex=ax3a)
+    ax6c = plt.subplot2grid((6,7),(2,6),sharey=ax1a,sharex=ax3a)
 
     # E
-    ax2d = plt.subplot2grid((6,6),(3,2),sharey=ax1a,sharex=ax2a)
-    ax3d = plt.subplot2grid((6,6),(3,3),sharey=ax1a,sharex=ax3a)
-    ax4d = plt.subplot2grid((6,6),(3,4),sharey=ax1a,sharex=ax3a)
-    ax5d = plt.subplot2grid((6,6),(3,5),sharey=ax1a,sharex=ax3a)
+    ax2d = plt.subplot2grid((6,7),(3,2),sharey=ax1a,sharex=ax2a)
+    ax3d = plt.subplot2grid((6,7),(3,3),sharey=ax1a,sharex=ax3a)
+    ax4d = plt.subplot2grid((6,7),(3,4),sharey=ax1a,sharex=ax3a)
+    ax5d = plt.subplot2grid((6,7),(3,5),sharey=ax1a,sharex=ax3a)
+    ax6d = plt.subplot2grid((6,7),(3,6),sharey=ax1a,sharex=ax3a)
 
     # B North
-    ax2e = plt.subplot2grid((6,6),(4,2),sharey=ax1a,sharex=ax2a)
-    ax3e = plt.subplot2grid((6,6),(4,3),sharey=ax1a,sharex=ax3a)
-    ax4e = plt.subplot2grid((6,6),(4,4),sharey=ax1a,sharex=ax3a)
-    ax5e = plt.subplot2grid((6,6),(4,5),sharey=ax1a,sharex=ax3a)
+    ax2e = plt.subplot2grid((6,7),(4,2),sharey=ax1a,sharex=ax2a)
+    ax3e = plt.subplot2grid((6,7),(4,3),sharey=ax1a,sharex=ax3a)
+    ax4e = plt.subplot2grid((6,7),(4,4),sharey=ax1a,sharex=ax3a)
+    ax5e = plt.subplot2grid((6,7),(4,5),sharey=ax1a,sharex=ax3a)
+    ax5e = plt.subplot2grid((6,7),(4,6),sharey=ax1a,sharex=ax3a)
 
     # B South
-    ax2f = plt.subplot2grid((6,6),(5,2), sharex = ax1a, sharey = ax2a)
+    ax2f = plt.subplot2grid((6,7),(5,2), sharex = ax1a, sharey = ax2a)
     ax2f.set_xlabel('Number of returns\n(x1000)',fontsize=axis_size,horizontalalignment='center')
     # - MacHorn
-    ax3f = plt.subplot2grid((6,6),(5,3),sharey=ax1a, sharex=ax3a)
+    ax3f = plt.subplot2grid((6,7),(5,3),sharey=ax1a, sharex=ax3a)
     ax3f.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
-    # - Corrected rad trans
-    ax4f = plt.subplot2grid((6,6),(5,4),sharey=ax1a,sharex=ax3a)
+    ax4f = plt.subplot2grid((6,7),(5,4),sharey=ax1a, sharex=ax3a)
     ax4f.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    # - Corrected rad trans
+    ax5f = plt.subplot2grid((6,7),(5,5),sharey=ax1a,sharex=ax3a)
+    ax5f.set_xlabel('PAD\n(m$^2$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
     # - Inventory
-    ax5f = plt.subplot2grid((6,6),(5,5),sharey=ax1a,sharex=ax3a)
-    ax5f.set_xlabel('Crown Volume\n(m$^3$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
+    ax6f = plt.subplot2grid((6,7),(5,6),sharey=ax1a,sharex=ax3a)
+    ax6f.set_xlabel('Crown Volume\n(m$^3$m$^{-2}$m$^{-1}$)',fontsize=axis_size,horizontalalignment='center')
 
     axes1 = [ax2a,  ax2b, ax2c, ax2d, ax2e, ax2f]
     axes2 = [ax3a,  ax3b, ax3c, ax3d, ax3e, ax3f]
     axes3 =  [ax4a,  ax4b, ax4c, ax4d, ax4e, ax4f]
     axes4 = [ax5a,  ax5b, ax5c, ax5d, ax5e, ax5f]
+    axes5 = [ax6a,  ax6b, ax6c, ax6d, ax6e, ax6f]
 
     yticklabels=[]
     xticklabels=[]
@@ -558,40 +568,42 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
 
             for i in range(0,n_subplots):
                 axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_PAD[Plot_name][i,2:],color=colour[0],alpha=0.01)
-                axes2[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.01)
+                axes3[pp].fill_betweenx(heights[2:],0,MacArthurHorn_wt_PAD[Plot_name][i,2:],color=colour[2],alpha=0.01)
 
             #llim,ulim = np.percentile(MacArthurHorn_PAD[Plot_name],[25,75],axis =0)
             #axes2[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color=colour[0],alpha=0.2)
             axes2[pp].plot(MacArthurHorn_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[0],linewidth=2)
-            axes2[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
+            axes3[pp].plot(MacArthurHorn_wt_PAD_mean[Plot_name][2:],heights[2:],'-',c=colour[2],linewidth=2)
 
             # plot corrective radiative transfer profile
 
             for i in range(0,n_subplots):
-                axes3[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
+                axes4[pp].fill_betweenx(heights_rad[3:],0,radiative_DTM_PAD[Plot_name][i,:-3,-1][::-1],color=colour[1],alpha=0.01)
 
             #llim,ulim = np.percentile(radiative_DTM_PAD[Plot_name][:,:,1],[25,75],axis =0)
             #axes3[pp].fill_betweenx(heights_rad[3:],llim[:-3][::-1],ulim[:-3][::-1],color=colour[1],alpha=0.2)
-            axes3[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
+            axes4[pp].plot(radiative_DTM_PAD_mean[Plot_name][:-3,1][::-1],heights_rad[3:],'-',c=colour[1],linewidth=2)
 
             # field inventory
             #for i in range(0,n_subplots):
                 #axes5[pp].fill_betweenx(heights[2:],0,inventory_PAD[Plot_name][i,2:],color=colour[2],alpha=0.05)
             #axes5[pp].plot(np.mean(inventory_PAD[Plot_name],axis=0)[2:],heights[2:],'-',c=colour[2],linewidth=2)
             llim,ulim = np.percentile(inventory_PAD_all[Plot_name],[2.5,97.5],axis =0)
-            axes4[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color='black',alpha=0.2)
-            axes4[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c='black',linewidth=2)
+            axes5[pp].fill_betweenx(heights[2:],llim[2:],ulim[2:],color='black',alpha=0.2)
+            axes5[pp].plot(inventory_PAD[Plot_name][2:],heights[2:],'-',c='black',linewidth=2)
 
         yticklabels.append(axes1[pp].get_yticklabels())
         yticklabels.append(axes2[pp].get_yticklabels())
         yticklabels.append(axes3[pp].get_yticklabels())
         yticklabels.append(axes4[pp].get_yticklabels())
+        yticklabels.append(axes5[pp].get_yticklabels())
 
         if pp < 5:
             xticklabels.append(axes1[pp].get_xticklabels())
             xticklabels.append(axes2[pp].get_xticklabels())
             xticklabels.append(axes3[pp].get_xticklabels())
             xticklabels.append(axes4[pp].get_xticklabels())
+            xticklabels.append(axes5[pp].get_xticklabels())
 
     ax1a.set_xlim(0,100)
     ax1a.set_ylim(0,80)
@@ -602,6 +614,7 @@ def plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,plot_
     ax3f.locator_params(axis='x',nbins=5)
     ax4f.locator_params(axis='x',nbins=5)
     ax5f.locator_params(axis='x',nbins=5)
+    ax6f.locator_params(axis='x',nbins=5)
 
     plt.setp(yticklabels,visible=False)
     plt.setp(xticklabels,visible=False)

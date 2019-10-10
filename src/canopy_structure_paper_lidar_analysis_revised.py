@@ -23,6 +23,7 @@ output_dir = '/home/dmilodow/DataStore_DTM/BALI/PAPERS/PaperDrafts/EstimatingCan
 # PARAMETERS
 # define important parameters for canopy profile estimation
 Plots = [b'LF',b'E',b'Belian',b'Seraya',b'B North',b'B South',b'DC1',b'DC2']
+Plots = [b'Belian']
 N_plots = len(Plots)
 leaf_angle_dist = 'spherical'
 max_height = 80
@@ -82,7 +83,8 @@ for pp in range(0,N_plots):
     n_coord_pairs = subplot_polygons[Plot_name].shape[0]*subplot_polygons[Plot_name].shape[1]
     coord_pairs = subplot_polygons[Plot_name].reshape(n_coord_pairs,2)
     bbox_polygon = aux.get_bounding_box(coord_pairs)
-    plot_point_cloud[Plots[pp]] = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon,filter_by_first_return_location=True)
+    plot_point_cloud[Plots[pp]] = lidar.filter_lidar_data_by_polygon(all_lidar_pts,bbox_polygon,
+                                                                    filter_by_first_return_location=True)
     plot_lidar_pts=plot_point_cloud[Plots[pp]]
     starting_ids, trees = io.create_KDTree(plot_lidar_pts) # build kd-tree for plot lidar points
     print("canopy height = ", np.percentile(plot_lidar_pts[plot_lidar_pts[:,3]==1,2],99), "m")
@@ -118,7 +120,6 @@ for pp in range(0,N_plots):
         sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts,subplot_poly,
                                                     filter_by_first_return_location=True)
         pt_count += sp_pts.shape[0]
-
         # first loop through the return numbers to calculate the radiative LAD profiles
         for rr in range(0,max_return):
             max_k=rr+1
@@ -157,9 +158,9 @@ for pp in range(0,N_plots):
         # iteratively, so that we can build up a full vertical profile. Note that
         # this potentially gives rise to coarsening effective resolution down the
         # profile, but this seems preferable to more crude gap-filling schemes.
-        nodata_test = np.any((np.any(~np.isfinite(LAD_MH[subplot_index])),
-                        np.any(~np.isfinite(np.mean(LAD_rad[subplot_index,:-1,:],axis=1))),
-                        np.any(~np.isfinite(np.mean(LAD_rad_DTM[subplot_index,:-1,:],axis=1)))))
+        nodata_test = np.any((np.any(~np.isfinite(LAD_MH[subplot_index,2:])),
+                        np.any(~np.isfinite(np.mean(LAD_rad[subplot_index,:-3,:],axis=1))),
+                        np.any(~np.isfinite(np.mean(LAD_rad_DTM[subplot_index,:-3,:],axis=1)))))
         centre_x = np.mean(subplot_poly[0:4,0])
         centre_y = np.mean(subplot_poly[0:4,1])
         radius=np.sqrt(subplot_width**2/2.)
@@ -206,9 +207,9 @@ for pp in range(0,N_plots):
             # update check
             iter_count+=1
             radius+=1.
-            nodata_test = np.any((np.any(~np.isfinite(LAD_MH[subplot_index])),
-                        np.any(~np.isfinite(np.mean(LAD_rad[subplot_index],axis=1))),
-                        np.any(~np.isfinite(np.mean(LAD_rad_DTM[subplot_index],axis=1)))))
+            nodata_test = np.any((np.any(~np.isfinite(LAD_MH[subplot_index,2:])),
+                        np.any(~np.isfinite(np.mean(LAD_rad[subplot_index,:-3,:],axis=1))),
+                        np.any(~np.isfinite(np.mean(LAD_rad_DTM[subplot_index,:-3,:],axis=1)))))
             #print(Plot_name,i,subplot_index,iter_count)
     print("average point density = ", pt_count/10.**4, " pts/m^2")
 

@@ -988,28 +988,28 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
     radDTM2 = np.zeros(N_plots)
     radDTMerr = np.zeros(N_plots)
     radDTM3 = np.zeros(N_plots)
-
+    order = [2,3,6,7,0,1,4,5]
     for pp in range(0,N_plots):
-        print(Plots[pp])
-        Plots_str = str(Plots[pp], 'utf-8')
+        print(Plots[order[pp]])
+        Plots_str = str(Plots[order[pp]], 'utf-8')
         # for 1 ha averages, want to avoid nodata
         # these should be identifiable based on penetration limit
         BA[pp] = BasalArea[Plots_str][0]
         BAerr[pp] = BasalArea[Plots_str][1]
-        mh[pp] = np.nansum(MacArthurHorn_PAD_mean[Plots[pp]])*layer_thickness
-        mherr[pp] = stats.sem(np.nansum(MacArthurHorn_PAD[Plots[pp]],axis=1)*layer_thickness)
-        mh_wt[pp] = np.nansum(MacArthurHorn_wt_PAD_mean[Plots[pp]])*layer_thickness
-        mh_wterr[pp] = stats.sem(np.nansum(MacArthurHorn_wt_PAD[Plots[pp]],axis=1)*layer_thickness)
-        radDTM2[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,1])*layer_thickness
-        radDTMerr[pp] = stats.sem(np.nansum(radiative_DTM_PAD[Plots[pp]][:,:,1],axis=1)*layer_thickness)
-        radDTM3[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[pp]][:,2])*layer_thickness
+        mh[pp] = np.nansum(MacArthurHorn_PAD_mean[Plots[order[pp]]])*layer_thickness
+        mherr[pp] = stats.sem(np.nansum(MacArthurHorn_PAD[Plots[order[pp]]],axis=1)*layer_thickness)
+        mh_wt[pp] = np.nansum(MacArthurHorn_wt_PAD_mean[Plots[order[pp]]])*layer_thickness
+        mh_wterr[pp] = stats.sem(np.nansum(MacArthurHorn_wt_PAD[Plots[order[pp]]],axis=1)*layer_thickness)
+        radDTM2[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[order[pp]]][:,1])*layer_thickness
+        radDTMerr[pp] = stats.sem(np.nansum(radiative_DTM_PAD[Plots[order[pp]]][:,:,1],axis=1)*layer_thickness)
+        radDTM3[pp] = np.nansum(radiative_DTM_PAD_mean[Plots[order[pp]]][:,2])*layer_thickness
 
     # annotate with stats
     r_sq_a =   aux.get_rsquared_annotation(BA,mh)
     r_sq_b =   aux.get_rsquared_annotation(BA,mh_wt)
     r_sq_c = aux.get_rsquared_annotation(BA,radDTM3)
 
-    plt.figure(figure_number, facecolor='White',figsize=[8,3.5])
+    plt.figure(figure_number, facecolor='White',figsize=[8,4])
     ax1 = plt.subplot2grid((1,3),(0,0))
     ax1.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
     ax1.set_ylabel('PAI',fontsize=axis_size)
@@ -1021,17 +1021,17 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
     ax1.fill_between(x_i,CI_l,CI_u,color='0.75')
     ax1.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
-        Plot_str = str(Plots[i], 'utf-8')
+        Plot_str = str(Plots[order[i]], 'utf-8')
         ax1.errorbar(BA[i],mh[i],xerr=BAerr[i],yerr=mherr[i],marker='None',
                     color=plot_colour[Plot_str],alpha=0.5)
         ax1.plot(BA[i],mh[i],marker=plot_marker[Plot_str],
                     color=plot_colour[Plot_str],linestyle='None')
 
-    ax2 = plt.subplot2grid((1,3),(0,1), sharex=ax1)#, sharey=ax1)
+    ax2 = plt.subplot2grid((1,3),(0,1), sharex=ax1, sharey=ax1)
     ax2.annotate('b - M1b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-    ax2.annotate(r_sq_b, xy=(0.5,0.05), xycoords='axes fraction',backgroundcolor='none',
-            horizontalalignment='center', verticalalignment='bottom', fontsize=axis_size)
-    ax2.set_ylabel('PAI',fontsize=axis_size)
+    ax2.annotate(r_sq_b, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',
+            horizontalalignment='right', verticalalignment='bottom', fontsize=axis_size)
+    #ax2.set_ylabel('PAI',fontsize=axis_size)
     ax2.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
 
     # plot linear regression
@@ -1039,32 +1039,34 @@ def plot_LAI_vs_basal_area(figure_name,figure_number,MacArthurHorn_PAD,MacArthur
     ax2.fill_between(x_i,CI_l,CI_u,color='0.75')
     ax2.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
-        Plot_str = str(Plots[i], 'utf-8')
+        Plot_str = str(Plots[order[i]], 'utf-8')
         ax2.errorbar(BA[i],mh_wt[i],xerr=BAerr[i],yerr=mh_wterr[i],marker='None',
                     color=plot_colour[Plot_str],alpha=0.5)
         ax2.plot(BA[i],mh_wt[i],marker=plot_marker[Plot_str],
-                    color=plot_colour[Plot_str],linestyle='None')
+                    color=plot_colour[Plot_str],linestyle='None',label=plot_label[Plot_str])
 
-    ax3 = plt.subplot2grid((1,3),(0,2), sharex=ax1)#, sharey=ax1)
+    lgd = ax2.legend(loc=10, bbox_to_anchor=(0.5, -0.5), ncol=4)
+
+    ax3 = plt.subplot2grid((1,3),(0,2), sharex=ax1, sharey=ax1)
     ax3.annotate('c - M2', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=axis_size)
-    ax3.annotate(r_sq_c, xy=(0.5,0.05), xycoords='axes fraction',backgroundcolor='none',
-            horizontalalignment='center', verticalalignment='bottom', fontsize=axis_size)
-    ax3.set_ylabel('PAI',fontsize=axis_size)
+    ax3.annotate(r_sq_c, xy=(0.95,0.05), xycoords='axes fraction',backgroundcolor='none',
+            horizontalalignment='right', verticalalignment='bottom', fontsize=axis_size)
+    #ax3.set_ylabel('PAI',fontsize=axis_size)
     ax3.set_xlabel('Basal Area / m$^2$ha$^{-1}$',fontsize=axis_size)
 
     m, c, r2, p, x_i, y_i, CI_u, CI_l, PI_u, PI_l = field.linear_regression(BA,radDTM3,conf=0.95)
     ax3.fill_between(x_i,CI_l,CI_u,color='0.75')
     ax3.plot(x_i,y_i,'-',color='black')
     for i in range(0,N_plots):
-        Plot_str = str(Plots[i], 'utf-8')
+        Plot_str = str(Plots[order[i]], 'utf-8')
         ax3.errorbar(BA[i],radDTM3[i],xerr=BAerr[i],yerr=radDTMerr[i],marker='None',
                     color=plot_colour[Plot_str],alpha=0.5)
         ax3.plot(BA[i],radDTM3[i],marker=plot_marker[Plot_str],
-                    color=plot_colour[Plot_str],linestyle='None',label=plot_label[Plot_str])
+                    color=plot_colour[Plot_str],linestyle='None')
 
-    ax3.legend(loc=4)
 
-    plt.tight_layout()
+    plt.subplots_adjust(hspace=0.4, wspace = 0.2, bottom = 0.4)
+    #plt.tight_layout()
     plt.savefig(figure_name)
     #plt.show()
     return 0

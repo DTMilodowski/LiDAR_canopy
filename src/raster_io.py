@@ -191,8 +191,13 @@ def write_raster_to_GeoTiff_UTM(array,geoTrans, OUTFILE_prefix, utm_zone, northe
     #srs.SetWellKnownGeogCS( 'EPSG:'+EPSG_CODE )
     dataset.SetProjection( srs.ExportToWkt() )
     # write array
-    dataset.GetRasterBand(1).SetNoDataValue( -9999 )
-    dataset.GetRasterBand(1).WriteArray( array )
+    if NBands==1:
+        dataset.GetRasterBand(1).SetNoDataValue( -9999 )
+        dataset.GetRasterBand(1).WriteArray( array )
+    else:
+        for bb in range(0,NBands):
+            dataset.GetRasterBand(bb+1).SetNoDataValue( -9999 )
+            dataset.GetRasterBand(bb+1).WriteArray( array[:,:,bb] )
     dataset = None
     return 0
     #-----------------------------------

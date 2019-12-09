@@ -646,7 +646,7 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
 
     ax1b = plt.subplot2grid((1,3),(0,1),sharex=ax1a,sharey=ax1a)
     ax1b.annotate('b - SAF03\n(moderately logged)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    ax1b.set_xlabel('percentage of voxels occluded voxels below\npenetration limit of first returns / %',fontsize=axis_size)
+    ax1b.set_xlabel('percentage of voxels below penetration limit of first returns / %',fontsize=axis_size)
 
     ax1c = plt.subplot2grid((1,3),(0,2),sharex=ax1a,sharey=ax1a)
     ax1c.annotate('c - SAF02\n(heavily logged)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)

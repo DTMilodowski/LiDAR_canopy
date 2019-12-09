@@ -2371,11 +2371,10 @@ def plot_niche_availability(figure_name,figure_number,PAD,heights):
         for ii in range(n_subplots):
             Shannon[pp*n_subplots+ii]=metrics.calculate_Shannon_index(P[ii])
     df = pd.DataFrame({'Plot':plots,'Subplot':subplots,'ShannonIndex':Shannon,
-                        'PAI':PAI,'Region':region,'forest_type':forest_type})
+                        'Region':region,'forest_type':forest_type})
     axa = plt.subplot2grid((1,5),(0,0),colspan=2)
-    axa.annotate('a - Shannon Index', xy=(0.95,0.95), xycoords='axes fraction',
-                    backgroundcolor='none',horizontalalignment='right',
-                    verticalalignment='top', fontsize=10)
+    axa.annotate('a - Shannon Index', xy=(0.05,0.05), xycoords='axes fraction',
+                    backgroundcolor='none',ha='left',va='bottom', fontsize=10)
     sns.violinplot(x='Region',y='ShannonIndex',data=df,inner="box",linewidth=0.5,
                     scale='width',hue="forest_type",hue_order=['OG1','OG2','ML','HL'],
                     order=['Maliau\nBasin', 'Danum\nValley',
@@ -2383,8 +2382,6 @@ def plot_niche_availability(figure_name,figure_number,PAD,heights):
                     palette = palette_colour,dodge=False,saturation=0.7,cut=0)
     axa.set_xlabel('')
     axa.set_ylabel('Shannon Index')
-    axa.legend_.remove()
-    axes =[axa,axb]
     for item in axa.get_xticklabels():
         item.set_rotation(90)
     axa.legend_.remove()
@@ -2421,8 +2418,6 @@ def plot_niche_availability(figure_name,figure_number,PAD,heights):
 
 
     # Now plot cumulative PAD distributions by region, coloured by forest type
-    fig = plt.figure('cal/val random',figsize=(4,3))
-    fig.clf()
     axb = plt.subplot2grid((1,5),(0,2),colspan=3)
     sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='Maliau\nBasin'],
                     color = palette_colour[0],label='Maliau Basin',
@@ -2458,13 +2453,16 @@ def plot_niche_availability(figure_name,figure_number,PAD,heights):
                     kde=False,norm_hist=False,bins=np.arange(0,14,0.5),ax=axb)
     axb.set_xlabel('Overlying plant area / m$^2$m$^{-2}$')
     axb.set_ylabel('Subcanopy volume / m$^3$ m$^{-2}$')
+    axb.annotate('b - Cumulative overstory PAD', xy=(0.95,0.95), xycoords='axes fraction',
+                    backgroundcolor='none',horizontalalignment='right',
+                    verticalalignment='top', fontsize=10)
     y_ticks = axb.get_yticks()
     axb.set_yticklabels(['{:3.0f}'.format(i*vertical_resolution/(2.*n_subplots)) for i in y_ticks])
     axb.set_xlim((0,14))
-    axb.legend()
+    axb.legend(loc = 'center right')
 
 
-    plt.subplots_adjust(wspace = 0.4,hspace=0.1,bottom=0.3)
+    plt.subplots_adjust(wspace = 1.4,hspace=0.2,bottom=0.3)
     plt.savefig(figure_name)
     #plt.show()
     return 0

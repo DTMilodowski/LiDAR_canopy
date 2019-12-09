@@ -666,11 +666,11 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
         limperc_ML = np.nanpercentile(lim_ML,[2.5,50,97.5],axis=0)
         limperc_HL = np.nanpercentile(lim_HL,[2.5,50,97.5],axis=0)
 
-        ax1a.fill_betweenx(heights[2:],limperc_OG[0][2:],limperc_OG[2][2:],color=cmap_colour[pp],alpha=0.3)
+        ax1a.fill_betweenx(heights[2:],limperc_OG[0][2:],limperc_OG[2][2:],color=palette_colour[pp],alpha=0.3)
         ax1a.plot(limperc_OG[1][2:],heights[2:],'-',c=palette_colour[pp],linewidth=1.5)
-        ax1b.fill_betweenx(heights[2:],limperc_ML[0][2:],limperc_ML[2][2:],color=cmap_colour[pp],alpha=0.3)
+        ax1b.fill_betweenx(heights[2:],limperc_ML[0][2:],limperc_ML[2][2:],color=palette_colour[pp],alpha=0.3)
         ax1b.plot(limperc_ML[1][2:],heights[2:],'-',c=palette_colour[pp],linewidth=1.5)
-        ax1c.fill_betweenx(heights[2:],limperc_HL[0][2:],limperc_HL[2][2:],color=cmap_colour[pp],alpha=0.3)
+        ax1c.fill_betweenx(heights[2:],limperc_HL[0][2:],limperc_HL[2][2:],color=palette_colour[pp],alpha=0.3)
         ax1c.plot(limperc_HL[1][2:],heights[2:],'-',c=palette_colour[pp],linewidth=1.5,label=pkeys[pp])
 
     ax1a.set_ylim(0,89)
@@ -685,7 +685,7 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
 
     plt.subplots_adjust(hspace=0.4, wspace = 0.3,bottom=0.2)
 
-    ax1c.legend(loc=5)
+    ax1c.legend(loc=5,title='grid resolution')
     plt.savefig(figure_name)
     #plt.show()
     return 0
@@ -967,7 +967,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,
     axa.set_xlabel('grid resolution')
     axa.set_ylabel('PAI',fontsize=axis_size)
 
-    axb = plt.subplot2grid((1,3),(0,1),sharex=axa,sharey=axa)
+    axb = plt.subplot2grid((2,3),(0,1),sharex=axa,sharey=axa)
     axb.set_title('b - M1b', fontsize=10)
     axb.set_ylabel('PAI',fontsize=axis_size)
     sns.violinplot(x='resolution',y='PAI_wt',data=df1,linewidth=0.5,inner='box',
@@ -975,7 +975,7 @@ def plot_PAI_sensitivity(figure_number,figure_name,
     axb.set_xlabel('grid resolution')
     axb.set_ylabel('')
 
-    axc = plt.subplot2grid((1,3),(0,2),sharex=axa,sharey=axa)
+    axc = plt.subplot2grid((2,3),(0,2),sharex=axa,sharey=axa)
     axc.set_title('c - M2', fontsize=10)
     sns.violinplot(x='resolution',y='PAI_rad',data=df1,linewidth=0.5,inner='box',
                     scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
@@ -1024,17 +1024,17 @@ def plot_PAI_sensitivity(figure_number,figure_name,
                         plot.append(plot_name[pp])
 
     df2 = pd.DataFrame({'plot' : plot,'density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_wt':PAI_wt,'PAI_rad':PAI_rad})
-    df2['density'][df['density']=='5']='05'
+    df2['density'][df2['density']=='5']='05'
     pp=0
-    axd = plt.subplot2grid((1,3),(1,0),sharey=axa)
+    axd = plt.subplot2grid((2,3),(1,0),sharey=axa)
     axd.set_title('d - M1a', fontsize=10)
     axd.set_ylabel('PAI',fontsize=axis_size)
-    snd.violinplot(x='density',y='PAI_MH',data=df2,linewidth=0.5,inner='box',
+    sns.violinplot(x='density',y='PAI_MH',data=df2,linewidth=0.5,inner='box',
                     scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axd.set_xlabel('pulse density / pts m$^{-2}$')
     axd.set_ylabel('PAI',fontsize=axis_size)
 
-    axe = plt.subplot2grid((1,3),(1,1),sharex=axd,sharey=axa)
+    axe = plt.subplot2grid((2,3),(1,1),sharex=axd,sharey=axa)
     axe.set_title('e - M1b', fontsize=10)
     axe.set_ylabel('PAI',fontsize=axis_size)
     sns.violinplot(x='density',y='PAI_wt',data=df2,linewidth=0.5,inner='box',
@@ -1043,9 +1043,9 @@ def plot_PAI_sensitivity(figure_number,figure_name,
 
     axe.set_xlabel('pulse density / pts m$^{-2}$')
 
-    axf = plt.subplot2grid((1,3),(1,2),sharex=axd,sharey=axa)
+    axf = plt.subplot2grid((2,3),(1,2),sharex=axd,sharey=axa)
     axf.set_title('f - M2', fontsize=10)
-    sns.violinplot(x='density',y='PAI_rad',data=df,linewidth=0.5,inner='box',
+    sns.violinplot(x='density',y='PAI_rad',data=df2,linewidth=0.5,inner='box',
                     scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axf.set_ylabel('')
     axf.set_xlabel('pulse density / pts m$^{-2}$')
@@ -1062,11 +1062,10 @@ def plot_PAI_sensitivity(figure_number,figure_name,
             ax.legend_.remove()
         else:
             axf.legend(loc =9, bbox_to_anchor=(-0.7, -0.3),ncol=3)
-    plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
+    plt.subplots_adjust(wspace = 0.2,hspace=0.4,bottom=0.2)
     plt.savefig(figure_name)
 
-
-return 0
+    return 0
 
 
 def plot_PAI_sensitivity_resolution(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_profiles_MH_BNorth,PAD_profiles_MH_E,

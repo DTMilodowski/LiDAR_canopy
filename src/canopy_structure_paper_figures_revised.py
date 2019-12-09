@@ -165,88 +165,71 @@ csp.plot_point_clouds_and_profiles(figure_name,figure_number, gps_pts_file,
                         inventory_PAD,inventory_PAD_all)
 
 """
-# Figure 9 - PAI and Shannon Index
+# Figure 5 - Sensitivity of PAI estimates to pulse density and resolution
+# Figure 6 - Sensitivity analysis of unsampled voxels
+# see sensitivity_analysis_figures_revised
 """
-figure_name = output_dir + 'Fig9_PAI_shannon_distributions.png'
-figure_number = 9
-csp.plot_PAI_Shannon_Index_distributions(figure_name,figure_number,MacArthurHorn_PAD)
-                                        #radiative_PAD)
+figure_name = output_dir + 'Fig5_PAI_sensitivity.png'
+
 """
-# Figure 12 - abundance of subcanopy volume for different levels of overstory PAD
+# Figure 7 - Niche availability
+# Plotting Shannon Index (panel a) and overstory PAD (panel b)
 """
-figure_name = output_dir + 'Fig10_cumulative_PAD_histograms.png'
-figure_number = 10
-csp.plot_cumulative_PAD_histograms(figure_name,figure_number,MacArthurHorn_PAD,heights)
+figure_name = output_dir + 'Fig7_niche_availability.png'
+figure_number = 7
+csp.plot_niche_availability(figure_name,figure_number,MacArthurHorn_PAD,heights)
 
-#-------------------------------
-# RESULTS - SENSITIVITY ANALYSIS
-# see sensitivity analysis plots
-#-------------------------------
-# Figure 8 - Sensitivity analysis of vertical profiles to spatial resolution
-# Comparison of OG vs Moderately Logged vs. Heavily Logged
-# <see sensitivity analysis script>
-
-# Figure 9 - Sensitivity analysis of unsampled voxels
-# <see sensitivity analysis script>
-
-# Figure 10 - Sensitivity analysis of vertical profiles to point density
-# <see sensitivity analysis script>
-
-# Figure 11 - Summary plots from sensitivity analysis for PAI vs. resolution
-# and point density
-# <see sensitivity analysis script>
-
+"""
 #-------------------------------
 # SUPPLEMENT
-# METHODS
 #-------------------------------
-"""
-# Figure S1 - "transmission ratio"
-"""
-las_file = 'Carbon_plot_point_cloud_buffer.las'
-all_lidar_pts = io.load_lidar_data(las_file)
-figure_number = 111
-figure_name = output_dir+'figS1_transmittance_ratios.png'
-csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
-
-"""
-# Figure S3 - comparison of Detto vs. modified algorithm
-"""
-figure_number = 112
-figure_name = output_dir+'figS2_LiDAR_profiles_comparison_test.png'
-csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
-                        lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
-                        MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
-                        radiative_PAD,radiative_PAD_mean,
-                        radiative_DTM_PAD,radiative_DTM_PAD_mean)
-
-
-"""
-#-------------------------------
-# Figure S4 - example crown model
+# Figure S1 - example crown model
 """
 field_data = field.load_crown_survey_data(field_file)
 a, b, CF, r_sq, p, H, D, H_i, PI_u, PI_l = field.retrieve_crown_allometry(allometry_file)
 a_ht, b_ht, CF_ht, a_A, b_A, CF_A = field.calculate_allometric_equations_from_survey(field_data)
-figure_number = 114
-figure_name = output_dir+'figS4_crown_model_example'
+figure_number = 111
+figure_name = output_dir+'figS1_crown_model_example'
 Plot_name = b'Belian'
 angle = 45.
 csp.plot_canopy_model(figure_number,figure_name,Plot_name,field_data,angle,
-                    a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+a_ht, b_ht, CF_ht, a_A, b_A, CF_A, a, b, CF)
+
 
 """
-# Figure S5 - Allometric models; include confidence intervals, and add vertical band
+# Figure S2 - Allometric models; include confidence intervals, and add vertical band
 # illustrating the 10 cm DBH cutoff
 """
-figure_name = output_dir + 'FigS5_allometric_relationships.png'
-figure_number = 115
+figure_name = output_dir + 'FigS2_allometric_relationships.png'
+figure_number = 112
 csp.plot_allometric_relationships(figure_name,figure_number,field_file,allometry_file)
 
-#-------------------------------
-# SUPPLEMENT
-# RESULTS
-#-------------------------------
+"""
+# Figure S3 - Leaf angle distributions
+# see canopy_structure_paper_leaf_angle_dist_revised
+"""
+
+"""
+# Figure S4 - "transmission ratio"
+"""
+las_file = 'Carbon_plot_point_cloud_buffer.las'
+all_lidar_pts = io.load_lidar_data(las_file)
+figure_number = 114
+figure_name = output_dir+'figS4_transmittance_ratios.png'
+csp.plot_transmittance_ratio(figure_number,figure_name,all_lidar_pts)
+
+
+"""
+# Figure S5- comparison of Detto vs. modified algorithm
+"""
+figure_number = 115
+figure_name = output_dir+'figS5_LiDAR_profiles_comparison_test.png'
+csp.plot_LiDAR_profiles_comparison(figure_name,figure_number,heights,heights_rad,
+lidar_profiles,MacArthurHorn_PAD,MacArthurHorn_PAD_mean,
+MacArthurHorn_wt_PAD,MacArthurHorn_wt_PAD_mean,
+radiative_PAD,radiative_PAD_mean,
+radiative_DTM_PAD,radiative_DTM_PAD_mean)
+
 """
 # Figure S6 comparison of profiles for the two Danum sites
 """
@@ -259,13 +242,17 @@ csp.plot_point_clouds_and_profiles_Danum(figure_name,figure_number, gps_pts_file
                         radiative_DTM_PAD,radiative_DTM_PAD_mean,
                         inventory_PAD,inventory_PAD_all)
 
-# Figure S7 - sensitivity analysis, confidence interval sensitivity to resolution
-
-# Figure S8 - sensitivity analysis, confidence interval sensitivity to density
-
-
+"""
+# Figure S7 - sensitivity of 1 ha profiles to pulse density
+# Figure S8 - relative CIs across profiles for different pulse densities
+# Figure S9 - sensitivity of 1 ha profiles to grid resolution
+# Figure S10- relative CIs across profiles for different grid resolutions
+# see sensitivity_analysis_figures_revised
+"""
+"""
 #===============================================================================
 # Summary statistics
+"""
 table_plots = [b'Belian',b'Seraya',b'DC1',b'DC2',b'E',b'LF',b'B North',b'B South']
 print("Plot    \tMH\t+/-\tMHwt\t+/-\trad_2\t+/-\trad_3\t+/-\tcv\t+/-")
 for pp,plot in enumerate(table_plots):
@@ -282,32 +269,3 @@ for pp,plot in enumerate(table_plots):
 
     print('%s     \t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.2f\t' % (plot,mh,mh_s,
                             mh_wt,mh_wt_s,r2,r2_s,r3,r3_s,cv,cv_s))
-    #print('%s\t    %.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f' % (plot,mh,mh_s,
-    #                        r2,r2_s,r3,r3_s,cv))
-
-"""
-================================================================================
-No Longer required
-================================================================================
-
-# Figure 6 - Cross-plot canopy layers
-figure_name = output_dir + 'Fig6_crossplot_LiDAR_PAD_residual_profiles.png'
-figure_number = 6
-csp.plot_canopy_layer_residuals(figure_name,figure_number,heights,MacArthurHorn_PAD,
-                MacArthurHorn_PAD_mean,radiative_DTM_PAD,radiative_DTM_PAD_mean)
-
-
-# Figure 8 - PAD distributions for distinct canopy layers
-figure_name = output_dir + 'Fig8_canopy_sublevel_PAD_test.png'
-figure_number = 8
-csp.plot_PAD_distributions_for_canopy_subdivisions(figure_name,figure_number,
-                            heights,heights_rad,MacArthurHorn_PAD,
-                            radiative_PAD,radiative_DTM_PAD)
-
-
-# Figure 11 - Cumulative PAD with Depth
-figure_name = output_dir + 'Fig11_cumulative_PAD_with_depth_test.png'
-figure_number = 11
-csp.plot_cumulative_PAD_vs_depth(figure_name,figure_number,MacArthurHorn_PAD,
-                        radiative_DTM_PAD, method=0)
-"""

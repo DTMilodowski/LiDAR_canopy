@@ -2234,8 +2234,7 @@ characterised by differing levels of PAD. This plot should highlight which
 environmental niches are particularly sensitive to disturbance across the
 disturbance gradient
 """
-def plot_cumulative_PAD_histograms(figure_name,figure_number,PAD,heights,
-                        horizontal_resolution = 20):
+def plot_cumulative_PAD_histograms(figure_name,figure_number,PAD,heights,horizontal_resolution = 20):
 
     vertical_resolution = 1
     fig_plots = [[b'Belian',b'Seraya'],[b'DC1',b'DC2'],[b'LF',b'E'],[b'B North',b'B South']]
@@ -2321,3 +2320,151 @@ def plot_cumulative_PAD_histograms(figure_name,figure_number,PAD,heights,
     fig.tight_layout()
     fig.savefig(figure_name)
     fig.show()
+
+
+"""
+Plot canopy Shannon Index and cumulative PAD distributions
+-------------------------------------------------------------------------------
+Summary of niche availability across degradation gradient. Panel (a) presents
+density distributions of canopy Shannon Index; panel (b) presents distributions
+of overlying PAD
+-------------
+Shannon Index is an indicator of the range of niches available, expressed in
+terms of the distribution of canopy density with height
+-------------
+Cumulative overstory PAD summarises subcanopy environments by calculating the
+volume occupied by sub-canopy environments with different levels of overstory
+vegetation, characterised by differing levels of PAD. This plot should highlight
+which environmental niches are particularly sensitive to disturbance across the
+disturbance gradient
+"""
+def plot_niche_availability(figure_name,figure_number,PAD,heights):
+
+    palette_colour = ['#30A000','#46E900','#1A2BCE','#E0007F']
+    fig = plt.figure(figure_number, facecolor='White',figsize=(7,3))
+
+    # Panel (a) violin plots of Shannon Index
+    n_plots = len(PAD.keys())
+    Shannon = np.zeros(n_subplots*n_plots)
+    subplots = np.zeros(n_subplots*n_plots)
+    plots = []
+    region = []
+    forest_type = []
+    for pp,plot in enumerate(PAD.keys()):
+        subplots[pp*n_subplots:(pp+1)*n_subplots]= np.arange(n_subplots)+1
+        plots+=[plot]*n_subplots
+        if plot in [b'Belian',b'Seraya']:
+            region += ['Maliau\nBasin']*n_subplots
+            forest_type += ['OG1']*n_subplots
+        elif plot in [b'DC1',b'DC2']:
+            region += ['Danum\nValley']*n_subplots
+            forest_type += ['OG2']*n_subplots
+        elif plot in [b'LF',b'E']:
+            region += ['SAFE\nmoderately\nlogged']*n_subplots
+            forest_type += ['ML']*n_subplots
+        else:
+            region += ['SAFE\nheavily\nlogged']*n_subplots
+            forest_type += ['HL']*n_subplots
+        P = PAD[plot][:,2:]
+        for ii in range(P.shape[1]):
+            P[np.isnan(P[:,ii])]=np.mean(P[np.isfinite(P[:,ii])])
+        for ii in range(n_subplots):
+            Shannon[pp*n_subplots+ii]=metrics.calculate_Shannon_index(P[ii])
+    df = pd.DataFrame({'Plot':plots,'Subplot':subplots,'ShannonIndex':Shannon,
+                        'PAI':PAI,'Region':region,'forest_type':forest_type})
+    axa = plt.subplot2grid((1,5),(0,0),colspan=2)
+    axa.annotate('a - Shannon Index', xy=(0.95,0.95), xycoords='axes fraction',
+                    backgroundcolor='none',horizontalalignment='right',
+                    verticalalignment='top', fontsize=10)
+    sns.violinplot(x='Region',y='ShannonIndex',data=df,inner="box",linewidth=0.5,
+                    scale='width',hue="forest_type",hue_order=['OG1','OG2','ML','HL'],
+                    order=['Maliau\nBasin', 'Danum\nValley',
+                    'SAFE\nmoderately\nlogged','SAFE\nheavily\nlogged'],
+                    palette = palette_colour,dodge=False,saturation=0.7,cut=0)
+    axa.set_xlabel('')
+    axa.set_ylabel('Shannon Index')
+    axa.legend_.remove()
+    axes =[axa,axb]
+    for item in axa.get_xticklabels():
+        item.set_rotation(90)
+    axa.legend_.remove()
+
+    # Panel (b) cumulative overstory PAD
+    vertical_resolution = 1
+    n_layers = heights.size-2
+    cumulative_PAD = np.zeros(n_subplots*n_plots*n_layers)
+    plots = []
+    region = []
+
+    # Loop through the plots calculating cumulative PAD for each subplot
+    for pp,plot in enumerate(PAD.keys()):
+
+        plots+=[plot]*n_subplots*n_layers
+        if plot in [b'Belian',b'Seraya']:
+            region += ['Maliau\nBasin']*n_subplots*n_layers
+        elif plot in [b'DC1',b'DC2']:
+            region += ['Danum\nValley']*n_subplots*n_layers
+        elif plot in [b'LF',b'E']:
+            region += ['SAFE\nmoderately\nlogged']*n_subplots*n_layers
+        else:
+            region += ['SAFE\nheavily\nlogged']*n_subplots*n_layers
+
+        P = PAD[plot][:,2:]
+        for ii in range(P.shape[1]):
+            P[np.isnan(P[:,ii])]=np.mean(P[np.isfinite(P[:,ii])])
+        for ii in range(n_subplots):
+            cumulative_PAD[pp*n_subplots*n_layers+ii*n_layers:pp*n_subplots*n_layers+(ii+1)*n_layers] = np.cumsum(P[ii,::-1])
+    # mask out areas above canopy (cuulative PAD=0)
+    mask = cumulative_PAD>0
+    dfb = pd.DataFrame({'Plot':np.asarray(plots)[mask],'cumulative_PAD':cumulative_PAD[mask],
+                        'Region':np.asarray(region)[mask]})
+
+
+    # Now plot cumulative PAD distributions by region, coloured by forest type
+    fig = plt.figure('cal/val random',figsize=(4,3))
+    fig.clf()
+    axb = plt.subplot2grid((1,5),(0,2),colspan=3)
+    sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='Maliau\nBasin'],
+                    color = palette_colour[0],label='Maliau Basin',
+                    kde=False,norm_hist=False,bins=np.arange(0,14,0.5),
+                    ax=axb,hist_kws={'alpha':1})
+    sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='Danum\nValley'],
+                    color = palette_colour[1],label='Danum Valley',
+                    kde=False,norm_hist=False,bins=np.arange(0,14,0.5),
+                    ax=axb,hist_kws={'alpha':1})
+    sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='SAFE\nmoderately\nlogged'],
+                    color = palette_colour[2],label='SAFE (moderately logged)',
+                    kde=False,norm_hist=False,bins=np.arange(0,14,0.5),
+                    ax=axb,hist_kws={'alpha':1})
+    sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='SAFE\nheavily\nlogged'],
+                    color = palette_colour[3],label='SAFE (heavily logged)',
+                    kde=False,norm_hist=False,bins=np.arange(0,14,0.5),
+                    ax=axb,hist_kws={'alpha':1})
+    sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='SAFE\nheavily\nlogged'],
+                    color = palette_colour[3],
+                    hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1},
+                    kde=False,norm_hist=False,bins=np.arange(0,14,0.5),ax=axb)
+    sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='SAFE\nmoderately\nlogged'],
+                    color = palette_colour[2],
+                    hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1},
+                    ax=axb,kde=False,norm_hist=False,bins=np.arange(0,14,0.5))
+    sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='Danum\nValley'],
+                    color = palette_colour[1],
+                    hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1}, ax=axb,
+                    kde=False,norm_hist=False,bins=np.arange(0,14,0.5),)
+    sns.distplot(dfb['cumulative_PAD'][dfb['Region']=='Maliau\nBasin'],
+                    color = palette_colour[0],
+                    hist_kws={"histtype": "step", "linewidth": 1.2,'alpha':1},
+                    kde=False,norm_hist=False,bins=np.arange(0,14,0.5),ax=axb)
+    axb.set_xlabel('Overlying plant area / m$^2$m$^{-2}$')
+    axb.set_ylabel('Subcanopy volume / m$^3$ m$^{-2}$')
+    y_ticks = axb.get_yticks()
+    axb.set_yticklabels(['{:3.0f}'.format(i*vertical_resolution/(2.*n_subplots)) for i in y_ticks])
+    axb.set_xlim((0,14))
+    axb.legend()
+
+
+    plt.subplots_adjust(wspace = 0.4,hspace=0.1,bottom=0.3)
+    plt.savefig(figure_name)
+    #plt.show()
+    return 0

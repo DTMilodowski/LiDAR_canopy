@@ -638,23 +638,24 @@ Plot fraction of unsampled layers in profile
 def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Belian,
                             penetration_lim_E,penetration_lim_BNorth):
     ## Belian
-    fig =plt.figure(figure_number, facecolor='White',figsize=[6,3])
+    fig =plt.figure(figure_number, facecolor='White',figsize=[7,3])
     ax1a = plt.subplot2grid((1,3),(0,0))
     ax1a.set_ylabel('height / m',fontsize=axis_size)
     ax1a.annotate('a - MLA01\n(old growth)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    ax1a.set_xlabel('occluded voxels / %',fontsize=axis_size)
+    #ax1a.set_xlabel('occluded voxels / %',fontsize=axis_size)
 
     ax1b = plt.subplot2grid((1,3),(0,1),sharex=ax1a,sharey=ax1a)
     ax1b.annotate('b - SAF03\n(moderately logged)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    ax1b.set_xlabel('occluded voxels / %',fontsize=axis_size)
+    ax1b.set_xlabel('percentage of voxels occluded voxels below\npenetration limit of first returns / %',fontsize=axis_size)
 
     ax1c = plt.subplot2grid((1,3),(0,2),sharex=ax1a,sharey=ax1a)
     ax1c.annotate('c - SAF02\n(heavily logged)', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    ax1c.set_xlabel('occluded voxels / %',fontsize=axis_size)
+    #ax1c.set_xlabel('occluded voxels / %',fontsize=axis_size)
 
     # loop through the subplots
     sp = [ax1a,ax1b,ax1c]
-    pkeys = ['5m','10m','20m','50m']
+    pkeys = ['5m','10m','20m']
+    palette_colour = ['#E0007F','#1A2BCE','#46E900']
     for pp in range(0,len(pkeys)):
 
         lim_OG = np.nanmean(penetration_lim_Belian[pkeys[pp]]['25'],axis=1)*100.
@@ -666,11 +667,11 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
         limperc_HL = np.nanpercentile(lim_HL,[2.5,50,97.5],axis=0)
 
         ax1a.fill_betweenx(heights[2:],limperc_OG[0][2:],limperc_OG[2][2:],color=cmap_colour[pp],alpha=0.3)
-        ax1a.plot(limperc_OG[1][2:],heights[2:],'-',c=cmap_colour[pp],linewidth=1.5)
+        ax1a.plot(limperc_OG[1][2:],heights[2:],'-',c=palette_colour[pp],linewidth=1.5)
         ax1b.fill_betweenx(heights[2:],limperc_ML[0][2:],limperc_ML[2][2:],color=cmap_colour[pp],alpha=0.3)
-        ax1b.plot(limperc_ML[1][2:],heights[2:],'-',c=cmap_colour[pp],linewidth=1.5)
+        ax1b.plot(limperc_ML[1][2:],heights[2:],'-',c=palette_colour[pp],linewidth=1.5)
         ax1c.fill_betweenx(heights[2:],limperc_HL[0][2:],limperc_HL[2][2:],color=cmap_colour[pp],alpha=0.3)
-        ax1c.plot(limperc_HL[1][2:],heights[2:],'-',c=cmap_colour[pp],linewidth=1.5,label=pkeys[pp])
+        ax1c.plot(limperc_HL[1][2:],heights[2:],'-',c=palette_colour[pp],linewidth=1.5,label=pkeys[pp])
 
     ax1a.set_ylim(0,89)
     ax1a.set_xlim(0,100)
@@ -682,7 +683,7 @@ def plot_penetration_limits(figure_number,figure_name,heights,penetration_lim_Be
         ax.locator_params(axis='x',nbins=5)
         ax.yaxis.set_ticks_position('both')
 
-    plt.subplots_adjust(hspace=0.4, wspace = 0.4,bottom=0.2)
+    plt.subplots_adjust(hspace=0.4, wspace = 0.3,bottom=0.2)
 
     ax1c.legend(loc=5)
     plt.savefig(figure_name)

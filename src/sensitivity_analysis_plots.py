@@ -888,126 +888,184 @@ def plot_profile_sensitivity_to_point_density_individual_CI(figure_number,figure
 """
 Plot sensitivity of PAI estimates
 """
-def plot_PAI_sensitivity(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_profiles_MH_BNorth,PAD_profiles_MH_E,
-                    PAD_profiles_rad_Belian,PAD_profiles_rad_BNorth,PAD_profiles_rad_E):
+def plot_PAI_sensitivity(figure_number,figure_name,
+                    res_profiles_MH_Belian,res_profiles_MH_BNorth,res_profiles_MH_E,
+                    res_profiles_rad_Belian,res_profiles_rad_BNorth,res_profiles_rad_E,
+                    res_profiles_wt_Belian,res_profiles_wt_BNorth,res_profiles_wt_E,
+                    dens_profiles_MH_Belian,dens_profiles_MH_BNorth,dens_profiles_MH_E,
+                    dens_profiles_rad_Belian,dens_profiles_rad_BNorth,dens_profiles_rad_E,
+                    dens_profiles_wt_Belian,dens_profiles_wt_BNorth,dens_profiles_wt_E):
 
-    res_keys = ['2m','5m','10m','20m','50m','100m']
+    res_keys = ['5m','10m','20m','50m','100m']
     N_res = len(res_keys)
-    dens_keys = ['5','20','40']
+    dens_keys = ['25']
     N_dens = len(dens_keys)
     dens = []
     res = []
     PAI_MH = np.arange(0)
     PAI_rad = np.arange(0)
+    PAI_wt = np.arange(0)
     plot = []
     plot_name = ['MLA01','SAF03','SAF02']
     for rr in range(0,N_res):
+        skip_rad=False
+        if res_keys[rr]=='5m':
+            skip_rad=True
         for dd in range(0,N_dens):
             for pp in range(0,len(plot_name)):
+                res_profiles_wt_Belian[res_keys[rr]][dens_keys[dd]][~np.isfinite(res_profiles_wt_Belian[res_keys[rr]][dens_keys[dd]])]=np.nan
+                res_profiles_wt_BNorth[res_keys[rr]][dens_keys[dd]][~np.isfinite(res_profiles_wt_BNorth[res_keys[rr]][dens_keys[dd]])]=np.nan
+                res_profiles_wt_E[res_keys[rr]][dens_keys[dd]][~np.isfinite(res_profiles_wt_E[res_keys[rr]][dens_keys[dd]])]=np.nan
                 if pp==0:
-                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
-                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
-                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    N_obs = np.sum(np.nanmean(res_profiles_MH_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    PAI_wt = np.append(PAI_wt,np.sum(np.nanmean(res_profiles_wt_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(res_profiles_MH_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    if skip_rad:
+                        PAI_rad = np.append(PAI_rad,np.zeros(N_obs)*np.nan)
+                    else:
+                        PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(res_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
                     for ii in range(0,N_obs):
                         dens.append(dens_keys[dd])
                         res.append(res_keys[rr])
                         plot.append(plot_name[pp])
                 if pp==1:
-                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
-                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
-                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    N_obs = np.sum(np.nanmean(res_profiles_MH_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    PAI_wt = np.append(PAI_wt,np.sum(np.nanmean(res_profiles_wt_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(res_profiles_MH_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    if skip_rad:
+                        PAI_rad = np.append(PAI_rad,np.zeros(N_obs)*np.nan)
+                    else:
+                        PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(res_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
                     for ii in range(0,N_obs):
                         dens.append(dens_keys[dd])
                         res.append(res_keys[rr])
                         plot.append(plot_name[pp])
                 if pp==2:
-                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(PAD_profiles_MH_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
-                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(PAD_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
-                    N_obs = np.sum(np.nanmean(PAD_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    N_obs = np.sum(np.nanmean(res_profiles_MH_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    PAI_wt = np.append(PAI_wt,np.sum(np.nanmean(res_profiles_wt_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(res_profiles_MH_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    if skip_rad:
+                        PAI_rad = np.append(PAI_rad,np.zeros(N_obs)*np.nan)
+                    else:
+                        PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(res_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+
                     for ii in range(0,N_obs):
                         dens.append(dens_keys[dd])
                         res.append(res_keys[rr])
                         plot.append(plot_name[pp])
 
-    df = pd.DataFrame({'plot' : plot,'point density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_rad':PAI_rad})
+    df1 = pd.DataFrame({'plot' : plot,'point density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_wt':PAI_wt,'PAI_rad':PAI_rad})
 
     pp=0
-    fig = plt.figure(figure_number, facecolor='White',figsize=(8,7))
-
-    mask = df['point density']=='5'
-
+    fig = plt.figure(figure_number, facecolor='White',figsize=(8,6))
     axa = plt.subplot2grid((2,3),(0,0))
-    axa.set_title('Point density = 5 pts m$^{-2}$', fontsize=10)
+    axa.set_title('a - M1a', fontsize=10)
     axa.set_ylabel('PAI',fontsize=axis_size)
-    axa.annotate('a - MacArthur-Horn', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
+    sns.violinplot(x='resolution',y='PAI_MH',data=df1,linewidth=0.5,inner='box',
                     scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
-    axa.set_ylabel('')
-    axa.set_xlabel('')
+    axa.set_xlabel('grid resolution')
     axa.set_ylabel('PAI',fontsize=axis_size)
 
-    axd = plt.subplot2grid((2,3),(1,0),sharex=axa,sharey=axa)
-    axd.annotate('d - multi return\nrad trans', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
+    axb = plt.subplot2grid((1,3),(0,1),sharex=axa,sharey=axa)
+    axb.set_title('b - M1b', fontsize=10)
+    axb.set_ylabel('PAI',fontsize=axis_size)
+    sns.violinplot(x='resolution',y='PAI_wt',data=df1,linewidth=0.5,inner='box',
                     scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
-    axd.set_ylabel('')
-    axd.set_xlabel('')
-    axd.set_ylabel('PAI',fontsize=axis_size)
-
-    # col two of matrix - point density is 20 pts m-2
-    mask = df['point density']=='20'
-
-    axb = plt.subplot2grid((2,3),(0,1),sharex=axa,sharey=axa)
-    axb.set_title('Point density = 20 pts m$^{-2}$', fontsize=10)
-    axb.annotate('b', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
-    axb.set_ylabel('')
-    axb.set_xlabel('')
     axb.set_xlabel('grid resolution')
+    axb.set_ylabel('')
 
-    axe = plt.subplot2grid((2,3),(1,1),sharex=axa,sharey=axa)
-    axe.annotate('e', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
-                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
-    axe.set_ylabel('')
-    axe.set_xlabel('grid resolution')
-
-    # col three of matrix - point density is 40 pts m-2
-    mask = df['point density']=='40'
-
-    axc = plt.subplot2grid((2,3),(0,2),sharex=axa,sharey=axa)
-    axc.set_title('Point density = 40 pts m$^{-2}$', fontsize=10)
-    axc.annotate('c', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='PAI_MH',data=df[mask],inner=None,linewidth=0.5,
+    axc = plt.subplot2grid((1,3),(0,2),sharex=axa,sharey=axa)
+    axc.set_title('c - M2', fontsize=10)
+    sns.violinplot(x='resolution',y='PAI_rad',data=df1,linewidth=0.5,inner='box',
                     scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axc.set_ylabel('')
-    axc.set_xlabel('')
+    axc.set_xlabel('grid resolution')
 
+    # --------------------------------------------------------------------------
+    # Now plot pulse density sensitivity
+    res_keys = ['20m']; N_res = len(res_keys)
+    dens_keys = ['5','10','15','20','25']; N_dens = len(dens_keys)
+    dens = []; res = []; plot = []
+    PAI_MH = np.arange(0); PAI_rad = np.arange(0); PAI_wt = np.arange(0)
+    plot_name = ['MLA01','SAF03','SAF02']
+    for rr in range(0,N_res):
+        for dd in range(0,N_dens):
+            for pp in range(0,len(plot_name)):
+                dens_profiles_wt_Belian[res_keys[rr]][dens_keys[dd]][~np.isfinite(dens_profiles_wt_Belian[res_keys[rr]][dens_keys[dd]])]=np.nan
+                dens_profiles_wt_BNorth[res_keys[rr]][dens_keys[dd]][~np.isfinite(dens_profiles_wt_BNorth[res_keys[rr]][dens_keys[dd]])]=np.nan
+                dens_profiles_wt_E[res_keys[rr]][dens_keys[dd]][~np.isfinite(dens_profiles_wt_E[res_keys[rr]][dens_keys[dd]])]=np.nan
+                if pp==0:
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(dens_profiles_MH_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_wt = np.append(PAI_wt,np.sum(np.nanmean(dens_profiles_wt_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(dens_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(dens_profiles_rad_Belian[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+                if pp==1:
+                    PAI_wt = np.append(PAI_wt,np.sum(np.nanmean(dens_profiles_wt_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(dens_profiles_MH_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(dens_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(dens_profiles_rad_E[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
+                if pp==2:
+                    PAI_wt = np.append(PAI_wt,np.sum(np.nanmean(dens_profiles_wt_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_MH = np.append(PAI_MH,np.sum(np.nanmean(dens_profiles_MH_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    PAI_rad = np.append(PAI_rad,np.sum(np.nanmean(dens_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1))
+                    N_obs = np.sum(np.nanmean(dens_profiles_rad_BNorth[res_keys[rr]][dens_keys[dd]],axis=1)[:,2:],axis=1).size
+                    for ii in range(0,N_obs):
+                        dens.append(dens_keys[dd])
+                        res.append(res_keys[rr])
+                        plot.append(plot_name[pp])
 
-    axf = plt.subplot2grid((2,3),(1,2),sharex=axa,sharey=axa)
-    axf.annotate('f', xy=(0.05,0.95), xycoords='axes fraction',backgroundcolor='none',horizontalalignment='left', verticalalignment='top', fontsize=10)
-    sns.violinplot(x='resolution',y='PAI_rad',data=df[mask],inner=None,linewidth=0.5,
+    df2 = pd.DataFrame({'plot' : plot,'density' : dens,'resolution' : res,'PAI_MH':PAI_MH,'PAI_wt':PAI_wt,'PAI_rad':PAI_rad})
+    df2['density'][df['density']=='5']='05'
+    pp=0
+    axd = plt.subplot2grid((1,3),(1,0),sharey=axa)
+    axd.set_title('d - M1a', fontsize=10)
+    axd.set_ylabel('PAI',fontsize=axis_size)
+    snd.violinplot(x='density',y='PAI_MH',data=df2,linewidth=0.5,inner='box',
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
+    axd.set_xlabel('pulse density / pts m$^{-2}$')
+    axd.set_ylabel('PAI',fontsize=axis_size)
+
+    axe = plt.subplot2grid((1,3),(1,1),sharex=axd,sharey=axa)
+    axe.set_title('e - M1b', fontsize=10)
+    axe.set_ylabel('PAI',fontsize=axis_size)
+    sns.violinplot(x='density',y='PAI_wt',data=df2,linewidth=0.5,inner='box',
+                    scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
+    axe.set_ylabel('')
+
+    axe.set_xlabel('pulse density / pts m$^{-2}$')
+
+    axf = plt.subplot2grid((1,3),(1,2),sharex=axd,sharey=axa)
+    axf.set_title('f - M2', fontsize=10)
+    sns.violinplot(x='density',y='PAI_rad',data=df,linewidth=0.5,inner='box',
                     scale='width',hue="plot",palette = colour,dodge=False,saturation=0.7,cut=0)
     axf.set_ylabel('')
-    axf.set_xlabel('')
+    axf.set_xlabel('pulse density / pts m$^{-2}$')
 
-    axa.set_ylim(ymax=14)
+    axa.set_ylim(top=13)
 
     axes =[axa,axb,axc,axd,axe,axf]
-    yticklabels = axb.get_yticklabels() + axc.get_yticklabels() + axe.get_yticklabels() + axf.get_yticklabels()
-    plt.setp(yticklabels,visible=False)
+    plt.setp(axb.get_yticklabels(),visible=False);plt.setp(axc.get_yticklabels(),visible=False)
+    plt.setp(axe.get_yticklabels(),visible=False);plt.setp(axf.get_yticklabels(),visible=False)
 
     for ax in axes:
         ax.yaxis.set_ticks_position('both')
-        if ax!=axe:
+        if ax!=axf:
             ax.legend_.remove()
         else:
-            axe.legend(loc = (0.3,-0.5))
-    plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.2)
+            axf.legend(loc =9, bbox_to_anchor=(-0.7, -0.3),ncol=3)
+    plt.subplots_adjust(wspace = 0.2,hspace=0.3,bottom=0.3)
     plt.savefig(figure_name)
 
-    #plt.show()
+
+return 0
 
 
 def plot_PAI_sensitivity_resolution(figure_number,figure_name,PAD_profiles_MH_Belian,PAD_profiles_MH_BNorth,PAD_profiles_MH_E,

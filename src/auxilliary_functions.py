@@ -18,7 +18,7 @@ def load_field_LAI(LAI_file):
 # Plot Subplot 'X0', 'Y0', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3'
 def load_boundaries(coordinate_list):
 
-    datatype = {'names': ('Plot', 'Subplot', 'X0', 'Y0', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3'), 'formats': ('S32','i8','f16','f16','f16','f16','f16','f16','f16','f16')}
+    datatype = {'names': ('Plot', 'Subplot', 'X0', 'Y0', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3'), 'formats': ('U32','i8','f16','f16','f16','f16','f16','f16','f16','f16')}
     coords = np.genfromtxt(coordinate_list, skip_header = 1, delimiter = ',',dtype=datatype)
     plot_name=np.unique(coords['Plot'])
     coordinate_dict = {}

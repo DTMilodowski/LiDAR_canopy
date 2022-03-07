@@ -3,8 +3,6 @@
 ###############################################################################################################
 import numpy as np
 import sys
-from matplotlib import pyplot as plt
-from matplotlib import rcParams
 
 sys.path.append('../')
 import LiDAR_io as io
@@ -14,8 +12,11 @@ import LiDAR_MacHorn_LAD_profiles as LAD1
 #---------------------------------------------------------------------------------------------------------------
 # Some filenames & params
 las_list = '/home/dmilodow/DataStore_DTM/BALI/LiDAR/Data/SAFE_las_files/las_list_full_path.txt' ## CHANGE AS REQUIRED
-las_files = np.genfromtxt(las_list,delimiter=',',dtype='S256')
-n_files = las_files.size
+las_files_temp = np.genfromtxt(las_list,delimiter=',',dtype='S256')
+las_files = []
+for ii, filepath in enumerate(las_files_temp):
+    las_files.append(filepath.decode('utf-8'))
+n_files = len(las_files)
 
 plot = 'OP'
 print(plot)
@@ -26,7 +27,7 @@ layer_thickness = 1.
 n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 subplot_width=20.
-kappa = 0.70
+kappa = 0.50
 
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 
@@ -41,7 +42,6 @@ polygon = np.array([[center[0]-plot_width/2.,center[1]-plot_width/2.],
 plot_lidar_pts, starting_ids, trees = io.load_lidar_data_by_polygon(las_list,polygon,max_pts_per_tree = 5*10**5, laz_files=False)
 N_trees = len(trees)
 plot_lidar_pts[plot_lidar_pts[:,2]<0,2]=0
-n_returns = pts.shape[0]
 
 
 # Loop through all the spatial scales of interest
@@ -96,13 +96,21 @@ for pp in range(0,n_subplots):
     sp_pts = lidar.filter_lidar_data_by_polygon(plot_lidar_pts[ids],subplots[pp],filter_by_first_return_location=False)
     pt_count += sp_pts.shape[0]
     # now get MacArthur-Horn profiles
+    """
     heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
     LAD_MH[pp,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile,
                                                     n_ground_returns,
                                                     layer_thickness,
                                                     kappa,
                                                     zero_nodata=False)
-
+    """
+    heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts, max_height, layer_thickness)
+    LAD_MH[pp,:] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,
+                                                    weighted_n_ground_returns,
+                                                    layer_thickness,
+                                                    kappa,
+                                                    zero_nodata=False)
+                                                                
     # Check for columns for which no pulses hit ground without interception.
     # Below the depth at which the canopy is not penetrated by first returns
     # some methods are infinite. Thus we need to expand the search radius
@@ -120,9 +128,17 @@ for pp in range(0,n_subplots):
 
         # get MacArthur-Horn profiles
         nodata_gaps = ~np.isfinite(LAD_MH[pp])
+        """
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts_iter, max_height, layer_thickness)
         LAD_MH[pp,nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile,
                                                                 n_ground_returns,
+                                                                layer_thickness,
+                                                                kappa,
+                                                                zero_nodata=False)[nodata_gaps]
+        """
+        heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts_iter, max_height, layer_thickness)
+        LAD_MH[subplot_index,nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,
+                                                                weighted_n_ground_returns,
                                                                 layer_thickness,
                                                                 kappa,
                                                                 zero_nodata=False)[nodata_gaps]
@@ -142,4 +158,4 @@ mask = heights <= 2.
 LAD_MH[:,mask]=np.nan
 MacArthurHorn_LAD[plot] = LAD_MH.copy()
 #----------------------------------------------------------------------------
-np.savez('lidar_canopy_profiles_adaptive_OP.npz',(MacArthurHorn_LAD))
+np.savez('lidar_canopy_profiles_adaptive_OP_for_synthesis.npz',(MacArthurHorn_LAD))

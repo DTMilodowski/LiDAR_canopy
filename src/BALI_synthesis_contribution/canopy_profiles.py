@@ -20,15 +20,15 @@ subplot_coordinate_file = '../BALI_subplot_coordinates_corrected.csv'
 #------------------------------------------------------------------------------------
 # PARAMETERS
 # define important parameters for canopy profile estimation
-Plots = [b'E',b'Belian',b'B North']
+Plots = ['E','Belian','B North']
 N_plots = len(Plots)
 max_height = 80
 layer_thickness = 1.
 n_layers = np.ceil(max_height/layer_thickness)
 minimum_height = 2.
 subplot_width=20.
-kappa = 0.70
-
+#kappa = 0.70
+kappa=0.50
 heights = np.arange(0,max_height,layer_thickness)+layer_thickness
 
 #------------------------------------------------------------------------------------
@@ -81,13 +81,21 @@ for pp in range(0,N_plots):
         pt_count += sp_pts.shape[0]
 
         # now get MacArthur-Horn profiles
+        """
         heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts, max_height, layer_thickness)
         LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile,
                                                                     n_ground_returns,
                                                                     layer_thickness,
                                                                     kappa,
                                                                     zero_nodata=False)
-
+        """
+        heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts, max_height, layer_thickness)
+        LAD_MH[subplot_index,:] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,
+                                                                    weighted_n_ground_returns,
+                                                                    layer_thickness,
+                                                                    kappa,
+                                                                    zero_nodata=False)
+        
         # Check for columns for which no pulses hit ground without interception.
         # Below the depth at which the canopy is not penetrated by first returns
         # some methods are infinite. Thus we need to expand the search radius
@@ -106,9 +114,17 @@ for pp in range(0,N_plots):
 
             # get MacArthur-Horn profiles
             nodata_gaps = ~np.isfinite(LAD_MH[subplot_index])
+            """
             heights,first_return_profile,n_ground_returns = LAD1.bin_returns(sp_pts_iter, max_height, layer_thickness)
             LAD_MH[subplot_index,nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(first_return_profile,
                                                                     n_ground_returns,
+                                                                    layer_thickness,
+                                                                    kappa,
+                                                                    zero_nodata=False)[nodata_gaps]
+            """
+            heights,weighted_return_profile,weighted_n_ground_returns = LAD1.bin_returns_weighted_by_num_returns(sp_pts_iter, max_height, layer_thickness)
+            LAD_MH[subplot_index,nodata_gaps] = LAD1.estimate_LAD_MacArthurHorn(weighted_return_profile,
+                                                                    weighted_n_ground_returns,
                                                                     layer_thickness,
                                                                     kappa,
                                                                     zero_nodata=False)[nodata_gaps]
@@ -128,4 +144,4 @@ for pp in range(0,N_plots):
     LAD_MH[:,mask]=np.nan
     MacArthurHorn_LAD[Plot_name] = LAD_MH.copy()
 #----------------------------------------------------------------------------
-np.savez('lidar_canopy_profiles_adaptive.npz',(MacArthurHorn_LAD))
+np.savez('lidar_canopy_profiles_adaptive_for_synthesis.npz',(MacArthurHorn_LAD))

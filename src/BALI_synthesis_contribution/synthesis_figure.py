@@ -13,7 +13,7 @@ import seaborn as sns
 sns.set()
 #---------------------------------------------------------------------------------------------------------------
 # Some filenames & params
-plots_b = [b'Belian',b'E',b'B North',b'OP']
+#plots = [b'Belian',b'E',b'B North',b'OP']
 plots = ['Belian','E','B North','OP']
 chm_files = ['CHM_50cm_Belian.npy','CHM_50cm_E.npy','CHM_50cm_BNorth.npy','CHM_50cm_OP.npy']
 chm = {}
@@ -23,10 +23,10 @@ xx,yy=np.meshgrid(x,y)
 for pp,plot in enumerate(plots):
     chm[plot]=np.load(chm_files[pp])
 
-profile_file = 'lidar_canopy_profiles_adaptive.npz'
-canopy_profiles = np.load(profile_file)['arr_0'][()]
-op_file = 'lidar_canopy_profiles_adaptive_OP.npz'
-canopy_profiles[b'OP']=np.load(op_file)['arr_0'][()]['OP']
+profile_file = 'lidar_canopy_profiles_adaptive_for_synthesis.npz'
+canopy_profiles = np.load(profile_file,allow_pickle=True)['arr_0'][()]
+op_file = 'lidar_canopy_profiles_adaptive_OP_for_synthesis.npz'
+canopy_profiles['OP']=np.load(op_file,allow_pickle=True)['arr_0'][()]['OP']
 
 gps_pts_file = '../GPS_points_file_for_least_squares_fitting_sensitivity_analysis_version.csv'
 datatype = {'names': ('plot', 'x', 'y', 'x_prime', 'y_prime'), 'formats': ('<U16','f16','f16','f16','f16')}
@@ -64,8 +64,8 @@ labels = ['OGF (MLA-01)','MLF (SAF-03)','HLF (SAF-02)','OP']
 fig,axes = plt.subplots(nrows=1,ncols=4,figsize=[10,4.5],subplot_kw={'aspect':'equal',
                         'xlim':(0,100),'ylim':(0,100)})
 for pp,ax in enumerate(axes):
-    mean_prof = np.mean(canopy_profiles[plots_b[pp]],axis=0)
-    sem_prof = stats.sem(canopy_profiles[plots_b[pp]],axis=0)
+    mean_prof = np.mean(canopy_profiles[plots[pp]],axis=0)
+    sem_prof = stats.sem(canopy_profiles[plots[pp]],axis=0)
     # chm
     im=ax.pcolormesh(xx,yy,chm[plots[pp]],cmap='viridis',vmin=0,vmax=80)
     # profile

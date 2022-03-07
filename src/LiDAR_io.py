@@ -14,25 +14,25 @@ import time
 
 # get bounding box from las file
 def get_lasfile_bbox(las_file):
-    lasFile = las.file.File(las_file,mode='r-')
+    lasFile = las.read(las_file)
     max_xyz = lasFile.header.max
     min_xyz = lasFile.header.min
     UR = np.asarray([max_xyz[0],max_xyz[1]])
     LR = np.asarray([max_xyz[0],min_xyz[1]])
     UL = np.asarray([min_xyz[0],max_xyz[1]])
     LL = np.asarray([min_xyz[0],min_xyz[1]])
-    lasFile.close()
+    #lasFile.close()
     return UR, LR, UL, LL
 
 # get bounding box from many las files or laz files
 def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
-    las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
+    las_files = np.genfromtxt(file_list,delimiter=',',dtype='unicode')
     n_files = las_files.size
 
     if laz_files:
         temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
         os.system("las2las %s %s" % (las_files[0],temp_file))
-        lasFile = las.file.File('%s' % temp_file,mode='r-')
+        lasFile = las.read('%s' % temp_file)
         max_xyz = lasFile.header.max
         min_xyz = lasFile.header.min
         xmin = min_xyz[0]
@@ -41,13 +41,13 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
         ymax = max_xyz[1]
         zmin = min_xyz[2]
         zmax = max_xyz[2]
-        lasFile.close()
+        #lasFile.close()
         os.system("rm %s" % temp_file)
 
         for i in range(1,n_files):
             temp_file = 'temp_%i.las' % np.round(np.random.random()*10**9).astype(int)
             os.system("las2las %s %s" % (las_files[i],temp_file))
-            lasFile = las.file.File('%s' % temp_file,mode='r-')
+            lasFile = las.read('%s' % temp_file)
             max_xyz = lasFile.header.max
             min_xyz = lasFile.header.min
             xmin = min(xmin,min_xyz[0])
@@ -56,12 +56,12 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
             ymax = max(ymax,max_xyz[1])
             zmin = min(zmin,max_xyz[2])
             zmax = max(zmax,max_xyz[2])
-            lasFile.close()
+            #lasFile.close()
             os.system("rm %s" % temp_file)
 
     else:
 
-        lasFile = las.file.File(las_files[0],mode='r-')
+        lasFile = las.read(las_files[0])
         max_xyz = lasFile.header.max
         min_xyz = lasFile.header.min
         xmin = min_xyz[0]
@@ -70,10 +70,10 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
         ymax = max_xyz[1]
         zmin = min_xyz[2]
         zmax = max_xyz[2]
-        lasFile.close()
+        #lasFile.close()
 
         for i in range(1,n_files):
-            lasFile = las.file.File(las_files[i],mode='r-')
+            lasFile = las.read(las_files[i])
             max_xyz = lasFile.header.max
             min_xyz = lasFile.header.min
             xmin = min(xmin,min_xyz[0])
@@ -82,7 +82,7 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
             ymax = max(ymax,max_xyz[1])
             zmin = min(zmin,min_xyz[2])
             zmax = max(zmax,max_xyz[2])
-            lasFile.close()
+            #lasFile.close()
 
     UR = np.asarray([xmax,ymax])
     LR = np.asarray([xmax,ymin])
@@ -99,7 +99,7 @@ def get_bbox_of_multiple_tiles(file_list,laz_files=False,return_zlim=False):
 # Returns: - a numpy array containing the points
 # Added checks to see what scan angle information is available
 def load_lidar_data(las_file,print_npts=True):
-    lasFile = las.file.File(las_file,mode='r')
+    lasFile = las.read(las_file)
 
     try:
         pts = np.vstack((lasFile.x, lasFile.y, lasFile.z, lasFile.return_num,
@@ -121,12 +121,12 @@ def load_lidar_data(las_file,print_npts=True):
     pts = pts[pts[:,2]>=0,:]
     if print_npts:
         print("loaded ", pts[:,0].size, " points")
-    lasFile.close()
+    #lasFile.close()
     return pts
 
 # a similar script, but now only loading points within bbox into memory
 def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
-    lasFile = las.file.File(las_file,mode='r')
+    lasFile = las.read(las_file)
 
     # conditions for points to be included
     X_valid = np.logical_and((lasFile.x <= E), (lasFile.x >= W))
@@ -158,7 +158,7 @@ def load_lidar_data_by_bbox(las_file,N,S,E,W,print_npts=True):
 
     if print_npts:
         print("loaded ", pts[:,0].size, " points")
-    lasFile.close()
+    #lasFile.close()
     return pts
 
 #---------------------------------------------------------------------------
@@ -197,7 +197,7 @@ def create_KDTree(pts,max_pts_per_tree = 10**6):
 
 # find all las files from a list that are located within a specified polygon
 def find_las_files_by_polygon(file_list,polygon,print_keep=False):
-    las_files = np.genfromtxt(file_list,delimiter=',',dtype='S256')
+    las_files = np.genfromtxt(file_list,delimiter=',',dtype='unicode')
     keep = []
     n_files = las_files.size
     for i in range(0,n_files):

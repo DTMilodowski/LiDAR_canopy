@@ -70,7 +70,7 @@ for pp,ax in enumerate(axes):
     im=ax.pcolormesh(xx,yy,chm[plots[pp]],cmap='viridis',vmin=0,vmax=80)
     # profile
     ax.plot(mean_prof*100,heights,'-',color='white')
-    ax.fill_betweenx(heights,(mean_prof-sem_prof)*100,(mean_prof+sem_prof)*100,color='white',alpha=0.5,linewidth=0)
+    ax.fill_betweenx(heights,(mean_prof-sem_prof*2)*100,(mean_prof+sem_prof*2)*100,color='white',alpha=0.5,linewidth=0)
     # N arrow
     N = n_arrow[plots[pp]]
     N_txt = n_arrow_text[plots[pp]]
